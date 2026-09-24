@@ -5104,6 +5104,37 @@ public class ChatActivityEnterView extends FrameLayout implements
                 }
             });
         }
+        if (audioToSendMessageObject == null && messageEditText != null && !TextUtils.isEmpty(messageEditText.getText()) && parentFragment != null) {
+            options.add(R.drawable.msg_translate, "Tarjima qilib yozish", () -> {
+                if (messageSendPreview != null) {
+                    messageSendPreview.dismiss(false);
+                    messageSendPreview = null;
+                }
+                AndroidUtilities.runOnUIThread(() -> org.telegram.ui.MgTranslate.chooseLanguage(parentFragment, "Qaysi tilga tarjima qilinsin?", lang -> {
+                    if (messageEditText == null) {
+                        return;
+                    }
+                    CharSequence[] arr = {new android.text.SpannableStringBuilder(messageEditText.getText())};
+                    ArrayList<TLRPC.MessageEntity> ents = MediaDataController.getInstance(currentAccount).getEntities(arr, true, false);
+                    String src = arr[0] == null ? "" : arr[0].toString();
+                    if (TextUtils.isEmpty(src.trim())) {
+                        return;
+                    }
+                    org.telegram.ui.MgTranslate.translate(currentAccount, src, ents, lang, (res, err) -> {
+                        if (res != null && messageEditText != null) {
+                            ArrayList<TLRPC.MessageEntity> re = res.entities == null ? new ArrayList<>() : new ArrayList<>(res.entities);
+                            CharSequence out = applyMessageEntities(re, res.text, messageEditText.getPaint().getFontMetricsInt());
+                            out = Emoji.replaceEmoji(out, messageEditText.getPaint().getFontMetricsInt(), false);
+                            setFieldText(out);
+                            messageEditText.setSelection(messageEditText.length());
+                            org.telegram.ui.Components.BulletinFactory.of(parentFragment).createSimpleBulletin(R.raw.contact_check, "Tarjima qilindi: " + org.telegram.ui.MgTranslate.nameOf(lang) + ". Tekshirib yuboring.").show();
+                        } else if (parentFragment != null) {
+                            org.telegram.ui.Components.BulletinFactory.of(parentFragment).createErrorBulletin(err == null ? "Tarjima qilib bo'lmadi" : err).show();
+                        }
+                    });
+                }), 200);
+            });
+        }
         options.setupSelectors();
         if (sendWhenOnlineButton != null) {
             TLRPC.User user = parentFragment == null ? null : parentFragment.getCurrentUser();

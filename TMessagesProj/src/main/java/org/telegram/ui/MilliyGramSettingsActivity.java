@@ -47,6 +47,11 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
     private static final int ID_FOLDER_ICONS = 13;
     private static final int ID_GHOST = 14;
     private static final int ID_FOLDERS = 15;
+    private static final int ID_THEMES = 16;
+    private static final int ID_CHAT_BG = 17;
+    private static final int ID_TR_IN = 18;
+    private static final int ID_TR_OUT = 19;
+    private static final int ID_SIGNATURE = 20;
 
     private static final int[][] FOCUS_PRESETS = {
             {22 * 60, 7 * 60},
@@ -88,9 +93,17 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
         items.add(UItem.asShadow("Yashirin bo'lim va chat qulfi alohida kodlarga ega. Yashirin chatlarni ko'rish: bosh ekranda qidiruv tugmasini uzoq bosing."));
 
         items.add(UItem.asHeader("Dizayn"));
+        items.add(UItem.asButton(ID_THEMES, R.drawable.msg_theme, "🎨 MilliyGram mavzulari", MgThemeCurrentName()));
+        items.add(UItem.asButton(ID_CHAT_BG, R.drawable.msg_background, "🖼 Chat foni"));
         items.add(UItem.asCheck(ID_HOLIDAY, "Bayram tabriklari").setChecked(MgConfig.isHolidayDecorEnabled()));
         items.add(UItem.asButton(ID_FOLDERS, R.drawable.msg_folders, "📁 Jildlar (ikonkalar, lokal jildlar)"));
         items.add(UItem.asShadow("Ikonkali jildlarda tanlangan jild nomi tepada yoziladi. Jildni uzoq bosib tartiblash va tahrirlash mumkin. Bayram kunlari sarlavhada tabrik ko'rinadi."));
+
+        items.add(UItem.asHeader("Tarjima va uzatish"));
+        items.add(UItem.asButton(ID_TR_IN, R.drawable.msg_translate, "Xabarlarni tarjima qilish tili", MgTranslate.nameOf(org.telegram.ui.Components.TranslateAlert2.getToLanguage())));
+        items.add(UItem.asButton(ID_TR_OUT, R.drawable.msg_language, "Yozganimni tarjima qilish tili", MgTranslate.nameOf(MgTranslate.lastOutgoingLang())));
+        items.add(UItem.asButton(ID_SIGNATURE, R.drawable.msg_edit, "✍️ Maxsus uzatish imzosi", org.telegram.messenger.MgConfig.getString("mg_cf_signature", "").isEmpty() ? "yo'q" : "bor"));
+        items.add(UItem.asShadow("Xabarni uzoq bosing → \"Maxsus uzatish\": matnni tahrirlab, havolalarsiz, tarjima qilib, o'z nomingizdan uzating. Yozgan matningizni tarjima qilish: yuborish tugmasini uzoq bosing → \"Tarjima qilib yozish\"."));
 
         items.add(UItem.asHeader("Zaxira"));
         items.add(UItem.asButton(ID_EXPORT, R.drawable.msg_copy, "Sozlamalarni nusxalash"));
@@ -151,6 +164,26 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
             case ID_FOLDERS:
                 presentFragment(new MgFoldersActivity());
                 break;
+            case ID_THEMES:
+                presentFragment(new MgThemesActivity());
+                break;
+            case ID_CHAT_BG:
+                presentFragment(new WallpapersListActivity(WallpapersListActivity.TYPE_ALL));
+                break;
+            case ID_TR_IN:
+                MgTranslate.chooseTarget(this, "Xabarlar qaysi tilga tarjima qilinsin?", org.telegram.ui.Components.TranslateAlert2.getToLanguage(), lang -> {
+                    org.telegram.ui.Components.TranslateAlert2.setToLanguage(lang);
+                    if (listView != null) listView.adapter.update(true);
+                });
+                break;
+            case ID_TR_OUT:
+                MgTranslate.chooseLanguage(this, "Yozganingiz qaysi tilga tarjima qilinsin?", lang -> {
+                    if (listView != null) listView.adapter.update(true);
+                });
+                break;
+            case ID_SIGNATURE:
+                MgCustomForward.editSignature(this, null);
+                break;
             case ID_EXPORT: {
                 String json = MgConfig.exportSettings();
                 if (json != null && AndroidUtilities.addToClipboard(json)) {
@@ -180,6 +213,25 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
                 break;
             }
         }
+    }
+
+    private static String MgThemeCurrentName() {
+        try {
+            org.telegram.ui.ActionBar.Theme.ThemeInfo t = org.telegram.ui.ActionBar.Theme.getActiveTheme();
+            if (t != null) {
+                boolean night = "Dark Blue".equals(t.getKey());
+                if (night || "Blue".equals(t.getKey())) {
+                    int[] ids = night ? org.telegram.ui.ActionBar.Theme.MG_THEME_NIGHT_IDS : org.telegram.ui.ActionBar.Theme.MG_THEME_DAY_IDS;
+                    for (int i = 0; i < ids.length; i++) {
+                        if (ids[i] == t.currentAccentId) {
+                            return org.telegram.ui.ActionBar.Theme.MG_THEME_NAMES[i];
+                        }
+                    }
+                }
+            }
+        } catch (Throwable ignore) {
+        }
+        return "";
     }
 
     @Override

@@ -164,8 +164,66 @@ public class Theme {
         return info.firstAccentIsDefault ? DEFALT_THEME_ACCENT_ID : 0;
     }
 
+    // MilliyGram mavzulari: nom, kunduzgi va tungi accent id, ko'rsatish rangi
+    public static final String[] MG_THEME_NAMES = {"Ko'k osmon", "Feruza · Samarqand", "Oltin · Buxoro", "Anor", "Paxta", "Atlas", "Material You"};
+    public static final String[] MG_THEME_PATTERNS = {"Milliy naqsh", "Girih", "Suzani", "Anor", "Paxta gullari", "Atlas (abr)", "Milliy naqsh"};
+    public static final int[] MG_THEME_DAY_IDS = {12, 13, 14, 9, 10, 11, 8};
+    public static final int[] MG_THEME_NIGHT_IDS = {0, 1, 2, 3, 4, 5, 6};
+    public static final int[] MG_THEME_COLORS = {0xFF0B63CE, 0xFF0E8C94, 0xFFB8862B, 0xFFC0392B, 0xFF3A9A4A, 0xFF8E3AA8, 0xFF6750A4};
+
+    /** MilliyGram naqsh slug'i → ilova ichidagi SVG (0 — serverdagi naqsh) */
+    public static int mgPatternRes(String slug) {
+        if (slug == null || !slug.startsWith("mg_")) {
+            return 0;
+        }
+        switch (slug) {
+            case MG_PATTERN_SLUG: return R.raw.mg_pattern;
+            case "mg_girih": return R.raw.mg_pattern_girih;
+            case "mg_suzani": return R.raw.mg_pattern_suzani;
+            case "mg_anor": return R.raw.mg_pattern_anor;
+            case "mg_paxta": return R.raw.mg_pattern_paxta;
+            case "mg_atlas": return R.raw.mg_pattern_atlas;
+        }
+        return 0;
+    }
+
+    private static void mgApplyExtraThemes(ThemeInfo info, boolean night) {
+        if (!night) {
+            mgApplyNationalAccent(info, 13, 0xFF0E8C94, 0xFFCDEFEA, 0xFFE3F6EF, 0xFFBFE6E0, 0xFFE2F2EC, 0xFFA8DAD4, 0xFFD3ECE6, 45, 40, "mg_girih");
+            mgApplyNationalAccent(info, 14, 0xFFB8862B, 0xFFFBEBC6, 0xFFFFF4DC, 0xFFF1DDB0, 0xFFFAEED3, 0xFFE8CD95, 0xFFF4E3BE, 45, 38, "mg_suzani");
+            mgApplyNationalAccent(info, 9, 0xFFC0392B, 0xFFFBD9D3, 0xFFFDE8E2, 0xFFF3C9C1, 0xFFFAE1DA, 0xFFE9B1A6, 0xFFF6D3CA, 45, 38, "mg_anor");
+            mgApplyNationalAccent(info, 10, 0xFF3A9A4A, 0xFFDDF3D8, 0xFFEEF8E6, 0xFFD2EBC9, 0xFFEAF5E2, 0xFFBFE0B3, 0xFFE1F0D8, 45, 38, "mg_paxta");
+            mgApplyNationalAccent(info, 11, 0xFF8E3AA8, 0xFFEBD9F5, 0xFFF5E6FA, 0xFFDCC5EC, 0xFFF1E3F7, 0xFFCBAEE3, 0xFFE8D5F2, 45, 38, "mg_atlas");
+        } else {
+            mgApplyNationalAccent(info, 1, 0xFF2EC4C4, 0xFF15605F, 0xFF1D4F66, 0xFF06201F, 0xFF0B2E2B, 0xFF041716, 0xFF0E3A36, 0, 45, "mg_girih");
+            mgApplyNationalAccent(info, 2, 0xFFE0B04A, 0xFF6B4E14, 0xFF5A3F10, 0xFF1E1606, 0xFF2A1F0A, 0xFF140F04, 0xFF33260C, 0, 45, "mg_suzani");
+            mgApplyNationalAccent(info, 3, 0xFFFF6B5A, 0xFF7A2A22, 0xFF5E1F28, 0xFF220908, 0xFF2E0E0C, 0xFF170606, 0xFF3A1210, 0, 45, "mg_anor");
+            mgApplyNationalAccent(info, 4, 0xFF5BC56A, 0xFF1F5A28, 0xFF1A4A34, 0xFF081A0B, 0xFF0E2612, 0xFF051106, 0xFF123018, 0, 45, "mg_paxta");
+            mgApplyNationalAccent(info, 5, 0xFFC77DFF, 0xFF4E2266, 0xFF3A1E5C, 0xFF160A1F, 0xFF21102D, 0xFF0E0614, 0xFF2A1438, 0, 45, "mg_atlas");
+        }
+        // Material You (Android 12+): ranglar telefon fon rasmidan olinadi
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= 31 && ApplicationLoader.applicationContext != null) {
+                android.content.res.Resources r = ApplicationLoader.applicationContext.getResources();
+                if (!night) {
+                    mgApplyNationalAccent(info, 8, r.getColor(android.R.color.system_accent1_600, null), r.getColor(android.R.color.system_accent1_100, null), r.getColor(android.R.color.system_accent2_100, null),
+                            r.getColor(android.R.color.system_accent1_200, null), r.getColor(android.R.color.system_neutral1_50, null), r.getColor(android.R.color.system_accent2_200, null), r.getColor(android.R.color.system_accent3_100, null), 45, 35, MG_PATTERN_SLUG);
+                } else {
+                    mgApplyNationalAccent(info, 6, r.getColor(android.R.color.system_accent1_200, null), r.getColor(android.R.color.system_accent1_700, null), r.getColor(android.R.color.system_accent2_700, null),
+                            r.getColor(android.R.color.system_neutral1_900, null), r.getColor(android.R.color.system_accent1_900, null), r.getColor(android.R.color.system_neutral2_900, null), r.getColor(android.R.color.system_accent2_900, null), 0, 45, MG_PATTERN_SLUG);
+                }
+            }
+        } catch (Throwable ignore) {
+        }
+    }
+
     private static void mgApplyNationalAccent(ThemeInfo info, int id, int accent, int myMessages, int myMessagesGradient,
                                               int bg, int bg1, int bg2, int bg3, int rotation, int intensity) {
+        mgApplyNationalAccent(info, id, accent, myMessages, myMessagesGradient, bg, bg1, bg2, bg3, rotation, intensity, MG_PATTERN_SLUG);
+    }
+
+    private static void mgApplyNationalAccent(ThemeInfo info, int id, int accent, int myMessages, int myMessagesGradient,
+                                              int bg, int bg1, int bg2, int bg3, int rotation, int intensity, String slug) {
         if (info.themeAccentsMap == null) {
             return;
         }
@@ -182,7 +240,7 @@ public class Theme {
         a.backgroundGradientOverrideColor3 = bg3;
         a.backgroundRotation = rotation;
         a.patternIntensity = intensity / 100.0f;
-        a.patternSlug = MG_PATTERN_SLUG;
+        a.patternSlug = slug;
     }
 
 
@@ -289,7 +347,8 @@ public class Theme {
                 ArrayList<ThemeAccent> mgCreated = null;
                 for (int a = 0, N = accents.size(); a < N; a++) {
                     ThemeAccent accent = accents.get(a);
-                    if (!MG_PATTERN_SLUG.equals(accent.patternSlug)) {
+                    final int mgRes = mgPatternRes(accent.patternSlug);
+                    if (mgRes == 0) {
                         continue;
                     }
                     File wallpaper = accent.getPathToWallpaper();
@@ -297,7 +356,7 @@ public class Theme {
                         try {
                             int w = Math.min(AndroidUtilities.displaySize.x, AndroidUtilities.displaySize.y);
                             int h = Math.max(AndroidUtilities.displaySize.x, AndroidUtilities.displaySize.y);
-                            Bitmap mgPattern = SvgHelper.getBitmap(R.raw.mg_pattern, w, h, Color.BLACK, 1f, SvgHelper.ScaleMode.ByWidth);
+                            Bitmap mgPattern = SvgHelper.getBitmap(mgRes, w, h, Color.BLACK, 1f, SvgHelper.ScaleMode.ByWidth);
                             if (mgPattern != null) {
                                 createWallpaperForAccent(mgPattern, true, null, accent);
                                 mgPattern.recycle();
@@ -3981,6 +4040,7 @@ public class Theme {
                 );
         mgApplyNationalAccent(themeInfo, MG_DAY_ACCENT_ID, 0xFF0B63CE, 0xFFD3E9FF, 0xFFE2F1FF,
                 0xFFC9DDF6, 0xFFE4EEFA, 0xFFB8D3F2, 0xFFDDE9F7, 45, 40);
+        mgApplyExtraThemes(themeInfo, false);
         sortAccents(themeInfo);
         themes.add(currentDayTheme = defaultTheme = themeInfo);
         themesDict.put("Blue", themeInfo);
@@ -4007,6 +4067,7 @@ public class Theme {
                 );
         mgApplyNationalAccent(themeInfo, MG_NIGHT_ACCENT_ID, 0xFF3D9BFF, 0xFF1B4E91, 0xFF0F3A78,
                 0xFF04163A, 0xFF0A2A5E, 0xFF021030, 0xFF0B3470, 0, 45);
+        mgApplyExtraThemes(themeInfo, true);
         sortAccents(themeInfo);
         themes.add(themeInfo);
         themesDict.put("Dark Blue", currentNightTheme = themeInfo);

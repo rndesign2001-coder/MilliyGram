@@ -6962,7 +6962,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     @Override
     protected void onResume() {
-        MgShake.start(this); // MilliyGram: silkitib yashirish
+        MgShake.start(this);
+        MgTranslate.ensureDefaultTarget(); // MilliyGram: tarjima tili
         super.onResume();
         isResumed = true;
         pipActivityHandler.onResume();
