@@ -34,6 +34,8 @@ import org.telegram.ui.Components.LayoutHelper;
 public class MgChatLock {
 
     public static final int MENU_ID = 9001;
+    public static final int MENU_ID_HIDE = 9002;
+    public static final int MENU_ID_COPY_ID = 9003;
 
     private static EditTextBoldCursor createPinField(Context context) {
         EditTextBoldCursor editText = new EditTextBoldCursor(context);

@@ -43,6 +43,7 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
     private static final int ID_EXPORT = 9;
     private static final int ID_IMPORT = 10;
     private static final int ID_ABOUT = 11;
+    private static final int ID_HIDDEN = 12;
 
     private static final int[][] FOCUS_PRESETS = {
             {22 * 60, 7 * 60},
@@ -76,10 +77,12 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
         items.add(UItem.asShadow("Belgilangan vaqtda bildirishnomalar kelmaydi. Xabarlar yo'qolmaydi: ilovani ochganingizda hammasi joyida bo'ladi."));
 
         items.add(UItem.asHeader("Maxfiylik"));
+        items.add(UItem.asButton(ID_HIDDEN, R.drawable.msg_archive, "Yashirin bo'lim",
+                MgConfig.getHiddenDialogs(currentAccount).isEmpty() ? "" : String.valueOf(MgConfig.getHiddenDialogs(currentAccount).size())));
         int locked = MgConfig.getLockedCount();
         items.add(UItem.asButton(ID_PIN_RESET, R.drawable.msg_secret, MgConfig.hasPin() ? "PIN kodni o'chirish" : "PIN kod o'rnatilmagan",
                 locked > 0 ? ("Qulflangan: " + locked) : ""));
-        items.add(UItem.asShadow("Chatni qulflash uchun chatni oching va yuqoridagi ⋮ menyudan \"Chatni qulflash\" ni tanlang."));
+        items.add(UItem.asShadow("Chatni qulflash yoki yashirish uchun chatni oching va yuqoridagi ⋮ menyudan tanlang. Yashirin bo'limga tez kirish: bosh ekranda qidiruv tugmasini uzoq bosing."));
 
         items.add(UItem.asHeader("Dizayn"));
         items.add(UItem.asCheck(ID_HOLIDAY, "Bayram tabriklari").setChecked(MgConfig.isHolidayDecorEnabled()));
@@ -161,6 +164,9 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
                 break;
             case ID_ABOUT:
                 showAboutDialog();
+                break;
+            case ID_HIDDEN:
+                MgHiddenActivity.open(this);
                 break;
         }
     }

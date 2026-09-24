@@ -3458,6 +3458,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         searchItem.setSearchFieldHint(getString(R.string.Search));
         searchItem.setContentDescription(getString(R.string.Search));
+        // MilliyGram: qidiruv tugmasini uzoq bosish — yashirin bo'lim
+        searchItem.setOnLongClickListener(v -> {
+            MgHiddenActivity.open(DialogsActivity.this);
+            return true;
+        });
         if (onlySelect) {
             actionBar.setBackButtonImage(R.drawable.ic_ab_back);
             if (initialDialogsType == DIALOGS_TYPE_BOT_SELECT_VERIFY) {
@@ -11000,6 +11005,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     @NonNull
     public ArrayList<TLRPC.Dialog> getDialogsArray(int currentAccount, int dialogsType, int folderId, boolean frozen) {
+        // MilliyGram: yashirin chatlar ro'yxatda ko'rinmaydi
+        return org.telegram.messenger.MgConfig.filterHidden(currentAccount, mgGetDialogsArrayRaw(currentAccount, dialogsType, folderId, frozen));
+    }
+
+    private ArrayList<TLRPC.Dialog> mgGetDialogsArrayRaw(int currentAccount, int dialogsType, int folderId, boolean frozen) {
         if (frozen && frozenDialogsList != null) {
             return frozenDialogsList;
         }

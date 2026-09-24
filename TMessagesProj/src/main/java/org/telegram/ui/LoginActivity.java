@@ -2475,6 +2475,18 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 });
             }
 
+            if (activityMode == MODE_LOGIN) {
+                // MilliyGram: bot tokeni orqali kirish
+                TextView mgBotLoginView = new TextView(context);
+                mgBotLoginView.setText("Bot tokeni orqali kirish");
+                mgBotLoginView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+                mgBotLoginView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
+                mgBotLoginView.setPadding(dp(4), dp(8), dp(4), dp(8));
+                addView(mgBotLoginView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP, 20, 4, 20, 0));
+                bottomMargin -= 24;
+                mgBotLoginView.setOnClickListener(v -> MgBotLogin.show(LoginActivity.this, currentAccount, res -> onAuthSuccess(res)));
+            }
+
             final boolean allowTestBackend = (BuildVars.DEBUG_VERSION || TEST_BACKEND_IN_STORE && !BuildConfig.BUNDLE) || getConnectionsManager().isTestBackend();
             if (allowTestBackend && activityMode == MODE_LOGIN) {
                 testBackendCheckBox = new CheckBoxCell(context, 2);

@@ -3698,6 +3698,20 @@ public class ChatActivity extends BaseFragment implements
                 if (id == MgChatLock.MENU_ID) {
                     MgChatLock.toggleLock(ChatActivity.this, currentAccount, dialog_id);
                     return;
+                } else if (id == MgChatLock.MENU_ID_HIDE) {
+                    MgHiddenActivity.toggleHidden(ChatActivity.this, currentAccount, dialog_id);
+                    return;
+                } else if (id == MgChatLock.MENU_ID_COPY_ID) {
+                    long mgId = dialog_id;
+                    if (currentChat != null) {
+                        mgId = ChatObject.isChannel(currentChat) ? -1000000000000L - currentChat.id : -currentChat.id;
+                    } else if (currentUser != null) {
+                        mgId = currentUser.id;
+                    }
+                    if (AndroidUtilities.addToClipboard(String.valueOf(mgId))) {
+                        BulletinFactory.of(ChatActivity.this).createCopyBulletin("ID nusxalandi: " + mgId).show();
+                    }
+                    return;
                 }
                 if (id == -1) {
                     if (isInPollAddOptionMode()) {
@@ -4454,6 +4468,9 @@ public class ChatActivity extends BaseFragment implements
                 // MilliyGram: chatni PIN bilan qulflash
                 headerItem.lazilyAddSubItem(MgChatLock.MENU_ID, R.drawable.msg_secret,
                     org.telegram.messenger.MgConfig.isDialogLocked(currentAccount, dialog_id) ? "Qulfni olish" : "Chatni qulflash");
+                headerItem.lazilyAddSubItem(MgChatLock.MENU_ID_HIDE, R.drawable.msg_archive,
+                    org.telegram.messenger.MgConfig.isDialogHidden(currentAccount, dialog_id) ? "Yashirishdan chiqarish" : "Chatni yashirish");
+                headerItem.lazilyAddSubItem(MgChatLock.MENU_ID_COPY_ID, R.drawable.msg_copy, "ID nusxalash");
             }
             boolean addedSettings = false;
             if (!isTopic) {

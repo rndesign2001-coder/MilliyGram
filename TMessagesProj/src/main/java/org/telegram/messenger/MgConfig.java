@@ -263,6 +263,96 @@ public class MgConfig {
         }
     }
 
+    // ---------- Yashirin bo'lim ----------
+
+    private static final Object hiddenSync = new Object();
+    private static final java.util.HashMap<Integer, HashSet<Long>> hiddenCache = new java.util.HashMap<>();
+
+    private static String hiddenKey(int account) {
+        return "hidden_dialogs_" + account;
+    }
+
+    public static HashSet<Long> getHiddenDialogs(int account) {
+        synchronized (hiddenSync) {
+            HashSet<Long> cached = hiddenCache.get(account);
+            if (cached != null) {
+                return cached;
+            }
+            HashSet<Long> result = new HashSet<>();
+            try {
+                for (String s : prefs().getStringSet(hiddenKey(account), new HashSet<>())) {
+                    try {
+                        result.add(Long.parseLong(s));
+                    } catch (NumberFormatException ignore) {
+                    }
+                }
+            } catch (Throwable e) {
+                FileLog.e(e);
+            }
+            hiddenCache.put(account, result);
+            return result;
+        }
+    }
+
+    public static boolean isDialogHidden(int account, long dialogId) {
+        if (dialogId == 0) {
+            return false;
+        }
+        HashSet<Long> set = getHiddenDialogs(account);
+        return !set.isEmpty() && set.contains(dialogId);
+    }
+
+    public static void setDialogHidden(int account, long dialogId, boolean hidden) {
+        synchronized (hiddenSync) {
+            HashSet<Long> set = new HashSet<>(getHiddenDialogs(account));
+            if (hidden) {
+                set.add(dialogId);
+            } else {
+                set.remove(dialogId);
+            }
+            HashSet<String> strings = new HashSet<>();
+            for (Long id : set) {
+                strings.add(String.valueOf(id));
+            }
+            prefs().edit().putStringSet(hiddenKey(account), strings).apply();
+            hiddenCache.put(account, set);
+        }
+    }
+
+    public static boolean isHiddenNotifyEnabled() {
+        return getBool("hidden_notify", false);
+    }
+
+    /** Ro'yxatdan yashirin chatlarni olib tashlaydi (asl ro'yxat o'zgarmaydi) */
+    public static java.util.ArrayList<org.telegram.tgnet.TLRPC.Dialog> filterHidden(int account, java.util.ArrayList<org.telegram.tgnet.TLRPC.Dialog> dialogs) {
+        if (dialogs == null) {
+            return null;
+        }
+        HashSet<Long> hidden = getHiddenDialogs(account);
+        if (hidden.isEmpty()) {
+            return dialogs;
+        }
+        boolean found = false;
+        for (int i = 0, n = dialogs.size(); i < n; i++) {
+            org.telegram.tgnet.TLRPC.Dialog d = dialogs.get(i);
+            if (d != null && hidden.contains(d.id)) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            return dialogs;
+        }
+        java.util.ArrayList<org.telegram.tgnet.TLRPC.Dialog> result = new java.util.ArrayList<>(dialogs.size());
+        for (int i = 0, n = dialogs.size(); i < n; i++) {
+            org.telegram.tgnet.TLRPC.Dialog d = dialogs.get(i);
+            if (d == null || !hidden.contains(d.id)) {
+                result.add(d);
+            }
+        }
+        return result;
+    }
+
     // ---------- Sozlamalar zaxirasi ----------
 
     /** Sozlamalarni JSON matn ko'rinishida (PIN va qulflangan chatlarsiz) */
@@ -274,7 +364,7 @@ public class MgConfig {
             JSONObject values = new JSONObject();
             for (Map.Entry<String, ?> e : prefs().getAll().entrySet()) {
                 String key = e.getKey();
-                if (key.startsWith("chat_pin") || key.startsWith("locked_dialogs_")) {
+                if (key.startsWith("chat_pin") || key.startsWith("locked_dialogs_") || key.startsWith("hidden_dialogs_")) {
                     continue;
                 }
                 Object v = e.getValue();
@@ -306,7 +396,7 @@ public class MgConfig {
             Iterator<String> keys = values.keys();
             while (keys.hasNext()) {
                 String key = keys.next();
-                if (key.startsWith("chat_pin") || key.startsWith("locked_dialogs_")) {
+                if (key.startsWith("chat_pin") || key.startsWith("locked_dialogs_") || key.startsWith("hidden_dialogs_")) {
                     continue;
                 }
                 JSONObject item = values.getJSONObject(key);
