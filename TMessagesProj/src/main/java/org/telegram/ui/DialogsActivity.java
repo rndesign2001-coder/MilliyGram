@@ -3522,6 +3522,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 logoDrawable.setColorFilter(getThemedColor(Theme.key_telegram_color_dialogsLogo), PorterDuff.Mode.MULTIPLY);
                 SpannableStringBuilder ssb = new SpannableStringBuilder(getString(R.string.AppName));
                 ssb.setSpan(new ImageSpan(logoDrawable), 0, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                // MilliyGram: bayram kunlari sarlavhada tabrik
+                if (org.telegram.messenger.MgConfig.isHolidayDecorEnabled()) {
+                    String greeting = org.telegram.messenger.MgConfig.getHolidayGreeting();
+                    if (greeting != null) {
+                        ssb.append("  ").append(greeting);
+                    }
+                }
                 actionBar.setTitle(ssb, statusDrawable);
                 updateStatus(UserConfig.getInstance(currentAccount).getCurrentUser(), false);
             }

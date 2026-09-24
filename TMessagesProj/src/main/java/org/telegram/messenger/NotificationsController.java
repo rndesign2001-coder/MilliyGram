@@ -4097,6 +4097,11 @@ public class NotificationsController extends BaseController implements Notificat
     }
 
     private void showOrUpdateNotification(boolean notifyAboutLast) {
+        if (MgConfig.isFocusActiveNow()) {
+            // MilliyGram: fokus rejimi — bildirishnoma ko'rsatilmaydi
+            dismissNotification();
+            return;
+        }
         if (!getUserConfig().isClientActivated() || pushMessages.isEmpty() && storyPushMessages.isEmpty() || !SharedConfig.showNotificationsForAllAccounts && currentAccount != UserConfig.selectedAccount) {
             dismissNotification();
             return;

@@ -1,0 +1,345 @@
+/*
+ * MilliyGram — norasmiy Telegram klienti.
+ * GNU GPL v2 yoki keyingi versiya asosida tarqatiladi.
+ */
+
+package org.telegram.messenger;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.security.MessageDigest;
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * MilliyGram sozlamalari va yordamchi funksiyalari.
+ */
+public class MgConfig {
+
+    public static final String PREFS = "milliygram";
+
+    public static final int SIMPLE_MODE_FONT_SIZE = 21;
+    public static final int NORMAL_FONT_SIZE = 16;
+
+    private static SharedPreferences prefs() {
+        return ApplicationLoader.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+    }
+
+    // ---------- Umumiy ----------
+
+    public static boolean getBool(String key, boolean def) {
+        try {
+            return prefs().getBoolean(key, def);
+        } catch (Throwable e) {
+            return def;
+        }
+    }
+
+    public static void setBool(String key, boolean value) {
+        prefs().edit().putBoolean(key, value).apply();
+    }
+
+    public static int getInt(String key, int def) {
+        try {
+            return prefs().getInt(key, def);
+        } catch (Throwable e) {
+            return def;
+        }
+    }
+
+    public static void setInt(String key, int value) {
+        prefs().edit().putInt(key, value).apply();
+    }
+
+    // ---------- Oddiy rejim (katta shrift) ----------
+
+    public static boolean isSimpleMode() {
+        return getBool("simple_mode", false);
+    }
+
+    public static void setSimpleMode(boolean enabled) {
+        setBool("simple_mode", enabled);
+        int size = enabled ? SIMPLE_MODE_FONT_SIZE : NORMAL_FONT_SIZE;
+        SharedConfig.fontSize = size;
+        SharedConfig.fontSizeIsDefault = false;
+        SharedPreferences main = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE);
+        main.edit().putInt("fons_size", size).commit();
+        try {
+            org.telegram.ui.ActionBar.Theme.createCommonMessageResources();
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
+    }
+
+    // ---------- Trafik tejash ----------
+
+    public static boolean isTrafficSaver() {
+        return getBool("traffic_saver", false);
+    }
+
+    public static void setTrafficSaver(boolean enabled) {
+        setBool("traffic_saver", enabled);
+        for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
+            if (!UserConfig.getInstance(a).isClientActivated()) {
+                continue;
+            }
+            try {
+                DownloadController dc = DownloadController.getInstance(a);
+                // 0 = kam (low), 1 = o'rtacha (medium)
+                int preset = enabled ? 0 : 1;
+                dc.currentMobilePreset = preset;
+                SharedPreferences.Editor editor = MessagesController.getMainSettings(a).edit();
+                editor.putInt("currentMobilePreset", preset);
+                editor.commit();
+                dc.checkAutodownloadSettings();
+            } catch (Throwable e) {
+                FileLog.e(e);
+            }
+        }
+    }
+
+    // ---------- Fokus rejimi ----------
+
+    public static boolean isFocusEnabled() {
+        return getBool("focus_enabled", false);
+    }
+
+    /** Daqiqalarda, 00:00 dan boshlab. Standart: 22:00 - 07:00 */
+    public static int getFocusStart() {
+        return getInt("focus_start", 22 * 60);
+    }
+
+    public static int getFocusEnd() {
+        return getInt("focus_end", 7 * 60);
+    }
+
+    public static boolean isFocusActiveNow() {
+        if (!isFocusEnabled()) {
+            return false;
+        }
+        Calendar c = Calendar.getInstance();
+        int now = c.get(Calendar.HOUR_OF_DAY) * 60 + c.get(Calendar.MINUTE);
+        int start = getFocusStart();
+        int end = getFocusEnd();
+        if (start == end) {
+            return true;
+        }
+        if (start < end) {
+            return now >= start && now < end;
+        }
+        return now >= start || now < end;
+    }
+
+    public static String formatMinutes(int minutes) {
+        return String.format(java.util.Locale.US, "%02d:%02d", minutes / 60, minutes % 60);
+    }
+
+    // ---------- Bayramlar ----------
+
+    public static boolean isHolidayDecorEnabled() {
+        return getBool("holiday_decor", true);
+    }
+
+    /** Bugun bayram bo'lsa tabrik matni, aks holda null */
+    public static String getHolidayGreeting() {
+        Calendar c = Calendar.getInstance();
+        int month = c.get(Calendar.MONTH) + 1;
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        if (month == 1 && day == 1) {
+            return "Yangi yil muborak! 🎄";
+        } else if (month == 1 && day == 14) {
+            return "Vatan himoyachilari kuni 🎖";
+        } else if (month == 3 && day == 8) {
+            return "8-mart muborak! 🌷";
+        } else if (month == 3 && (day >= 20 && day <= 22)) {
+            return "Navro'z muborak! 🌱";
+        } else if (month == 5 && day == 9) {
+            return "Xotira va qadrlash kuni 🕊";
+        } else if (month == 9 && day == 1) {
+            return "Mustaqillik kuni muborak! 🇺🇿";
+        } else if (month == 10 && day == 1) {
+            return "Ustoz va murabbiylar kuni 📚";
+        } else if (month == 10 && day == 21) {
+            return "O'zbek tili bayrami 📖";
+        } else if (month == 12 && day == 8) {
+            return "Konstitutsiya kuni 📜";
+        } else if (month == 12 && day == 31) {
+            return "Yangi yil arafasi 🎆";
+        }
+        return null;
+    }
+
+    public static CharSequence getMainTitle() {
+        String title = "MilliyGram";
+        if (isHolidayDecorEnabled()) {
+            String greeting = getHolidayGreeting();
+            if (greeting != null) {
+                return title + " · " + greeting;
+            }
+        }
+        return title;
+    }
+
+    // ---------- Chatlarni PIN bilan qulflash ----------
+
+    private static String lockedKey(int account) {
+        return "locked_dialogs_" + account;
+    }
+
+    public static boolean hasPin() {
+        return prefs().contains("chat_pin_hash");
+    }
+
+    public static void setPin(String pin) {
+        prefs().edit().putString("chat_pin_hash", hash(pin)).apply();
+    }
+
+    public static boolean checkPin(String pin) {
+        String h = prefs().getString("chat_pin_hash", null);
+        return h != null && h.equals(hash(pin));
+    }
+
+    public static void removePinAndLocks() {
+        SharedPreferences.Editor editor = prefs().edit();
+        editor.remove("chat_pin_hash");
+        for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
+            editor.remove(lockedKey(a));
+        }
+        editor.apply();
+    }
+
+    public static Set<String> getLockedDialogs(int account) {
+        try {
+            return new HashSet<>(prefs().getStringSet(lockedKey(account), new HashSet<>()));
+        } catch (Throwable e) {
+            return new HashSet<>();
+        }
+    }
+
+    public static int getLockedCount() {
+        int count = 0;
+        for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
+            count += getLockedDialogs(a).size();
+        }
+        return count;
+    }
+
+    public static boolean isDialogLocked(int account, long dialogId) {
+        if (dialogId == 0 || !hasPin()) {
+            return false;
+        }
+        return getLockedDialogs(account).contains(String.valueOf(dialogId));
+    }
+
+    public static void setDialogLocked(int account, long dialogId, boolean locked) {
+        Set<String> set = getLockedDialogs(account);
+        if (locked) {
+            set.add(String.valueOf(dialogId));
+        } else {
+            set.remove(String.valueOf(dialogId));
+        }
+        prefs().edit().putStringSet(lockedKey(account), set).apply();
+    }
+
+    private static String hash(String pin) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] bytes = md.digest(("milliygram:" + pin).getBytes("UTF-8"));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : bytes) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (Throwable e) {
+            return pin;
+        }
+    }
+
+    // ---------- Sozlamalar zaxirasi ----------
+
+    /** Sozlamalarni JSON matn ko'rinishida (PIN va qulflangan chatlarsiz) */
+    public static String exportSettings() {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("app", "MilliyGram");
+            json.put("version", 1);
+            JSONObject values = new JSONObject();
+            for (Map.Entry<String, ?> e : prefs().getAll().entrySet()) {
+                String key = e.getKey();
+                if (key.startsWith("chat_pin") || key.startsWith("locked_dialogs_")) {
+                    continue;
+                }
+                Object v = e.getValue();
+                if (v instanceof Boolean || v instanceof Integer || v instanceof String || v instanceof Long || v instanceof Float) {
+                    JSONObject item = new JSONObject();
+                    item.put("t", v.getClass().getSimpleName());
+                    item.put("v", v);
+                    values.put(key, item);
+                }
+            }
+            json.put("values", values);
+            return json.toString();
+        } catch (Throwable e) {
+            FileLog.e(e);
+            return null;
+        }
+    }
+
+    /** @return import qilingan sozlamalar soni, xato bo'lsa -1 */
+    public static int importSettings(String text) {
+        try {
+            JSONObject json = new JSONObject(text.trim());
+            if (!"MilliyGram".equals(json.optString("app"))) {
+                return -1;
+            }
+            JSONObject values = json.getJSONObject("values");
+            SharedPreferences.Editor editor = prefs().edit();
+            int count = 0;
+            Iterator<String> keys = values.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                if (key.startsWith("chat_pin") || key.startsWith("locked_dialogs_")) {
+                    continue;
+                }
+                JSONObject item = values.getJSONObject(key);
+                String t = item.optString("t");
+                switch (t) {
+                    case "Boolean":
+                        editor.putBoolean(key, item.getBoolean("v"));
+                        break;
+                    case "Integer":
+                        editor.putInt(key, item.getInt("v"));
+                        break;
+                    case "Long":
+                        editor.putLong(key, item.getLong("v"));
+                        break;
+                    case "Float":
+                        editor.putFloat(key, (float) item.getDouble("v"));
+                        break;
+                    case "String":
+                        editor.putString(key, item.getString("v"));
+                        break;
+                    default:
+                        continue;
+                }
+                count++;
+            }
+            editor.commit();
+            // bog'liq sozlamalarni qo'llash
+            setSimpleMode(isSimpleMode());
+            setTrafficSaver(isTrafficSaver());
+            return count;
+        } catch (Throwable e) {
+            FileLog.e(e);
+            return -1;
+        }
+    }
+}

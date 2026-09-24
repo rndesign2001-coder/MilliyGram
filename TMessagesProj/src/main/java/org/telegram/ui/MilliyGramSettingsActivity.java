@@ -1,0 +1,237 @@
+/*
+ * MilliyGram — norasmiy Telegram klienti.
+ * GNU GPL v2 yoki keyingi versiya asosida tarqatiladi.
+ */
+
+package org.telegram.ui;
+
+import android.content.Context;
+import android.text.InputType;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.FrameLayout;
+
+import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.MgConfig;
+import org.telegram.messenger.R;
+import org.telegram.ui.ActionBar.AlertDialog;
+import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Cells.TextCheckCell;
+import org.telegram.ui.Components.BulletinFactory;
+import org.telegram.ui.Components.EditTextBoldCursor;
+import org.telegram.ui.Components.LayoutHelper;
+import org.telegram.ui.Components.UItem;
+import org.telegram.ui.Components.UniversalAdapter;
+import org.telegram.ui.Components.UniversalFragment;
+
+import java.util.ArrayList;
+
+/**
+ * MilliyGram qo'shimcha sozlamalari.
+ */
+public class MilliyGramSettingsActivity extends UniversalFragment {
+
+    private static final int ID_SIMPLE_MODE = 1;
+    private static final int ID_TRAFFIC_SAVER = 2;
+    private static final int ID_AUTODOWNLOAD = 3;
+    private static final int ID_PROXY = 4;
+    private static final int ID_FOCUS = 5;
+    private static final int ID_FOCUS_TIME = 6;
+    private static final int ID_HOLIDAY = 7;
+    private static final int ID_PIN_RESET = 8;
+    private static final int ID_EXPORT = 9;
+    private static final int ID_IMPORT = 10;
+    private static final int ID_ABOUT = 11;
+
+    private static final int[][] FOCUS_PRESETS = {
+            {22 * 60, 7 * 60},
+            {23 * 60, 8 * 60},
+            {21 * 60, 6 * 60},
+            {0, 8 * 60},
+            {9 * 60, 18 * 60},
+    };
+
+    @Override
+    protected CharSequence getTitle() {
+        return "MilliyGram";
+    }
+
+    @Override
+    protected void fillItems(ArrayList<UItem> items, UniversalAdapter adapter) {
+        items.add(UItem.asHeader("Qulaylik"));
+        items.add(UItem.asCheck(ID_SIMPLE_MODE, "Oddiy rejim (katta shrift)").setChecked(MgConfig.isSimpleMode()));
+        items.add(UItem.asShadow("Xabarlar kattaroq shriftda ko'rinadi. Keksalar va ko'rishi zaif foydalanuvchilar uchun qulay."));
+
+        items.add(UItem.asHeader("Internet va trafik"));
+        items.add(UItem.asCheck(ID_TRAFFIC_SAVER, "Trafik tejash").setChecked(MgConfig.isTrafficSaver()));
+        items.add(UItem.asButton(ID_AUTODOWNLOAD, R.drawable.msg_download, "Avto-yuklash sozlamalari"));
+        items.add(UItem.asButton(ID_PROXY, R.drawable.msg2_data, "Proksi menejeri"));
+        items.add(UItem.asShadow("Trafik tejash yoqilsa, mobil internetda rasm va videolar kamroq avtomatik yuklanadi."));
+
+        items.add(UItem.asHeader("Fokus rejimi"));
+        items.add(UItem.asCheck(ID_FOCUS, "Fokus rejimi").setChecked(MgConfig.isFocusEnabled()));
+        items.add(UItem.asButton(ID_FOCUS_TIME, R.drawable.msg_recent, "Vaqt oralig'i",
+                MgConfig.formatMinutes(MgConfig.getFocusStart()) + " – " + MgConfig.formatMinutes(MgConfig.getFocusEnd())));
+        items.add(UItem.asShadow("Belgilangan vaqtda bildirishnomalar kelmaydi. Xabarlar yo'qolmaydi: ilovani ochganingizda hammasi joyida bo'ladi."));
+
+        items.add(UItem.asHeader("Maxfiylik"));
+        int locked = MgConfig.getLockedCount();
+        items.add(UItem.asButton(ID_PIN_RESET, R.drawable.msg_secret, MgConfig.hasPin() ? "PIN kodni o'chirish" : "PIN kod o'rnatilmagan",
+                locked > 0 ? ("Qulflangan: " + locked) : ""));
+        items.add(UItem.asShadow("Chatni qulflash uchun chatni oching va yuqoridagi ⋮ menyudan \"Chatni qulflash\" ni tanlang."));
+
+        items.add(UItem.asHeader("Dizayn"));
+        items.add(UItem.asCheck(ID_HOLIDAY, "Bayram tabriklari").setChecked(MgConfig.isHolidayDecorEnabled()));
+        items.add(UItem.asShadow("Navro'z, Mustaqillik kuni va boshqa bayramlarda sarlavhada tabrik ko'rinadi."));
+
+        items.add(UItem.asHeader("Zaxira"));
+        items.add(UItem.asButton(ID_EXPORT, R.drawable.msg_copy, "Sozlamalarni nusxalash"));
+        items.add(UItem.asButton(ID_IMPORT, R.drawable.msg_download, "Sozlamalarni tiklash"));
+        items.add(UItem.asShadow("Sozlamalar matn ko'rinishida nusxalanadi. Uni Saqlangan xabarlarga yuborib qo'ying va yangi telefonda qayta joylang."));
+
+        items.add(UItem.asButton(ID_ABOUT, R.drawable.msg_info, "MilliyGram haqida"));
+        items.add(UItem.asShadow("MilliyGram — Telegram'ning ochiq manba kodi asosida qurilgan norasmiy klient."));
+    }
+
+    @Override
+    protected void onClick(UItem item, View view, int position, float x, float y) {
+        switch (item.id) {
+            case ID_SIMPLE_MODE: {
+                boolean value = !MgConfig.isSimpleMode();
+                MgConfig.setSimpleMode(value);
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(value);
+                }
+                break;
+            }
+            case ID_TRAFFIC_SAVER: {
+                boolean value = !MgConfig.isTrafficSaver();
+                MgConfig.setTrafficSaver(value);
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(value);
+                }
+                break;
+            }
+            case ID_AUTODOWNLOAD:
+                presentFragment(new DataSettingsActivity());
+                break;
+            case ID_PROXY:
+                presentFragment(new ProxyListActivity());
+                break;
+            case ID_FOCUS: {
+                boolean value = !MgConfig.isFocusEnabled();
+                MgConfig.setBool("focus_enabled", value);
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(value);
+                }
+                break;
+            }
+            case ID_FOCUS_TIME:
+                showFocusTimeDialog();
+                break;
+            case ID_HOLIDAY: {
+                boolean value = !MgConfig.isHolidayDecorEnabled();
+                MgConfig.setBool("holiday_decor", value);
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(value);
+                }
+                break;
+            }
+            case ID_PIN_RESET:
+                if (MgConfig.hasPin()) {
+                    MgChatLock.askPin(this, "PIN kodni o'chirish", ok -> {
+                        if (ok) {
+                            MgConfig.removePinAndLocks();
+                            BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, "PIN kod va barcha qulflar olib tashlandi").show();
+                            listView.adapter.update(true);
+                        }
+                    });
+                }
+                break;
+            case ID_EXPORT: {
+                String json = MgConfig.exportSettings();
+                if (json != null && AndroidUtilities.addToClipboard(json)) {
+                    BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, "Sozlamalar nusxalandi").show();
+                }
+                break;
+            }
+            case ID_IMPORT:
+                showImportDialog();
+                break;
+            case ID_ABOUT:
+                showAboutDialog();
+                break;
+        }
+    }
+
+    @Override
+    protected boolean onLongClick(UItem item, View view, int position, float x, float y) {
+        return false;
+    }
+
+    private void showFocusTimeDialog() {
+        if (getParentActivity() == null) {
+            return;
+        }
+        CharSequence[] titles = new CharSequence[FOCUS_PRESETS.length];
+        for (int i = 0; i < FOCUS_PRESETS.length; i++) {
+            titles[i] = MgConfig.formatMinutes(FOCUS_PRESETS[i][0]) + " – " + MgConfig.formatMinutes(FOCUS_PRESETS[i][1]);
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+        builder.setTitle("Fokus vaqti");
+        builder.setItems(titles, (dialog, which) -> {
+            MgConfig.setInt("focus_start", FOCUS_PRESETS[which][0]);
+            MgConfig.setInt("focus_end", FOCUS_PRESETS[which][1]);
+            listView.adapter.update(true);
+        });
+        showDialog(builder.create());
+    }
+
+    private void showImportDialog() {
+        Context context = getParentActivity();
+        if (context == null) {
+            return;
+        }
+        EditTextBoldCursor editText = new EditTextBoldCursor(context);
+        editText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+        editText.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
+        editText.setHintTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteHintText));
+        editText.setCursorColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+        editText.setBackground(null);
+        editText.setLineColors(Theme.getColor(Theme.key_windowBackgroundWhiteInputField), Theme.getColor(Theme.key_windowBackgroundWhiteInputFieldActivated), Theme.getColor(Theme.key_text_RedRegular));
+        editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        editText.setMaxLines(6);
+        editText.setHint("Nusxalangan matnni shu yerga joylang");
+        FrameLayout frameLayout = new FrameLayout(context);
+        frameLayout.addView(editText, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP, 24, 6, 24, 0));
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, getResourceProvider());
+        builder.setTitle("Sozlamalarni tiklash");
+        builder.setView(frameLayout);
+        builder.setPositiveButton("Tiklash", (dialog, which) -> {
+            int count = MgConfig.importSettings(editText.getText().toString());
+            if (count < 0) {
+                BulletinFactory.of(this).createErrorBulletin("Matn noto'g'ri. MilliyGram'dan nusxalangan matnni joylang").show();
+            } else {
+                BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, "Tiklandi: " + count + " ta sozlama").show();
+                listView.adapter.update(true);
+            }
+        });
+        builder.setNegativeButton("Bekor qilish", null);
+        showDialog(builder.create());
+    }
+
+    private void showAboutDialog() {
+        if (getParentActivity() == null) {
+            return;
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+        builder.setTitle("MilliyGram");
+        builder.setMessage("MilliyGram — milliy dizayndagi norasmiy Telegram klienti.\n\n" +
+                "Ilova Telegram FZ-LLC tomonidan ishlab chiqilmagan. U Telegram'ning ochiq manba kodi (GPL v2) asosida qurilgan va Telegram API'dan foydalanadi.\n\n" +
+                "Xabarlaringiz to'g'ridan-to'g'ri Telegram serverlari orqali yuboriladi. MilliyGram hech qanday ma'lumot yig'maydi.");
+        builder.setPositiveButton("OK", null);
+        showDialog(builder.create());
+    }
+}

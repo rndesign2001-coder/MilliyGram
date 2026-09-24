@@ -3695,6 +3695,10 @@ public class ChatActivity extends BaseFragment implements
         actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
             @Override
             public void onItemClick(final int id) {
+                if (id == MgChatLock.MENU_ID) {
+                    MgChatLock.toggleLock(ChatActivity.this, currentAccount, dialog_id);
+                    return;
+                }
                 if (id == -1) {
                     if (isInPollAddOptionMode()) {
                         pollAddOptionModeClose();
@@ -4445,6 +4449,11 @@ public class ChatActivity extends BaseFragment implements
             if (!isTopic && !ChatObject.isMonoForum(currentChat)) {
                 clearHistoryItem = headerItem.lazilyAddSubItem(clear_history, R.drawable.msg_clear,
                     LocaleController.getString(UserObject.isBotForum(currentUser) ? R.string.ClearAllHistory : R.string.ClearHistory));
+            }
+            if (chatMode == 0 && !isTopic) {
+                // MilliyGram: chatni PIN bilan qulflash
+                headerItem.lazilyAddSubItem(MgChatLock.MENU_ID, R.drawable.msg_secret,
+                    org.telegram.messenger.MgConfig.isDialogLocked(currentAccount, dialog_id) ? "Qulfni olish" : "Chatni qulflash");
             }
             boolean addedSettings = false;
             if (!isTopic) {
@@ -8974,6 +8983,9 @@ public class ChatActivity extends BaseFragment implements
         onBottomItemsVisibilityChanged();
         ViewCompat.setOnApplyWindowInsetsListener(fragmentView, this::onApplyWindowInsets);
         Timer.finish(t);
+
+        // MilliyGram: qulflangan chat
+        MgChatLock.checkOnOpen(this, fragmentView, currentAccount, dialog_id, inPreviewMode);
 
         return fragmentView;
     }
