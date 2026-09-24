@@ -149,7 +149,7 @@ import java.util.concurrent.CountDownLatch;
 
 public class Theme {
 
-    // ===== MilliyGram: milliy rang mavzusi (feruza + oltin) =====
+    // ===== MilliyGram: milliy rang mavzusi (ko'k + oq, bayroq ranglari) =====
     public static final int MG_DAY_ACCENT_ID = 12;
     public static final int MG_NIGHT_ACCENT_ID = 0;
 
@@ -3945,8 +3945,8 @@ public class Theme {
                 new int[]    {          0,                            180,                            45,                             0,                            45,                           180,                             0,                             0,                             0,                             0,                             0,                             0,                             0,                             0,                             0,                             0 },
                 new int[]    {          0,                             52,                            46,                            57,                            45,                            64,                            52,                            35,                            36,                            41,                            50,                            50,                            35,                            38,                            37,                            30 }
                 );
-        mgApplyNationalAccent(themeInfo, MG_DAY_ACCENT_ID, 0xFF1A8AA6, 0xFFCFEFE0, 0xFFE6F4D2,
-                0xFFF1E3B8, 0xFFD9ECDF, 0xFFF3D9A4, 0xFFCDE6E4, 45, 45);
+        mgApplyNationalAccent(themeInfo, MG_DAY_ACCENT_ID, 0xFF0B63CE, 0xFFD3E9FF, 0xFFE2F1FF,
+                0xFFC9DDF6, 0xFFE4EEFA, 0xFFB8D3F2, 0xFFDDE9F7, 45, 40);
         sortAccents(themeInfo);
         themes.add(currentDayTheme = defaultTheme = themeInfo);
         themesDict.put("Blue", themeInfo);
@@ -3971,8 +3971,8 @@ public class Theme {
                 new int[]    {                           225,                            45,                           225,                           135,                            45,                           225,                            45,                             0,                             0,                             0,                             0,                             0,                             0,                             0,                             0,                             0,                             0,                             0 },
                 new int[]    {                            40,                            40,                            31,                            50,                            25,                            34,                            35,                            35,                            38,                            29,                            24,                            34,                            34,                            31,                            29,                            37,                            21,                            38 }
                 );
-        mgApplyNationalAccent(themeInfo, MG_NIGHT_ACCENT_ID, 0xFF2FB0C6, 0xFF1F6F6A, 0xFF2A5F7E,
-                0xFF0B1A1C, 0xFF14231D, 0xFF0E1A22, 0xFF1A1A10, 0, 38);
+        mgApplyNationalAccent(themeInfo, MG_NIGHT_ACCENT_ID, 0xFF3D9BFF, 0xFF1B4E91, 0xFF0F3A78,
+                0xFF04163A, 0xFF0A2A5E, 0xFF021030, 0xFF0B3470, 0, 45);
         sortAccents(themeInfo);
         themes.add(themeInfo);
         themesDict.put("Dark Blue", currentNightTheme = themeInfo);
