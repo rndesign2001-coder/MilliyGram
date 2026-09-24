@@ -96,7 +96,7 @@ public class MgHiddenActivity extends UniversalFragment {
 
     @Override
     protected CharSequence getTitle() {
-        return "🙈 Yashirin bo'lim";
+        return "Yashirin bo'lim";
     }
 
     private String encryptedName(long dialogId) {
@@ -143,12 +143,12 @@ public class MgHiddenActivity extends UniversalFragment {
             items.add(UItem.asTopViewStatic("Hozircha yashirilgan chat yo'q.\n\nYashirish uchun: chatni belgilab ⋮ → \"Yashirish\" yoki chat ichida ⋮ → \"Chatni yashirish\".", R.drawable.msg_archive));
             return;
         }
-        addSection(items, "👤 Profillar", users);
-        addSection(items, "👥 Guruhlar", groups);
-        addSection(items, "📢 Kanallar", channels);
-        addSection(items, "🤖 Botlar", bots);
+        addSection(items, "Profillar", users);
+        addSection(items, "Guruhlar", groups);
+        addSection(items, "Kanallar", channels);
+        addSection(items, "Botlar", bots);
         if (!encryptedIds.isEmpty()) {
-            items.add(UItem.asHeader("🔒 Maxfiy chatlar"));
+            items.add(UItem.asHeader("Maxfiy chatlar"));
             for (int i = 0; i < encryptedIds.size(); i++) {
                 items.add(UItem.asButton(ID_ENCRYPTED_BASE + i, R.drawable.msg_secret, encryptedName(encryptedIds.get(i))));
             }

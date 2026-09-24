@@ -9106,6 +9106,9 @@ public class Theme {
         return getColor(key);
     }
 
+    public static volatile SparseIntArray mgDesignDay, mgDesignNight;
+    private static boolean mgDesignLoaded;
+
     public static int getCurrentColor(int key) {
         return currentColors.get(key);
     }
@@ -9123,6 +9126,26 @@ public class Theme {
             int index = animatingColors.indexOfKey(key);
             if (index >= 0) {
                 return animatingColors.valueAt(index);
+            }
+        }
+        // MilliyGram: "Dizayn" bo'limidagi foydalanuvchi ranglari
+        if (!mgDesignLoaded) {
+            try {
+                org.telegram.ui.MgDesign.reloadIntoTheme();
+                mgDesignLoaded = true;
+            } catch (Throwable ignore) {
+            }
+        }
+        if (mgDesignDay != null || mgDesignNight != null) {
+            SparseIntArray mgO = currentTheme != null && currentTheme.isDark() ? mgDesignNight : mgDesignDay;
+            if (mgO != null) {
+                int mi = mgO.indexOfKey(key);
+                if (mi >= 0) {
+                    if (isDefault != null && isDefault.length > 0) {
+                        isDefault[0] = false;
+                    }
+                    return mgO.valueAt(mi);
+                }
             }
         }
         if (serviceBitmapShader != null && (key_chat_serviceText == key || key_chat_serviceLink == key || key_chat_serviceIcon == key

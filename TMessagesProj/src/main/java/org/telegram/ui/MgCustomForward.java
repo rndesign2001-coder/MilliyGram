@@ -246,6 +246,21 @@ public class MgCustomForward {
         counter.setTextColor(Theme.getColor(Theme.key_dialogTextGray3));
         counter.setGravity(Gravity.RIGHT);
         root.addView(counter, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 4, 24, 0));
+        TextView status = new TextView(ctx);
+        status.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+        status.setTextColor(Theme.getColor(Theme.key_featuredStickers_addButton));
+        status.setGravity(Gravity.CENTER);
+        status.setVisibility(View.GONE);
+        root.addView(status, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 6, 24, 0));
+        final Runnable[] hideStatus = new Runnable[1];
+        final Utilities.Callback<String> say = msg -> {
+            status.setText(msg);
+            status.setVisibility(View.VISIBLE);
+            if (hideStatus[0] != null) {
+                AndroidUtilities.cancelRunOnUIThread(hideStatus[0]);
+            }
+            AndroidUtilities.runOnUIThread(hideStatus[0] = () -> status.setVisibility(View.GONE), 3500);
+        };
         final TextCheckCell mediaCellF = mediaCell;
         Runnable updateCounter = () -> {
             int len = edit.length();
@@ -300,7 +315,7 @@ public class MgCustomForward {
                 e.removeSpan(s);
                 removed++;
             }
-            BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, removed > 0 ? "Yashirin havolalar olib tashlandi: " + removed : "Yashirin havola topilmadi").show();
+            say.run(removed > 0 ? "✓ Yashirin havolalar olib tashlandi: " + removed : "Yashirin havola topilmadi");
         }), LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 32, 4, 0, 4, 0));
         tools.addView(chip(ctx, "🧽 @ va linklarni tozalash", v -> {
             Editable e = edit.getText();
@@ -314,7 +329,7 @@ public class MgCustomForward {
                 e.delete(ranges.get(i)[0], ranges.get(i)[1]);
             }
             cleanupWhitespace(e);
-            BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, ranges.isEmpty() ? "Tozalanadigan narsa topilmadi" : "Tozalandi: " + ranges.size() + " ta").show();
+            say.run(ranges.isEmpty() ? "Tozalanadigan narsa topilmadi" : "✓ Tozalandi: " + ranges.size() + " ta");
         }), LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 32, 4, 0, 4, 0));
         tools.addView(chip(ctx, "🧹 Formatsiz", v -> {
             Editable e = edit.getText();
@@ -326,32 +341,10 @@ public class MgCustomForward {
                 e.removeSpan(s);
             }
         }), LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 32, 4, 0, 4, 0));
-        tools.addView(chip(ctx, "🔁 Almashtirish", v -> showReplace(fragment, edit)), LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 32, 4, 0, 4, 0));
-        tools.addView(chip(ctx, "✍️ Imzo", v -> addSignature(fragment, edit)), LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 32, 4, 0, 4, 0));
-        tools.addView(chip(ctx, "🌐 Tarjima", v -> MgTranslate.chooseLanguage(fragment, "Qaysi tilga tarjima qilinsin?", lang -> {
-            CharSequence[] arr = {new SpannableStringBuilder(edit.getText())};
-            ArrayList<TLRPC.MessageEntity> ents = MediaDataController.getInstance(account).getEntities(arr, true, false);
-            String src = arr[0] == null ? "" : arr[0].toString();
-            if (TextUtils.isEmpty(src.trim())) {
-                BulletinFactory.of(fragment).createErrorBulletin("Tarjima uchun matn yo'q").show();
-                return;
-            }
-            AlertDialog progress = new AlertDialog(ctx, AlertDialog.ALERT_TYPE_SPINNER);
-            progress.showDelayed(300);
-            MgTranslate.translate(account, src, ents, lang, (res, err) -> {
-                try {
-                    progress.dismiss();
-                } catch (Throwable ignore) {
-                }
-                if (res != null) {
-                    edit.setText(fromEntities(res.text, res.entities));
-                    edit.setSelection(edit.length());
-                    BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, "Tarjima qilindi: " + MgTranslate.nameOf(lang)).show();
-                } else {
-                    BulletinFactory.of(fragment).createErrorBulletin(err == null ? "Tarjima qilib bo'lmadi" : err).show();
-                }
-            });
-        })), LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 32, 4, 0, 4, 0));
+        tools.addView(chip(ctx, "🔁 Almashtirish", v -> showReplace(fragment, edit, say)), LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 32, 4, 0, 4, 0));
+        tools.addView(chip(ctx, "✍️ Imzo", v -> addSignature(fragment, edit, say)), LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 32, 4, 0, 4, 0));
+        tools.addView(chip(ctx, "🌐 Tarjima", v -> translateInEditor(fragment, account, edit, say, false)), LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 32, 4, 0, 4, 0));
+        tools.addView(chip(ctx, "🌐+ Tarjimani qo'shish", v -> translateInEditor(fragment, account, edit, say, true)), LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 32, 4, 0, 4, 0));
 
         TextView hint = new TextView(ctx);
         hint.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
@@ -424,7 +417,7 @@ public class MgCustomForward {
         }
     }
 
-    private static void showReplace(ChatActivity fragment, EditTextCaption target) {
+    private static void showReplace(ChatActivity fragment, EditTextCaption target, Utilities.Callback<String> say) {
         Context ctx = fragment.getParentActivity();
         if (ctx == null) return;
         LinearLayout ll = new LinearLayout(ctx);
@@ -470,16 +463,16 @@ public class MgCustomForward {
                 if (idx == 0) break;
                 idx = lower.lastIndexOf(fl, idx - 1);
             }
-            BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, count > 0 ? "Almashtirildi: " + count + " ta" : "Topilmadi").show();
+            say.run(count > 0 ? "✓ Almashtirildi: " + count + " ta" : "\"" + f + "\" topilmadi");
         });
         b.setNegativeButton("Bekor", null);
-        fragment.showDialog(b.create());
+        b.show();
     }
 
-    private static void addSignature(ChatActivity fragment, EditTextCaption target) {
+    private static void addSignature(ChatActivity fragment, EditTextCaption target, Utilities.Callback<String> say) {
         String sig = MgConfig.getString("mg_cf_signature", "");
         if (TextUtils.isEmpty(sig)) {
-            editSignature(fragment, () -> addSignature(fragment, target));
+            editSignature(fragment, () -> addSignature(fragment, target, say), true);
             return;
         }
         Editable e = target.getText();
@@ -487,7 +480,7 @@ public class MgCustomForward {
         String cur = e.toString();
         if (cur.endsWith(sig)) {
             // Ikkinchi bosishda imzoni tahrirlash
-            editSignature(fragment, null);
+            editSignature(fragment, null, true);
             return;
         }
         if (cur.trim().length() > 0) {
@@ -495,9 +488,14 @@ public class MgCustomForward {
         }
         e.append(sig);
         target.setSelection(target.length());
+        say.run("✓ Imzo qo'shildi (qayta bossangiz — tahrirlash)");
     }
 
     public static void editSignature(org.telegram.ui.ActionBar.BaseFragment fragment, Runnable after) {
+        editSignature(fragment, after, false);
+    }
+
+    public static void editSignature(org.telegram.ui.ActionBar.BaseFragment fragment, Runnable after, boolean overlay) {
         Context ctx = fragment.getParentActivity();
         if (ctx == null) return;
         org.telegram.ui.Components.EditTextBoldCursor f = new org.telegram.ui.Components.EditTextBoldCursor(ctx);
@@ -522,7 +520,47 @@ public class MgCustomForward {
             }
         });
         b.setNegativeButton("Bekor", null);
-        fragment.showDialog(b.create());
+        if (overlay) {
+            b.show();
+        } else {
+            fragment.showDialog(b.create());
+        }
+    }
+
+    /** Muharrir ichida tarjima (dialog yopilmaydi) */
+    private static void translateInEditor(ChatActivity fragment, int account, EditTextCaption edit, Utilities.Callback<String> say, boolean append) {
+        Context ctx = fragment.getParentActivity();
+        if (ctx == null) {
+            return;
+        }
+        MgTranslate.chooseLanguage(fragment, append ? "Tarjima qaysi tilda qo'shilsin?" : "Qaysi tilga tarjima qilinsin?", true, lang -> {
+            CharSequence[] arr = {new SpannableStringBuilder(edit.getText())};
+            ArrayList<TLRPC.MessageEntity> ents = MediaDataController.getInstance(account).getEntities(arr, true, false);
+            String src = arr[0] == null ? "" : arr[0].toString();
+            if (TextUtils.isEmpty(src.trim())) {
+                say.run("Tarjima uchun matn yo'q");
+                return;
+            }
+            say.run("⏳ Tarjima qilinmoqda…");
+            MgTranslate.translate(account, src, ents, lang, (res, err) -> {
+                if (res != null) {
+                    CharSequence tr = fromEntities(res.text, res.entities);
+                    if (append) {
+                        Editable e = edit.getText();
+                        if (e != null) {
+                            e.append("\n\n");
+                            e.append(tr);
+                        }
+                    } else {
+                        edit.setText(tr);
+                    }
+                    edit.setSelection(edit.length());
+                    say.run("✓ Tarjima qilindi: " + MgTranslate.nameOf(lang));
+                } else {
+                    say.run("⚠️ " + (err == null ? "Tarjima qilib bo'lmadi" : err));
+                }
+            });
+        });
     }
 
     private static void openPicker(ChatActivity fragment, State st) {

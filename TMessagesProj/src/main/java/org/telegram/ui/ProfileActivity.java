@@ -10735,7 +10735,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     usernameRow = rowCount++;
                 }
                 if (user != null) {
-                    mgIdRow = rowCount++;
+                    if (org.telegram.messenger.MgConfig.getBool("show_profile_id", true)) mgIdRow = rowCount++;
                 }
                 if (userInfo != null) {
                     if (userInfo.birthday != null) {
@@ -10896,7 +10896,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     usernameRow = rowCount++;
                 }
                 if (currentChat != null) {
-                    mgIdRow = rowCount++;
+                    if (org.telegram.messenger.MgConfig.getBool("show_profile_id", true)) mgIdRow = rowCount++;
                 }
             }
             if (emptyRow < 0 && emptyRow2 < 0) {

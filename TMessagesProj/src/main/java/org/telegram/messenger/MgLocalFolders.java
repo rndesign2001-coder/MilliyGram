@@ -33,6 +33,10 @@ public class MgLocalFolders {
     public static final int TYPE_ADMIN = 1;
     public static final int TYPE_ADMIN_CHANNELS = 2;
     public static final int TYPE_ADMIN_GROUPS = 3;
+    public static final int TYPE_CUSTOM = 4; // foydalanuvchi toifasi (faqat tanlangan chatlar)
+
+    public static final int CUSTOM_MIN = 920;
+    public static final int CUSTOM_MAX = 989;
 
     private static final int EXCL_ARCH = MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_ARCHIVED;
 
@@ -47,16 +51,19 @@ public class MgLocalFolders {
     }
 
     static {
-        icon("all", R.drawable.msg_discussion, "Barcha chatlar");
-        icon("unread", R.drawable.msg_markunread, "O'qilmagan");
-        icon("private", R.drawable.msg_folders_private, "Profillar");
-        icon("groups", R.drawable.msg_folders_groups, "Guruhlar");
-        icon("channels", R.drawable.msg_folders_channels, "Kanallar");
-        icon("bots", R.drawable.msg_folders_bots, "Botlar");
+        icon("all", R.drawable.msg_media, "Barcha chatlar");
+        icon("private", R.drawable.msg_contacts, "Profillar");
+        icon("groups", R.drawable.msg_groups, "Guruhlar");
+        icon("channels", R.drawable.msg_channel, "Kanallar");
+        icon("bots", R.drawable.msg_bots, "Botlar");
         icon("fave", R.drawable.msg_fave, "Tanlanganlar");
         icon("admin", R.drawable.msg_admins, "Admin");
-        icon("admin_channels", R.drawable.msg_channel, "Mening kanallarim");
-        icon("admin_groups", R.drawable.msg_groups, "Mening guruhlarim");
+        icon("unread", R.drawable.msg_markunread, "O'qilmagan");
+        icon("admin_channels", R.drawable.msg_channel_create, "Mening kanallarim");
+        icon("admin_groups", R.drawable.msg_groups_create, "Mening guruhlarim");
+        icon("archive", R.drawable.msg_archive, "Arxiv");
+        icon("chat", R.drawable.msg_discussion, "Suhbat");
+        icon("category", R.drawable.msg_folders, "Toifa");
         icon("folder", R.drawable.msg_folders, "Jild");
         icon("home", R.drawable.msg_home, "Uy");
         icon("work", R.drawable.msg_work, "Ish");
@@ -95,11 +102,11 @@ public class MgLocalFolders {
     }
 
     private static final Def[] DEFS = {
-            new Def(901, "unread", "O'qilmagan", MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS | MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_READ | EXCL_ARCH, TYPE_NONE, "unread", true, 1),
+            new Def(903, "private", "Profillar", MessagesController.DIALOG_FILTER_FLAG_CONTACTS | MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS | EXCL_ARCH, TYPE_NONE, "private", true, 1),
             new Def(902, "groups", "Guruhlar", MessagesController.DIALOG_FILTER_FLAG_GROUPS | EXCL_ARCH, TYPE_NONE, "groups", true, 2),
-            new Def(903, "private", "Profillar", MessagesController.DIALOG_FILTER_FLAG_CONTACTS | MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS | EXCL_ARCH, TYPE_NONE, "private", true, 3),
-            new Def(904, "channels", "Kanallar", MessagesController.DIALOG_FILTER_FLAG_CHANNELS | EXCL_ARCH, TYPE_NONE, "channels", true, 4),
-            new Def(905, "bots", "Botlar", MessagesController.DIALOG_FILTER_FLAG_BOTS | EXCL_ARCH, TYPE_NONE, "bots", true, 5),
+            new Def(904, "channels", "Kanallar", MessagesController.DIALOG_FILTER_FLAG_CHANNELS | EXCL_ARCH, TYPE_NONE, "channels", true, 3),
+            new Def(905, "bots", "Botlar", MessagesController.DIALOG_FILTER_FLAG_BOTS | EXCL_ARCH, TYPE_NONE, "bots", true, 4),
+            new Def(901, "unread", "O'qilmagan", MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS | MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_READ | EXCL_ARCH, TYPE_NONE, "unread", true, 5),
             new Def(906, "admin", "Admin", MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_ADMIN, "admin", false, 6),
             new Def(907, "admin_channels", "Mening kanallarim", MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_ADMIN_CHANNELS, "admin_channels", false, 7),
             new Def(908, "admin_groups", "Mening guruhlarim", MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_ADMIN_GROUPS, "admin_groups", false, 8),
@@ -172,6 +179,18 @@ public class MgLocalFolders {
         } catch (Throwable e) {
             FileLog.e(e);
         }
+        // v2 migratsiyasi: yangi tartib va Plus uslubidagi ikonkalar
+        final boolean migrate = !MgConfig.getBool("mg_lf_v2_" + account, false);
+        if (migrate) {
+            for (Def d : DEFS) {
+                Entry e = saved.get(d.id);
+                if (e != null) {
+                    e.pos = d.pos;
+                    e.icon = d.icon;
+                }
+                MgConfig.setString("folder_icon_" + account + "_" + d.id, null);
+            }
+        }
         ArrayList<Entry> result = new ArrayList<>();
         for (Def d : DEFS) {
             Entry e = saved.get(d.id);
@@ -188,7 +207,21 @@ public class MgLocalFolders {
             e.type = d.type;
             result.add(e);
         }
+        // Foydalanuvchi toifalari
+        for (Entry e : saved.values()) {
+            if (e.id >= CUSTOM_MIN && e.id <= CUSTOM_MAX) {
+                e.type = TYPE_CUSTOM;
+                e.flags = 0;
+                result.add(e);
+            }
+        }
         Collections.sort(result, (a, b) -> Integer.compare(a.pos, b.pos));
+        if (migrate) {
+            MgConfig.setBool("mg_lf_v2_" + account, true);
+            if (!saved.isEmpty()) {
+                save(account, result);
+            }
+        }
         return result;
     }
 
@@ -353,6 +386,139 @@ public class MgLocalFolders {
         mc.getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
     }
 
+    // ---------- Toifalar (foydalanuvchi yaratgan lokal jildlar) ----------
+
+    public static ArrayList<Entry> getCategories(int account) {
+        ArrayList<Entry> list = new ArrayList<>();
+        for (Entry e : load(account)) {
+            if (e.type == TYPE_CUSTOM) {
+                list.add(e);
+            }
+        }
+        return list;
+    }
+
+    private static void applyAndNotify(int account) {
+        MessagesController mc = MessagesController.getInstance(account);
+        inject(mc);
+        mc.lockFiltersInternal();
+        resetUnreadCache();
+        mc.getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
+        for (int a = 0; a < 2; a++) {
+            if (mc.selectedDialogFilter[a] != null) {
+                MessagesController.DialogFilter f = mc.dialogFiltersById.get(mc.selectedDialogFilter[a].id);
+                if (f != null && f != mc.selectedDialogFilter[a]) {
+                    mc.selectDialogFilter(f, a);
+                }
+            }
+        }
+        mc.sortDialogs(null);
+        mc.getNotificationCenter().postNotificationName(NotificationCenter.dialogsNeedReload, true);
+    }
+
+    /** Yangi toifa yaratadi, id qaytaradi (0 — joy qolmagan) */
+    public static int createCategory(int account, String name, ArrayList<Long> dialogs) {
+        if (!isEnabledFeature()) {
+            MgConfig.setBool("local_folders", true);
+        }
+        ArrayList<Entry> entries = load(account);
+        int id = 0;
+        for (int candidate = CUSTOM_MIN; candidate <= CUSTOM_MAX; candidate++) {
+            boolean used = false;
+            for (Entry e : entries) {
+                if (e.id == candidate) {
+                    used = true;
+                    break;
+                }
+            }
+            if (!used) {
+                id = candidate;
+                break;
+            }
+        }
+        if (id == 0) {
+            return 0;
+        }
+        MessagesController mc = MessagesController.getInstance(account);
+        // xotiradagi tartibni saqlab qolish
+        for (int i = 0; i < mc.dialogFilters.size(); i++) {
+            for (Entry e : entries) {
+                if (e.id == mc.dialogFilters.get(i).id) {
+                    e.pos = i;
+                }
+            }
+        }
+        Entry e = new Entry();
+        e.id = id;
+        e.key = "custom";
+        e.name = name;
+        e.flags = 0;
+        e.type = TYPE_CUSTOM;
+        e.icon = "category";
+        e.enabled = true;
+        e.pos = Math.max(1, mc.dialogFilters.size());
+        if (dialogs != null) {
+            for (Long d : dialogs) {
+                if (!e.always.contains(d)) {
+                    e.always.add(d);
+                }
+            }
+        }
+        entries.add(e);
+        save(account, entries);
+        applyAndNotify(account);
+        return id;
+    }
+
+    /** Chatlarni toifaga qo'shadi; qo'shilganlar sonini qaytaradi */
+    public static int addToCategory(int account, int id, ArrayList<Long> dialogs) {
+        MessagesController mc = MessagesController.getInstance(account);
+        persist(account);
+        ArrayList<Entry> entries = load(account);
+        int added = 0;
+        for (Entry e : entries) {
+            if (e.id != id) {
+                continue;
+            }
+            for (Long d : dialogs) {
+                e.never.remove(d);
+                if (!e.always.contains(d)) {
+                    e.always.add(d);
+                    added++;
+                }
+            }
+            e.enabled = true;
+        }
+        save(account, entries);
+        applyAndNotify(account);
+        return added;
+    }
+
+    public static void removeFromCategory(int account, int id, ArrayList<Long> dialogs) {
+        persist(account);
+        ArrayList<Entry> entries = load(account);
+        for (Entry e : entries) {
+            if (e.id == id) {
+                e.always.removeAll(dialogs);
+            }
+        }
+        save(account, entries);
+        applyAndNotify(account);
+    }
+
+    public static void deleteCategory(int account, int id) {
+        persist(account);
+        ArrayList<Entry> entries = load(account);
+        for (int i = entries.size() - 1; i >= 0; i--) {
+            if (entries.get(i).id == id) {
+                entries.remove(i);
+            }
+        }
+        save(account, entries);
+        MgConfig.setString("folder_icon_" + account + "_" + id, null);
+        applyAndNotify(account);
+    }
+
     // ---------- So'rovlarni ushlash (lokal jildlar serverga yuborilmaydi) ----------
 
     /** @return true bo'lsa so'rov serverga yuborilmaydi (javob lokal beriladi) */
@@ -415,28 +581,59 @@ public class MgLocalFolders {
 
     private static final SparseArray<long[]> unreadCache = new SparseArray<>();
 
-    public static int getUnreadCount(int account, MessagesController.DialogFilter filter) {
-        int key = account * 1000 + filter.id;
+    /** {ovozli o'qilmagan chatlar, ovozsiz o'qilmagan chatlar} — 1.5 soniya keshlanadi */
+    public static int[] getUnreadCounts(int account, MessagesController.DialogFilter filter) {
+        int key = account * 100000 + (filter.id & 0xFFFF);
         long now = SystemClock.elapsedRealtime();
         long[] cached = unreadCache.get(key);
         if (cached != null && now - cached[0] < 1500) {
-            return (int) cached[1];
+            return new int[]{(int) cached[1], (int) cached[2]};
         }
         MessagesController mc = MessagesController.getInstance(account);
         AccountInstance ai = AccountInstance.getInstance(account);
-        int count = 0;
+        int count = 0, muted = 0;
         ArrayList<TLRPC.Dialog> all = mc.getAllDialogs();
         for (int i = 0, n = all.size(); i < n; i++) {
             TLRPC.Dialog d = all.get(i);
             if (d == null || d.folder_id != 0 && (filter.flags & EXCL_ARCH) != 0) {
                 continue;
             }
-            if ((d.unread_count > 0 || d.unread_mark) && !mc.isDialogMuted(d.id, 0) && filter.includesDialog(ai, d.id, d)) {
+            if (!(d.unread_count > 0 || d.unread_mark)) {
+                continue;
+            }
+            if (MgConfig.isDialogHidden(account, d.id)) {
+                continue;
+            }
+            try {
+                if (!filter.includesDialog(ai, d.id, d)) {
+                    continue;
+                }
+            } catch (Throwable e) {
+                continue;
+            }
+            if (mc.isDialogMuted(d.id, 0)) {
+                muted++;
+            } else {
                 count++;
             }
         }
-        unreadCache.put(key, new long[]{now, count});
-        return count;
+        unreadCache.put(key, new long[]{now, count, muted});
+        return new int[]{count, muted};
+    }
+
+    /** Tab hisoblagichi: ovozli bo'lsa ular soni, aks holda ovozsizlar soni */
+    public static int getUnreadCount(int account, MessagesController.DialogFilter filter) {
+        int[] c = getUnreadCounts(account, filter);
+        return c[0] > 0 ? c[0] : c[1];
+    }
+
+    public static boolean isMutedOnly(int account, MessagesController.DialogFilter filter) {
+        int[] c = getUnreadCounts(account, filter);
+        return c[0] == 0 && c[1] > 0;
+    }
+
+    public static void resetUnreadCache() {
+        unreadCache.clear();
     }
 
     // ---------- Jild ikonkasi va tabni yashirish (barcha jildlar uchun) ----------

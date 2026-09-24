@@ -55,6 +55,11 @@ public class MgConfig {
         }
     }
 
+    /** Arxiv qatori barcha jild tablarida ko'rinadimi */
+    public static boolean isArchiveInAllTabs() {
+        return getBool("archive_all_tabs", true);
+    }
+
     public static void setString(String key, String value) {
         prefs().edit().putString(key, value).apply();
     }

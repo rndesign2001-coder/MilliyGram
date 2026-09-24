@@ -393,7 +393,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         Runnable saveScrollPositionRunnable = () -> {
             if (listView != null && listView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE && listView.getChildCount() > 0 && listView.getLayoutManager() != null) {
-                boolean hasHiddenArchive = dialogsType == DIALOGS_TYPE_DEFAULT && hasHiddenArchive() && archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN;
+                boolean hasHiddenArchive = mgArchiveType(dialogsType) && hasHiddenArchive() && archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN;
                 float tabsTranslation = scrollYOffset;
                 LinearLayoutManager layoutManager = ((LinearLayoutManager) listView.getLayoutManager());
                 View view = null;
@@ -712,6 +712,15 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private final static int community_ungroup = 111;
     private final static int mg_favorite = 120; // MilliyGram: tanlanganlarga qo'shish
     private final static int mg_hide = 121; // MilliyGram: yashirin bo'limga
+    private final static int mg_shortcut = 122;
+    private final static int mg_category = 123;
+    private final static int mg_add_to_group = 124;
+    private final static int mg_clear_cache = 125;
+    private final static int mg_chat_settings = 126;
+    private final static int mg_preview = 127;
+    private ActionBarMenuSubItem mgAddToGroupItem;
+    private ActionBarMenuSubItem mgPreviewItem;
+    private int mgArchiveKind; // MilliyGram: arxivni turlar bo'yicha saralash
 
     private final static int ARCHIVE_ITEM_STATE_PINNED = 0;
     private final static int ARCHIVE_ITEM_STATE_SHOWED = 1;
@@ -958,7 +967,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
             if (invalidateScrollY && (rightSlidingDialogContainer == null || !rightSlidingDialogContainer.hasFragment()) && progressToActionMode == 0) {
                 invalidateScrollY = false;
-                int firstItemPosition = hasHiddenArchive() && viewPages[0].dialogsType == DIALOGS_TYPE_DEFAULT ? 1 : 0;
+                int firstItemPosition = hasHiddenArchive() && mgArchiveType(viewPages[0].dialogsType) ? 1 : 0;
                 DialogsRecyclerView recyclerView = viewPages[0].listView;
                 if (fixScrollYAfterArchiveOpened) {
                     if (waitingForScrollFinished) {
@@ -2051,7 +2060,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 RecyclerView.ViewHolder holder = parentPage.listView.findViewHolderForAdapterPosition(pos);
                 if (holder != null) {
                     int top = holder.itemView.getTop();
-                    if (parentPage.dialogsType == DIALOGS_TYPE_DEFAULT && hasHiddenArchive() && parentPage.archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN) {
+                    if (mgArchiveType(parentPage.dialogsType) && hasHiddenArchive() && parentPage.archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN) {
                         pos = Math.max(1, pos);
                     }
                     ignoreLayout = true;
@@ -2059,7 +2068,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     ignoreLayout = false;
                 }
             } else if (pos == RecyclerView.NO_POSITION && firstLayout) {
-                parentPage.layoutManager.scrollToPositionWithOffset(parentPage.dialogsType == DIALOGS_TYPE_DEFAULT && hasHiddenArchive() ? 1 : 0, (int) scrollYOffset);
+                parentPage.layoutManager.scrollToPositionWithOffset(mgArchiveType(parentPage.dialogsType) && hasHiddenArchive() ? 1 : 0, (int) scrollYOffset);
             }
 
             ignoreLayout = true;
@@ -2105,7 +2114,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             ignoreLayout = false;
 
             if (firstLayout && getMessagesController().dialogsLoaded) {
-                if (parentPage.dialogsType == DIALOGS_TYPE_DEFAULT && hasHiddenArchive()) {
+                if (mgArchiveType(parentPage.dialogsType) && hasHiddenArchive()) {
                     ignoreLayout = true;
                     LinearLayoutManager layoutManager = (LinearLayoutManager) getLayoutManager();
                     layoutManager.scrollToPositionWithOffset(1, (int) scrollYOffset);
@@ -2241,7 +2250,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 }
             }
             boolean result = super.onTouchEvent(e);
-            if (parentPage.dialogsType == DIALOGS_TYPE_DEFAULT && (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) && parentPage.archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN && hasHiddenArchive()) {
+            if (mgArchiveType(parentPage.dialogsType) && (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) && parentPage.archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN && hasHiddenArchive()) {
                 LinearLayoutManager layoutManager = (LinearLayoutManager) getLayoutManager();
                 int currentPosition = layoutManager.findFirstVisibleItemPosition();
                 if (currentPosition == 0) {
@@ -2365,7 +2374,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         int p = adapter.findDialogPosition(anchorView.getDialogId());
                         int offset = (int) (anchorView.getTop() - anchorListView.getPaddingTop() + scrollOffset);
                         if (p >= 0) {
-                            boolean hasArchive = parentPage.dialogsType == DIALOGS_TYPE_DEFAULT && parentPage.archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN && hasHiddenArchive();
+                            boolean hasArchive = mgArchiveType(parentPage.dialogsType) && parentPage.archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN && hasHiddenArchive();
                             int fixedOffset = adapter.fixScrollGap(this, p, offset, hasArchive, hasStories, canShowFilterTabsView, opened);
                             ((LinearLayoutManager) animationSupportListView.getLayoutManager()).scrollToPositionWithOffset(p, fixedOffset);
                         }
@@ -3444,6 +3453,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         });
         fragmentSearchFieldWatcher.setDoNotCloseAfterFieldEmpty();
 
+        if (initialDialogsType == DIALOGS_TYPE_DEFAULT && folderId == 1 && communityId == 0) {
+            // MilliyGram: arxivni turlar bo'yicha saralash
+            ActionBarMenuItem mgKindItem = menu.addItem(9051, R.drawable.msg_media);
+            mgKindItem.setContentDescription("Arxivni saralash");
+            mgKindItem.setOnClickListener(v -> mgShowArchiveKindPicker());
+        }
         if (initialDialogsType == DIALOGS_TYPE_DEFAULT) {
             optionsItem = menu.addItem(4, R.drawable.ic_ab_other);
             optionsItem.setContentDescription(LocaleController.getString(R.string.AccDescrMoreOptions));
@@ -3588,6 +3603,17 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             filterTabsView.setVisibility(View.GONE);
             canShowFilterTabsView = false;
             animatorFilterTabsVisible.setValue(false, false);
+            filterTabsView.mgMutedCounter = tabId -> {
+                ArrayList<MessagesController.DialogFilter> mgFilters = getMessagesController().getDialogFilters();
+                if (filterTabsView == null || tabId == filterTabsView.getDefaultTabId() || tabId < 0 || tabId >= mgFilters.size()) {
+                    return false;
+                }
+                MessagesController.DialogFilter f = mgFilters.get(tabId);
+                if (f.isDefault() || !(org.telegram.messenger.MgLocalFolders.isLocal(f) || org.telegram.messenger.MgConfig.isFolderIconTabs())) {
+                    return false;
+                }
+                return org.telegram.messenger.MgLocalFolders.isMutedOnly(currentAccount, f);
+            };
             filterTabsView.setDelegate(new FilterTabsView.FilterTabsViewDelegate() {
 
                 private void showDeleteAlert(MessagesController.DialogFilter dialogFilter) {
@@ -3698,7 +3724,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         return 0;
                     }
                     MessagesController.DialogFilter mgTabFilter = getMessagesController().getDialogFilters().get(tabId);
-                    if (org.telegram.messenger.MgLocalFolders.isLocal(mgTabFilter)) {
+                    if (org.telegram.messenger.MgLocalFolders.isLocal(mgTabFilter) || org.telegram.messenger.MgConfig.isFolderIconTabs()) {
                         return org.telegram.messenger.MgLocalFolders.getUnreadCount(currentAccount, mgTabFilter);
                     }
                     return mgTabFilter.unreadCount;
@@ -4051,6 +4077,32 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 } else if (id == mg_favorite) {
                     mgAddToFavorites(new ArrayList<>(selectedDialogs));
                     hideActionMode(true);
+                } else if (id == mg_shortcut) {
+                    MgDialogActions.addShortcuts(DialogsActivity.this, currentAccount, new ArrayList<>(selectedDialogs));
+                    hideActionMode(true);
+                } else if (id == mg_category) {
+                    ArrayList<Long> mgDids = new ArrayList<>(selectedDialogs);
+                    hideActionMode(true);
+                    MgDialogActions.addToCategory(DialogsActivity.this, currentAccount, mgDids);
+                } else if (id == mg_add_to_group) {
+                    if (selectedDialogs.size() == 1) {
+                        long mgDid = selectedDialogs.get(0);
+                        hideActionMode(true);
+                        MgDialogActions.addUserToGroup(DialogsActivity.this, currentAccount, mgDid);
+                    }
+                } else if (id == mg_clear_cache) {
+                    ArrayList<Long> mgDids = new ArrayList<>(selectedDialogs);
+                    hideActionMode(true);
+                    MgDialogActions.clearCache(DialogsActivity.this, currentAccount, mgDids);
+                } else if (id == mg_chat_settings) {
+                    hideActionMode(true);
+                    presentFragment(new MgSettingsPage(MgSettingsPage.PAGE_CHATLIST));
+                } else if (id == mg_preview) {
+                    if (selectedDialogs.size() == 1) {
+                        long mgDid = selectedDialogs.get(0);
+                        hideActionMode(true);
+                        AndroidUtilities.runOnUIThread(() -> mgPreviewDialog(mgDid), 250);
+                    }
                 } else if (id == pin || id == read || id == delete || id == clear || id == mute || id == archive || id == block || id == archive2 || id == pin2) {
                     performSelectedDialogsAction(selectedDialogs, id, true, false);
                 }
@@ -4141,7 +4193,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
                 @Override
                 protected int firstPosition() {
-                    if (viewPage.dialogsType == DIALOGS_TYPE_DEFAULT && hasHiddenArchive() && viewPage.archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN) {
+                    if (mgArchiveType(viewPage.dialogsType) && hasHiddenArchive() && viewPage.archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN) {
                         return 1;
                     }
                     return 0;
@@ -4234,7 +4286,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     if (hasStories && !rightSlidingDialogContainer.hasFragment() && !fixScrollYAfterArchiveOpened) {
                         pTop -= dp(DialogStoriesCell.HEIGHT_IN_DP);
                     }
-                    boolean hasHiddenArchive = !fixScrollYAfterArchiveOpened && viewPage.dialogsType == DIALOGS_TYPE_DEFAULT && !onlySelect && folderId == 0 && communityId == 0 && getMessagesController().hasHiddenArchive() && viewPage.archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN;
+                    boolean hasHiddenArchive = !fixScrollYAfterArchiveOpened && mgArchiveType(viewPage.dialogsType) && !onlySelect && folderId == 0 && communityId == 0 && getMessagesController().hasHiddenArchive() && viewPage.archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN;
                     if ((hasHiddenArchive || (hasStories && !rightSlidingDialogContainer.hasFragment())) && dy < 0) {
                         viewPage.listView.setOverScrollMode(View.OVER_SCROLL_ALWAYS);
                         int currentPosition = viewPage.layoutManager.findFirstVisibleItemPosition();
@@ -4305,7 +4357,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         viewPage.listView.setViewsOffset(ty);
                     }
 
-                    if (viewPage.dialogsType == DIALOGS_TYPE_DEFAULT && viewPage.archivePullViewState != ARCHIVE_ITEM_STATE_PINNED && hasHiddenArchive() && !fixScrollYAfterArchiveOpened) {
+                    if (mgArchiveType(viewPage.dialogsType) && viewPage.archivePullViewState != ARCHIVE_ITEM_STATE_PINNED && hasHiddenArchive() && !fixScrollYAfterArchiveOpened) {
                         int usedDy = super.scrollVerticallyBy(measuredDy, recycler, state);
                         if (viewPage.pullForegroundDrawable != null) {
                             viewPage.pullForegroundDrawable.scrollDy = usedDy;
@@ -4595,7 +4647,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         }
                     }
                     if (!hasStories && recyclerView == viewPages[0].listView && !searching && actionBar != null && !actionBar.isActionModeShowed() && !disableActionBarScrolling && !rightSlidingDialogContainer.hasFragment()) {
-                        if (dy > 0 && hasHiddenArchive() && viewPages[0].dialogsType == DIALOGS_TYPE_DEFAULT) {
+                        if (dy > 0 && hasHiddenArchive() && mgArchiveType(viewPages[0].dialogsType)) {
                             View child = recyclerView.getChildAt(0);
                             if (child != null) {
                                 RecyclerView.ViewHolder holder = recyclerView.getChildViewHolder(child);
@@ -5520,7 +5572,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     LinearLayoutManager layoutManager = new LinearLayoutManager(context) {
                         @Override
                         protected int firstPosition() {
-                            if (page.dialogsType == DIALOGS_TYPE_DEFAULT && hasHiddenArchive() && page.archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN) {
+                            if (mgArchiveType(page.dialogsType) && hasHiddenArchive() && page.archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN) {
                                 return 1;
                             }
                             return 0;
@@ -6793,7 +6845,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         readItem = otherItem.addSubItem(read, R.drawable.msg_markread, LocaleController.getString(R.string.MarkAsRead));
         clearItem = otherItem.addSubItem(clear, R.drawable.msg_clear, LocaleController.getString(R.string.ClearHistory));
         blockItem = otherItem.addSubItem(block, R.drawable.msg_block, LocaleController.getString(R.string.BlockUser));
-        otherItem.addSubItem(mg_hide, R.drawable.msg_archive, "Yashirish");
+        otherItem.addSubItem(mg_shortcut, R.drawable.msg_home, "Bosh ekranga chiqarish");
+        otherItem.addSubItem(mg_category, R.drawable.msg_folders, "Toifaga qo'shish");
+        mgAddToGroupItem = otherItem.addSubItem(mg_add_to_group, R.drawable.msg_contact_add, "Guruh yoki kanalga qo'shish");
+        otherItem.addSubItem(mg_hide, R.drawable.msg_stories_myhide, "Yashirish");
+        otherItem.addSubItem(mg_clear_cache, R.drawable.msg_clearcache, "Keshni tozalash");
+        otherItem.addSubItem(mg_chat_settings, R.drawable.msg_settings, "Chatlar sozlamalari");
+        mgPreviewItem = otherItem.addSubItem(mg_preview, R.drawable.msg_views, "Chat ko'rinishi");
 
         muteItem.setOnLongClickListener(e -> {
             performSelectedDialogsAction(selectedDialogs, mute, true, true);
@@ -6865,6 +6923,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
             viewPages[a].listView.setScrollEnabled(true);
             getMessagesController().selectDialogFilter(filter, viewPages[a].dialogsType == 8 ? 1 : 0);
+            if (mgArchiveType(viewPages[a].dialogsType)) {
+                viewPages[a].listView.updatePullState();
+            }
         }
 
         if (viewPages.length > 1) {
@@ -6872,7 +6933,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
 
         viewPages[a].dialogsAdapter.setDialogsType(viewPages[a].dialogsType);
-        viewPages[a].layoutManager.scrollToPositionWithOffset(viewPages[a].dialogsType == DIALOGS_TYPE_DEFAULT && hasHiddenArchive() && viewPages[a].archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN ? 1 : 0, (int) scrollYOffset);
+        viewPages[a].layoutManager.scrollToPositionWithOffset(mgArchiveType(viewPages[a].dialogsType) && hasHiddenArchive() && viewPages[a].archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN ? 1 : 0, (int) scrollYOffset);
         checkListLoad(viewPages[a]);
     }
 
@@ -6904,11 +6965,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
         }
         if (filter == null || filter.isDefault()) {
-            return R.drawable.msg_discussion;
+            return R.drawable.msg_media;
         }
         String name = filter.name == null ? "" : filter.name.toLowerCase();
-        if (name.contains("tanlangan") || name.contains("⭐") || name.contains("sevimli")) {
+        if (name.contains("tanlangan") || name.contains("⭐") || name.contains("sevimli") || name.contains("избран")) {
             return R.drawable.msg_fave;
+        }
+        if (name.contains("admin")) {
+            return R.drawable.msg_admins;
         }
         if (filter.isChatlist()) {
             return R.drawable.msg_folders;
@@ -6916,19 +6980,19 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         int types = filter.flags & MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS;
         int privateFlags = MessagesController.DIALOG_FILTER_FLAG_CONTACTS | MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS;
         if ((filter.flags & MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_READ) != 0) {
-            return R.drawable.msg_msgbubble3;
+            return R.drawable.msg_markunread;
         }
         if (types != 0 && (types & ~privateFlags) == 0) {
-            return R.drawable.msg_folders_private;
+            return R.drawable.msg_contacts;
         }
         if (types == MessagesController.DIALOG_FILTER_FLAG_GROUPS) {
-            return R.drawable.msg_folders_groups;
+            return R.drawable.msg_groups;
         }
         if (types == MessagesController.DIALOG_FILTER_FLAG_CHANNELS) {
-            return R.drawable.msg_folders_channels;
+            return R.drawable.msg_channel;
         }
         if (types == MessagesController.DIALOG_FILTER_FLAG_BOTS) {
-            return R.drawable.msg_folders_bots;
+            return R.drawable.msg_bots;
         }
         return R.drawable.msg_folders;
     }
@@ -6958,6 +7022,65 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             actionBar.setTitle(filters.size() > 1 ? getString(R.string.FilterAllChats) : mgMainTitle(), statusDrawable);
         } else {
             actionBar.setTitle(filters.get(tabId).name, statusDrawable);
+        }
+    }
+
+    /** Tanlangan chatni o'qilgan deb belgilamasdan oldindan ko'rish */
+    private void mgPreviewDialog(long did) {
+        for (int p = 0; viewPages != null && p < viewPages.length; p++) {
+            RecyclerListView lv = viewPages[p].listView;
+            for (int i = 0; lv != null && i < lv.getChildCount(); i++) {
+                View child = lv.getChildAt(i);
+                if (child instanceof DialogCell && ((DialogCell) child).getDialogId() == did) {
+                    if (showChatPreview((DialogCell) child)) {
+                        return;
+                    }
+                }
+            }
+        }
+        Bundle args = new Bundle();
+        if (DialogObject.isUserDialog(did)) {
+            args.putLong("user_id", did);
+        } else {
+            args.putLong("chat_id", -did);
+        }
+        if (getMessagesController().checkCanOpenChat(args, this)) {
+            presentFragmentAsPreview(new ChatActivity(args));
+        }
+    }
+
+    private void mgShowArchiveKindPicker() {
+        if (getParentActivity() == null) {
+            return;
+        }
+        CharSequence[] names = new CharSequence[MgDialogActions.KIND_NAMES.length];
+        for (int i = 0; i < names.length; i++) {
+            names[i] = MgDialogActions.KIND_NAMES[i] + (i == mgArchiveKind ? "  ✓" : "");
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+        builder.setTitle("Arxivni saralash");
+        builder.setItems(names, MgDialogActions.KIND_ICONS, (dialog, which) -> {
+            mgArchiveKind = which;
+            mgUpdateArchiveTitle();
+            if (viewPages != null) {
+                for (ViewPage page : viewPages) {
+                    page.updateList(false);
+                }
+            }
+        });
+        showDialog(builder.create());
+    }
+
+    private void mgUpdateArchiveTitle() {
+        if (actionBar == null || folderId == 0) {
+            return;
+        }
+        if (mgArchiveKind == MgDialogActions.KIND_ALL) {
+            actionBar.setTitle(getString(R.string.ArchivedChats));
+            actionBar.setSubtitle(null);
+        } else {
+            actionBar.setTitle(MgDialogActions.KIND_NAMES[mgArchiveKind]);
+            actionBar.setSubtitle(getString(R.string.ArchivedChats));
         }
     }
 
@@ -7120,7 +7243,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 canShowFilterTabsView = false;
                 updateFilterTabsVisibility(animated);
                 for (int a = 0; a < viewPages.length; a++) {
-                    if (viewPages[a].dialogsType == DIALOGS_TYPE_DEFAULT && viewPages[a].archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN && hasHiddenArchive()) {
+                    if (mgArchiveType(viewPages[a].dialogsType) && viewPages[a].archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN && hasHiddenArchive()) {
                         int p = viewPages[a].layoutManager.findFirstVisibleItemPosition();
                         if (p == 0 || p == 1) {
                             viewPages[a].layoutManager.scrollToPositionWithOffset(1, (int) scrollYOffset);
@@ -7331,7 +7454,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         showFiltersHint();
         if (viewPages != null) {
             for (int a = 0; a < viewPages.length; a++) {
-                if (viewPages[a].dialogsType == 0 && viewPages[a].archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN && viewPages[a].layoutManager.findFirstVisibleItemPosition() == 0 && hasHiddenArchive()) {
+                if (mgArchiveType(viewPages[a].dialogsType) && viewPages[a].archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN && viewPages[a].layoutManager.findFirstVisibleItemPosition() == 0 && hasHiddenArchive()) {
                     viewPages[a].layoutManager.scrollToPositionWithOffset(1, (int) scrollYOffset);
                 }
                 if (a == 0) {
@@ -9078,6 +9201,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
     }
 
+    /** MilliyGram: arxiv qatori (yashirish/tortib ochish) jildlar tablarida ham ishlaydi */
+    public static boolean mgArchiveType(int dialogsType) {
+        return dialogsType == DIALOGS_TYPE_DEFAULT || (dialogsType == 7 || dialogsType == 8) && org.telegram.messenger.MgConfig.isArchiveInAllTabs();
+    }
+
     public boolean hasHiddenArchive() {
         return !onlySelect && initialDialogsType == DIALOGS_TYPE_DEFAULT && communityId == 0 && folderId == 0 && getMessagesController().hasHiddenArchive();
     }
@@ -9485,7 +9613,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                                 performSelectedDialogsAction(didsCopy, action, false, false, param ? dialogsIdsPossibleToRevoke : null);
                                 getMessagesController().setDialogsInTransaction(false);
                                 getMessagesController().checkIfFolderEmpty(folderId);
-                                if (folderId != 0 && getDialogsArray(currentAccount, viewPages[0].dialogsType, folderId, false).size() == 0) {
+                                if (folderId != 0 && getMessagesController().getDialogs(folderId).size() == 0) {
                                     viewPages[0].listView.setEmptyView(null);
                                     viewPages[0].progressView.setVisibility(View.INVISIBLE);
                                     finishFragment();
@@ -9608,7 +9736,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                             if (action == clear && ChatObject.isChannel(chat) && (!chat.megagroup || ChatObject.isPublic(chat))) {
                                 getMessagesController().deleteDialog(selectedDialog, 2, param);
                             } else {
-                                if (action == delete && folderId != 0 && getDialogsArray(currentAccount, viewPages[0].dialogsType, folderId, false).size() == 1) {
+                                if (action == delete && folderId != 0 && getMessagesController().getDialogs(folderId).size() == 1) {
                                     viewPages[0].progressView.setVisibility(View.INVISIBLE);
                                 }
 
@@ -9817,7 +9945,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         int selectedDialogIndex = -1;
         int currentDialogIndex = -1;
 
-        int scrollToPosition = viewPages[0].dialogsType == 0 && hasHiddenArchive() && viewPages[0].archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN ? 1 : 0;
+        int scrollToPosition = mgArchiveType(viewPages[0].dialogsType) && hasHiddenArchive() && viewPages[0].archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN ? 1 : 0;
         int currentPosition = viewPages[0].layoutManager.findFirstVisibleItemPosition();
 
         if (filter != null) {
@@ -9887,7 +10015,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     viewPages[0].dialogsItemAnimator.prepareForRemove();
                     viewPages[0].updateList(true);
 
-                    viewPages[0].layoutManager.scrollToPositionWithOffset(viewPages[0].dialogsType == 0 && hasHiddenArchive() && viewPages[0].archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN ? 1 : 0, (int) scrollYOffset);
+                    viewPages[0].layoutManager.scrollToPositionWithOffset(mgArchiveType(viewPages[0].dialogsType) && hasHiddenArchive() && viewPages[0].archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN ? 1 : 0, (int) scrollYOffset);
 
                     animate = true;
                 } else if (currentDialogIndex >= 0 && selectedDialogIndex == currentDialogIndex) {
@@ -9906,7 +10034,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             return;
         }
 
-        int position = viewPages[0].dialogsType == 0 && hasHiddenArchive() && viewPages[0].archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN ? 1 : 0;
+        int position = mgArchiveType(viewPages[0].dialogsType) && hasHiddenArchive() && viewPages[0].archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN ? 1 : 0;
         int offset = 0;
         if (hasStories && !expandStories && !dialogStoriesCell.isExpanded()) {
             offset = -dp(DialogStoriesCell.HEIGHT_IN_DP);
@@ -10125,7 +10253,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
         }
         if (addToFolderItem != null) {
-            if (folderId == 1 || filterTabsView != null && getFilterTabsVisibilityFactor(false) > 0.5f && filterTabsView.currentTabIsDefault() && !FiltersListBottomSheet.getCanAddDialogFilters(this, selectedDialogs).isEmpty()) {
+            if (folderId == 1 || !FiltersListBottomSheet.getCanAddDialogFilters(this, selectedDialogs).isEmpty()) {
                 addToFolderItem.setVisibility(View.VISIBLE);
             } else {
                 addToFolderItem.setVisibility(View.GONE);
@@ -10152,6 +10280,15 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     readItem.setVisibility(View.GONE);
                 }
             }
+        }
+        if (mgAddToGroupItem != null) {
+            boolean single = selectedDialogs.size() == 1;
+            long sd = single ? selectedDialogs.get(0) : 0;
+            TLRPC.User su = single && sd > 0 ? getMessagesController().getUser(sd) : null;
+            mgAddToGroupItem.setVisibility(su != null && !UserObject.isUserSelf(su) && !UserObject.isDeleted(su) ? View.VISIBLE : View.GONE);
+        }
+        if (mgPreviewItem != null) {
+            mgPreviewItem.setVisibility(selectedDialogs.size() == 1 && !DialogObject.isEncryptedDialog(selectedDialogs.get(0)) ? View.VISIBLE : View.GONE);
         }
         if (pinItem != null && pin2Item != null) {
             if (canPinCount != 0) {
@@ -10654,7 +10791,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
         int oldItemCount = viewPage.dialogsAdapter.getCurrentCount();
 
-        if (viewPage.dialogsType == 0 && hasHiddenArchive() && viewPage.listView.getChildCount() == 0 && viewPage.archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN) {
+        if (mgArchiveType(viewPage.dialogsType) && hasHiddenArchive() && viewPage.listView.getChildCount() == 0 && viewPage.archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN) {
             LinearLayoutManager layoutManager = (LinearLayoutManager) viewPage.listView.getLayoutManager();
             layoutManager.scrollToPositionWithOffset(1, (int) scrollYOffset);
         }
@@ -10709,6 +10846,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     AndroidUtilities.runOnUIThread(() -> {
                         reloadViewPageDialogs(viewPage, args.length > 0);
                         if (filterTabsView != null && filterTabsView.getVisibility() == View.VISIBLE) {
+                            org.telegram.messenger.MgLocalFolders.resetUnreadCache();
                             filterTabsView.checkTabsCounter();
                         }
                     }, 160);
@@ -10717,6 +10855,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 }
             }
             if (filterTabsView != null && filterTabsView.getVisibility() == View.VISIBLE) {
+                org.telegram.messenger.MgLocalFolders.resetUnreadCache();
                 filterTabsView.checkTabsCounter();
             }
             slowedReloadAfterDialogClick = false;
@@ -10769,6 +10908,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             Integer mask = (Integer) args[0];
             updateVisibleRows(mask);
             if (filterTabsView != null && filterTabsView.getVisibility() == View.VISIBLE && (mask & MessagesController.UPDATE_MASK_READ_DIALOG_MESSAGE) != 0) {
+                org.telegram.messenger.MgLocalFolders.resetUnreadCache();
                 filterTabsView.checkTabsCounter();
             }
             if (communityId != 0 ) {
@@ -11173,7 +11313,20 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @NonNull
     public ArrayList<TLRPC.Dialog> getDialogsArray(int currentAccount, int dialogsType, int folderId, boolean frozen) {
         // MilliyGram: yashirin chatlar ro'yxatda ko'rinmaydi
-        return org.telegram.messenger.MgConfig.filterHidden(currentAccount, mgGetDialogsArrayRaw(currentAccount, dialogsType, folderId, frozen));
+        ArrayList<TLRPC.Dialog> mgRes = org.telegram.messenger.MgConfig.filterHidden(currentAccount, mgGetDialogsArrayRaw(currentAccount, dialogsType, folderId, frozen));
+        if (folderId == 1 && mgArchiveKind != 0 && dialogsType == DIALOGS_TYPE_DEFAULT && !frozen) {
+            mgRes = MgDialogActions.filterKind(MessagesController.getInstance(currentAccount), mgRes, mgArchiveKind);
+        }
+        // MilliyGram: "Arxivlangan chatlar" qatori jildlar tablarida ham
+        if ((dialogsType == 7 || dialogsType == 8) && folderId == 0 && communityId == 0 && !onlySelect && initialDialogsType == DIALOGS_TYPE_DEFAULT
+                && org.telegram.messenger.MgConfig.isArchiveInAllTabs() && mgRes != null) {
+            TLRPC.Dialog mgFolder = MessagesController.getInstance(currentAccount).dialogs_dict.get(DialogObject.makeFolderDialogId(1));
+            if (mgFolder instanceof TLRPC.TL_dialogFolder && !mgRes.isEmpty() && mgRes.get(0) != mgFolder) {
+                mgRes = new ArrayList<>(mgRes);
+                mgRes.add(0, mgFolder);
+            }
+        }
+        return mgRes;
     }
 
     private ArrayList<TLRPC.Dialog> mgGetDialogsArrayRaw(int currentAccount, int dialogsType, int folderId, boolean frozen) {
@@ -12947,6 +13100,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         } else {
             newVisibility = !onlySelfStories && getStoriesController().hasStories();
             onlySelfStories = getStoriesController().hasOnlySelfStories();
+        }
+        if (org.telegram.messenger.MgConfig.getBool("hide_stories", false)) {
+            // MilliyGram: hikoyalar paneli yashirilgan
+            newVisibility = false;
+            onlySelfStories = false;
         }
 
         hasOnlySlefStories = onlySelfStories;

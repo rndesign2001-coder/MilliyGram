@@ -186,7 +186,7 @@ public class MgAccountMenu {
             }
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getParentActivity(), fragment.getResourceProvider());
-        builder.setTitle("🙈 Yashirilgan akkauntlar");
+        builder.setTitle("Yashirilgan akkauntlar");
         if (hidden.isEmpty()) {
             builder.setMessage("Yashirilgan akkaunt yo'q. Akkauntni yashirish: akkauntlar ro'yxatida ⚙ → \"Yashirish\".");
             builder.setPositiveButton("OK", null);

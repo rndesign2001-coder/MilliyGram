@@ -35,18 +35,91 @@ public class MgThemesActivity extends UniversalFragment {
 
     @Override
     protected CharSequence getTitle() {
-        return "🎨 MilliyGram mavzulari";
+        return "MilliyGram mavzulari";
+    }
+
+    /** Rangli doira: TextCell ikonkaga rang filtri qo'yganda ham o'z rangini saqlaydi */
+    public static class ColorDot extends Drawable {
+        private final android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint ring = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final int color, color2;
+        private final boolean selected;
+
+        public ColorDot(int color, int color2, boolean selected) {
+            this.color = color;
+            this.color2 = color2;
+            this.selected = selected;
+            ring.setStyle(android.graphics.Paint.Style.STROKE);
+            ring.setStrokeWidth(AndroidUtilities.dp(2));
+        }
+
+        @Override
+        public void draw(android.graphics.Canvas canvas) {
+            android.graphics.Rect b = getBounds();
+            float cx = b.exactCenterX(), cy = b.exactCenterY();
+            float r = Math.min(b.width(), b.height()) / 2f - AndroidUtilities.dp(selected ? 4 : 1);
+            paint.setColor(color);
+            if (color2 != 0 && color2 != color) {
+                android.graphics.RectF rf = new android.graphics.RectF(cx - r, cy - r, cx + r, cy + r);
+                canvas.drawArc(rf, 90, 180, true, paint);
+                paint.setColor(color2);
+                canvas.drawArc(rf, 270, 180, true, paint);
+            } else {
+                canvas.drawCircle(cx, cy, r, paint);
+            }
+            if (selected) {
+                ring.setColor(color);
+                canvas.drawCircle(cx, cy, r + AndroidUtilities.dp(3), ring);
+            }
+        }
+
+        @Override
+        public int getIntrinsicWidth() {
+            return AndroidUtilities.dp(26);
+        }
+
+        @Override
+        public int getIntrinsicHeight() {
+            return AndroidUtilities.dp(26);
+        }
+
+        @Override
+        public void setAlpha(int alpha) {
+        }
+
+        @Override
+        public void setColorFilter(android.graphics.ColorFilter colorFilter) {
+            // atayin e'tiborsiz: rang o'zgarmasin
+        }
+
+        @Override
+        public int getOpacity() {
+            return android.graphics.PixelFormat.TRANSLUCENT;
+        }
+    }
+
+    /** Joriy MilliyGram mavzusi nomi (bo'lmasa bo'sh) */
+    public static String currentName() {
+        try {
+            Theme.ThemeInfo t = Theme.getActiveTheme();
+            if (t != null) {
+                boolean night = "Dark Blue".equals(t.getKey());
+                if (night || "Blue".equals(t.getKey())) {
+                    int[] ids = night ? Theme.MG_THEME_NIGHT_IDS : Theme.MG_THEME_DAY_IDS;
+                    for (int i = 0; i < ids.length; i++) {
+                        if (ids[i] == t.currentAccentId) {
+                            return Theme.MG_THEME_NAMES[i];
+                        }
+                    }
+                }
+            }
+        } catch (Throwable ignore) {
+        }
+        return "";
     }
 
     private Drawable dot(int color, boolean selected) {
-        GradientDrawable d = new GradientDrawable();
-        d.setShape(GradientDrawable.OVAL);
-        d.setColor(color);
-        if (selected) {
-            d.setStroke(AndroidUtilities.dp(3), Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
-        }
-        d.setSize(AndroidUtilities.dp(26), AndroidUtilities.dp(26));
-        return d;
+        return new ColorDot(color, 0, selected);
     }
 
     private boolean isCurrent(boolean night, int idx) {
@@ -61,7 +134,7 @@ public class MgThemesActivity extends UniversalFragment {
 
     @Override
     protected void fillItems(ArrayList<UItem> items, UniversalAdapter adapter) {
-        items.add(UItem.asHeader("☀️ Kunduzgi mavzular"));
+        items.add(UItem.asHeader("Kunduzgi mavzular"));
         for (int i = 0; i < Theme.MG_THEME_NAMES.length; i++) {
             if (i == Theme.MG_THEME_NAMES.length - 1 && Build.VERSION.SDK_INT < 31) {
                 continue;
@@ -70,7 +143,7 @@ public class MgThemesActivity extends UniversalFragment {
             items.add(UItem.asButton(ID_DAY_BASE + i, dot(Theme.MG_THEME_COLORS[i], cur), Theme.MG_THEME_NAMES[i] + (cur ? "  ✓" : "")));
         }
         items.add(UItem.asShadow(null));
-        items.add(UItem.asHeader("🌙 Tungi mavzular"));
+        items.add(UItem.asHeader("Tungi mavzular"));
         for (int i = 0; i < Theme.MG_THEME_NAMES.length; i++) {
             if (i == Theme.MG_THEME_NAMES.length - 1 && Build.VERSION.SDK_INT < 31) {
                 continue;
@@ -95,12 +168,19 @@ public class MgThemesActivity extends UniversalFragment {
                 .putString(night ? "lastDarkTheme" : "lastDayTheme", info.getKey())
                 .commit();
         Theme.turnOffAutoNight(this);
+        final String name = Theme.MG_THEME_NAMES[idx];
+        // Mavzu animatsiyasidan keyin barcha ekranlarni qayta chizish (eski ranglar qolib ketmasin)
+        AndroidUtilities.runOnUIThread(() -> {
+            if (getParentLayout() != null) {
+                getParentLayout().rebuildAllFragmentViews(true, true);
+            }
+        }, 650);
         AndroidUtilities.runOnUIThread(() -> {
             if (listView != null) {
                 listView.adapter.update(true);
             }
-            BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, "Mavzu qo'llanildi: " + Theme.MG_THEME_NAMES[idx]).show();
-        }, 400);
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, "Mavzu qo'llanildi: " + name).show();
+        }, 900);
     }
 
     @Override

@@ -108,7 +108,7 @@ public class MgHiddenSettingsActivity extends UniversalFragment {
         items.add(UItem.asShadow("Bu kod chat qulfi kodidan alohida. Parolsiz kirish yoqilsa, qidiruvni uzoq bosganda kod so'ralmaydi."));
 
         items.add(UItem.asHeader("Xavfsizlik"));
-        items.add(UItem.asCheck(ID_SHAKE, "📳 Silkitib yashirish").setChecked(MgConfig.isShakeToHide()));
+        items.add(UItem.asCheck(ID_SHAKE, "Silkitib yashirish").setChecked(MgConfig.isShakeToHide()));
         items.add(UItem.asShadow("Telefonni keskin silkitsangiz, ochiq yashirin bo'lim va qulflangan chatlar darhol yopiladi, yashirilgan akkauntdan asosiy akkauntga o'tiladi."));
 
         items.add(UItem.asHeader("Yolg'on ism"));

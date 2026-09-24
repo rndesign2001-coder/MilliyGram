@@ -39,6 +39,7 @@ public class MgFoldersActivity extends UniversalFragment {
     private static final int ID_ICON_TABS = 1;
     private static final int ID_LOCAL = 2;
     private static final int ID_EDIT_CLOUD = 3;
+    private static final int ID_NEW_CATEGORY = 4;
     private static final int ID_LOCAL_BASE = 1000;
     private static final int ID_HIDDEN_BASE = 3000;
 
@@ -69,8 +70,10 @@ public class MgFoldersActivity extends UniversalFragment {
                 if (custom != null && MgLocalFolders.ICONS.containsKey(custom)) {
                     icon = MgLocalFolders.ICONS.get(custom);
                 }
-                items.add(UItem.asButtonCheck(ID_LOCAL_BASE + i, e.name, e.enabled ? "Yoqilgan" : "Yashirilgan").setChecked(e.enabled));
+                String sub = e.type == MgLocalFolders.TYPE_CUSTOM ? "Toifa · " + e.always.size() + " ta chat · " + (e.enabled ? "yoqilgan" : "yashirilgan") : (e.enabled ? "Yoqilgan" : "Yashirilgan");
+                items.add(UItem.asButtonCheck(ID_LOCAL_BASE + i, e.name, sub).setChecked(e.enabled));
             }
+            items.add(UItem.asButton(ID_NEW_CATEGORY, R.drawable.msg_add, "Yangi toifa yaratish"));
             items.add(UItem.asShadow("Yoqish/yashirish uchun bosing. Nomini yoki ikonkasini o'zgartirish uchun uzoq bosing.\n\n• Admin — siz admin bo'lgan barcha guruh va kanallar\n• Mening kanallarim / guruhlarim — o'zingiz ochganlari"));
         }
 
@@ -113,6 +116,14 @@ public class MgFoldersActivity extends UniversalFragment {
             presentFragment(new FiltersSetupActivity());
             return;
         }
+        if (item.id == ID_NEW_CATEGORY) {
+            MgDialogActions.askName(this, "Yangi toifa", "", name -> {
+                MgLocalFolders.createCategory(currentAccount, name, new ArrayList<>());
+                listView.adapter.update(true);
+                org.telegram.ui.Components.BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, "Toifa yaratildi. Chatlarni belgilab ⋮ → \"Toifaga qo'shish\"").show();
+            });
+            return;
+        }
         int local = item.id - ID_LOCAL_BASE;
         if (local >= 0 && local < entries.size()) {
             MgLocalFolders.Entry e = entries.get(local);
@@ -134,10 +145,16 @@ public class MgFoldersActivity extends UniversalFragment {
             return false;
         }
         MgLocalFolders.Entry e = entries.get(local);
-        ItemOptions.makeOptions(this, view)
+        ItemOptions o = ItemOptions.makeOptions(this, view)
                 .add(R.drawable.msg_edit, "Nomini o'zgartirish", () -> showRename(e))
-                .add(R.drawable.msg_palette, "Ikonka tanlash", () -> showIconPicker(e.id))
-                .show();
+                .add(R.drawable.msg_palette, "Ikonka tanlash", () -> showIconPicker(e.id));
+        if (e.type == MgLocalFolders.TYPE_CUSTOM) {
+            o.add(R.drawable.msg_delete, "Toifani o'chirish", true, () -> {
+                MgLocalFolders.deleteCategory(currentAccount, e.id);
+                listView.adapter.update(true);
+            });
+        }
+        o.show();
         return true;
     }
 

@@ -53,6 +53,11 @@ public class MgTranslate {
     }
 
     public static void chooseLanguage(BaseFragment fragment, String title, Utilities.Callback<String> onChosen) {
+        chooseLanguage(fragment, title, false, onChosen);
+    }
+
+    /** overlay=true — boshqa dialog ustida ochiladi (uni yopmaydi) */
+    public static void chooseLanguage(BaseFragment fragment, String title, boolean overlay, Utilities.Callback<String> onChosen) {
         if (fragment == null || fragment.getParentActivity() == null) {
             return;
         }
@@ -67,7 +72,11 @@ public class MgTranslate {
             MgConfig.setString("mg_translate_out", CODES[which]);
             onChosen.run(CODES[which]);
         });
-        fragment.showDialog(builder.create());
+        if (overlay) {
+            builder.show();
+        } else {
+            fragment.showDialog(builder.create());
+        }
     }
 
     /** Tilni tanlash (saqlamasdan), joriy til belgilanadi */
@@ -85,28 +94,118 @@ public class MgTranslate {
         fragment.showDialog(builder.create());
     }
 
+    public static final int ENGINE_AUTO = 0;
+    public static final int ENGINE_GOOGLE = 1;
+    public static final int ENGINE_TELEGRAM = 2;
+    public static final String[] ENGINE_NAMES = {"Avtomatik (Telegram + Google)", "Google Tarjimon", "Telegram"};
+
+    public static int getEngine() {
+        return MgConfig.getInt("mg_translate_engine", ENGINE_AUTO);
+    }
+
     /**
-     * Matnni tarjima qiladi. Natija UI thread'da: (tarjima, xato matni)
+     * Matnni tarjima qiladi. Natija UI thread'da: (tarjima, xato matni).
+     * Avtomatik rejimda avval Telegram, u ishlamasa yoki matnni o'zgartirmasa — Google.
      */
     public static void translate(int account, String text, ArrayList<TLRPC.MessageEntity> entities, String lang,
                                  Utilities.Callback2<TLRPC.TL_textWithEntities, String> done) {
+        final String src = text == null ? "" : text;
+        int engine = getEngine();
+        if (engine == ENGINE_GOOGLE) {
+            google(src, lang, done);
+            return;
+        }
         TLRPC.TL_messages_translateText req = new TLRPC.TL_messages_translateText();
         req.flags |= 2;
         TLRPC.TL_textWithEntities t = new TLRPC.TL_textWithEntities();
-        t.text = text == null ? "" : text;
+        t.text = src;
         if (entities != null) {
             t.entities = new ArrayList<>(entities);
         }
         req.text.add(t);
         req.to_lang = lang;
         ConnectionsManager.getInstance(account).sendRequest(req, (res, err) -> AndroidUtilities.runOnUIThread(() -> {
+            TLRPC.TL_textWithEntities result = null;
             if (res instanceof TLRPC.TL_messages_translateResult
-                    && !((TLRPC.TL_messages_translateResult) res).result.isEmpty()
-                    && ((TLRPC.TL_messages_translateResult) res).result.get(0) != null) {
-                done.run(((TLRPC.TL_messages_translateResult) res).result.get(0), null);
+                    && !((TLRPC.TL_messages_translateResult) res).result.isEmpty()) {
+                result = ((TLRPC.TL_messages_translateResult) res).result.get(0);
+            }
+            boolean unchanged = result == null || result.text == null || result.text.trim().equals(src.trim());
+            if (!unchanged) {
+                done.run(result, null);
+            } else if (engine == ENGINE_AUTO) {
+                google(src, lang, done);
             } else {
-                done.run(null, err != null ? err.text : "Tarjima qilib bo'lmadi");
+                done.run(null, err != null ? "Telegram: " + err.text : "Telegram tarjima qila olmadi");
             }
         }));
+    }
+
+    /** Google Tarjimon (ochiq gtx endpoint) — formatlashsiz oddiy matn */
+    public static void google(String text, String lang, Utilities.Callback2<TLRPC.TL_textWithEntities, String> done) {
+        Utilities.globalQueue.postRunnable(() -> {
+            String out = null;
+            String error = null;
+            java.net.HttpURLConnection c = null;
+            try {
+                java.net.URL url = new java.net.URL("https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl="
+                        + java.net.URLEncoder.encode(lang, "UTF-8") + "&dt=t&ie=UTF-8&oe=UTF-8");
+                c = (java.net.HttpURLConnection) url.openConnection();
+                c.setRequestMethod("POST");
+                c.setConnectTimeout(15000);
+                c.setReadTimeout(20000);
+                c.setDoOutput(true);
+                c.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Mobile Safari/537.36");
+                c.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+                byte[] body = ("q=" + java.net.URLEncoder.encode(text, "UTF-8")).getBytes("UTF-8");
+                c.setFixedLengthStreamingMode(body.length);
+                try (java.io.OutputStream os = c.getOutputStream()) {
+                    os.write(body);
+                }
+                int code = c.getResponseCode();
+                if (code != 200) {
+                    error = "Google: HTTP " + code;
+                } else {
+                    StringBuilder sb = new StringBuilder();
+                    try (java.io.BufferedReader r = new java.io.BufferedReader(new java.io.InputStreamReader(c.getInputStream(), "UTF-8"))) {
+                        char[] buf = new char[4096];
+                        int n;
+                        while ((n = r.read(buf)) > 0) {
+                            sb.append(buf, 0, n);
+                        }
+                    }
+                    org.json.JSONArray root = new org.json.JSONArray(sb.toString());
+                    org.json.JSONArray parts = root.getJSONArray(0);
+                    StringBuilder res = new StringBuilder();
+                    for (int i = 0; i < parts.length(); i++) {
+                        org.json.JSONArray part = parts.optJSONArray(i);
+                        if (part != null && !part.isNull(0)) {
+                            res.append(part.optString(0, ""));
+                        }
+                    }
+                    out = res.toString();
+                }
+            } catch (Throwable e) {
+                error = "Internet orqali tarjima qilib bo'lmadi";
+            } finally {
+                if (c != null) {
+                    try {
+                        c.disconnect();
+                    } catch (Throwable ignore) {
+                    }
+                }
+            }
+            final String outF = out;
+            final String errF = error;
+            AndroidUtilities.runOnUIThread(() -> {
+                if (outF != null && !outF.isEmpty()) {
+                    TLRPC.TL_textWithEntities t = new TLRPC.TL_textWithEntities();
+                    t.text = outF;
+                    done.run(t, null);
+                } else {
+                    done.run(null, errF != null ? errF : "Tarjima qilib bo'lmadi");
+                }
+            });
+        });
     }
 }

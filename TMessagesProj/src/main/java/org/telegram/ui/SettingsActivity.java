@@ -689,7 +689,8 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
         }
 
         // MilliyGram sozlamalari
-        items.add(SettingCell.Factory.of(100, 0xFF1E9BF0, 0xFF0B4FB3, R.drawable.settings_features, "MilliyGram", "Qo'shimcha imkoniyatlar"));
+        items.add(SettingCell.Factory.of(100, 0xFF5AB2FF, 0xFF2F80ED, R.drawable.settings_mg_gear, "MilliyGram sozlamalari", "Jildlar, arxiv, tarjima, maxfiylik"));
+        items.add(SettingCell.Factory.of(101, 0xFFFFB547, 0xFFF08A1C, R.drawable.settings_mg_palette, "Dizayn", "Mavzular, ranglar, chat foni"));
         items.add(UItem.asShadow(null));
 
         items.add(SettingCell.Factory.of(1, IconBackgroundColors.BLUE.top, IconBackgroundColors.BLUE.bottom, R.drawable.settings_account, getString(R.string.SettingsAccount), getString(R.string.SettingsAccountInfo)));
@@ -815,6 +816,9 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
         switch (item.id) {
             case 100:
                 presentSettingFragment(new MilliyGramSettingsActivity());
+                break;
+            case 101:
+                presentSettingFragment(new MgDesignActivity());
                 break;
             case 1:
                 presentSettingFragment(new UserInfoActivity());

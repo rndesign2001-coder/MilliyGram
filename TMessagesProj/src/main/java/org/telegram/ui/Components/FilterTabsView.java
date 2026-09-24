@@ -125,6 +125,7 @@ public class FilterTabsView extends FrameLayout {
         public boolean isLocked;
         public boolean noanimate;
         public CharSequence mgIcon; // MilliyGram: jild ikonkasi (matn o'rniga)
+        public boolean mgMuted; // MilliyGram: faqat ovozsiz chatlar hisoblangan (kulrang)
 
         public Tab(int i, CharSequence title, boolean noanimate) {
             this.id = i;
@@ -140,6 +141,7 @@ public class FilterTabsView extends FrameLayout {
                 if (c < 0) {
                     c = 0;
                 }
+                mgMuted = mgMutedCounter != null && c > 0 && Boolean.TRUE.equals(mgMutedCounter.run(id));
                 if (store) {
                     counter = c;
                 }
@@ -152,7 +154,7 @@ public class FilterTabsView extends FrameLayout {
                 String counterText = String.format("%d", c);
                 int counterWidth = (int) Math.ceil(textCounterPaint.measureText(counterText));
                 int countWidth = Math.max(dp(TAB_COUNTER_HEIGHT - 10), counterWidth) + dp(10);
-                counterResultWidth = countWidth + dp(-2);
+                counterResultWidth = mgIcon != null ? Math.max(0, countWidth - dp(MG_BADGE_OVERLAP)) : countWidth + dp(-2);
             } else {
                 counterResultWidth = !isDefault && isEditing ? dp(TAB_COUNTER_HEIGHT - 5) : 0;
             }
@@ -182,6 +184,9 @@ public class FilterTabsView extends FrameLayout {
     }
 
     private static final float TAB_PADDING_WIDTH = 24;
+    private static final float MG_BADGE_OVERLAP = 11;
+    /** MilliyGram: tab hisoblagichi faqat ovozsiz chatlardanmi (kulrang ko'rsatish uchun) */
+    public Utilities.CallbackReturn<Integer, Boolean> mgMutedCounter;
     private static final float TAB_INTERNAL_PADDING = 12.5f;
     private static final float TAB_COUNTER_HEIGHT = 17.333f;
 
@@ -394,13 +399,16 @@ public class FilterTabsView extends FrameLayout {
             }
 
             tabCounterVisible = (countWidth != 0 && !animateCounterRemove) ? (counterText != null ? 1.0f : editingStartAnimationProgress) : 0;
+            if (currentTab.mgIcon != null) {
+                tabWidth = currentTab.titleWidth + ((countWidth != 0 && !animateCounterRemove) ? Math.max(0, countWidth - dp(MG_BADGE_OVERLAP)) : 0);
+            } else
             tabWidth = currentTab.titleWidth + ((countWidth != 0 && !animateCounterRemove) ? countWidth + dp(-2 * (counterText != null ? 1.0f : editingStartAnimationProgress)) : 0);
             float textX = (getMeasuredWidth() - tabWidth) / 2f;
             if (animateTextX) {
                 textX = textX * changeProgress + animateFromTextX * (1f - changeProgress);
             }
 
-            if (!TextUtils.equals(currentTab.title, currentText)) {
+            if (currentTab.mgIcon != null || currentText instanceof android.text.SpannableString ? currentTab.title != currentText : !TextUtils.equals(currentTab.title, currentText)) {
                 currentText = currentTab.title;
                 textLayout = new StaticLayout(currentText, textPaint, dp(400), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0, false);
                 textLayoutEmojis = AnimatedEmojiSpan.update(currentTab.noanimate ? AnimatedEmojiDrawable.CACHE_TYPE_NOANIMATE_FOLDER : AnimatedEmojiDrawable.CACHE_TYPE_MESSAGES, this, textLayoutEmojis, textLayout);
@@ -468,6 +476,9 @@ public class FilterTabsView extends FrameLayout {
                 } else {
                     counterPaint.setColor(textPaint.getColor());
                 }
+                if (currentTab.mgIcon != null && currentTab.mgMuted) {
+                    counterPaint.setColor(Theme.getColor(Theme.key_chats_unreadCounterMuted, resourcesProvider));
+                }
 
                 float x;
                 float titleWidth = currentTab.titleWidth;
@@ -480,6 +491,11 @@ public class FilterTabsView extends FrameLayout {
                     x = textX + titleWidth + dp(5);
                 }
                 int countTop = (getMeasuredHeight() - dp(TAB_COUNTER_HEIGHT)) / 2;
+                if (currentTab.mgIcon != null) {
+                    // MilliyGram: hisoblagich ikonka ustida, o'ng-pastda (Plus uslubi)
+                    x = textX + titleWidth - dp(MG_BADGE_OVERLAP);
+                    countTop += dp(7);
+                }
 
                 if (showRemove && (isEditing || editingStartAnimationProgress != 0) && counterText == null) {
                     counterPaint.setAlpha((int) (editingStartAnimationProgress * 255));
@@ -663,7 +679,9 @@ public class FilterTabsView extends FrameLayout {
             } else {
                 countWidth = 0;
             }
-            int tabWidth = currentTab.titleWidth + (countWidth != 0 ? countWidth + dp(6 * (counterText != null ? 1.0f : editingStartAnimationProgress)) : 0);
+            int tabWidth = currentTab.mgIcon != null
+                    ? currentTab.titleWidth + (countWidth != 0 ? Math.max(0, countWidth - dp(MG_BADGE_OVERLAP)) : 0)
+                    : currentTab.titleWidth + (countWidth != 0 ? countWidth + dp(6 * (counterText != null ? 1.0f : editingStartAnimationProgress)) : 0);
             int textX = (getMeasuredWidth() - tabWidth) / 2;
 
             if (textX != lastTextX) {
@@ -1320,6 +1338,7 @@ public class FilterTabsView extends FrameLayout {
         android.text.SpannableString icon = new android.text.SpannableString("x");
         ColoredImageSpan span = new ColoredImageSpan(iconRes);
         span.setRelativeSize(textPaint.getFontMetricsInt());
+        span.setSize(dp(23)); // MilliyGram: kattaroq ikonka
         icon.setSpan(span, 0, 1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         Tab tab = new Tab(id, icon, true);
