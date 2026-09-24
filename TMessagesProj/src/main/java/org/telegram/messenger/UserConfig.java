@@ -24,8 +24,8 @@ import java.util.Arrays;
 public class UserConfig extends BaseController {
 
     public static int selectedAccount;
-    public final static int MAX_ACCOUNT_DEFAULT_COUNT = 10; // MilliyGram
-    public final static int MAX_ACCOUNT_COUNT = 10; // MilliyGram: 10 tagacha akkaunt
+    public final static int MAX_ACCOUNT_DEFAULT_COUNT = 30; // MilliyGram
+    public final static int MAX_ACCOUNT_COUNT = 30; // MilliyGram: 30 tagacha akkaunt (botlar bilan)
 
     private final Object sync = new Object();
     private volatile boolean configLoaded;
@@ -296,6 +296,19 @@ public class UserConfig extends BaseController {
             SharedPreferences preferences = getPreferences();
             if (currentAccount == 0) {
                 selectedAccount = preferences.getInt("selectedAccount", 0);
+                // MilliyGram: asosiy akkaunt ilova ochilganda tanlanadi
+                try {
+                    int mgMain = MgConfig.getMainAccount();
+                    if (mgMain > 0 && mgMain < MAX_ACCOUNT_COUNT) {
+                        getInstance(mgMain).loadConfig();
+                    }
+                    if (mgMain > 0 && mgMain < MAX_ACCOUNT_COUNT && getInstance(mgMain).isClientActivated()) {
+                        selectedAccount = mgMain;
+                    } else if (mgMain == 0) {
+                        selectedAccount = 0;
+                    }
+                } catch (Throwable ignore) {
+                }
             }
             registeredForPush = preferences.getBoolean("registeredForPush", false);
             lastSendMessageId = preferences.getInt("lastSendMessageId", -210000);

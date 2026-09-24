@@ -46,6 +46,7 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
     private static final int ID_HIDDEN = 12;
     private static final int ID_FOLDER_ICONS = 13;
     private static final int ID_GHOST = 14;
+    private static final int ID_FOLDERS = 15;
 
     private static final int[][] FOCUS_PRESETS = {
             {22 * 60, 7 * 60},
@@ -81,18 +82,14 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
 
         items.add(UItem.asHeader("Maxfiylik"));
         items.add(UItem.asCheck(ID_GHOST, "👻 Sharpa rejimi").setChecked(MgGhostMode.isEnabled(currentAccount)));
-        if (MgConfig.isHiddenInSettings()) {
-            items.add(UItem.asButton(ID_HIDDEN, R.drawable.msg_archive, "Yashirin bo'lim",
-                    MgConfig.getHiddenDialogs(currentAccount).isEmpty() ? "" : String.valueOf(MgConfig.getHiddenDialogs(currentAccount).size())));
-        }
+        items.add(UItem.asButton(ID_HIDDEN, R.drawable.msg_archive, "🙈 Yashirin bo'lim sozlamalari"));
         int locked = MgConfig.getLockedCount();
-        items.add(UItem.asButton(ID_PIN_RESET, R.drawable.msg_secret, MgConfig.hasPin() ? "Qulfni o'chirish (PIN / grafik kalit)" : "Qulf o'rnatilmagan",
-                locked > 0 ? ("Qulflangan: " + locked) : ""));
-        items.add(UItem.asShadow("Chatni qulflash yoki yashirish uchun chatni oching va yuqoridagi ⋮ menyudan tanlang. Yashirin bo'limga tez kirish: bosh ekranda qidiruv tugmasini uzoq bosing."));
+        items.add(UItem.asButton(ID_PIN_RESET, R.drawable.msg_secret, "🔒 Chat qulfi sozlamalari", locked > 0 ? String.valueOf(locked) : ""));
+        items.add(UItem.asShadow("Yashirin bo'lim va chat qulfi alohida kodlarga ega. Yashirin chatlarni ko'rish: bosh ekranda qidiruv tugmasini uzoq bosing."));
 
         items.add(UItem.asHeader("Dizayn"));
         items.add(UItem.asCheck(ID_HOLIDAY, "Bayram tabriklari").setChecked(MgConfig.isHolidayDecorEnabled()));
-        items.add(UItem.asCheck(ID_FOLDER_ICONS, "Jildlarni ikonkada ko'rsatish").setChecked(MgConfig.isFolderIconTabs()));
+        items.add(UItem.asButton(ID_FOLDERS, R.drawable.msg_folders, "📁 Jildlar (ikonkalar, lokal jildlar)"));
         items.add(UItem.asShadow("Ikonkali jildlarda tanlangan jild nomi tepada yoziladi. Jildni uzoq bosib tartiblash va tahrirlash mumkin. Bayram kunlari sarlavhada tabrik ko'rinadi."));
 
         items.add(UItem.asHeader("Zaxira"));
@@ -149,15 +146,10 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
                 break;
             }
             case ID_PIN_RESET:
-                if (MgConfig.hasPin()) {
-                    MgChatLock.askPin(this, "PIN kodni o'chirish", ok -> {
-                        if (ok) {
-                            MgConfig.removePinAndLocks();
-                            BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, "PIN kod va barcha qulflar olib tashlandi").show();
-                            listView.adapter.update(true);
-                        }
-                    });
-                }
+                MgChatLockSettingsActivity.open(this);
+                break;
+            case ID_FOLDERS:
+                presentFragment(new MgFoldersActivity());
                 break;
             case ID_EXPORT: {
                 String json = MgConfig.exportSettings();
@@ -173,7 +165,7 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
                 showAboutDialog();
                 break;
             case ID_HIDDEN:
-                MgHiddenActivity.open(this);
+                MgHiddenSettingsActivity.open(this);
                 break;
             case ID_GHOST:
                 toggleGhost(view);

@@ -57,6 +57,7 @@ public class MgLockScreen extends Dialog {
     private static final int PIN_LENGTH = 4;
 
     private final int mode;
+    private final String scope;
     private final String lockType;
     private final Utilities.Callback<Boolean> callback;
     private boolean resultSent;
@@ -72,27 +73,28 @@ public class MgLockScreen extends Dialog {
     private String firstEntry;
 
     /** Tekshirish (mavjud kod bilan) */
-    public static void verify(Context context, String title, Utilities.Callback<Boolean> callback) {
+    public static void verify(Context context, String scope, String title, Utilities.Callback<Boolean> callback) {
         if (context == null) {
             callback.run(false);
             return;
         }
-        new MgLockScreen(context, MODE_VERIFY, MgConfig.getLockType(), title, callback).show();
+        new MgLockScreen(context, MODE_VERIFY, scope, MgConfig.getLockType(scope), title, callback).show();
     }
 
     /** Yangi kod yaratish */
-    public static void create(Context context, String type, Utilities.Callback<Boolean> callback) {
+    public static void create(Context context, String scope, String type, Utilities.Callback<Boolean> callback) {
         if (context == null) {
             callback.run(false);
             return;
         }
-        new MgLockScreen(context, MODE_CREATE, type, null, callback).show();
+        new MgLockScreen(context, MODE_CREATE, scope, type, null, callback).show();
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private MgLockScreen(Context context, int mode, String lockType, String title, Utilities.Callback<Boolean> callback) {
+    private MgLockScreen(Context context, int mode, String scope, String lockType, String title, Utilities.Callback<Boolean> callback) {
         super(context, R.style.TransparentDialog);
         this.mode = mode;
+        this.scope = scope;
         this.lockType = lockType;
         this.callback = callback;
 
@@ -180,7 +182,7 @@ public class MgLockScreen extends Dialog {
     }
 
     private boolean canUseFingerprint() {
-        if (mode != MODE_VERIFY || !MgConfig.isFingerprintEnabled() || Build.VERSION.SDK_INT < 23 || LaunchActivity.instance == null) {
+        if (mode != MODE_VERIFY || !MgConfig.isFingerprintEnabled(scope) || Build.VERSION.SDK_INT < 23 || LaunchActivity.instance == null) {
             return false;
         }
         try {
@@ -299,7 +301,7 @@ public class MgLockScreen extends Dialog {
         if (mode == MODE_CREATE) {
             return PIN_LENGTH;
         }
-        int len = MgConfig.getPinLength();
+        int len = MgConfig.getPinLength(scope);
         return len > 0 ? len : 0;
     }
 
@@ -329,8 +331,8 @@ public class MgLockScreen extends Dialog {
                 }
             } else if (pin.length() >= 4) {
                 // eski versiyada saqlangan PIN (uzunligi noma'lum)
-                if (MgConfig.checkPin(pin)) {
-                    MgConfig.setPinLength(pin.length());
+                if (MgConfig.checkLock(scope, pin)) {
+                    MgConfig.setPinLength(scope, pin.length());
                     finish(true);
                 } else if (pin.length() >= 8) {
                     submit(pin);
@@ -344,7 +346,7 @@ public class MgLockScreen extends Dialog {
     private void submit(String secret) {
         if (mode == MODE_VERIFY) {
             String stored = isPattern() ? MgConfig.PATTERN_PREFIX + secret : secret;
-            if (MgConfig.checkPin(stored)) {
+            if (MgConfig.checkLock(scope, stored)) {
                 finish(true);
             } else {
                 onError("Noto'g'ri. Qayta urinib ko'ring");
@@ -356,7 +358,7 @@ public class MgLockScreen extends Dialog {
                 subtitleView.setText(isPattern() ? "Grafik kalitni yana bir marta chizing" : "PIN kodni takrorlang");
                 duckView.playAnimation();
             } else if (firstEntry.equals(secret)) {
-                MgConfig.setLock(lockType, secret);
+                MgConfig.setLock(scope, lockType, secret);
                 finish(true);
             } else {
                 firstEntry = null;
@@ -558,7 +560,7 @@ public class MgLockScreen extends Dialog {
 
         @Override
         protected void onDraw(Canvas canvas) {
-            boolean invisible = mode == MODE_VERIFY && MgConfig.isPatternInvisible();
+            boolean invisible = mode == MODE_VERIFY && MgConfig.isPatternInvisible(scope);
             if (!invisible && !selected.isEmpty()) {
                 Path path = new Path();
                 for (int k = 0; k < selected.size(); k++) {

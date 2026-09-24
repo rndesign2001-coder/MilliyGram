@@ -595,6 +595,7 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
         if (dialogFilters.size() < getMessagesController().dialogFiltersLimitPremium) {
             items.add(ItemInner.asButton(LocaleController.getString(R.string.CreateNewFilter)));
         }
+        items.add(ItemInner.asButton(MG_LOCAL_BUTTON)); // MilliyGram
         items.add(ItemInner.asShadow(null));
         folderTagsPosition = items.size();
         showTagsRow = items.size();
@@ -715,7 +716,11 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
                     presentFragment(new FilterCreateActivity(filter));
                 }
             } else if (item.viewType == VIEW_TYPE_BUTTON) {
-                createFolder(getParentLayout());
+                if (item.text != null && MG_LOCAL_BUTTON.contentEquals(item.text)) {
+                    presentFragment(new MgFoldersActivity());
+                } else {
+                    createFolder(getParentLayout());
+                }
             }
         });
 
@@ -731,8 +736,16 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
         return fragmentView;
     }
 
+    private static final String MG_LOCAL_BUTTON = "Lokal jildlar, ikonkalar va yashirin jildlar";
+
     public void createFolder(INavigationLayout navigationLayout) {
-        final int count = getMessagesController().getDialogFilters().size();
+        int mgCount = 0;
+        for (MessagesController.DialogFilter f : getMessagesController().getDialogFilters()) {
+            if (!org.telegram.messenger.MgLocalFolders.isLocal(f)) {
+                mgCount++;
+            }
+        }
+        final int count = mgCount; // MilliyGram: lokal jildlar limitga kirmaydi
         if (
             count - 1 >= getMessagesController().dialogFiltersLimitDefault && !getUserConfig().isPremium() ||
             count >= getMessagesController().dialogFiltersLimitPremium

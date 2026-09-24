@@ -3701,6 +3701,12 @@ public class ChatActivity extends BaseFragment implements
                 } else if (id == MgChatLock.MENU_ID_HIDE) {
                     MgHiddenActivity.toggleHidden(ChatActivity.this, currentAccount, dialog_id);
                     return;
+                } else if (id == MgChatTools.MENU_EXPORT) {
+                    MgChatTools.export(ChatActivity.this, currentChat != null ? currentChat.title : (currentUser != null ? UserObject.getUserName(currentUser) : "chat"), messages);
+                    return;
+                } else if (id == MgChatTools.MENU_STATS) {
+                    MgChatTools.stats(ChatActivity.this, messages);
+                    return;
                 } else if (id == MgChatLock.MENU_ID_COPY_ID) {
                     long mgId = dialog_id;
                     if (currentChat != null) {
@@ -4470,6 +4476,8 @@ public class ChatActivity extends BaseFragment implements
                     org.telegram.messenger.MgConfig.isDialogLocked(currentAccount, dialog_id) ? "Qulfni olish" : "Chatni qulflash");
                 headerItem.lazilyAddSubItem(MgChatLock.MENU_ID_HIDE, R.drawable.msg_archive,
                     org.telegram.messenger.MgConfig.isDialogHidden(currentAccount, dialog_id) ? "Yashirishdan chiqarish" : "Chatni yashirish");
+                headerItem.lazilyAddSubItem(MgChatTools.MENU_STATS, R.drawable.msg_stats, "📊 Chat statistikasi");
+                headerItem.lazilyAddSubItem(MgChatTools.MENU_EXPORT, R.drawable.msg_download, "📄 Chatni eksport qilish");
             }
             boolean addedSettings = false;
             if (!isTopic) {

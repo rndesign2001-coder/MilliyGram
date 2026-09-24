@@ -212,8 +212,34 @@ public class MgConfig {
         return "locked_dialogs_" + account;
     }
 
+    // Qulf "doira"lari: chat qulfi va yashirin bo'lim alohida kodga ega
+    public static final String SCOPE_CHAT = "chat";
+    public static final String SCOPE_HIDDEN = "hidden";
+
+    private static String k(String scope, String chatKey, String hiddenKey) {
+        return SCOPE_HIDDEN.equals(scope) ? hiddenKey : chatKey;
+    }
+
+    public static boolean hasLock(String scope) {
+        return prefs().contains(k(scope, "chat_pin_hash", "hidden_pin_hash"));
+    }
+
+    public static boolean checkLock(String scope, String secret) {
+        String h = prefs().getString(k(scope, "chat_pin_hash", "hidden_pin_hash"), null);
+        return h != null && h.equals(hash(secret));
+    }
+
+    public static void removeLock(String scope) {
+        SharedPreferences.Editor editor = prefs().edit();
+        editor.remove(k(scope, "chat_pin_hash", "hidden_pin_hash"));
+        editor.remove(k(scope, "lock_type", "hidden_lock_type"));
+        editor.remove(k(scope, "chat_pin_len", "hidden_pin_len"));
+        editor.apply();
+    }
+
+    // eski API — chat qulfi uchun
     public static boolean hasPin() {
-        return prefs().contains("chat_pin_hash");
+        return hasLock(SCOPE_CHAT);
     }
 
     public static void setPin(String pin) {
@@ -221,8 +247,7 @@ public class MgConfig {
     }
 
     public static boolean checkPin(String pin) {
-        String h = prefs().getString("chat_pin_hash", null);
-        return h != null && h.equals(hash(pin));
+        return checkLock(SCOPE_CHAT, pin);
     }
 
     public static void removePinAndLocks() {
@@ -290,8 +315,12 @@ public class MgConfig {
     public static final String PATTERN_PREFIX = "pat:";
 
     public static String getLockType() {
+        return getLockType(SCOPE_CHAT);
+    }
+
+    public static String getLockType(String scope) {
         try {
-            String t = prefs().getString("lock_type", LOCK_PIN);
+            String t = prefs().getString(k(scope, "lock_type", "hidden_lock_type"), LOCK_PIN);
             return LOCK_PATTERN.equals(t) ? LOCK_PATTERN : LOCK_PIN;
         } catch (Throwable e) {
             return LOCK_PIN;
@@ -300,24 +329,44 @@ public class MgConfig {
 
     /** Yangi qulf kodini saqlaydi (PIN yoki grafik kalit ketma-ketligi) */
     public static void setLock(String type, String secret) {
+        setLock(SCOPE_CHAT, type, secret);
+    }
+
+    public static void setLock(String scope, String type, String secret) {
         boolean pattern = LOCK_PATTERN.equals(type);
-        setPin(pattern ? PATTERN_PREFIX + secret : secret);
         prefs().edit()
-                .putString("lock_type", pattern ? LOCK_PATTERN : LOCK_PIN)
-                .putInt("chat_pin_len", pattern ? 0 : secret.length())
+                .putString(k(scope, "chat_pin_hash", "hidden_pin_hash"), hash(pattern ? PATTERN_PREFIX + secret : secret))
+                .putString(k(scope, "lock_type", "hidden_lock_type"), pattern ? LOCK_PATTERN : LOCK_PIN)
+                .putInt(k(scope, "chat_pin_len", "hidden_pin_len"), pattern ? 0 : secret.length())
                 .apply();
     }
 
     public static int getPinLength() {
-        return getInt("chat_pin_len", 0);
+        return getPinLength(SCOPE_CHAT);
+    }
+
+    public static int getPinLength(String scope) {
+        return getInt(k(scope, "chat_pin_len", "hidden_pin_len"), 0);
     }
 
     public static void setPinLength(int len) {
-        setInt("chat_pin_len", len);
+        setPinLength(SCOPE_CHAT, len);
+    }
+
+    public static void setPinLength(String scope, int len) {
+        setInt(k(scope, "chat_pin_len", "hidden_pin_len"), len);
     }
 
     public static boolean isFingerprintEnabled() {
-        return getBool("lock_fingerprint", true);
+        return isFingerprintEnabled(SCOPE_CHAT);
+    }
+
+    public static boolean isFingerprintEnabled(String scope) {
+        return getBool(k(scope, "lock_fingerprint", "hidden_lock_fingerprint"), true);
+    }
+
+    public static String fingerprintKey(String scope) {
+        return k(scope, "lock_fingerprint", "hidden_lock_fingerprint");
     }
 
     public static boolean isLockVibrate() {
@@ -325,7 +374,15 @@ public class MgConfig {
     }
 
     public static boolean isPatternInvisible() {
-        return getBool("pattern_invisible", false);
+        return isPatternInvisible(SCOPE_CHAT);
+    }
+
+    public static boolean isPatternInvisible(String scope) {
+        return getBool(k(scope, "pattern_invisible", "hidden_pattern_invisible"), false);
+    }
+
+    public static String patternInvisibleKey(String scope) {
+        return k(scope, "pattern_invisible", "hidden_pattern_invisible");
     }
 
     /** Yashirin bo'limga parolsiz kirish */
@@ -349,6 +406,32 @@ public class MgConfig {
 
     public static boolean isHiddenAccountNotify() {
         return getBool("hidden_account_notify", false);
+    }
+
+    // ---------- Akkaunt: taxallus, asosiy akkaunt ----------
+
+    public static String getAccountAlias(int account) {
+        String v = getString("account_alias_" + account, "");
+        return v == null ? "" : v.trim();
+    }
+
+    public static void setAccountAlias(int account, String alias) {
+        setString("account_alias_" + account, alias == null ? "" : alias.trim());
+    }
+
+    /** Ilova ochilganda tanlanadigan asosiy akkaunt (-1 — oxirgi ochilgan) */
+    public static int getMainAccount() {
+        return getInt("main_account", -1);
+    }
+
+    public static void setMainAccount(int account) {
+        setInt("main_account", account);
+    }
+
+    // ---------- Silkitib yashirish ----------
+
+    public static boolean isShakeToHide() {
+        return getBool("shake_to_hide", true);
     }
 
     // ---------- Yolg'on ism ----------
@@ -480,7 +563,7 @@ public class MgConfig {
             JSONObject values = new JSONObject();
             for (Map.Entry<String, ?> e : prefs().getAll().entrySet()) {
                 String key = e.getKey();
-                if (key.startsWith("chat_pin") || key.startsWith("locked_dialogs_") || key.startsWith("hidden_dialogs_") || key.startsWith("hidden_account_") || key.startsWith("ghost_") || key.equals("lock_type") || key.equals("fake_name")) {
+                if (key.startsWith("chat_pin") || key.startsWith("hidden_pin") || key.startsWith("hidden_lock") || key.startsWith("locked_dialogs_") || key.startsWith("hidden_dialogs_") || key.startsWith("hidden_account_") || key.startsWith("ghost_") || key.startsWith("account_alias_") || key.startsWith("mg_local_folders_") || key.equals("main_account") || key.equals("lock_type") || key.equals("fake_name")) {
                     continue;
                 }
                 Object v = e.getValue();
@@ -512,7 +595,7 @@ public class MgConfig {
             Iterator<String> keys = values.keys();
             while (keys.hasNext()) {
                 String key = keys.next();
-                if (key.startsWith("chat_pin") || key.startsWith("locked_dialogs_") || key.startsWith("hidden_dialogs_") || key.startsWith("hidden_account_") || key.startsWith("ghost_") || key.equals("lock_type") || key.equals("fake_name")) {
+                if (key.startsWith("chat_pin") || key.startsWith("hidden_pin") || key.startsWith("hidden_lock") || key.startsWith("locked_dialogs_") || key.startsWith("hidden_dialogs_") || key.startsWith("hidden_account_") || key.startsWith("ghost_") || key.startsWith("account_alias_") || key.startsWith("mg_local_folders_") || key.equals("main_account") || key.equals("lock_type") || key.equals("fake_name")) {
                     continue;
                 }
                 JSONObject item = values.getJSONObject(key);

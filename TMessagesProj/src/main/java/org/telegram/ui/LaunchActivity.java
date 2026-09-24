@@ -6726,6 +6726,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     @Override
     protected void onPause() {
+        MgShake.stop(); // MilliyGram
         super.onPause();
         isResumed = false;
         pipActivityHandler.onPause();
@@ -6961,6 +6962,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     @Override
     protected void onResume() {
+        MgShake.start(this); // MilliyGram: silkitib yashirish
         super.onResume();
         isResumed = true;
         pipActivityHandler.onResume();

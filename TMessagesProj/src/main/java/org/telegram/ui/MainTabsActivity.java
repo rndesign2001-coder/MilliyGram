@@ -642,6 +642,8 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
                     showDialog(new LimitReachedBottomSheet(this, getContext(), TYPE_ACCOUNTS, currentAccount, null));
                 }
             });
+            // MilliyGram: uzoq bosish — yashirilgan akkauntlar
+            MgAccountMenu.attachHiddenAccounts(this, o, o.getLast());
         }
 
         if (BuildConfig.DEBUG_PRIVATE_VERSION) {
@@ -660,7 +662,8 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
                         LaunchActivity.instance.switchToAccount(account, true);
                     }
                 });
-                o.addView(btn, LayoutHelper.createLinear(230, 48));
+                MgAccountMenu.decorateRow(this, o, (LinearLayout) btn, account); // MilliyGram: ⚙ menyu
+                o.addView(btn, LayoutHelper.createLinear(270, 48));
             }
         }
 

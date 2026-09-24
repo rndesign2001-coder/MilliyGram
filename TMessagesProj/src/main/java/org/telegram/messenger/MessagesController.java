@@ -875,9 +875,21 @@ public class MessagesController extends BaseController implements NotificationCe
 
     public void lockFiltersInternal() {
         boolean changed = false;
-        if (!getUserConfig().isPremium() && dialogFilters.size() - 1 > dialogFiltersLimitDefault) {
-            int n = dialogFilters.size() - 1 - dialogFiltersLimitDefault;
-            ArrayList<DialogFilter> filtersSortedById = new ArrayList<>(dialogFilters);
+        // MilliyGram: lokal jildlar limitga kirmaydi va hech qachon qulflanmaydi
+        ArrayList<DialogFilter> mgServerFilters = new ArrayList<>();
+        for (DialogFilter f : dialogFilters) {
+            if (MgLocalFolders.isLocal(f)) {
+                if (f.locked) {
+                    f.locked = false;
+                    changed = true;
+                }
+            } else {
+                mgServerFilters.add(f);
+            }
+        }
+        if (!getUserConfig().isPremium() && mgServerFilters.size() - 1 > dialogFiltersLimitDefault) {
+            int n = mgServerFilters.size() - 1 - dialogFiltersLimitDefault;
+            ArrayList<DialogFilter> filtersSortedById = new ArrayList<>(mgServerFilters);
             Collections.reverse(filtersSortedById);
             for (int i = 0; i < filtersSortedById.size(); i++) {
                 if (i < n) {
@@ -1294,6 +1306,7 @@ public class MessagesController extends BaseController implements NotificationCe
         private static int dialogFilterPointer = 10;
         public int localId = dialogFilterPointer++;
         public boolean locked;
+        public int mgLocalType; // MilliyGram: lokal jild turi (Admin va h.k.)
 
         public boolean includesDialog(AccountInstance accountInstance, long dialogId) {
             MessagesController messagesController = accountInstance.getMessagesController();
@@ -1310,6 +1323,9 @@ public class MessagesController extends BaseController implements NotificationCe
             }
             if (alwaysShow.contains(dialogId)) {
                 return true;
+            }
+            if (mgLocalType != 0) {
+                return MgLocalFolders.includesByType(this, accountInstance.getMessagesController(), dialogId);
             }
             if (d.folder_id != 0 && (flags & DIALOG_FILTER_FLAG_EXCLUDE_ARCHIVED) != 0) {
                 return false;
@@ -2237,6 +2253,13 @@ public class MessagesController extends BaseController implements NotificationCe
                         }
                         return 0;
                     });
+                    // MilliyGram: lokal jildlarni qo'shish
+                    try {
+                        MgLocalFolders.inject(this);
+                    } catch (Throwable e) {
+                        FileLog.e(e);
+                    }
+                    lockFiltersInternal();
                     putUsers(users, true);
                     putChats(chats, true);
                     dialogFiltersLoaded = true;

@@ -62,27 +62,36 @@ public class MgChatLock {
         return frameLayout;
     }
 
-    /** Qulf ekranini ko'rsatadi. Natija: true — to'g'ri, false — bekor qilindi */
+    /** Chat qulfi kodini so'raydi */
     public static void askPin(BaseFragment fragment, String title, Utilities.Callback<Boolean> result) {
+        askLock(fragment, MgConfig.SCOPE_CHAT, title, result);
+    }
+
+    /** Berilgan doira (chat / yashirin bo'lim) qulfini so'raydi */
+    public static void askLock(BaseFragment fragment, String scope, String title, Utilities.Callback<Boolean> result) {
         Context context = fragment.getParentActivity();
         if (context == null) {
             result.run(false);
             return;
         }
-        MgLockScreen.verify(context, title, result);
+        MgLockScreen.verify(context, scope, title, result);
     }
 
-    /** Yangi qulf kodi yaratish (joriy qulf turi bilan) */
+    /** Yangi chat qulfi kodi (joriy turi bilan) */
     public static void createPin(BaseFragment fragment, Runnable onDone) {
-        createLock(fragment, MgConfig.getLockType(), onDone);
+        createLock(fragment, MgConfig.SCOPE_CHAT, MgConfig.getLockType(MgConfig.SCOPE_CHAT), onDone);
     }
 
     public static void createLock(BaseFragment fragment, String type, Runnable onDone) {
+        createLock(fragment, MgConfig.SCOPE_CHAT, type, onDone);
+    }
+
+    public static void createLock(BaseFragment fragment, String scope, String type, Runnable onDone) {
         Context context = fragment.getParentActivity();
         if (context == null) {
             return;
         }
-        MgLockScreen.create(context, type, ok -> {
+        MgLockScreen.create(context, scope, type, ok -> {
             if (ok) {
                 BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, MgConfig.LOCK_PATTERN.equals(type) ? "Grafik kalit saqlandi" : "PIN kod saqlandi").show();
                 if (onDone != null) {
