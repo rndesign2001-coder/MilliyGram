@@ -13098,13 +13098,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         } else if (isArchive()) {
             newVisibility = !getStoriesController().getHiddenList().isEmpty();
         } else {
-            newVisibility = !onlySelfStories && getStoriesController().hasStories();
-            onlySelfStories = getStoriesController().hasOnlySelfStories();
-        }
-        if (org.telegram.messenger.MgConfig.getBool("hide_stories", false)) {
-            // MilliyGram: hikoyalar paneli yashirilgan
-            newVisibility = false;
-            onlySelfStories = false;
+            final boolean mgHideStories = org.telegram.messenger.MgConfig.getBool("hide_stories", false); // MilliyGram
+            newVisibility = !mgHideStories && !onlySelfStories && getStoriesController().hasStories();
+            onlySelfStories = !mgHideStories && getStoriesController().hasOnlySelfStories();
         }
 
         hasOnlySlefStories = onlySelfStories;
