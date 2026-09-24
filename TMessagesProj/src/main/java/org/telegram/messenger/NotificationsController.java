@@ -4100,6 +4100,11 @@ public class NotificationsController extends BaseController implements Notificat
     }
 
     private void showOrUpdateNotification(boolean notifyAboutLast) {
+        if (currentAccount != UserConfig.selectedAccount && MgConfig.isAccountHidden(currentAccount) && !MgConfig.isHiddenAccountNotify()) {
+            // MilliyGram: yashirilgan akkaunt — bildirishnoma ko'rsatilmaydi
+            dismissNotification();
+            return;
+        }
         if (MgConfig.isFocusActiveNow()) {
             // MilliyGram: fokus rejimi — bildirishnoma ko'rsatilmaydi
             dismissNotification();

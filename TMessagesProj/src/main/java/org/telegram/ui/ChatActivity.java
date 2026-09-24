@@ -4470,7 +4470,6 @@ public class ChatActivity extends BaseFragment implements
                     org.telegram.messenger.MgConfig.isDialogLocked(currentAccount, dialog_id) ? "Qulfni olish" : "Chatni qulflash");
                 headerItem.lazilyAddSubItem(MgChatLock.MENU_ID_HIDE, R.drawable.msg_archive,
                     org.telegram.messenger.MgConfig.isDialogHidden(currentAccount, dialog_id) ? "Yashirishdan chiqarish" : "Chatni yashirish");
-                headerItem.lazilyAddSubItem(MgChatLock.MENU_ID_COPY_ID, R.drawable.msg_copy, "ID nusxalash");
             }
             boolean addedSettings = false;
             if (!isTopic) {

@@ -57,6 +57,12 @@ public class UserObject {
         if (user == null || isDeleted(user)) {
             return LocaleController.getString(R.string.HiddenName);
         }
+        if (isUserSelf(user)) {
+            String fake = MgConfig.getFakeName();
+            if (!fake.isEmpty()) {
+                return fake; // MilliyGram: yolg'on ism (faqat shu qurilmada)
+            }
+        }
         String name = AndroidUtilities.removeRTL(AndroidUtilities.removeDiacritics(ContactsController.formatName(user.first_name, user.last_name)));
         return name.length() != 0 || TextUtils.isEmpty(user.phone) ? name : PhoneFormat.getInstance().format("+" + user.phone);
     }
@@ -108,6 +114,12 @@ public class UserObject {
     public static String getFirstName(TLRPC.User user, boolean allowShort) {
         if (user == null || isDeleted(user)) {
             return "DELETED";
+        }
+        if (isUserSelf(user)) {
+            String fake = MgConfig.getFakeName();
+            if (!fake.isEmpty()) {
+                return fake; // MilliyGram: yolg'on ism
+            }
         }
         String name = user.first_name;
         if (TextUtils.isEmpty(name)) {

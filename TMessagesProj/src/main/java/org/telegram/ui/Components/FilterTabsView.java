@@ -124,6 +124,7 @@ public class FilterTabsView extends FrameLayout {
         public boolean isDefault;
         public boolean isLocked;
         public boolean noanimate;
+        public CharSequence mgIcon; // MilliyGram: jild ikonkasi (matn o'rniga)
 
         public Tab(int i, CharSequence title, boolean noanimate) {
             this.id = i;
@@ -161,6 +162,13 @@ public class FilterTabsView extends FrameLayout {
         }
 
         public boolean setTitle(String newTitle, ArrayList<TLRPC.MessageEntity> newEntities, boolean noanimate) {
+            if (mgIcon != null) {
+                if (title != mgIcon) {
+                    title = mgIcon;
+                    return true;
+                }
+                return false;
+            }
             if (TextUtils.equals(title, newTitle)) {
                 return false;
             }
@@ -1291,6 +1299,31 @@ public class FilterTabsView extends FrameLayout {
         }
 
         Tab tab = new Tab(id, text, noanimate);
+        tab.isDefault = isDefault;
+        tab.isLocked = isLocked;
+        allTabsWidth += tab.getWidth(true) + dp(TAB_PADDING_WIDTH);
+        tabs.add(tab);
+    }
+
+    /** MilliyGram: matn o'rniga ikonkali tab qo'shish */
+    public void mgAddIconTab(int id, int stableId, int iconRes, String name, boolean isDefault, boolean isLocked) {
+        int position = tabs.size();
+        if (position == 0 && selectedTabId == -1) {
+            selectedTabId = id;
+        }
+        positionToId.put(position, id);
+        positionToStableId.put(position, stableId);
+        idToPosition.put(id, position);
+        if (selectedTabId != -1 && selectedTabId == id) {
+            currentPosition = position;
+        }
+        android.text.SpannableString icon = new android.text.SpannableString("x");
+        ColoredImageSpan span = new ColoredImageSpan(iconRes);
+        span.setRelativeSize(textPaint.getFontMetricsInt());
+        icon.setSpan(span, 0, 1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        Tab tab = new Tab(id, icon, true);
+        tab.mgIcon = icon;
         tab.isDefault = isDefault;
         tab.isLocked = isLocked;
         allTabsWidth += tab.getWidth(true) + dp(TAB_PADDING_WIDTH);

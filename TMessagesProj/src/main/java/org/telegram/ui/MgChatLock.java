@@ -62,96 +62,34 @@ public class MgChatLock {
         return frameLayout;
     }
 
-    /** PIN so'raydi. Natija: true — to'g'ri, false — bekor qilindi */
+    /** Qulf ekranini ko'rsatadi. Natija: true — to'g'ri, false — bekor qilindi */
     public static void askPin(BaseFragment fragment, String title, Utilities.Callback<Boolean> result) {
         Context context = fragment.getParentActivity();
         if (context == null) {
             result.run(false);
             return;
         }
-        final boolean[] handled = new boolean[1];
-        EditTextBoldCursor editText = createPinField(context);
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, fragment.getResourceProvider());
-        builder.setTitle(title);
-        builder.setView(wrap(context, editText));
-        builder.setPositiveButton("Ochish", (dialog, which) -> {
-            String pin = editText.getText().toString();
-            if (MgConfig.checkPin(pin)) {
-                handled[0] = true;
-                result.run(true);
-            } else {
-                handled[0] = true;
-                AndroidUtilities.runOnUIThread(() -> {
-                    if (fragment.getParentActivity() != null) {
-                        BulletinFactory.of(fragment).createErrorBulletin("PIN kod noto'g'ri").show();
-                    }
-                    result.run(false);
-                });
-            }
-        });
-        builder.setNegativeButton("Bekor qilish", (dialog, which) -> {
-            handled[0] = true;
-            result.run(false);
-        });
-        AlertDialog dialog = builder.create();
-        dialog.setCanceledOnTouchOutside(false);
-        fragment.showDialog(dialog, d -> {
-            if (!handled[0]) {
-                handled[0] = true;
-                result.run(false);
-            }
-        });
-        AndroidUtilities.runOnUIThread(() -> {
-            editText.requestFocus();
-            AndroidUtilities.showKeyboard(editText);
-        }, 250);
+        MgLockScreen.verify(context, title, result);
     }
 
-    /** Yangi PIN yaratish (ikki marta kiritiladi) */
+    /** Yangi qulf kodi yaratish (joriy qulf turi bilan) */
     public static void createPin(BaseFragment fragment, Runnable onDone) {
+        createLock(fragment, MgConfig.getLockType(), onDone);
+    }
+
+    public static void createLock(BaseFragment fragment, String type, Runnable onDone) {
         Context context = fragment.getParentActivity();
         if (context == null) {
             return;
         }
-        LinearLayout layout = new LinearLayout(context);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        TextView info = new TextView(context);
-        info.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
-        info.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
-        info.setText("Qulflangan chatlarni ochish uchun 4–8 raqamli PIN kod o'ylab toping. Uni unutmang!");
-        layout.addView(info, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 8));
-        EditTextBoldCursor pin1 = createPinField(context);
-        pin1.setHint("PIN kod");
-        layout.addView(pin1, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 6));
-        EditTextBoldCursor pin2 = createPinField(context);
-        pin2.setHint("PIN kodni takrorlang");
-        layout.addView(pin2, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, fragment.getResourceProvider());
-        builder.setTitle("PIN kod o'rnatish");
-        builder.setView(wrap(context, layout));
-        builder.setPositiveButton("Saqlash", (dialog, which) -> {
-            String a = pin1.getText().toString();
-            String b = pin2.getText().toString();
-            if (a.length() < 4) {
-                BulletinFactory.of(fragment).createErrorBulletin("PIN kod kamida 4 ta raqam bo'lishi kerak").show();
-                return;
-            }
-            if (!a.equals(b)) {
-                BulletinFactory.of(fragment).createErrorBulletin("PIN kodlar bir xil emas").show();
-                return;
-            }
-            MgConfig.setPin(a);
-            if (onDone != null) {
-                onDone.run();
+        MgLockScreen.create(context, type, ok -> {
+            if (ok) {
+                BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, MgConfig.LOCK_PATTERN.equals(type) ? "Grafik kalit saqlandi" : "PIN kod saqlandi").show();
+                if (onDone != null) {
+                    onDone.run();
+                }
             }
         });
-        builder.setNegativeButton("Bekor qilish", null);
-        fragment.showDialog(builder.create());
-        AndroidUtilities.runOnUIThread(() -> {
-            pin1.requestFocus();
-            AndroidUtilities.showKeyboard(pin1);
-        }, 250);
     }
 
     /** Chat menyusidagi "Qulflash / Qulfni olish" */

@@ -710,6 +710,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private final static int add_to_folder = 109;
     private final static int remove_from_folder = 110;
     private final static int community_ungroup = 111;
+    private final static int mg_favorite = 120; // MilliyGram: tanlanganlarga qo'shish
 
     private final static int ARCHIVE_ITEM_STATE_PINNED = 0;
     private final static int ARCHIVE_ITEM_STATE_SHOWED = 1;
@@ -3649,6 +3650,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     showScrollbars(false);
                     switchToCurrentSelectedMode(true);
                     animatingForward = forward;
+                    mgUpdateFolderTitle(tab.id);
                 }
 
                 @Override
@@ -3815,6 +3817,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                             })
                             .add(R.drawable.msg_edit, defaultTab ? LocaleController.getString(R.string.FilterEditAll) : LocaleController.getString(R.string.FilterEdit), () -> {
                                 presentFragment(defaultTab ? new FiltersSetupActivity() : new FilterCreateActivity(dialogFilter));
+                            })
+                            .addIf(!defaultTab, R.drawable.msg_folders, "Jildlarni tahrirlash", () -> {
+                                presentFragment(new FiltersSetupActivity());
                             })
                             .addIf(dialogFilter != null && !dialogs.isEmpty(), muteAll ? R.drawable.msg_mute : R.drawable.msg_unmute, muteAll ? LocaleController.getString(R.string.FilterMuteAll) : LocaleController.getString(R.string.FilterUnmuteAll), () -> {
                                 int count = 0;
@@ -4024,6 +4029,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         undoView.showWithAction(did, UndoView.ACTION_REMOVED_FROM_FOLDER, neverShow.size(), filter, null, null);
                     }
                     hideActionMode(false);
+                } else if (id == mg_favorite) {
+                    mgAddToFavorites(new ArrayList<>(selectedDialogs));
+                    hideActionMode(true);
                 } else if (id == pin || id == read || id == delete || id == clear || id == mute || id == archive || id == block || id == archive2 || id == pin2) {
                     performSelectedDialogsAction(selectedDialogs, id, true, false);
                 }
@@ -6751,6 +6759,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         actionMode.addView(selectedDialogsCountTextView, LayoutHelper.createLinear(0, LayoutHelper.MATCH_PARENT, 1.0f, hasMainTabs ? 18 : 72, 0, 0, 0));
         selectedDialogsCountTextView.setOnTouchListener((v, event) -> true);
 
+        ActionBarMenuItem mgFavoriteItem = actionMode.addItemWithWidth(mg_favorite, R.drawable.msg_fave, dp(48), "Tanlanganlarga qo'shish");
         pinItem = actionMode.addItemWithWidth(pin, R.drawable.msg_pin, dp(48));
         muteItem = actionMode.addItemWithWidth(mute, R.drawable.msg_mute, dp(48));
         archive2Item = actionMode.addItemWithWidth(archive2, R.drawable.msg_archive, dp(48));
@@ -6771,6 +6780,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             return true;
         });
 
+        actionModeViews.add(mgFavoriteItem);
         actionModeViews.add(pinItem);
         actionModeViews.add(archive2Item);
         actionModeViews.add(muteItem);
@@ -6864,6 +6874,112 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
     }
 
+    // ===== MilliyGram: jildlar =====
+
+    private int mgFolderIcon(MessagesController.DialogFilter filter) {
+        if (filter == null || filter.isDefault()) {
+            return R.drawable.msg_discussion;
+        }
+        String name = filter.name == null ? "" : filter.name.toLowerCase();
+        if (name.contains("tanlangan") || name.contains("⭐") || name.contains("sevimli")) {
+            return R.drawable.msg_fave;
+        }
+        if (filter.isChatlist()) {
+            return R.drawable.msg_folders;
+        }
+        int types = filter.flags & MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS;
+        int privateFlags = MessagesController.DIALOG_FILTER_FLAG_CONTACTS | MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS;
+        if ((filter.flags & MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_READ) != 0) {
+            return R.drawable.msg_msgbubble3;
+        }
+        if (types != 0 && (types & ~privateFlags) == 0) {
+            return R.drawable.msg_folders_private;
+        }
+        if (types == MessagesController.DIALOG_FILTER_FLAG_GROUPS) {
+            return R.drawable.msg_folders_groups;
+        }
+        if (types == MessagesController.DIALOG_FILTER_FLAG_CHANNELS) {
+            return R.drawable.msg_folders_channels;
+        }
+        if (types == MessagesController.DIALOG_FILTER_FLAG_BOTS) {
+            return R.drawable.msg_folders_bots;
+        }
+        return R.drawable.msg_folders;
+    }
+
+    private CharSequence mgMainTitle() {
+        SpannableStringBuilder ssb = new SpannableStringBuilder(getString(R.string.AppName));
+        if (logoDrawable != null) {
+            ssb.setSpan(new ImageSpan(logoDrawable), 0, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        if (org.telegram.messenger.MgConfig.isHolidayDecorEnabled()) {
+            String greeting = org.telegram.messenger.MgConfig.getHolidayGreeting();
+            if (greeting != null) {
+                ssb.append("  ").append(greeting);
+            }
+        }
+        return ssb;
+    }
+
+    /** Ikonkali tablarda tanlangan jild nomi sarlavhada ko'rinadi */
+    private void mgUpdateFolderTitle(int tabId) {
+        if (!org.telegram.messenger.MgConfig.isFolderIconTabs() || actionBar == null || folderId != 0 || communityId != 0
+                || initialDialogsType != DIALOGS_TYPE_DEFAULT || searching || onlySelect) {
+            return;
+        }
+        ArrayList<MessagesController.DialogFilter> filters = getMessagesController().getDialogFilters();
+        if (tabId < 0 || tabId >= filters.size() || filters.get(tabId).isDefault()) {
+            actionBar.setTitle(mgMainTitle(), statusDrawable);
+        } else {
+            actionBar.setTitle(filters.get(tabId).name, statusDrawable);
+        }
+    }
+
+    /** Tanlangan chatlarni "Tanlanganlar" jildiga qo'shadi (jild bo'lmasa yaratadi) */
+    private void mgAddToFavorites(ArrayList<Long> dialogIds) {
+        if (dialogIds == null || dialogIds.isEmpty()) {
+            return;
+        }
+        final String favName = "Tanlanganlar";
+        MessagesController.DialogFilter fav = null;
+        ArrayList<MessagesController.DialogFilter> filters = getMessagesController().getDialogFilters();
+        for (int i = 0; i < filters.size(); i++) {
+            MessagesController.DialogFilter f = filters.get(i);
+            if (!f.isDefault() && favName.equals(f.name)) {
+                fav = f;
+                break;
+            }
+        }
+        boolean creatingNew = fav == null;
+        if (creatingNew) {
+            fav = new MessagesController.DialogFilter();
+            fav.id = 2;
+            while (getMessagesController().dialogFiltersById.get(fav.id) != null) {
+                fav.id++;
+            }
+            fav.name = favName;
+            fav.color = 3;
+        }
+        ArrayList<Long> alwaysShow = new ArrayList<>(fav.alwaysShow);
+        ArrayList<Long> neverShow = new ArrayList<>(fav.neverShow);
+        int added = 0;
+        for (Long did : dialogIds) {
+            neverShow.remove(did);
+            if (!alwaysShow.contains(did)) {
+                alwaysShow.add(did);
+                added++;
+            }
+        }
+        if (alwaysShow.size() > getMessagesController().dialogFiltersChatsLimitDefault && !getUserConfig().isPremium()) {
+            showDialog(new LimitReachedBottomSheet(DialogsActivity.this, getParentActivity(), LimitReachedBottomSheet.TYPE_CHATS_IN_FOLDER, currentAccount, null));
+            return;
+        }
+        final int finalAdded = added;
+        FilterCreateActivity.saveFilterToServer(fav, fav.flags, fav.name, fav.entities, fav.title_noanimate, fav.color, alwaysShow, neverShow, fav.pinnedDialogs, creatingNew, false, true, true, true, DialogsActivity.this, () -> {
+            BulletinFactory.of(DialogsActivity.this).createSimpleBulletin(R.raw.contact_check, finalAdded > 0 ? "\"Tanlanganlar\" jildiga qo'shildi" : "Allaqachon \"Tanlanganlar\" jildida").show();
+        });
+    }
+
     private void updateFilterTabs(boolean force, boolean animated) {
         if (filterTabsView == null || inPreviewMode || searchIsShowed || (rightSlidingDialogContainer != null && rightSlidingDialogContainer.hasFragment())) {
             return;
@@ -6891,7 +7007,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 }
                 filterTabsView.removeTabs();
                 for (int a = 0, N = filters.size(); a < N; a++) {
-                    if (filters.get(a).isDefault()) {
+                    if (org.telegram.messenger.MgConfig.isFolderIconTabs()) {
+                        // MilliyGram: ikonkali jild tablari
+                        final MessagesController.DialogFilter mgFilter = filters.get(a);
+                        filterTabsView.mgAddIconTab(a, mgFilter.isDefault() ? 0 : mgFilter.localId, mgFolderIcon(mgFilter), mgFilter.isDefault() ? LocaleController.getString(R.string.FilterAllChats) : mgFilter.name, mgFilter.isDefault(), mgFilter.locked);
+                    } else if (filters.get(a).isDefault()) {
                         filterTabsView.addTab(a, 0, LocaleController.getString(R.string.FilterAllChats), null, false, true, filters.get(a).locked);
                     } else {
                         final MessagesController.DialogFilter filter = filters.get(a);
@@ -14390,7 +14510,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         accountNumbers.clear();
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
-            if (UserConfig.getInstance(a).isClientActivated()) {
+            if (UserConfig.getInstance(a).isClientActivated() && (a == currentAccount || !org.telegram.messenger.MgConfig.isAccountHidden(a))) {
                 accountNumbers.add(a);
             }
         }

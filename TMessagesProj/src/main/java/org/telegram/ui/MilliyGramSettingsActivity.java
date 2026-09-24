@@ -44,6 +44,8 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
     private static final int ID_IMPORT = 10;
     private static final int ID_ABOUT = 11;
     private static final int ID_HIDDEN = 12;
+    private static final int ID_FOLDER_ICONS = 13;
+    private static final int ID_GHOST = 14;
 
     private static final int[][] FOCUS_PRESETS = {
             {22 * 60, 7 * 60},
@@ -60,6 +62,7 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
 
     @Override
     protected void fillItems(ArrayList<UItem> items, UniversalAdapter adapter) {
+        MgGhostMode.isReady(currentAccount); // maxfiylik sozlamalarini oldindan yuklash
         items.add(UItem.asHeader("Qulaylik"));
         items.add(UItem.asCheck(ID_SIMPLE_MODE, "Oddiy rejim (katta shrift)").setChecked(MgConfig.isSimpleMode()));
         items.add(UItem.asShadow("Xabarlar kattaroq shriftda ko'rinadi. Keksalar va ko'rishi zaif foydalanuvchilar uchun qulay."));
@@ -77,16 +80,20 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
         items.add(UItem.asShadow("Belgilangan vaqtda bildirishnomalar kelmaydi. Xabarlar yo'qolmaydi: ilovani ochganingizda hammasi joyida bo'ladi."));
 
         items.add(UItem.asHeader("Maxfiylik"));
-        items.add(UItem.asButton(ID_HIDDEN, R.drawable.msg_archive, "Yashirin bo'lim",
-                MgConfig.getHiddenDialogs(currentAccount).isEmpty() ? "" : String.valueOf(MgConfig.getHiddenDialogs(currentAccount).size())));
+        items.add(UItem.asCheck(ID_GHOST, "👻 Sharpa rejimi").setChecked(MgGhostMode.isEnabled(currentAccount)));
+        if (MgConfig.isHiddenInSettings()) {
+            items.add(UItem.asButton(ID_HIDDEN, R.drawable.msg_archive, "Yashirin bo'lim",
+                    MgConfig.getHiddenDialogs(currentAccount).isEmpty() ? "" : String.valueOf(MgConfig.getHiddenDialogs(currentAccount).size())));
+        }
         int locked = MgConfig.getLockedCount();
-        items.add(UItem.asButton(ID_PIN_RESET, R.drawable.msg_secret, MgConfig.hasPin() ? "PIN kodni o'chirish" : "PIN kod o'rnatilmagan",
+        items.add(UItem.asButton(ID_PIN_RESET, R.drawable.msg_secret, MgConfig.hasPin() ? "Qulfni o'chirish (PIN / grafik kalit)" : "Qulf o'rnatilmagan",
                 locked > 0 ? ("Qulflangan: " + locked) : ""));
         items.add(UItem.asShadow("Chatni qulflash yoki yashirish uchun chatni oching va yuqoridagi ⋮ menyudan tanlang. Yashirin bo'limga tez kirish: bosh ekranda qidiruv tugmasini uzoq bosing."));
 
         items.add(UItem.asHeader("Dizayn"));
         items.add(UItem.asCheck(ID_HOLIDAY, "Bayram tabriklari").setChecked(MgConfig.isHolidayDecorEnabled()));
-        items.add(UItem.asShadow("Navro'z, Mustaqillik kuni va boshqa bayramlarda sarlavhada tabrik ko'rinadi."));
+        items.add(UItem.asCheck(ID_FOLDER_ICONS, "Jildlarni ikonkada ko'rsatish").setChecked(MgConfig.isFolderIconTabs()));
+        items.add(UItem.asShadow("Ikonkali jildlarda tanlangan jild nomi tepada yoziladi. Jildni uzoq bosib tartiblash va tahrirlash mumkin. Bayram kunlari sarlavhada tabrik ko'rinadi."));
 
         items.add(UItem.asHeader("Zaxira"));
         items.add(UItem.asButton(ID_EXPORT, R.drawable.msg_copy, "Sozlamalarni nusxalash"));
@@ -168,12 +175,53 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
             case ID_HIDDEN:
                 MgHiddenActivity.open(this);
                 break;
+            case ID_GHOST:
+                toggleGhost(view);
+                break;
+            case ID_FOLDER_ICONS: {
+                boolean value = !MgConfig.isFolderIconTabs();
+                MgConfig.setBool("folder_icon_tabs", value);
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(value);
+                }
+                getNotificationCenter().postNotificationName(org.telegram.messenger.NotificationCenter.dialogFiltersUpdated);
+                break;
+            }
         }
     }
 
     @Override
     protected boolean onLongClick(UItem item, View view, int position, float x, float y) {
         return false;
+    }
+
+    private void toggleGhost(View view) {
+        boolean enable = !MgGhostMode.isEnabled(currentAccount);
+        Runnable apply = () -> MgGhostMode.setEnabled(currentAccount, enable, error -> {
+            if (error == null) {
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(enable);
+                }
+                BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, enable ? "Sharpa rejimi yoqildi" : "Avvalgi maxfiylik sozlamalari tiklandi").show();
+            } else {
+                BulletinFactory.of(this).createErrorBulletin(error).show();
+            }
+        });
+        if (!enable || getParentActivity() == null) {
+            apply.run();
+            return;
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+        builder.setTitle("👻 Sharpa rejimi");
+        builder.setMessage("Telegram maxfiylik sozlamalarida quyidagilar \"Hech kim\" ga o'zgaradi:\n\n" +
+                "• oxirgi marta onlayn bo'lgan vaqtingiz va onlayn holatingiz;\n" +
+                "• telefon raqamingiz;\n" +
+                "• uzatilgan xabarlaringizdagi profilingizga havola.\n\n" +
+                "Eslatma: Telegram qoidasiga ko'ra, o'z vaqtingizni yashirsangiz, boshqalarning ham \"oxirgi marta onlayn\" vaqtini ko'ra olmaysiz.\n\n" +
+                "O'chirganingizda avvalgi sozlamalaringiz aynan tiklanadi.");
+        builder.setPositiveButton("Yoqish", (dialog, which) -> apply.run());
+        builder.setNegativeButton("Bekor qilish", null);
+        showDialog(builder.create());
     }
 
     private void showFocusTimeDialog() {
