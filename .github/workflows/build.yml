@@ -1,0 +1,85 @@
+name: MilliyGram APK
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore: [ '**.md' ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - name: Diskda joy ochish
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost /usr/local/lib/node_modules /opt/hostedtoolcache/CodeQL || true
+          df -h /
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Submodullarni yuklash
+        run: git submodule update --init --recursive --depth 1 --jobs 8
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Android NDK va CMake
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;27.2.12479018" "cmake;3.22.1" "build-tools;36.0.0" "platforms;android-36" > /dev/null
+
+      - name: Kalitlarni tayyorlash
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+          API_ID: ${{ secrets.API_ID }}
+        run: |
+          if [ -z "$API_ID" ]; then echo "::error::API_ID secret qo'yilmagan (my.telegram.org)"; exit 1; fi
+          echo "$KEYSTORE_BASE64" | base64 -d > TMessagesProj/config/release.keystore
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then echo "$GOOGLE_SERVICES_JSON" > TMessagesProj_App/google-services.json; fi
+
+      - name: APK yig'ish
+        env:
+          API_ID: ${{ secrets.API_ID }}
+          API_HASH: ${{ secrets.API_HASH }}
+        run: |
+          ./gradlew :TMessagesProj_App:assembleAfatRelease --stacktrace \
+            -PRELEASE_STORE_PASSWORD='${{ secrets.KEYSTORE_PASSWORD }}' \
+            -PRELEASE_KEY_ALIAS='${{ secrets.KEY_ALIAS }}' \
+            -PRELEASE_KEY_PASSWORD='${{ secrets.KEY_PASSWORD }}'
+
+      - name: Faylni nomlash
+        id: out
+        run: |
+          VER=$(grep APP_VERSION_NAME gradle.properties | cut -d= -f2)
+          NAME="MilliyGram-${VER}-${GITHUB_RUN_NUMBER}.apk"
+          cp TMessagesProj_App/build/outputs/apk/afat/release/app.apk "$NAME"
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "tag=v${VER}-b${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.out.outputs.name }}
+          path: ${{ steps.out.outputs.name }}
+
+      - name: Release chiqarish
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.out.outputs.tag }}
+          name: MilliyGram ${{ steps.out.outputs.tag }}
+          body: "Avtomatik yig'ilgan APK. Norasmiy Telegram klienti."
+          files: ${{ steps.out.outputs.name }}
