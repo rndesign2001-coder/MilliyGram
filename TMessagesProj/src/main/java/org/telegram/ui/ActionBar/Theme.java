@@ -152,6 +152,7 @@ public class Theme {
     // ===== MilliyGram: milliy rang mavzusi (ko'k + oq, bayroq ranglari) =====
     public static final int MG_DAY_ACCENT_ID = 12;
     public static final int MG_NIGHT_ACCENT_ID = 0;
+    public static final String MG_PATTERN_SLUG = "mg_milliy_naqsh";
 
     private static int mgDefaultAccentId(ThemeInfo info) {
         if ("bluebubbles.attheme".equals(info.assetName)) {
@@ -181,6 +182,7 @@ public class Theme {
         a.backgroundGradientOverrideColor3 = bg3;
         a.backgroundRotation = rotation;
         a.patternIntensity = intensity / 100.0f;
+        a.patternSlug = MG_PATTERN_SLUG;
     }
 
 
@@ -283,6 +285,38 @@ public class Theme {
             }
             Utilities.globalQueue.postRunnable(() -> {
                 ArrayList<String> slugs = null;
+                // MilliyGram: milliy naqsh ilova ichida (res/raw/mg_pattern.svg), serverdan yuklanmaydi
+                ArrayList<ThemeAccent> mgCreated = null;
+                for (int a = 0, N = accents.size(); a < N; a++) {
+                    ThemeAccent accent = accents.get(a);
+                    if (!MG_PATTERN_SLUG.equals(accent.patternSlug)) {
+                        continue;
+                    }
+                    File wallpaper = accent.getPathToWallpaper();
+                    if (wallpaper == null || wallpaper.length() <= 0) {
+                        try {
+                            int w = Math.min(AndroidUtilities.displaySize.x, AndroidUtilities.displaySize.y);
+                            int h = Math.max(AndroidUtilities.displaySize.x, AndroidUtilities.displaySize.y);
+                            Bitmap mgPattern = SvgHelper.getBitmap(R.raw.mg_pattern, w, h, Color.BLACK, 1f, SvgHelper.ScaleMode.ByWidth);
+                            if (mgPattern != null) {
+                                createWallpaperForAccent(mgPattern, true, null, accent);
+                                mgPattern.recycle();
+                                if (mgCreated == null) {
+                                    mgCreated = new ArrayList<>();
+                                }
+                                mgCreated.add(accent);
+                            }
+                        } catch (Throwable e) {
+                            FileLog.e(e);
+                        }
+                    }
+                    accents.remove(a);
+                    a--;
+                    N--;
+                }
+                if (mgCreated != null) {
+                    checkCurrentWallpaper(mgCreated, false);
+                }
                 for (int a = 0, N = accents.size(); a < N; a++) {
                     ThemeAccent accent = accents.get(a);
                     File wallpaper = accent.getPathToWallpaper();
@@ -9653,12 +9687,12 @@ public class Theme {
     }
 
     public static Drawable createDefaultWallpaper(int w, int h) {
-        MotionBackgroundDrawable motionBackgroundDrawable = new MotionBackgroundDrawable(0xffdbddbb, 0xff6ba587, 0xffd5d88d, 0xff88b884, w != 0);
+        MotionBackgroundDrawable motionBackgroundDrawable = new MotionBackgroundDrawable(0xffc9ddf6, 0xff8fb8ec, 0xffdce8f8, 0xffa9c8f0, w != 0); // MilliyGram: ko'k
         if (w <= 0 || h <= 0) {
             w = Math.min(AndroidUtilities.displaySize.x, AndroidUtilities.displaySize.y);
             h = Math.max(AndroidUtilities.displaySize.x, AndroidUtilities.displaySize.y);
         }
-        motionBackgroundDrawable.setPatternBitmap(34, SvgHelper.getBitmap(R.raw.default_pattern, w, h, Color.BLACK, 1f, SvgHelper.ScaleMode.ByWidth));
+        motionBackgroundDrawable.setPatternBitmap(34, SvgHelper.getBitmap(R.raw.mg_pattern, w, h, Color.BLACK, 1f, SvgHelper.ScaleMode.ByWidth));
         motionBackgroundDrawable.setPatternColorFilter(motionBackgroundDrawable.getPatternColor());
         return motionBackgroundDrawable;
     }
