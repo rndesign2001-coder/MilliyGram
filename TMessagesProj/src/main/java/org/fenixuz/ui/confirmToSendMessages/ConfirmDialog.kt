@@ -15,7 +15,7 @@ object ConfirmDialog {
             context
         )
         builder.setMessage(LanguageCode.getMyTitles(195))
-        builder.setTitle("Novagram")
+        builder.setTitle("MilliyGram")
         builder.setPositiveButton(
             LocaleController.getString("OK", R.string.OK)
         ) { dialogInterface: DialogInterface?, i: Int ->

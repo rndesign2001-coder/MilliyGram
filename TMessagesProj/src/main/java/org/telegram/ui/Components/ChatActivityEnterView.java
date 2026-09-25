@@ -8934,9 +8934,10 @@ public class ChatActivityEnterView extends FrameLayout implements
             final boolean fromPause = lastRecordState == RECORD_STATE_PREPARING;
 
             if (!fromPause) {
-                voiceOnce = false;
+                // MilliyGram: chat uchun "bir martalik" yoqilgan bo'lsa, yangi yozuv standart holatda bir martalik
+                voiceOnce = org.telegram.ui.MgChatFeatures.isOneTimeVoice(currentAccount, dialog_id);
                 if (controlsView != null) {
-                    controlsView.periodDrawable.setValue(1, false, false);
+                    controlsView.periodDrawable.setValue(1, voiceOnce, false);
                 }
                 MediaDataController.getInstance(currentAccount).toggleDraftVoiceOnce(dialog_id, parentFragment != null && parentFragment.isTopic ? parentFragment.getTopicId() : 0, voiceOnce);
                 millisecondsRecorded = 0;

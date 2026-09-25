@@ -175,6 +175,8 @@ public class MgCustomForward {
 
         TextCheckCell mediaCell = null;
         TextCheckCell spoilerCell = null;
+        LinearLayout optionsBox = new LinearLayout(ctx);
+        optionsBox.setOrientation(LinearLayout.VERTICAL);
         if (st.hasMedia) {
             FrameLayout preview = new FrameLayout(ctx);
             BackupImageView img = new BackupImageView(ctx);
@@ -209,16 +211,16 @@ public class MgCustomForward {
 
             mediaCell = new TextCheckCell(ctx, 23, true, fragment.getResourceProvider());
             mediaCell.setTextAndCheck("Mediani ham yuborish", st.withMedia, false);
-            root.addView(mediaCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50));
+            optionsBox.addView(mediaCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50));
             if (isPhotoOrDoc(first) && !captionless(first)) {
                 spoilerCell = new TextCheckCell(ctx, 23, true, fragment.getResourceProvider());
                 spoilerCell.setTextAndCheck("Spoiler bilan yashirish", st.spoiler, false);
-                root.addView(spoilerCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50));
+                optionsBox.addView(spoilerCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50));
             }
         }
         TextCheckCell silentCell = new TextCheckCell(ctx, 23, true, fragment.getResourceProvider());
         silentCell.setTextAndCheck("Ovozsiz yuborish", st.silent, false);
-        root.addView(silentCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50));
+        optionsBox.addView(silentCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50));
 
         EditTextCaption edit = new EditTextCaption(ctx, fragment.getResourceProvider());
         edit.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
@@ -239,7 +241,27 @@ public class MgCustomForward {
         ebg.setStroke(AndroidUtilities.dp(1), Theme.multAlpha(Theme.getColor(Theme.key_dialogTextBlack), 0.2f));
         edit.setBackground(ebg);
         edit.setText(st.text);
-        root.addView(edit, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 8, 24, 0));
+        root.addView(sectionLabel(ctx, st.hasMedia ? "1. Izohni tahrirlang" : "1. Matnni tahrirlang"), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 10, 24, 6));
+        root.addView(edit, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 0, 24, 0));
+
+        // Formatlash paneli: matnni belgilab tugmani bosing (qayta bosish — olib tashlaydi)
+        HorizontalScrollView fmtScroll = new HorizontalScrollView(ctx);
+        fmtScroll.setHorizontalScrollBarEnabled(false);
+        LinearLayout fmt = new LinearLayout(ctx);
+        fmt.setOrientation(LinearLayout.HORIZONTAL);
+        fmt.setPadding(AndroidUtilities.dp(20), 0, AndroidUtilities.dp(20), 0);
+        fmtScroll.addView(fmt);
+        root.addView(fmtScroll, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 44, 0, 8, 0, 0));
+        final Runnable[] fmtSay = new Runnable[1];
+        addFmt(ctx, fmt, "B", android.graphics.Typeface.DEFAULT_BOLD, 0, "Qalin", edit, () -> edit.toggleStyleForSelection(org.telegram.ui.Components.TextStyleSpan.FLAG_STYLE_BOLD), fmtSay);
+        addFmt(ctx, fmt, "I", android.graphics.Typeface.create(android.graphics.Typeface.SERIF, android.graphics.Typeface.ITALIC), 0, "Qiya", edit, () -> edit.toggleStyleForSelection(org.telegram.ui.Components.TextStyleSpan.FLAG_STYLE_ITALIC), fmtSay);
+        addFmt(ctx, fmt, "U", null, android.graphics.Paint.UNDERLINE_TEXT_FLAG, "Tagiga chizilgan", edit, () -> edit.toggleStyleForSelection(org.telegram.ui.Components.TextStyleSpan.FLAG_STYLE_UNDERLINE), fmtSay);
+        addFmt(ctx, fmt, "S", null, android.graphics.Paint.STRIKE_THRU_TEXT_FLAG, "O'rtasiga chizilgan", edit, () -> edit.toggleStyleForSelection(org.telegram.ui.Components.TextStyleSpan.FLAG_STYLE_STRIKE), fmtSay);
+        addFmt(ctx, fmt, "</>", android.graphics.Typeface.MONOSPACE, 0, "Monoshrift", edit, () -> edit.toggleStyleForSelection(org.telegram.ui.Components.TextStyleSpan.FLAG_STYLE_MONO), fmtSay);
+        addFmt(ctx, fmt, "▒ Spoyler", null, 0, "Yashirin (spoyler)", edit, edit::makeSelectedSpoiler, fmtSay);
+        addFmt(ctx, fmt, "❝ Iqtibos", null, 0, "Iqtibos", edit, edit::makeSelectedQuote, fmtSay);
+        addFmt(ctx, fmt, "🔗 Havola", null, 0, "Havola", edit, edit::makeSelectedUrl, fmtSay);
+        addFmt(ctx, fmt, "✕ Oddiy", null, 0, "Formatsiz", edit, edit::makeSelectedRegular, fmtSay);
 
         TextView counter = new TextView(ctx);
         counter.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
@@ -261,6 +283,7 @@ public class MgCustomForward {
             }
             AndroidUtilities.runOnUIThread(hideStatus[0] = () -> status.setVisibility(View.GONE), 3500);
         };
+        fmtSay[0] = () -> say.run("Avval matnning bir qismini belgilang (bosib turing va suring)");
         final TextCheckCell mediaCellF = mediaCell;
         Runnable updateCounter = () -> {
             int len = edit.length();
@@ -297,16 +320,12 @@ public class MgCustomForward {
         }
         silentCell.setOnClickListener(v -> ((TextCheckCell) v).setChecked(!((TextCheckCell) v).isChecked()));
 
-        // Vositalar paneli
-        HorizontalScrollView hs = new HorizontalScrollView(ctx);
-        hs.setHorizontalScrollBarEnabled(false);
-        LinearLayout tools = new LinearLayout(ctx);
-        tools.setOrientation(LinearLayout.HORIZONTAL);
-        tools.setPadding(AndroidUtilities.dp(20), 0, AndroidUtilities.dp(20), 0);
-        hs.addView(tools);
-        root.addView(hs, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 36, 0, 10, 0, 12));
+        // Tezkor amallar (2 ustunli to'r)
+        root.addView(sectionLabel(ctx, "2. Tezkor amallar"), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 14, 24, 6));
+        final LinearLayout tools = new ToolGrid(ctx);
+        root.addView(tools, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 20, 0, 20, 6));
 
-        tools.addView(chip(ctx, "↺ Asl matn", v -> edit.setText(st.originalText)), LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 32, 4, 0, 4, 0));
+        tools.addView(chip(ctx, "↺ Asl matn", v -> edit.setText(st.originalText)), null);
         tools.addView(chip(ctx, "🔗 Havolalarni o'chirish", v -> {
             Editable e = edit.getText();
             if (e == null) return;
@@ -316,7 +335,7 @@ public class MgCustomForward {
                 removed++;
             }
             say.run(removed > 0 ? "✓ Yashirin havolalar olib tashlandi: " + removed : "Yashirin havola topilmadi");
-        }), LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 32, 4, 0, 4, 0));
+        }), null);
         tools.addView(chip(ctx, "🧽 @ va linklarni tozalash", v -> {
             Editable e = edit.getText();
             if (e == null) return;
@@ -330,7 +349,7 @@ public class MgCustomForward {
             }
             cleanupWhitespace(e);
             say.run(ranges.isEmpty() ? "Tozalanadigan narsa topilmadi" : "✓ Tozalandi: " + ranges.size() + " ta");
-        }), LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 32, 4, 0, 4, 0));
+        }), null);
         tools.addView(chip(ctx, "🧹 Formatsiz", v -> {
             Editable e = edit.getText();
             if (e == null) return;
@@ -340,16 +359,19 @@ public class MgCustomForward {
                 }
                 e.removeSpan(s);
             }
-        }), LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 32, 4, 0, 4, 0));
-        tools.addView(chip(ctx, "🔁 Almashtirish", v -> showReplace(fragment, edit, say)), LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 32, 4, 0, 4, 0));
-        tools.addView(chip(ctx, "✍️ Imzo", v -> addSignature(fragment, edit, say)), LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 32, 4, 0, 4, 0));
-        tools.addView(chip(ctx, "🌐 Tarjima", v -> translateInEditor(fragment, account, edit, say, false)), LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 32, 4, 0, 4, 0));
-        tools.addView(chip(ctx, "🌐+ Tarjimani qo'shish", v -> translateInEditor(fragment, account, edit, say, true)), LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 32, 4, 0, 4, 0));
+        }), null);
+        tools.addView(chip(ctx, "🔁 Almashtirish", v -> showReplace(fragment, edit, say)), null);
+        tools.addView(chip(ctx, "✍️ Imzo", v -> addSignature(fragment, edit, say)), null);
+        tools.addView(chip(ctx, "🌐 Tarjima", v -> translateInEditor(fragment, account, edit, say, false)), null);
+        tools.addView(chip(ctx, "🌐+ Tarjimani qo'shish", v -> translateInEditor(fragment, account, edit, say, true)), null);
+
+        root.addView(sectionLabel(ctx, "3. Yuborish"), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 14, 24, 0));
+        root.addView(optionsBox, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
 
         TextView hint = new TextView(ctx);
         hint.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
         hint.setTextColor(Theme.getColor(Theme.key_dialogTextGray3));
-        hint.setText("Matnni belgilab qalin, kursiv, havola, spoiler va boshqa formatlarni qo'shishingiz mumkin. Xabar sizning nomingizdan, \"Forwarded from\" belgisisiz yuboriladi.");
+        hint.setText("Xabar sizning nomingizdan, \"Forwarded from\" belgisisiz yuboriladi. Pastdagi \"Chatni tanlash\" tugmasini bosing.");
         root.addView(hint, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 0, 24, 8));
 
         final TextCheckCell spoilerCellF = spoilerCell;
@@ -363,7 +385,7 @@ public class MgCustomForward {
         AlertDialog.Builder builder = new AlertDialog.Builder(ctx, fragment.getResourceProvider());
         builder.setTitle("Maxsus uzatish");
         builder.setView(scroll);
-        builder.setPositiveButton("Kimga yuborish…", (dialog, which) -> {
+        builder.setPositiveButton("Chatni tanlash ➜", (dialog, which) -> {
             saveState.run();
             if (!st.hasMedia || !st.withMedia) {
                 if (TextUtils.isEmpty(st.text.toString().trim())) {
@@ -383,6 +405,77 @@ public class MgCustomForward {
             edit.requestFocus();
             edit.setSelection(edit.length());
         }, 200);
+    }
+
+    private static TextView sectionLabel(Context ctx, String text) {
+        TextView tv = new TextView(ctx);
+        tv.setText(text);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+        tv.setTypeface(AndroidUtilities.bold());
+        tv.setTextColor(Theme.getColor(Theme.key_dialogTextBlue2));
+        return tv;
+    }
+
+    private static void addFmt(Context ctx, LinearLayout bar, String label, android.graphics.Typeface tf, int paintFlags, String desc,
+                               EditTextCaption edit, Runnable action, Runnable[] noSelection) {
+        TextView b = new TextView(ctx);
+        b.setText(label);
+        b.setContentDescription(desc);
+        b.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+        if (tf != null) {
+            b.setTypeface(tf);
+        }
+        if (paintFlags != 0) {
+            b.setPaintFlags(b.getPaintFlags() | paintFlags);
+        }
+        b.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
+        b.setGravity(Gravity.CENTER);
+        b.setMinWidth(AndroidUtilities.dp(40));
+        b.setPadding(AndroidUtilities.dp(10), 0, AndroidUtilities.dp(10), 0);
+        GradientDrawable bg = new GradientDrawable();
+        bg.setCornerRadius(AndroidUtilities.dp(10));
+        bg.setColor(Theme.multAlpha(Theme.getColor(Theme.key_dialogTextBlack), 0.07f));
+        b.setBackground(bg);
+        b.setFocusable(false);
+        b.setOnClickListener(v -> {
+            if (edit.getSelectionStart() == edit.getSelectionEnd()) {
+                if (noSelection[0] != null) {
+                    noSelection[0].run();
+                }
+                return;
+            }
+            try {
+                action.run();
+            } catch (Throwable e) {
+                FileLog.e(e);
+            }
+        });
+        bar.addView(b, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 38, 3, 3, 3, 3));
+    }
+
+    /** Qo'shilgan tugmalarni 2 ustunli qatorlarga joylaydigan oddiy to'r */
+    private static class ToolGrid extends LinearLayout {
+        private LinearLayout row;
+
+        ToolGrid(Context ctx) {
+            super(ctx);
+            setOrientation(VERTICAL);
+        }
+
+        @Override
+        public void addView(android.view.View child, android.view.ViewGroup.LayoutParams params) {
+            if (row == null || row.getChildCount() >= 2) {
+                row = new LinearLayout(getContext());
+                row.setOrientation(HORIZONTAL);
+                super.addView(row, -1, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 44));
+            }
+            row.addView(child, LayoutHelper.createLinear(0, 40, 1f, 4, 2, 4, 2));
+        }
+
+        @Override
+        public void addView(android.view.View child) {
+            addView(child, (android.view.ViewGroup.LayoutParams) null);
+        }
     }
 
     private static String mediaLabel(MessageObject m) {

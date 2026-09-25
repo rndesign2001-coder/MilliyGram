@@ -5933,7 +5933,7 @@ public class MessageObject {
                 messageText = restrictionReason;
                 isRestrictedMessage = true;
             } else if (org.fenixuz.utils.ApkShield.INSTANCE.shouldHide(messageOwner)) {
-                messageText = org.fenixuz.utils.LanguageCode.INSTANCE.getMyTitles(377);
+                messageText = "🛡 APK fayl bloklandi — xavfsizlik uchun (Sozlamalar → Maxfiylik)";
                 isRestrictedMessage = true;
             } else if (messageOwner.rich_message != null) {
                 messageText = formatRichMessage(messageOwner.rich_message, isOutOwner());

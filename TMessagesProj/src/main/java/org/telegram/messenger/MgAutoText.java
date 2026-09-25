@@ -175,6 +175,7 @@ public class MgAutoText {
             if (p.sendMessageChatArguments != null && p.sendMessageChatArguments.quickReplyShortcut != null) {
                 return;
             }
+            applyDefaultStyle(p);
             if (!isActive(account, p.peer)) {
                 return;
             }
@@ -229,5 +230,67 @@ public class MgAutoText {
         } catch (Throwable t) {
             FileLog.e(t);
         }
+    }
+
+    // ================= Standart matn uslubi =================
+
+    public static final String[] STYLE_NAMES = {"Oddiy (o'chirilgan)", "Qalin", "Qiya", "Monoshrift", "Tagiga chizilgan", "O'rtasiga chizilgan", "Yashirin (spoyler)"};
+
+    public static int getDefaultStyle() {
+        return Math.max(0, Math.min(STYLE_NAMES.length - 1, MgConfig.getInt("text_style", 0)));
+    }
+
+    public static void setDefaultStyle(int style) {
+        MgConfig.setInt("text_style", style);
+    }
+
+    private static TLRPC.MessageEntity styleEntity(int style) {
+        switch (style) {
+            case 1: return new TLRPC.TL_messageEntityBold();
+            case 2: return new TLRPC.TL_messageEntityItalic();
+            case 3: return new TLRPC.TL_messageEntityCode();
+            case 4: return new TLRPC.TL_messageEntityUnderline();
+            case 5: return new TLRPC.TL_messageEntityStrike();
+            case 6: return new TLRPC.TL_messageEntitySpoiler();
+        }
+        return null;
+    }
+
+    /** Oddiy matnli xabarga butun matn bo'yicha tanlangan uslubni qo'yadi (buyruqlar va faqat emojili xabarlar bundan mustasno) */
+    private static void applyDefaultStyle(SendMessagesHelper.SendMessageParams p) {
+        int style = getDefaultStyle();
+        if (style == 0 || p.photo != null || p.document != null || TextUtils.isEmpty(p.message) || p.message.startsWith("/")) {
+            return;
+        }
+        String m = p.message;
+        boolean hasText = false;
+        for (int i = 0; i < m.length(); i++) {
+            if (Character.isLetterOrDigit(m.charAt(i))) {
+                hasText = true;
+                break;
+            }
+        }
+        if (!hasText) {
+            return;
+        }
+        if (p.entities != null) {
+            for (TLRPC.MessageEntity en : p.entities) {
+                if (en instanceof TLRPC.TL_messageEntityPre || en instanceof TLRPC.TL_messageEntityCode) {
+                    return; // kod bloklari buzilmasin
+                }
+            }
+        }
+        TLRPC.MessageEntity en = styleEntity(style);
+        if (en == null) {
+            return;
+        }
+        en.offset = 0;
+        en.length = m.length();
+        ArrayList<TLRPC.MessageEntity> ents = new ArrayList<>();
+        if (p.entities != null) {
+            ents.addAll(p.entities);
+        }
+        ents.add(en);
+        p.entities = ents;
     }
 }

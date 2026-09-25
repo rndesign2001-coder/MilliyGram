@@ -10,7 +10,7 @@ import org.telegram.ui.ActionBar.AlertDialog
 
 
 object LanguageCode {
-    var languageCode = "en"
+    var languageCode = "uz"
 
     var languages = ArrayList<Language>()
     var titlesLanguages = ArrayList<TitleLanguages>()

@@ -29,6 +29,7 @@ import org.telegram.messenger.MgConfig;
 import org.telegram.messenger.MgStrangers;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
+import org.telegram.messenger.UserObject;
 import org.telegram.messenger.UserConfig;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLRPC;
@@ -58,6 +59,7 @@ public class MgChatFeatures {
     public static final int MENU_JOIN_REQUESTS = 9022;
     public static final int MENU_JOIN_ALL = 9023;
     public static final int MENU_STRANGER = 9024;
+    public static final int MENU_ONE_TIME_VOICE = 9025;
 
     // ================= Avto-tarjima (chat bo'yicha) =================
 
@@ -648,5 +650,27 @@ public class MgChatFeatures {
             BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, "Chat \"Notanishlar\" jildiga o'tkazildi").show();
         }
         MgStrangers.refresh(account);
+    }
+
+    // ================= Bir martalik ovozli xabar =================
+
+    public static boolean isOneTimeVoice(int account, long did) {
+        return MgConfig.getBool("once_voice_" + account + "_" + did, false);
+    }
+
+    public static boolean canOneTimeVoice(TLRPC.User user) {
+        return user != null && !user.bot && !UserObject.isUserSelf(user) && !UserObject.isService(user.id);
+    }
+
+    public static String oneTimeVoiceMenuTitle(int account, long did) {
+        return isOneTimeVoice(account, did) ? "Bir martalik ovoz: yoqilgan" : "Bir martalik ovoz";
+    }
+
+    public static void toggleOneTimeVoice(BaseFragment f, int account, long did) {
+        boolean on = !isOneTimeVoice(account, did);
+        MgConfig.setBool("once_voice_" + account + "_" + did, on);
+        BulletinFactory.of(f).createSimpleBulletin(R.raw.chats_infotip, on
+                ? "Bu chatda ovozli va doira xabarlar bir marta tinglanadigan bo'lib yuboriladi"
+                : "Bir martalik ovozli xabar o'chirildi").show();
     }
 }

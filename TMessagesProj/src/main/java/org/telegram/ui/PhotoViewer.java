@@ -366,6 +366,16 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     private boolean allowOrder = true;
 
     private boolean muteVideo;
+    private boolean sendAsRoundVideo; // Novagram: current video will be sent as a round video note
+    // Novagram: source size as it is actually DISPLAYED - the container rotation and the pixel aspect ratio
+    // (SAR) are already applied. That is the space the round-video square crop has to be computed in, because
+    // the transcoder's decoder applies the same rotation before TextureRenderer ever samples the frame.
+    // Both stay 0 until the player reports a size; getRoundVideoDisplaySize() then falls back to the demuxer.
+    private float roundVideoDisplayWidth;
+    private float roundVideoDisplayHeight;
+    // Cached square side. fixVideoWidthHeight() spins up (and releases) a MediaCodec encoder, so it must not
+    // run on every timeline drag; invalidated whenever the source or its reported display size changes.
+    private int roundVideoSideCached;
 
     private boolean isUnalivePhoto() {
         if (sendPhotoType == SELECT_TYPE_STICKER) return true;
@@ -940,6 +950,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     private ImageView tuneItem;
     private MuteDrawable muteDrawable;
     private ImageView muteButton;
+    private ImageView roundVideoButton; // Novagram: toggle to send a gallery video as a round video note
     private LivePhotoButton livePhotoButton;
     private EditCoverButton editCoverButton;
     private ArrayList<HintView2> muteHints;
@@ -3276,7 +3287,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                     childTop = (_b - t) - height + (!inBubbleMode && !AndroidUtilities.isInMultiwindow ? AndroidUtilities.navigationBarHeight : 0);
                 } else if (child == selectedPhotosListView) {
                     childTop = actionBar.getMeasuredHeight() + dp(5);
-                } else if (child == muteButton || child == livePhotoButton || child == editCoverButton) {
+                } else if (child == muteButton || child == roundVideoButton || child == livePhotoButton || child == editCoverButton) {
                     int top;
                     if (videoTimelineViewContainer != null && videoTimelineViewContainer.getVisibility() == VISIBLE) {
                         top = videoTimelineViewContainer.getTop();
@@ -6689,6 +6700,9 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 if (livePhotoButton != null) {
                     livePhotoButton.setTranslationY(translationY);
                 }
+                if (roundVideoButton != null) {
+                    roundVideoButton.setTranslationY(translationY);
+                }
             }
         };
         muteButton.setScaleType(ImageView.ScaleType.CENTER);
@@ -6738,6 +6752,38 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 if (object instanceof MediaController.MediaEditState) {
                     ((MediaController.MediaEditState) object).editedInfo = getCurrentVideoEditedInfo();
                 }
+            }
+        });
+
+        // Novagram: "send as round video note" toggle. Sits next to the mute button, only shown for a
+        // single plain video (see the AndroidUtilities.updateViewVisibilityAnimated(roundVideoButton, ...)
+        // gate in onPhotoShow). Mirrors the mute/editCover sibling lifecycle so it fades/hides with them.
+        roundVideoButton = new ImageView(parentActivity);
+        roundVideoButton.setScaleType(ImageView.ScaleType.CENTER);
+        roundVideoButton.setContentDescription("Doira video qilib yuborish");
+        roundVideoButton.setImageResource(R.drawable.input_video);
+        roundVideoButton.setColorFilter(new PorterDuffColorFilter(0xFFFFFFFF, PorterDuff.Mode.SRC_IN));
+        roundVideoButton.setBackground(iBlur3FactoryFrostedLiquidGlass.create(roundVideoButton)
+            .setColorProvider(BlurredBackgroundProviderImpl.photoViewer(null))
+            .setPadding(dp(4))
+            .setRadius(dp(16)));
+        ScaleStateListAnimator.apply(roundVideoButton);
+        containerView.addView(roundVideoButton, LayoutHelper.createFrame(40, 40, Gravity.LEFT | Gravity.BOTTOM, 56, 0, 0, -4));
+        roundVideoButton.setOnClickListener(v -> {
+            if (isCaptionOpen()) {
+                return;
+            }
+            sendAsRoundVideo = !sendAsRoundVideo;
+            updateRoundVideoButton();
+            updateVideoInfo();
+            try {
+                BulletinFactory.of(containerView, resourcesProvider).createSimpleBulletin(R.raw.chats_infotip,
+                        sendAsRoundVideo ? "Video doira (dumaloq) ko'rinishida yuboriladi — maks. 60 soniya" : "Video oddiy ko'rinishda yuboriladi").show();
+            } catch (Throwable ignore) {
+            }
+            Object object = imagesArrLocals.get(currentIndex);
+            if (object instanceof MediaController.MediaEditState) {
+                ((MediaController.MediaEditState) object).editedInfo = getCurrentVideoEditedInfo();
             }
         });
 
@@ -9730,6 +9776,47 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         return result;
     }
 
+    // Novagram: source size of the current video in DISPLAY space, written into out[0]/out[1].
+    // Preferred source is the player, which reports the size with the container rotation and the pixel
+    // aspect ratio already applied. Until it has reported we fall back to the demuxer's coded size plus the
+    // container's rotation tag - correct for rotation, only blind to a non-square pixel aspect.
+    private void getRoundVideoDisplaySize(float[] out) {
+        float w = roundVideoDisplayWidth;
+        float h = roundVideoDisplayHeight;
+        if (w <= 0 || h <= 0) {
+            w = Math.max(1, originalWidth);
+            h = Math.max(1, originalHeight);
+            if (rotationValue == 90 || rotationValue == 270) {
+                final float swap = w;
+                w = h;
+                h = swap;
+            }
+        }
+        out[0] = w;
+        out[1] = h;
+    }
+
+    // Novagram: side of the square a round video note is encoded at. Matches Telegram's own camera notes
+    // (server-configured roundVideoSize, 384 by default) and never upscales past the source.
+    private int getRoundVideoSide() {
+        if (roundVideoSideCached > 0) {
+            return roundVideoSideCached;
+        }
+        final float[] size = new float[2];
+        getRoundVideoDisplaySize(size);
+        final int maxSide = Math.max(64, Math.min(1280, MessagesController.getInstance(currentAccount).roundVideoSize));
+        final int target = Math.min(maxSide, Math.max(2, Math.round(Math.min(size[0], size[1]))));
+        final int[] fixed = fixVideoWidthHeight(target, target);
+        // fixVideoWidthHeight clamps width and height against separate encoder ranges, so collapse them back
+        // to a single value: a video note frame must never come out non-square.
+        return roundVideoSideCached = Math.max(fixed[0], fixed[1]);
+    }
+
+    // Novagram: same bitrate Telegram uses for its own round notes (server-configured, 1000 * 1024 by default).
+    private int getRoundVideoBitrate() {
+        return Math.max(100_000, MessagesController.getInstance(currentAccount).roundVideoBitrate * 1024);
+    }
+
     private VideoEditedInfo getCurrentVideoEditedInfo() {
         if (!isCurrentVideo && hasAnimatedMediaEntities() && centerImage.getBitmapWidth() > 0) {
             float maxSize = 854;
@@ -9872,6 +9959,61 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             videoEditedInfo.originalBitrate = originalBitrate;
         }
         videoEditedInfo.muted = muteVideo || sendPhotoType == SELECT_TYPE_AVATAR;
+        if (sendAsRoundVideo && sendPhotoType != SELECT_TYPE_AVATAR) {
+            // Novagram: send this gallery video as a round video note. Auto center-square crop (no manual
+            // pan): keep the largest centered square of the source and encode a square frame — the
+            // round_message flag added in SendMessagesHelper is what makes every client render it as a
+            // circle. This path always transcodes (a cropState is set), so it runs off the UI thread.
+            videoEditedInfo.roundVideo = true;
+            // The crop fractions are read by TextureRenderer AFTER the decoder has applied the container
+            // rotation, so they must describe the frame as it is displayed, not as it is coded. Building them
+            // from the raw coded size is what stretched the note: a phone recording is stored landscape
+            // (1920x1080) with a "rotate 90" tag, so the square was cut across the wrong axis and then
+            // squashed into the output. getRoundVideoDisplaySize() hands back the rotated, SAR-corrected size.
+            final float[] displaySize = new float[2];
+            getRoundVideoDisplaySize(displaySize);
+            // A user rotation from the crop editor makes TextureRenderer map the source's height axis onto the
+            // output's width axis, so the two fractions swap roles - the same rule the normal crop path applies
+            // when it derives transformWidth/transformHeight. Pan/zoom from that editor is intentionally
+            // dropped: a note is always the centred square.
+            final MediaController.CropState userCrop = editState.cropState;
+            final int userRotation = userCrop != null ? userCrop.transformRotation : 0;
+            final boolean axisSwapped = userRotation == 90 || userRotation == 270;
+            final float axisW = axisSwapped ? displaySize[1] : displaySize[0];
+            final float axisH = axisSwapped ? displaySize[0] : displaySize[1];
+            MediaController.CropState crop = new MediaController.CropState();
+            crop.cropScale = 1f;
+            crop.cropPx = 0f;
+            crop.cropPy = 0f;
+            crop.transformRotation = userRotation;
+            crop.mirrored = userCrop != null && userCrop.mirrored;
+            if (axisW >= axisH) {
+                crop.cropPw = axisH / axisW;
+                crop.cropPh = 1f;
+            } else {
+                crop.cropPw = 1f;
+                crop.cropPh = axisW / axisH;
+            }
+            final int side = getRoundVideoSide();
+            crop.transformWidth = side;
+            crop.transformHeight = side;
+            videoEditedInfo.cropState = crop;
+            videoEditedInfo.rotationValue = (rotationValue + userRotation) % 360;
+            videoEditedInfo.muted = muteVideo;
+            videoEditedInfo.bitrate = getRoundVideoBitrate();
+            // Hard safety cap: a round video note must never exceed 60s no matter what the trim slider shows
+            // (e.g. if a later mute toggle reset its max-progress-diff). Clamp the end here at the source of truth.
+            final long durationUs = (long) (videoDuration * 1000);
+            final long startUs = videoEditedInfo.startTime < 0 ? 0 : videoEditedInfo.startTime;
+            long endUs = videoEditedInfo.endTime < 0 ? durationUs : videoEditedInfo.endTime;
+            if (durationUs > 0 && endUs - startUs > 60_000_000L) {
+                endUs = startUs + 60_000_000L;
+                videoEditedInfo.endTime = endUs;
+                videoEditedInfo.end = (float) endUs / durationUs;
+            }
+            videoEditedInfo.estimatedDuration = Math.max(1, (endUs - startUs) / 1000);
+            videoEditedInfo.estimatedSize = Math.max(1, (long) (videoEditedInfo.bitrate / 8.0 * (videoEditedInfo.estimatedDuration / 1000.0)));
+        }
         return videoEditedInfo;
     }
 
@@ -10555,6 +10697,19 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
 
                 @Override
                 public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
+                    // Novagram: remember the DISPLAY size of the source for the round-video square crop. The
+                    // player hands us the size with the container rotation already applied (MediaCodec rotates
+                    // when decoding to a surface, so ExoPlayer swaps w/h and inverts the SAR itself) - the same
+                    // orientation the transcoder will see. Deriving the crop from the raw coded size instead
+                    // squeezed every rotated clip: an ordinary phone recording is stored landscape + "rotate 90".
+                    final float roundSar = pixelWidthHeightRatio > 0 ? pixelWidthHeightRatio : 1f;
+                    final float roundW = (unappliedRotationDegrees == 90 || unappliedRotationDegrees == 270 ? height : width) * roundSar;
+                    final float roundH = unappliedRotationDegrees == 90 || unappliedRotationDegrees == 270 ? width : height;
+                    if (roundW != roundVideoDisplayWidth || roundH != roundVideoDisplayHeight) {
+                        roundVideoDisplayWidth = roundW;
+                        roundVideoDisplayHeight = roundH;
+                        roundVideoSideCached = 0;
+                    }
                     if (aspectRatioFrameLayout != null) {
                         if (unappliedRotationDegrees == 90 || unappliedRotationDegrees == 270) {
                             int temp = width;
@@ -12248,6 +12403,10 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                         editCoverButton.setVisibility(sendPhotoTypeIsGif ? View.GONE : View.VISIBLE);
                         arrayList.add(ObjectAnimator.ofFloat(editCoverButton, View.ALPHA, 1));
                     }
+                    if (roundVideoButton.getTag() != null) {
+                        roundVideoButton.setVisibility(sendPhotoTypeIsGif ? View.GONE : View.VISIBLE);
+                        arrayList.add(ObjectAnimator.ofFloat(roundVideoButton, View.ALPHA, 1));
+                    }
                     if (navigationBar != null) {
                         navigationBar.setVisibility(View.VISIBLE);
                         arrayList.add(ObjectAnimator.ofFloat(navigationBar, View.ALPHA, 1));
@@ -12335,6 +12494,9 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             if (editCoverButton.getTag() != null) {
                 arrayList.add(ObjectAnimator.ofFloat(editCoverButton, View.ALPHA, 1, 0));
             }
+            if (roundVideoButton.getTag() != null) {
+                arrayList.add(ObjectAnimator.ofFloat(roundVideoButton, View.ALPHA, 1, 0));
+            }
             if (navigationBar != null) {
                 arrayList.add(ObjectAnimator.ofFloat(navigationBar, View.ALPHA, 1));
             }
@@ -12350,6 +12512,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                     muteButton.setVisibility(View.GONE);
                     livePhotoButton.setVisibility(View.GONE);
                     editCoverButton.setVisibility(View.GONE);
+                    roundVideoButton.setVisibility(View.GONE);
                     selectedPhotosListView.setVisibility(View.GONE);
                     selectedPhotosListView.setAlpha(0.0f);
                     selectedPhotosListView.setTranslationY(-dp(10));
@@ -12540,6 +12703,9 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             if (editCoverButton.getTag() != null) {
                 arrayList.add(ObjectAnimator.ofFloat(editCoverButton, View.ALPHA, 1, 0));
             }
+            if (roundVideoButton.getTag() != null) {
+                arrayList.add(ObjectAnimator.ofFloat(roundVideoButton, View.ALPHA, 1, 0));
+            }
             arrayList.add(ObjectAnimator.ofObject(navigationBar, "backgroundColor", new ArgbEvaluator(), navigationBarColorFrom, navigationBarColorTo));
             changeModeAnimation.playTogether(arrayList);
             changeModeAnimation.setDuration(200);
@@ -12554,6 +12720,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                     muteButton.setVisibility(View.GONE);
                     livePhotoButton.setVisibility(View.GONE);
                     editCoverButton.setVisibility(View.GONE);
+                    roundVideoButton.setVisibility(View.GONE);
                     if (photoCropView != null) {
                         photoCropView.setVisibility(View.INVISIBLE);
                     }
@@ -12679,6 +12846,9 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             if (editCoverButton.getTag() != null) {
                 arrayList.add(ObjectAnimator.ofFloat(editCoverButton, View.ALPHA, 1, 0));
             }
+            if (roundVideoButton.getTag() != null) {
+                arrayList.add(ObjectAnimator.ofFloat(roundVideoButton, View.ALPHA, 1, 0));
+            }
             changeModeAnimation.playTogether(arrayList);
             changeModeAnimation.setDuration(200);
             changeModeAnimation.addListener(new AnimatorListenerAdapter() {
@@ -12725,6 +12895,9 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             if (editCoverButton.getTag() != null) {
                 arrayList.add(ObjectAnimator.ofFloat(editCoverButton, View.ALPHA, 1, 0));
             }
+            if (roundVideoButton.getTag() != null) {
+                arrayList.add(ObjectAnimator.ofFloat(roundVideoButton, View.ALPHA, 1, 0));
+            }
             changeModeAnimation.playTogether(arrayList);
             changeModeAnimation.setDuration(200);
             changeModeAnimation.addListener(new AnimatorListenerAdapter() {
@@ -12766,6 +12939,9 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             }
             if (editCoverButton.getTag() != null) {
                 arrayList.add(ObjectAnimator.ofFloat(editCoverButton, View.ALPHA, 1, 0));
+            }
+            if (roundVideoButton.getTag() != null) {
+                arrayList.add(ObjectAnimator.ofFloat(roundVideoButton, View.ALPHA, 1, 0));
             }
             coverEditor.setVisibility(View.VISIBLE);
             arrayList.add(ObjectAnimator.ofFloat(coverEditor, View.ALPHA, 0, 1));
@@ -13022,6 +13198,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         muteButton.setVisibility(View.GONE);
         livePhotoButton.setVisibility(View.GONE);
         editCoverButton.setVisibility(View.GONE);
+        roundVideoButton.setVisibility(View.GONE);
         if (photoCropView != null) {
             photoCropView.setVisibility(View.INVISIBLE);
         }
@@ -13413,6 +13590,9 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             }
             if (livePhotoButton.getTag() != null) {
                 arrayList.add(ObjectAnimator.ofFloat(livePhotoButton, View.ALPHA, show ? 1.0f : 0.0f));
+            }
+            if (roundVideoButton.getTag() != null) {
+                arrayList.add(ObjectAnimator.ofFloat(roundVideoButton, View.ALPHA, show ? 1.0f : 0.0f));
             }
             if (editCoverButton.getTag() != null) {
                 arrayList.add(ObjectAnimator.ofFloat(editCoverButton, View.ALPHA, show ? 1.0f : 0.0f));
@@ -14044,10 +14224,12 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         AndroidUtilities.updateViewVisibilityAnimated(muteButton, false, 1f, false);
         AndroidUtilities.updateViewVisibilityAnimated(livePhotoButton, false, 1f, false);
         AndroidUtilities.updateViewVisibilityAnimated(editCoverButton, false, 1f, false);
+        AndroidUtilities.updateViewVisibilityAnimated(roundVideoButton, false, 1f, false);
 
         actionBarContainer.setSubtitle(null);
         setItemVisible(masksItem, false, true);
         muteVideo = false;
+        sendAsRoundVideo = false;
         if (livePhotoButton != null) {
             livePhotoButton.setValue(true, false);
         }
@@ -14962,6 +15144,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                             AndroidUtilities.updateViewVisibilityAnimated(muteButton, false, 1f, animated);
                             AndroidUtilities.updateViewVisibilityAnimated(livePhotoButton, false, 1f, animated);
                             AndroidUtilities.updateViewVisibilityAnimated(editCoverButton, false, 1f, animated);
+                            AndroidUtilities.updateViewVisibilityAnimated(roundVideoButton, false, 1f, animated);
                             compressItem.setVisibility(View.GONE);
                         } else {
                             showVideoTimeline(!isLivePhoto, animated);
@@ -14974,6 +15157,13 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                                 mirrorItem.setVisibility(View.GONE);
                                 mirrorItem.setTag(null);
                                 AndroidUtilities.updateViewVisibilityAnimated(muteButton, !sendPhotoTypeIsGif && !isLivePhoto, 1f, animated);
+                                // Novagram: round-video toggle is available for a plain video being sent to a chat,
+                                // and only for a SINGLE selected item — a video note can never be part of an album,
+                                // so allowing it under multi-select would let the whole group send fail on the server.
+                                // Restore the per-entry round state so it survives paging between selected items.
+                                AndroidUtilities.updateViewVisibilityAnimated(roundVideoButton, !sendPhotoTypeIsGif && !isLivePhoto && parentChatActivity != null && (placeProvider == null || placeProvider.getSelectedCount() <= 1), 1f, animated);
+                                sendAsRoundVideo = object instanceof MediaController.PhotoEntry && ((MediaController.PhotoEntry) object).editedInfo != null && ((MediaController.PhotoEntry) object).editedInfo.roundVideo;
+                                roundVideoButton.setColorFilter(new PorterDuffColorFilter(sendAsRoundVideo ? getThemedColor(Theme.key_chat_editMediaButton) : 0xFFFFFFFF, PorterDuff.Mode.SRC_IN));
                                 AndroidUtilities.updateViewVisibilityAnimated(livePhotoButton, !sendPhotoTypeIsGif && isLivePhoto && (placeProvider == null || placeProvider.allowLivePhotos()), 1f, animated);
                                 if (isLivePhoto) {
                                     livePhotoButton.setValue(!isUnalivePhoto(), true);
@@ -14996,6 +15186,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                                 AndroidUtilities.updateViewVisibilityAnimated(muteButton, false, 1f, animated);
                                 AndroidUtilities.updateViewVisibilityAnimated(livePhotoButton, false, 1f, animated);
                                 AndroidUtilities.updateViewVisibilityAnimated(editCoverButton, false, 1f, animated);
+                                AndroidUtilities.updateViewVisibilityAnimated(roundVideoButton, false, 1f, animated);
                                 compressItem.setVisibility(View.GONE);
                             }
                             tuneItem.setVisibility(View.VISIBLE);
@@ -15015,6 +15206,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                     AndroidUtilities.updateViewVisibilityAnimated(muteButton, false, 1f, animated);
                     AndroidUtilities.updateViewVisibilityAnimated(livePhotoButton, false, 1f, animated);
                     AndroidUtilities.updateViewVisibilityAnimated(editCoverButton, false, 1f, animated);
+                    AndroidUtilities.updateViewVisibilityAnimated(roundVideoButton, false, 1f, animated);
                     if (isCurrentVideo) {
                         animateCaption = false;
                     }
@@ -21233,6 +21425,28 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 videoTimelineView.setMode(VideoTimelinePlayView.MODE_VIDEO);
             }
         }
+        // Novagram: mute toggling rewrites the timeline's max-progress-diff, so re-assert the round 60s cap.
+        if (sendAsRoundVideo) {
+            updateRoundVideoButton();
+        }
+    }
+
+    // Novagram: reflect the round-video toggle state (accent tint when on) and enforce the 60s cap that
+    // round video notes require. Only ever called for a single plain video, where mute keeps the timeline
+    // at the default 1.0 diff, so we can safely own the max-progress-diff here.
+    private void updateRoundVideoButton() {
+        if (roundVideoButton == null) {
+            return;
+        }
+        int color = sendAsRoundVideo ? getThemedColor(Theme.key_chat_editMediaButton) : 0xFFFFFFFF;
+        roundVideoButton.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN));
+        if (videoTimelineView != null) {
+            if (sendAsRoundVideo && videoDuration > 60000.0) {
+                videoTimelineView.setMaxProgressDiff((float) (60000.0 / videoDuration));
+            } else {
+                videoTimelineView.setMaxProgressDiff(1.0f);
+            }
+        }
     }
 
     private void didChangedCompressionLevel(boolean request) {
@@ -21318,8 +21532,15 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             endTime = (long) (videoCutEnd * videoDuration) * 1000;
         }
 
+        long subtitleSize = estimatedSize;
+        if (sendAsRoundVideo) {
+            // Novagram: a round note is always re-encoded to a square at Telegram's note bitrate, so report
+            // that instead of what the plain-video compression path would have produced.
+            width = height = getRoundVideoSide();
+            subtitleSize = Math.max(1, (long) (getRoundVideoBitrate() / 8.0 * (estimatedDuration / 1000.0)));
+        }
         String videoDimension = String.format("%dx%d", width, height);
-        String videoTimeSize = String.format("%s, ~%s", AndroidUtilities.formatShortDuration((int) (estimatedDuration / 1000)), AndroidUtilities.formatFileSize(estimatedSize));
+        String videoTimeSize = String.format("%s, ~%s", AndroidUtilities.formatShortDuration((int) (estimatedDuration / 1000)), AndroidUtilities.formatFileSize(subtitleSize));
         currentSubtitle = String.format("%s, %s", videoDimension, videoTimeSize);
         actionBar.beginDelayedTransition();
         if (customTitle == null) {
@@ -21589,6 +21810,12 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                     .alpha(show ? 0 : 1)
                     .setDuration(200);
         }
+        if (roundVideoButton.getVisibility() == View.VISIBLE) {
+            roundVideoButton.animate().scaleX(show ? 0.25f : 1f)
+                    .scaleY(show ? 0.25f : 1f)
+                    .alpha(show ? 0 : 1)
+                    .setDuration(200);
+        }
     }
 
     private ByteArrayInputStream cleanBuffer(byte[] data) {
@@ -21621,6 +21848,10 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
 
         compressionsCount = -1;
         rotationValue = 0;
+        // Novagram: reset per video; onVideoSizeChanged fills in the real display size.
+        roundVideoDisplayWidth = 0f;
+        roundVideoDisplayHeight = 0f;
+        roundVideoSideCached = 0;
         videoFramerate = 25;
         File file = new File(videoPath);
         originalSize = file.length();
@@ -21664,6 +21895,9 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
 
                     if (videoConvertSupported) {
                         rotationValue = params[AnimatedFileInfo.PARAM_NUM_ROTATION];
+                        // Novagram: the demuxer's size/rotation are the round-crop fallback until the player
+                        // reports, and they only land here - drop anything cached from the previous video.
+                        roundVideoSideCached = 0;
                         updateWidthHeightBitrateForCompression();
 
                         if (selectedCompression > compressionsCount - 1) {

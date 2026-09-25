@@ -105,6 +105,8 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
     private GradientDrawable startMessagingButtonBackground;
     private TextView startMessagingButton;
     private FrameLayout frameLayout2;
+    private android.widget.ImageView mgIconView;
+    private TextureView mgTextureView;
     private FrameLayout frameContainerView;
 
     private RLottieDrawable darkThemeDrawable;
@@ -153,8 +155,10 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
 
     @Override
     public View createView(Context context) {
-        logoDrawable = context.getResources().getDrawable(R.drawable.telegram_logo).mutate();
-        logoDrawable.setBounds(0, dp(8.666f), dp(115), dp(35));
+        // MilliyGram: so'z belgisi (Telegram logotipi o'rniga)
+        logoDrawable = context.getResources().getDrawable(R.drawable.telegram_logo_2).mutate();
+        logoDrawable.setColorFilter(new android.graphics.PorterDuffColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText), android.graphics.PorterDuff.Mode.SRC_IN));
+        logoDrawable.setBounds(0, dp(4), dp(140), dp(31));
         SpannableStringBuilder ssb = new SpannableStringBuilder(LocaleController.getString(R.string.Page1Title));
         ssb.setSpan(new ImageSpan(logoDrawable), 0, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         titles[0] = ssb;
@@ -249,6 +253,22 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
 
         TextureView textureView = new TextureView(context);
         frameLayout2.addView(textureView, LayoutHelper.createFrame(ICON_WIDTH_DP, ICON_HEIGHT_DP, Gravity.CENTER));
+        // MilliyGram: birinchi sahifada ilova ikonkasi (animatsiya bilan)
+        mgTextureView = textureView;
+        textureView.setAlpha(currentViewPagerPage == 0 ? 0f : 1f);
+        mgIconView = new android.widget.ImageView(context);
+        mgIconView.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
+        try {
+            android.graphics.drawable.Drawable anim = context.getResources().getDrawable(R.drawable.mg_splash_anim);
+            mgIconView.setImageDrawable(anim);
+            if (anim instanceof android.graphics.drawable.AnimationDrawable) {
+                AndroidUtilities.runOnUIThread(((android.graphics.drawable.AnimationDrawable) anim)::start, 300);
+            }
+        } catch (Throwable e) {
+            mgIconView.setImageResource(R.mipmap.ic_launcher_round);
+        }
+        mgIconView.setAlpha(currentViewPagerPage == 0 ? 1f : 0f);
+        frameLayout2.addView(mgIconView, LayoutHelper.createFrame(ICON_HEIGHT_DP, ICON_HEIGHT_DP, Gravity.CENTER));
         textureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
             @Override
             public void onSurfaceTextureAvailable(@NonNull SurfaceTexture surface, int width, int height) {
@@ -308,6 +328,15 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
                 }
                 float offset = (position * width + positionOffsetPixels - currentViewPagerPage * width) / width;
                 Intro.setScrollOffset(offset);
+                float mgP = Math.max(0f, Math.min(1f, position + positionOffset));
+                if (mgIconView != null) {
+                    mgIconView.setAlpha(1f - mgP);
+                    mgIconView.setScaleX(1f - 0.3f * mgP);
+                    mgIconView.setScaleY(1f - 0.3f * mgP);
+                }
+                if (mgTextureView != null) {
+                    mgTextureView.setAlpha(mgP);
+                }
             }
 
             @Override

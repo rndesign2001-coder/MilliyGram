@@ -378,6 +378,7 @@ public class ChatActivity extends BaseFragment implements
         InstantCameraView.Delegate,
         FactorAnimator.Target
 {
+    private org.telegram.ui.ActionBar.ActionBarMenuItem.Item mgOneTimeItem;
     private final static boolean PULL_DOWN_BACK_FRAGMENT = false;
     private final static boolean DISABLE_PROGRESS_VIEW = true;
     private final static int SKELETON_DISAPPEAR_MS = 200;
@@ -3771,6 +3772,12 @@ public class ChatActivity extends BaseFragment implements
                 } else if (id == MgChatFeatures.MENU_JOIN_ALL) {
                     MgChatFeatures.joinAllAccounts(ChatActivity.this, currentAccount, currentChat);
                     return;
+                } else if (id == MgChatFeatures.MENU_ONE_TIME_VOICE) {
+                    MgChatFeatures.toggleOneTimeVoice(ChatActivity.this, currentAccount, dialog_id);
+                    if (mgOneTimeItem != null) {
+                        mgOneTimeItem.setText(MgChatFeatures.oneTimeVoiceMenuTitle(currentAccount, dialog_id));
+                    }
+                    return;
                 } else if (id == MgChatFeatures.MENU_STRANGER) {
                     MgChatFeatures.toggleStranger(ChatActivity.this, currentAccount, dialog_id);
                     return;
@@ -4555,6 +4562,9 @@ public class ChatActivity extends BaseFragment implements
                 }
                 if (MgChatFeatures.canJoinAll(currentChat)) {
                     headerItem.lazilyAddSubItem(MgChatFeatures.MENU_JOIN_ALL, R.drawable.msg_contact_add, "Barcha akkauntlardan qo'shilish");
+                }
+                if (currentEncryptedChat == null && MgChatFeatures.canOneTimeVoice(currentUser)) {
+                    mgOneTimeItem = headerItem.lazilyAddSubItem(MgChatFeatures.MENU_ONE_TIME_VOICE, R.drawable.msg_voicechat, MgChatFeatures.oneTimeVoiceMenuTitle(currentAccount, dialog_id));
                 }
                 if (MgChatFeatures.canToggleStranger(currentAccount, currentUser)) {
                     headerItem.lazilyAddSubItem(MgChatFeatures.MENU_STRANGER, R.drawable.msg_usersearch, MgChatFeatures.strangerMenuTitle(currentAccount, dialog_id));

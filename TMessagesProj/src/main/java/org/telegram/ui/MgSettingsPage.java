@@ -91,6 +91,12 @@ public class MgSettingsPage extends UniversalFragment {
     private static final int ID_STRANGER_ON = 110;
     private static final int ID_STRANGER_NOTIFY = 111;
     private static final int ID_LOCK_ANIM = 112;
+    private static final int ID_TEXT_STYLE = 120;
+    private static final int ID_CONFIRM_STICKER = 121;
+    private static final int ID_CONFIRM_VOICE = 122;
+    private static final int ID_CONFIRM_GIF = 123;
+    private static final int ID_ROUND_FRONT = 124;
+    private static final int ID_APK_BLOCK = 125;
     private static final int ID_ACC_NOTIFY_BASE = 2000;
     private static final int ID_EXPORT = 90;
     private static final int ID_IMPORT = 91;
@@ -167,6 +173,17 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asHeader("Maxsus uzatish"));
                 items.add(UItem.asButton(ID_SIGNATURE, R.drawable.msg_edit, "Imzo", MgConfig.getString("mg_cf_signature", "").isEmpty() ? "yo'q" : "bor"));
                 items.add(UItem.asShadow("Xabarni uzoq bosing → \"Maxsus uzatish\": matnni tahrirlab, havola va @larni tozalab, tarjima qilib, o'z nomingizdan uzating."));
+                items.add(UItem.asHeader("Yozish"));
+                items.add(UItem.asButton(ID_TEXT_STYLE, R.drawable.msg_text_outlined, "Standart matn uslubi", org.telegram.messenger.MgAutoText.STYLE_NAMES[org.telegram.messenger.MgAutoText.getDefaultStyle()]));
+                items.add(UItem.asShadow("Tanlangan uslub har bir oddiy matnli xabaringizga avtomatik qo'llanadi (buyruqlar, kod va faqat emojidan iborat xabarlar bundan mustasno)."));
+                items.add(UItem.asHeader("Yuborishdan oldin so'rash"));
+                items.add(UItem.asCheck(ID_CONFIRM_STICKER, "Stiker yuborishda").setChecked(org.fenixuz.utils.ConfirmDialogsPref.INSTANCE.getConfirmSticker()));
+                items.add(UItem.asCheck(ID_CONFIRM_GIF, "GIF yuborishda").setChecked(org.fenixuz.utils.ConfirmDialogsPref.INSTANCE.getConfirmGif()));
+                items.add(UItem.asCheck(ID_CONFIRM_VOICE, "Ovozli xabarda (avval tinglash)").setChecked(org.fenixuz.utils.ConfirmDialogsPref.INSTANCE.getConfirmVoice()));
+                items.add(UItem.asShadow("Tasodifan yuborib yuborishning oldini oladi. Ovozli xabar yozib bo'lingach darhol ketmaydi — avval tinglab, keyin yuborasiz."));
+                items.add(UItem.asHeader("Doira video"));
+                items.add(UItem.asCheck(ID_ROUND_FRONT, "Old kamera bilan boshlash").setChecked(org.fenixuz.utils.CameraSituation.INSTANCE.isFront()));
+                items.add(UItem.asShadow("O'chirilsa, doira video orqa kamera bilan boshlanadi. Galereyadagi videoni doira qilib yuborish: videoni tanlang → pastdagi ⏺ (kamera) tugmasini bosing. Bir martalik ovozli xabar: chat → ⋮ → \"Bir martalik ovoz\"."));
                 break;
             case PAGE_THEMES:
                 items.add(UItem.asButton(ID_THEMES, R.drawable.msg_theme, "MilliyGram mavzulari", MgThemesActivity.currentName()));
@@ -212,6 +229,9 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asShadow(null));
                 items.add(UItem.asCheck(ID_LOCK_ANIM, "Qulf ekranida animatsiyali fon").setChecked(MgConfig.getBool("lock_animated_bg", true)));
                 items.add(UItem.asShadow("Chatni qulflashda umumiy parol yoki shu chatga alohida PIN / grafik kalit tanlash mumkin: chat → ⋮ → \"Chatni qulflash\"."));
+                items.add(UItem.asHeader("Xavfsizlik"));
+                items.add(UItem.asCheck(ID_APK_BLOCK, "APK fayllarni bloklash").setChecked(org.fenixuz.utils.ApkShield.isEnabled()));
+                items.add(UItem.asShadow("Chatlardagi .apk (Android ilova) fayllari ko'rsatilmaydi va ochilmaydi. Bu firibgarlar yuboradigan zararli ilovalardan himoya qiladi."));
                 items.add(UItem.asHeader("Notanishlardan himoya"));
                 items.add(UItem.asCheck(ID_STRANGER_ON, "Notanishlardan himoya").setChecked(org.telegram.messenger.MgStrangers.isEnabled(currentAccount)));
                 items.add(UItem.asCheck(ID_STRANGER_NOTIFY, "Notanishlardan bildirishnoma").setChecked(org.telegram.messenger.MgStrangers.isNotifyEnabled()));
@@ -248,6 +268,12 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asButton(ID_IMPORT, R.drawable.msg_download, "Sozlamalarni tiklash"));
                 items.add(UItem.asShadow("Sozlamalar matn ko'rinishida nusxalanadi (sevimlilar va jildlar bilan). Uni Saqlangan xabarlarga yuborib qo'ying va yangi telefonda qayta joylang. Maxfiy kodlar nusxalanmaydi."));
                 break;
+        }
+    }
+
+    private static void setChecked(View view, boolean v) {
+        if (view instanceof TextCheckCell) {
+            ((TextCheckCell) view).setChecked(v);
         }
     }
 
@@ -465,6 +491,40 @@ public class MgSettingsPage extends UniversalFragment {
             case ID_LOCK_ANIM:
                 toggle(view, "lock_animated_bg", true);
                 break;
+            case ID_TEXT_STYLE: {
+                AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+                b.setTitle("Standart matn uslubi");
+                b.setItems(org.telegram.messenger.MgAutoText.STYLE_NAMES, (d, w) -> {
+                    org.telegram.messenger.MgAutoText.setDefaultStyle(w);
+                    listView.adapter.update(true);
+                });
+                showDialog(b.create());
+                break;
+            }
+            case ID_CONFIRM_STICKER:
+                org.fenixuz.utils.ConfirmDialogsPref.INSTANCE.changeConfirmStickerMode();
+                setChecked(view, org.fenixuz.utils.ConfirmDialogsPref.INSTANCE.getConfirmSticker());
+                break;
+            case ID_CONFIRM_GIF:
+                org.fenixuz.utils.ConfirmDialogsPref.INSTANCE.changeConfirmGifMode();
+                setChecked(view, org.fenixuz.utils.ConfirmDialogsPref.INSTANCE.getConfirmGif());
+                break;
+            case ID_CONFIRM_VOICE:
+                org.fenixuz.utils.ConfirmDialogsPref.INSTANCE.changeConfirmVoiceMode();
+                setChecked(view, org.fenixuz.utils.ConfirmDialogsPref.INSTANCE.getConfirmVoice());
+                break;
+            case ID_ROUND_FRONT: {
+                boolean v = !org.fenixuz.utils.CameraSituation.INSTANCE.isFront();
+                org.fenixuz.utils.CameraSituation.INSTANCE.setFront(v);
+                setChecked(view, v);
+                break;
+            }
+            case ID_APK_BLOCK: {
+                boolean v = !org.fenixuz.utils.ApkShield.isEnabled();
+                org.fenixuz.utils.ApkShield.setEnabled(v);
+                setChecked(view, v);
+                break;
+            }
             case ID_STRANGER_NOTIFY:
                 toggle(view, "stranger_notify", false);
                 break;

@@ -1397,6 +1397,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                             filterTabsView.selectTabWithId(viewPages[0].selectedType, 1f);
                             filterTabsView.selectTabWithId(viewPages[1].selectedType, additionalOffset / viewPages[0].getMeasuredWidth());
                             switchToCurrentSelectedMode(true);
+                            mgUpdateFolderTitle(viewPages[0].selectedType);
                             viewPages[0].dialogsAdapter.resume();
                             viewPages[1].dialogsAdapter.pause();
                         }
@@ -1410,6 +1411,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                             filterTabsView.selectTabWithId(viewPages[0].selectedType, 1f);
                             filterTabsView.selectTabWithId(viewPages[1].selectedType, -additionalOffset / viewPages[0].getMeasuredWidth());
                             switchToCurrentSelectedMode(true);
+                            mgUpdateFolderTitle(viewPages[0].selectedType);
                             viewPages[0].dialogsAdapter.resume();
                             viewPages[1].dialogsAdapter.pause();
                         } else {
@@ -1555,6 +1557,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                                     viewPages[0] = viewPages[1];
                                     viewPages[1] = tempPage;
                                     filterTabsView.selectTabWithId(viewPages[0].selectedType, 1.0f);
+                                    mgUpdateFolderTitle(viewPages[0].selectedType); // MilliyGram: suriganda ham jild nomi
                                     updateCounters(false);
                                     viewPages[0].dialogsAdapter.resume();
                                     viewPages[1].dialogsAdapter.pause();
@@ -7339,6 +7342,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
         if (viewPages != null) {
             for (int a = 0; a < viewPages.length; a++) {
+                // MilliyGram: arxiv holati sozlamalardan o'zgargan bo'lsa, ro'yxatni moslash
+                boolean mgHidden = SharedConfig.archiveHidden;
+                if ((viewPages[a].archivePullViewState == ARCHIVE_ITEM_STATE_PINNED) == mgHidden) {
+                    viewPages[a].listView.updatePullState();
+                    if (mgHidden && mgArchiveType(viewPages[a].dialogsType) && hasHiddenArchive() && viewPages[a].layoutManager.findFirstVisibleItemPosition() == 0) {
+                        viewPages[a].layoutManager.scrollToPositionWithOffset(1, (int) scrollYOffset);
+                    }
+                }
                 viewPages[a].dialogsAdapter.notifyDataSetChanged();
             }
         }
@@ -8737,12 +8748,23 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             if (which == 0) {
                 getMessagesStorage().readAllDialogs(1);
             } else if (which == 1 && viewPages != null) {
+                // MilliyGram: jild tablarida ham ishlaydi; holat faqat bir marta almashadi
+                ViewPage mgTarget = null;
                 for (int a = 0; a < viewPages.length; a++) {
-                    if (viewPages[a].dialogsType != 0 || viewPages[a].getVisibility() != View.VISIBLE) {
-                        continue;
+                    if (mgArchiveType(viewPages[a].dialogsType) && viewPages[a].getVisibility() == View.VISIBLE) {
+                        mgTarget = viewPages[a];
+                        break;
                     }
-                    DialogCell dialogCell = findArchiveDialogCell(viewPages[a]);
-                    viewPages[a].listView.toggleArchiveHidden(true, dialogCell);
+                }
+                if (mgTarget == null) {
+                    mgTarget = viewPages[0];
+                }
+                DialogCell dialogCell = findArchiveDialogCell(mgTarget);
+                mgTarget.listView.toggleArchiveHidden(true, dialogCell);
+                for (int a = 0; a < viewPages.length; a++) {
+                    if (viewPages[a] != mgTarget) {
+                        viewPages[a].listView.updatePullState();
+                    }
                 }
             }
         });
