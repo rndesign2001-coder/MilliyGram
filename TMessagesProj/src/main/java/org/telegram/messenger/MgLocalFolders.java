@@ -34,6 +34,7 @@ public class MgLocalFolders {
     public static final int TYPE_ADMIN_CHANNELS = 2;
     public static final int TYPE_ADMIN_GROUPS = 3;
     public static final int TYPE_CUSTOM = 4; // foydalanuvchi toifasi (faqat tanlangan chatlar)
+    public static final int TYPE_STRANGERS = 5; // notanishlar (kontaktda yo'q shaxsiy chatlar)
 
     public static final int CUSTOM_MIN = 920;
     public static final int CUSTOM_MAX = 989;
@@ -64,6 +65,7 @@ public class MgLocalFolders {
         icon("archive", R.drawable.msg_archive, "Arxiv");
         icon("chat", R.drawable.msg_discussion, "Suhbat");
         icon("category", R.drawable.msg_folders, "Toifa");
+        icon("strangers", R.drawable.msg_usersearch, "Notanishlar");
         icon("folder", R.drawable.msg_folders, "Jild");
         icon("home", R.drawable.msg_home, "Uy");
         icon("work", R.drawable.msg_work, "Ish");
@@ -110,6 +112,7 @@ public class MgLocalFolders {
             new Def(906, "admin", "Admin", MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_ADMIN, "admin", false, 6),
             new Def(907, "admin_channels", "Mening kanallarim", MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_ADMIN_CHANNELS, "admin_channels", false, 7),
             new Def(908, "admin_groups", "Mening guruhlarim", MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_ADMIN_GROUPS, "admin_groups", false, 8),
+            new Def(909, "strangers", "Notanishlar", MessagesController.DIALOG_FILTER_FLAG_CONTACTS | MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS, TYPE_STRANGERS, "strangers", false, 9),
     };
 
     public static class Entry {
@@ -558,6 +561,9 @@ public class MgLocalFolders {
     // ---------- Admin jildlari ----------
 
     public static boolean includesByType(MessagesController.DialogFilter filter, MessagesController mc, long dialogId) {
+        if (filter.mgLocalType == TYPE_STRANGERS) {
+            return MgStrangers.belongsInInbox(mc.currentAccount, dialogId);
+        }
         if (dialogId >= 0) {
             return false;
         }

@@ -718,6 +718,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private final static int mg_clear_cache = 125;
     private final static int mg_chat_settings = 126;
     private final static int mg_preview = 127;
+    private final static int mg_trust = 128;
+    private ActionBarMenuSubItem mgTrustItem;
     private ActionBarMenuSubItem mgAddToGroupItem;
     private ActionBarMenuSubItem mgPreviewItem;
     private int mgArchiveKind; // MilliyGram: arxivni turlar bo'yicha saralash
@@ -4077,6 +4079,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 } else if (id == mg_favorite) {
                     mgAddToFavorites(new ArrayList<>(selectedDialogs));
                     hideActionMode(true);
+                } else if (id == mg_trust) {
+                    for (int i = 0; i < selectedDialogs.size(); i++) {
+                        org.telegram.messenger.MgStrangers.trust(currentAccount, selectedDialogs.get(i));
+                    }
+                    hideActionMode(true);
+                    org.telegram.messenger.MgStrangers.refresh(currentAccount);
+                    BulletinFactory.of(DialogsActivity.this).createSimpleBulletin(R.raw.contact_check, "Asosiy ro'yxatga qaytarildi").show();
                 } else if (id == mg_shortcut) {
                     MgDialogActions.addShortcuts(DialogsActivity.this, currentAccount, new ArrayList<>(selectedDialogs));
                     hideActionMode(true);
@@ -6852,6 +6861,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         otherItem.addSubItem(mg_clear_cache, R.drawable.msg_clearcache, "Keshni tozalash");
         otherItem.addSubItem(mg_chat_settings, R.drawable.msg_settings, "Chatlar sozlamalari");
         mgPreviewItem = otherItem.addSubItem(mg_preview, R.drawable.msg_views, "Chat ko'rinishi");
+        mgTrustItem = otherItem.addSubItem(mg_trust, R.drawable.msg_usersearch, "Notanish emas");
 
         muteItem.setOnLongClickListener(e -> {
             performSelectedDialogsAction(selectedDialogs, mute, true, true);
@@ -10287,6 +10297,16 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             TLRPC.User su = single && sd > 0 ? getMessagesController().getUser(sd) : null;
             mgAddToGroupItem.setVisibility(su != null && !UserObject.isUserSelf(su) && !UserObject.isDeleted(su) ? View.VISIBLE : View.GONE);
         }
+        if (mgTrustItem != null) {
+            boolean anyInbox = false;
+            for (int i = 0; i < selectedDialogs.size(); i++) {
+                if (org.telegram.messenger.MgStrangers.belongsInInbox(currentAccount, selectedDialogs.get(i))) {
+                    anyInbox = true;
+                    break;
+                }
+            }
+            mgTrustItem.setVisibility(anyInbox ? View.VISIBLE : View.GONE);
+        }
         if (mgPreviewItem != null) {
             mgPreviewItem.setVisibility(selectedDialogs.size() == 1 && !DialogObject.isEncryptedDialog(selectedDialogs.get(0)) ? View.VISIBLE : View.GONE);
         }
@@ -11314,6 +11334,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     public ArrayList<TLRPC.Dialog> getDialogsArray(int currentAccount, int dialogsType, int folderId, boolean frozen) {
         // MilliyGram: yashirin chatlar ro'yxatda ko'rinmaydi
         ArrayList<TLRPC.Dialog> mgRes = org.telegram.messenger.MgConfig.filterHidden(currentAccount, mgGetDialogsArrayRaw(currentAccount, dialogsType, folderId, frozen));
+        // MilliyGram: notanishlar asosiy ro'yxatda ko'rinmaydi ("Notanishlar" jildida)
+        if (!onlySelect && communityId == 0 && folderId == 0 && !frozen && (dialogsType == DIALOGS_TYPE_DEFAULT || dialogsType == 7 || dialogsType == 8)) {
+            MessagesController.DialogFilter mgSel = dialogsType == DIALOGS_TYPE_DEFAULT ? null : MessagesController.getInstance(currentAccount).selectedDialogFilter[dialogsType == 8 ? 1 : 0];
+            if (mgSel == null || mgSel.mgLocalType != org.telegram.messenger.MgLocalFolders.TYPE_STRANGERS) {
+                mgRes = org.telegram.messenger.MgStrangers.filter(currentAccount, mgRes);
+            }
+        }
         if (folderId == 1 && mgArchiveKind != 0 && dialogsType == DIALOGS_TYPE_DEFAULT && !frozen) {
             mgRes = MgDialogActions.filterKind(MessagesController.getInstance(currentAccount), mgRes, mgArchiveKind);
         }

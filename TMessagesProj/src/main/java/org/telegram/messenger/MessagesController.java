@@ -20702,6 +20702,7 @@ public class MessagesController extends BaseController implements NotificationCe
                     } else if (baseUpdate instanceof TL_update.TL_updatePendingJoinRequests) {
                         TL_update.TL_updatePendingJoinRequests update = (TL_update.TL_updatePendingJoinRequests) baseUpdate;
                         getMemberRequestsController().onPendingRequestsUpdated(update);
+                        org.telegram.ui.MgChatFeatures.onPendingJoinRequests(currentAccount, update); // MilliyGram
                     } else if (baseUpdate instanceof TL_update.TL_updateSavedRingtones) {
                         getMediaDataController().ringtoneDataStore.loadUserRingtones(true);
                     } else if (baseUpdate instanceof TL_update.TL_updateTranscribeAudio) {

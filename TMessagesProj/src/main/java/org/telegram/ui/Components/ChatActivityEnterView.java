@@ -7243,7 +7243,90 @@ public class ChatActivityEnterView extends FrameLayout implements
         isRecordingStateChanged();
     }
 
+    // MilliyGram: chat avto-tarjimasi
+    private boolean mgTranslating;
+    private boolean mgSkipTranslateOnce;
+
+    /** @return true — tugma bosilishi tarjima uchun ishlatildi (xabar keyin yuboriladi) */
+    private boolean mgAutoTranslateBeforeSend() {
+        if (mgTranslating) {
+            return true;
+        }
+        if (mgSkipTranslateOnce) {
+            mgSkipTranslateOnce = false;
+            return false;
+        }
+        if (audioToSend != null || editingMessageObject != null || messageEditText == null || isInScheduleMode()) {
+            return false;
+        }
+        final String lang = org.telegram.ui.MgChatFeatures.getAutoTranslateLang(currentAccount, dialog_id);
+        if (lang == null) {
+            return false;
+        }
+        final CharSequence text = messageEditText.getText();
+        if (text == null || TextUtils.getTrimmedLength(text) == 0 || text.toString().trim().startsWith("/")) {
+            return false;
+        }
+        CharSequence[] arr = {new android.text.SpannableStringBuilder(text)};
+        ArrayList<TLRPC.MessageEntity> ents = MediaDataController.getInstance(currentAccount).getEntities(arr, true, false);
+        final String src = arr[0] == null ? text.toString() : arr[0].toString();
+        mgTranslating = true;
+        final Bulletin progress = parentFragment == null ? null : BulletinFactory.of(parentFragment)
+                .createSimpleBulletin(R.raw.msg_translate, "Tarjima qilinmoqda: " + org.telegram.ui.MgTranslate.nameOf(lang) + "…").setDuration(30000).show();
+        final boolean[] settled = {false};
+        final Runnable watchdog = () -> {
+            if (settled[0]) {
+                return;
+            }
+            settled[0] = true;
+            mgTranslating = false;
+            if (progress != null) {
+                progress.hide();
+            }
+            mgSkipTranslateOnce = true;
+            if (parentFragment != null) {
+                BulletinFactory.of(parentFragment).createErrorBulletin("Tarjima qilib bo'lmadi. Qayta bossangiz, asl matn yuboriladi").show();
+            }
+        };
+        AndroidUtilities.runOnUIThread(watchdog, 25000);
+        org.telegram.ui.MgTranslate.translate(currentAccount, src, ents, lang, (res, err) -> {
+            if (settled[0]) {
+                return;
+            }
+            settled[0] = true;
+            AndroidUtilities.cancelRunOnUIThread(watchdog);
+            mgTranslating = false;
+            if (progress != null) {
+                progress.hide();
+            }
+            if (res != null && messageEditText != null && !TextUtils.isEmpty(res.text)) {
+                ArrayList<TLRPC.MessageEntity> re = res.entities == null ? new ArrayList<>() : new ArrayList<>(res.entities);
+                CharSequence out = applyMessageEntities(re, res.text, messageEditText.getPaint().getFontMetricsInt());
+                out = Emoji.replaceEmoji(out, messageEditText.getPaint().getFontMetricsInt(), false);
+                setFieldText(out);
+                messageEditText.setSelection(messageEditText.length());
+                mgSkipTranslateOnce = true;
+                if (org.telegram.ui.MgChatFeatures.isAutoTranslatePreview()) {
+                    if (parentFragment != null) {
+                        BulletinFactory.of(parentFragment).createSimpleBulletin(R.raw.msg_translate, "Tarjimani tekshirib, yana yuborish tugmasini bosing").show();
+                    }
+                } else {
+                    sendMessage();
+                }
+            } else {
+                mgSkipTranslateOnce = true;
+                if (parentFragment != null) {
+                    BulletinFactory.of(parentFragment).createErrorBulletin((err == null ? "Tarjima qilib bo'lmadi" : err) + ". Qayta bossangiz, asl matn yuboriladi").show();
+                }
+            }
+        });
+        return true;
+    }
+
     public boolean sendMessage() {
+        if (mgAutoTranslateBeforeSend()) {
+            return true;
+        }
         if (richDraftActive && !UserConfig.getInstance(currentAccount).isPremium()) {
             RichEditor.openConversionSheet(getContext(), this::openRichEditorWithoutFormatting, () -> {
                 if (parentFragment != null) {
