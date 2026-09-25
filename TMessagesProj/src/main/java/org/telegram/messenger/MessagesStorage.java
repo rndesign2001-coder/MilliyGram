@@ -2967,6 +2967,7 @@ public class MessagesStorage extends BaseController {
                             unreadCount += contacts[1][1];
                         }
                     }
+                }
                 if ((flags & MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS) != 0
                         && !(a == N && org.fenixuz.utils.StrangerShield.INSTANCE.isEnabled(currentAccount))) {
                     if ((flags & MessagesController.DIALOG_FILTER_FLAG_ONLY_ARCHIVED) == 0) {
@@ -6510,6 +6511,7 @@ public class MessagesStorage extends BaseController {
                             unreadCount += contacts[1][1];
                         }
                     }
+                }
                 if ((flags & MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS) != 0
                         && !(a == N && org.fenixuz.utils.StrangerShield.INSTANCE.isEnabled(currentAccount))) {
                     if ((flags & MessagesController.DIALOG_FILTER_FLAG_ONLY_ARCHIVED) == 0) {

@@ -165,7 +165,7 @@ object DeletedMsg {
                     dialogId,
                     if (isChannel) dialogId else 0,
                     messageIds,
-                    null,
+                    null as ArrayList<Long>?,
                     true
                 )
                 deleteFromSharedPrefByDialogId(dialogId)
@@ -307,9 +307,3 @@ object DeletedMsg {
 }
 
 data class WhoDeletedMsg(val dialogId: Long?, val id: Int?, val who: By?)
-
-enum class By {
-    Me,
-    You,
-    Channel
-}

@@ -1203,6 +1203,11 @@ public class ChatActivity extends BaseFragment implements
     public final static int OPTION_RETRY = 0;
     public final static int OPTION_FENIX_EDIT_HISTORY = 1000;
     public final static int OPTION_DELETE = 1;
+
+    public static ChatActivity instance;
+
+    public void markChatLockPassed() {
+    }
     public final static int OPTION_FORWARD = 2;
     public final static int OPTION_COPY = 3;
     public final static int OPTION_SAVE_TO_GALLERY = 4;
@@ -2674,6 +2679,7 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public boolean onFragmentCreate() {
+        instance = this;
         final long chatId = arguments.getLong("chat_id", 0);
         final long userId = arguments.getLong("user_id", 0);
         final int encId = arguments.getInt("enc_id", 0);
@@ -3400,6 +3406,9 @@ public class ChatActivity extends BaseFragment implements
     @Override
     public void onFragmentDestroy() {
         super.onFragmentDestroy();
+        if (instance == this) {
+            instance = null;
+        }
         if (messageMetricsView != null) {
             messageMetricsView.finish();
         }

@@ -849,7 +849,7 @@ object AdminFolders {
             org.telegram.messenger.AndroidUtilities.runOnUIThread {
                 if (error == null) {
                     controller.removeFilter(filter)
-                    org.telegram.messenger.MessagesStorage.getInstance(account).deleteDialogFilter(filter)
+                    org.telegram.messenger.MessagesStorage.getInstance(account).deleteDialogFilter(filter!!)
                     FolderIcons.setIconRes(id, 0)   // 0 is not in ICONS -> clears our override
                     onResult(true)
                 } else {
