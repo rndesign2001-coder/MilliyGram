@@ -5154,6 +5154,37 @@ public class ChatActivityEnterView extends FrameLayout implements
                     });
                 }), 200);
             });
+            // MilliyGram: Lotin ↔ Kirill va shablonga saqlash
+            final boolean mgCyr = org.telegram.messenger.MgTranslit.isCyrillic(messageEditText.getText());
+            options.add(R.drawable.msg_language, mgCyr ? "Lotinga o'girish" : "Kirillga o'girish", () -> {
+                if (messageSendPreview != null) {
+                    messageSendPreview.dismiss(false);
+                    messageSendPreview = null;
+                }
+                AndroidUtilities.runOnUIThread(() -> {
+                    if (messageEditText == null) {
+                        return;
+                    }
+                    CharSequence[] arr = {new android.text.SpannableStringBuilder(messageEditText.getText())};
+                    ArrayList<TLRPC.MessageEntity> ents = MediaDataController.getInstance(currentAccount).getEntities(arr, true, false);
+                    String src = arr[0] == null ? "" : arr[0].toString();
+                    String conv = org.telegram.messenger.MgTranslit.flip(src);
+                    CharSequence out = conv.length() == src.length() && ents != null && !ents.isEmpty()
+                            ? applyMessageEntities(ents, conv, messageEditText.getPaint().getFontMetricsInt()) : conv;
+                    out = Emoji.replaceEmoji(out, messageEditText.getPaint().getFontMetricsInt(), false);
+                    setFieldText(out);
+                    messageEditText.setSelection(messageEditText.length());
+                }, 150);
+            });
+            options.add(R.drawable.msg_saved, "Shablonga saqlash", () -> {
+                if (messageSendPreview != null) {
+                    messageSendPreview.dismiss(false);
+                    messageSendPreview = null;
+                }
+                if (messageEditText != null && parentFragment != null) {
+                    org.telegram.ui.MgMessageTools.saveTemplate(parentFragment, messageEditText.getText().toString());
+                }
+            });
         }
         options.setupSelectors();
         if (sendWhenOnlineButton != null) {

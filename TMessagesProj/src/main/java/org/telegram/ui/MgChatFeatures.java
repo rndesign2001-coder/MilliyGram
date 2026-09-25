@@ -61,6 +61,7 @@ public class MgChatFeatures {
     public static final int MENU_STRANGER = 9024;
     public static final int MENU_ONE_TIME_VOICE = 9025;
     public static final int MENU_VOICE_TYPING = 9026;
+    public static final int MENU_TEMPLATES = 9027;
 
     // ================= Avto-tarjima (chat bo'yicha) =================
 

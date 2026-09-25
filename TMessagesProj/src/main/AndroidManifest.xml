@@ -86,6 +86,10 @@
 
     <uses-sdk tools:overrideLibrary="com.google.mlkit.vision.segmentation.subject"/>
 
+    <!-- MilliyGram: namoz vaqti eslatmasi aniq vaqtda kelishi uchun -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32" />
+
     <queries>
         <package android:name="com.google.android.apps.maps"/>
         <intent>
@@ -94,6 +98,9 @@
         </intent>
         <intent>
             <action android:name="android.speech.RecognitionService"/>
+        </intent>
+        <intent>
+            <action android:name="android.speech.action.RECOGNIZE_SPEECH"/>
         </intent>
     </queries>
 
@@ -397,6 +404,15 @@
 				  android:taskAffinity="${applicationId}.voip_feedback"
                   android:excludeFromRecents="true"
                 android:theme="@style/Theme.TMessages.TransparentWithAlerts"/>
+
+        <!-- MilliyGram: namoz vaqti eslatmasi -->
+        <receiver
+            android:name="org.telegram.messenger.MgPrayerAlarm"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="uz.milliygram.PRAYER_ALARM"/>
+            </intent-filter>
+        </receiver>
 
         <!-- MilliyGram: javobsiz xabar eslatmasi -->
         <receiver

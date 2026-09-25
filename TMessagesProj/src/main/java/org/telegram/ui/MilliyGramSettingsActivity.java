@@ -22,6 +22,7 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
 
     private static final int ID_ABOUT = 500;
     private static final int ID_DESIGN = 501;
+    private static final int ID_TOUR = 502;
 
     private static final int[] PAGES = {
             MgSettingsPage.PAGE_GENERAL,
@@ -34,6 +35,7 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
             MgSettingsPage.PAGE_NOTIFY,
             MgSettingsPage.PAGE_PRIVACY,
             MgSettingsPage.PAGE_DATA,
+            MgSettingsPage.PAGE_PRAYER,
     };
 
     private static final int[] ICONS = {
@@ -47,6 +49,7 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
             R.drawable.msg_notifications,
             R.drawable.msg_secret,
             R.drawable.msg_download,
+            R.drawable.msg_calendar2,
     };
 
     @Override
@@ -64,6 +67,7 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
         items.add(UItem.asShadow(null));
         items.add(UItem.asButton(MgSettingsPage.PAGE_BACKUP, R.drawable.msg_copy, "Sozlamalarni saqlash"));
         items.add(UItem.asShadow("Sozlamalarni (sevimlilar va jildlar bilan) nusxalab, boshqa telefonda tiklash mumkin."));
+        items.add(UItem.asButton(ID_TOUR, R.drawable.msg_help, "Qisqacha tanishtiruv"));
         items.add(UItem.asButton(ID_ABOUT, R.drawable.msg_info, "MilliyGram haqida"));
         items.add(UItem.asShadow("MilliyGram — Telegram'ning ochiq manba kodi asosida qurilgan norasmiy klient."));
     }
@@ -74,8 +78,55 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
             showAboutDialog();
         } else if (item.id == ID_DESIGN) {
             presentFragment(new MgDesignActivity());
-        } else if (item.id >= MgSettingsPage.PAGE_GENERAL && item.id <= MgSettingsPage.PAGE_AUTOMATION) {
+        } else if (item.id == ID_TOUR) {
+            startTour();
+        } else if (item.id >= MgSettingsPage.PAGE_GENERAL && item.id <= MgSettingsPage.PAGE_PRAYER) {
             presentFragment(new MgSettingsPage(item.id));
+        }
+    }
+
+    @Override
+    public android.view.View createView(android.content.Context context) {
+        android.view.View v = super.createView(context);
+        if (!org.telegram.messenger.MgConfig.getBool("tour_done", false)) {
+            org.telegram.messenger.AndroidUtilities.runOnUIThread(() -> {
+                if (getParentActivity() != null && fragmentView != null && fragmentView.isAttachedToWindow()) {
+                    startTour();
+                }
+            }, 700);
+        }
+        return v;
+    }
+
+    /** Yangi foydalanuvchi uchun bo'limlarni bittalab, strelka bilan ko'rsatib chiqish */
+    private void startTour() {
+        if (listView == null || !(fragmentView instanceof android.widget.FrameLayout) || getParentActivity() == null) {
+            return;
+        }
+        org.telegram.messenger.MgConfig.setBool("tour_done", true);
+        java.util.ArrayList<org.fenixuz.ui.onboarding.FenixTour.Step> steps = new java.util.ArrayList<>();
+        steps.add(new org.fenixuz.ui.onboarding.FenixTour.Step(MgSettingsPage.PAGE_GENERAL, "Asosiy",
+                "Katta shriftli oddiy rejim, silkitib yashirish va @username tekshirish shu yerda."));
+        steps.add(new org.fenixuz.ui.onboarding.FenixTour.Step(MgSettingsPage.PAGE_CHATLIST, "Chat ro'yxati",
+                "Jildlar, ikonkalar, toifalar va arxiv. Chatlarni ✓✓ bilan oraliqda, ☰ bilan hammasini belgilash mumkin."));
+        steps.add(new org.fenixuz.ui.onboarding.FenixTour.Step(MgSettingsPage.PAGE_MESSAGES, "Xabarlar va tarjima",
+                "Tarjima, maxsus uzatish, shablonlar, standart matn uslubi va yuborishdan oldin so'rash."));
+        steps.add(new org.fenixuz.ui.onboarding.FenixTour.Step(MgSettingsPage.PAGE_AUTOMATION, "Avtomatlashtirish",
+                "Band bo'lganingizda avto-javob, avto-tarjima, avto-imzo va qo'shilish so'rovlarini avtomatik qabul qilish."));
+        steps.add(new org.fenixuz.ui.onboarding.FenixTour.Step(MgSettingsPage.PAGE_THEMES, "Mavzular",
+                "Milliy naqshli mavzular va chat foni."));
+        steps.add(new org.fenixuz.ui.onboarding.FenixTour.Step(MgSettingsPage.PAGE_NOTIFY, "Bildirishnomalar",
+                "Fokus rejimi, akkauntlar bo'yicha bildirishnoma va javobsiz xabar eslatmasi."));
+        steps.add(new org.fenixuz.ui.onboarding.FenixTour.Step(MgSettingsPage.PAGE_PRIVACY, "Maxfiylik va xavfsizlik",
+                "Chat qulfi, yashirin bo'lim, notanishlardan himoya, APK blok va firibgarlikdan ogohlantirish."));
+        steps.add(new org.fenixuz.ui.onboarding.FenixTour.Step(MgSettingsPage.PAGE_PRAYER, "Namoz vaqti va ob-havo",
+                "Tumaningizni tanlang — chatlar ro'yxati tepasida keyingi namozgacha qolgan vaqt yoki ob-havo chiqadi."));
+        steps.add(new org.fenixuz.ui.onboarding.FenixTour.Step(ID_TOUR, "Tanishtiruv",
+                "Bu tanishtiruvni istalgan vaqtda shu yerdan qayta ko'rishingiz mumkin."));
+        try {
+            new org.fenixuz.ui.onboarding.FenixTour(getParentActivity(), (android.widget.FrameLayout) fragmentView, listView, steps).start();
+        } catch (Throwable e) {
+            org.telegram.messenger.FileLog.e(e);
         }
     }
 

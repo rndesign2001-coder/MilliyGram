@@ -1261,6 +1261,8 @@ public class ChatActivity extends BaseFragment implements
     public final static int OPTION_VIEW_STATISTICS = 115;
     public final static int OPTION_WELCOME_REVERT = 116;
     public final static int OPTION_MG_CUSTOM_FORWARD = 9101;
+    public final static int OPTION_MG_TRANSLIT = 9102;
+    public final static int OPTION_MG_REMIND = 9103;
 
     private final static int[] allowedNotificationsDuringChatListAnimations = new int[]{
             NotificationCenter.messagesRead,
@@ -3778,6 +3780,9 @@ public class ChatActivity extends BaseFragment implements
                 } else if (id == MgChatFeatures.MENU_JOIN_ALL) {
                     MgChatFeatures.joinAllAccounts(ChatActivity.this, currentAccount, currentChat);
                     return;
+                } else if (id == MgChatFeatures.MENU_TEMPLATES) {
+                    MgMessageTools.showTemplates(ChatActivity.this, ChatActivity.this);
+                    return;
                 } else if (id == MgChatFeatures.MENU_VOICE_TYPING) {
                     MgVoiceTyping.open(ChatActivity.this);
                     return;
@@ -4565,6 +4570,7 @@ public class ChatActivity extends BaseFragment implements
                 if (currentEncryptedChat == null && (currentChat == null || ChatObject.canSendMessages(currentChat))) {
                     headerItem.lazilyAddSubItem(MgChatFeatures.MENU_AUTO_TEXT, R.drawable.msg_text_outlined, MgChatFeatures.autoTextMenuTitle(currentAccount, dialog_id));
                     headerItem.lazilyAddSubItem(MgChatFeatures.MENU_AUTO_TRANSLATE, R.drawable.msg_translate, MgChatFeatures.autoTranslateMenuTitle(currentAccount, dialog_id));
+                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_TEMPLATES, R.drawable.msg_saved, "Tezkor shablonlar");
                     if (MgVoiceTyping.isAvailable(getParentActivity())) {
                         headerItem.lazilyAddSubItem(MgChatFeatures.MENU_VOICE_TYPING, R.drawable.input_mic, "Ovoz bilan yozish");
                     }
@@ -20531,6 +20537,9 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
+        if (MgVoiceTyping.onResult(this, requestCode, resultCode, data)) {
+            return;
+        }
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == 0 || requestCode == 2) {
                 createChatAttachView();
@@ -20755,6 +20764,9 @@ public class ChatActivity extends BaseFragment implements
         }
         if (id == NotificationCenter.messagesDidLoad) {
             didReceivedNotification_messagesDidLoad(id, account, args);
+            if (args.length > 10 && args[10] instanceof Integer && (Integer) args[10] == classGuid && currentUser != null) {
+                MgMessageTools.scamCheck(this, messages);
+            }
         } else {
             didReceivedNotification2(id, account, args);
             didReceivedNotification3(id, account, args);
@@ -22239,6 +22251,7 @@ public class ChatActivity extends BaseFragment implements
                     return;
                 }
                 processNewMessages(arr);
+                MgMessageTools.scamCheck(this, arr);
             } else if (ChatObject.isChannel(currentChat) && !currentChat.megagroup && chatInfo != null && did == -chatInfo.linked_chat_id) {
                 for (int a = 0, N = arr.size(); a < N; a++) {
                     MessageObject messageObject = arr.get(a);
@@ -34596,6 +34609,16 @@ public class ChatActivity extends BaseFragment implements
                 MgCustomForward.open(this, selectedObject, selectedObjectGroup);
                 break;
             }
+            case OPTION_MG_TRANSLIT: {
+                MgMessageTools.showTranslit(this, MgMessageTools.messageText(selectedObject, selectedObjectGroup));
+                break;
+            }
+            case OPTION_MG_REMIND: {
+                final MessageObject mgMsg = selectedObject;
+                final MessageObject.GroupedMessages mgGroup = selectedObjectGroup;
+                AndroidUtilities.runOnUIThread(() -> MgMessageTools.showRemind(ChatActivity.this, mgMsg, mgGroup), 200);
+                break;
+            }
             case OPTION_SUGGESTION_ADD_OFFER:
             case OPTION_SUGGESTION_EDIT_PRICE: {
                 final MessageObject msg = selectedObjectGroup != null ? selectedObjectGroup.findPrimaryMessageObject() : selectedObject;
@@ -46484,6 +46507,17 @@ public class ChatActivity extends BaseFragment implements
                     items.add("Maxsus uzatish");
                     options.add(OPTION_MG_CUSTOM_FORWARD);
                     icons.add(R.drawable.msg_forward_replace);
+                }
+                if (selectedObject != null && selectedObject.getId() > 0 && !selectedObject.isSponsored() && chatMode != MODE_SCHEDULED) {
+                    String mgTxt = MgMessageTools.messageText(selectedObject, selectedObjectGroup);
+                    if (!TextUtils.isEmpty(mgTxt) && org.telegram.messenger.MgTranslit.hasLetters(mgTxt)) {
+                        items.add(org.telegram.messenger.MgTranslit.isCyrillic(mgTxt) ? "Lotinga o'girish" : "Kirillga o'girish");
+                        options.add(OPTION_MG_TRANSLIT);
+                        icons.add(R.drawable.msg_language);
+                    }
+                    items.add("Keyin eslatish");
+                    options.add(OPTION_MG_REMIND);
+                    icons.add(R.drawable.msg_calendar);
                 }
                 if (allowUnpin) {
                     items.add(LocaleController.getString(R.string.UnpinMessage));

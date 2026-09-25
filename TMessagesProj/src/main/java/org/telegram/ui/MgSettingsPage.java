@@ -48,6 +48,7 @@ public class MgSettingsPage extends UniversalFragment {
     public static final int PAGE_DATA = 9;
     public static final int PAGE_BACKUP = 10;
     public static final int PAGE_AUTOMATION = 11;
+    public static final int PAGE_PRAYER = 12;
 
     // Element identifikatorlari
     private static final int ID_SIMPLE_MODE = 1;
@@ -101,6 +102,19 @@ public class MgSettingsPage extends UniversalFragment {
     private static final int ID_REMIND_DELAY = 127;
     private static final int ID_REMIND_SOUND = 128;
     private static final int ID_CHAT_FINDER = 129;
+    private static final int ID_TEMPLATES = 130;
+    private static final int ID_SCAM = 131;
+    private static final int ID_CLEANUP = 132;
+    private static final int ID_CHIP_MODE = 140;
+    private static final int ID_CHIP_STYLE = 141;
+    private static final int ID_PR_REGION = 142;
+    private static final int ID_PR_PLACE = 143;
+    private static final int ID_PR_TODAY = 144;
+    private static final int ID_PR_NOTIFY = 145;
+    private static final int ID_PR_BEFORE = 146;
+    private static final int ID_PR_WHICH = 147;
+    private static final int ID_PR_ADJUST = 148;
+    private static final int ID_WX_REFRESH = 149;
     private static final int ID_ACC_NOTIFY_BASE = 2000;
     private static final int ID_EXPORT = 90;
     private static final int ID_IMPORT = 91;
@@ -131,6 +145,7 @@ public class MgSettingsPage extends UniversalFragment {
             case PAGE_DATA: return "Yuklamalar va trafik";
             case PAGE_BACKUP: return "Sozlamalarni saqlash";
             case PAGE_AUTOMATION: return "Avtomatlashtirish";
+            case PAGE_PRAYER: return "Namoz vaqti va ob-havo";
         }
         return "MilliyGram";
     }
@@ -160,6 +175,8 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asButton(ID_CATEGORIES, R.drawable.msg_addfolder, "Toifalar", String.valueOf(MgLocalFolders.getCategories(currentAccount).size())));
                 items.add(UItem.asButton(ID_CLOUD_FOLDERS, R.drawable.msg_customize, "Bulut jildlarini tahrirlash"));
                 items.add(UItem.asShadow("Jildni uzoq bossangiz: tahrirlash, ikonka tanlash, tabni yashirish. Chatlarni belgilab ⋮ → \"Toifaga qo'shish\" orqali o'z toifalaringizni yarating."));
+                items.add(UItem.asButton(ID_CLEANUP, R.drawable.msg_clear, "Kanal va guruhlarni tozalash"));
+                items.add(UItem.asShadow("O'qilmay yotgan va faolsiz kanal/guruhlarni topib, birdaniga chiqib ketish."));
                 items.add(UItem.asHeader("Arxiv"));
                 items.add(UItem.asCheck(ID_ARCHIVE_TABS, "Arxivni barcha jildlarda ko'rsatish").setChecked(MgConfig.isArchiveInAllTabs()));
                 items.add(UItem.asCheck(ID_ARCHIVE_HIDDEN, "Arxivni yashirish (pastga tortib ochiladi)").setChecked(SharedConfig.archiveHidden));
@@ -180,6 +197,9 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asHeader("Maxsus uzatish"));
                 items.add(UItem.asButton(ID_SIGNATURE, R.drawable.msg_edit, "Imzo", MgConfig.getString("mg_cf_signature", "").isEmpty() ? "yo'q" : "bor"));
                 items.add(UItem.asShadow("Xabarni uzoq bosing → \"Maxsus uzatish\": matnni tahrirlab, havola va @larni tozalab, tarjima qilib, o'z nomingizdan uzating."));
+                items.add(UItem.asHeader("Tezkor shablonlar"));
+                items.add(UItem.asButton(ID_TEMPLATES, R.drawable.msg_saved, "Shablonlarni boshqarish", String.valueOf(MgMessageTools.templates().size())));
+                items.add(UItem.asShadow("Ko'p yoziladigan gaplarni saqlang: chat → ⋮ → \"Tezkor shablonlar\" orqali bir bosishda qo'yiladi. Xabarni uzoq bosib \"Lotinga/Kirillga o'girish\" va \"Keyin eslatish\" ham mavjud."));
                 items.add(UItem.asHeader("Yozish"));
                 items.add(UItem.asButton(ID_TEXT_STYLE, R.drawable.msg_text_outlined, "Standart matn uslubi", org.telegram.messenger.MgAutoText.STYLE_NAMES[org.telegram.messenger.MgAutoText.getDefaultStyle()]));
                 items.add(UItem.asShadow("Tanlangan uslub har bir oddiy matnli xabaringizga avtomatik qo'llanadi (buyruqlar, kod va faqat emojidan iborat xabarlar bundan mustasno)."));
@@ -243,7 +263,8 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asShadow("Chatni qulflashda umumiy parol yoki shu chatga alohida PIN / grafik kalit tanlash mumkin: chat → ⋮ → \"Chatni qulflash\"."));
                 items.add(UItem.asHeader("Xavfsizlik"));
                 items.add(UItem.asCheck(ID_APK_BLOCK, "APK fayllarni bloklash").setChecked(org.fenixuz.utils.ApkShield.isEnabled()));
-                items.add(UItem.asShadow("Chatlardagi .apk (Android ilova) fayllari ko'rsatilmaydi va ochilmaydi. Bu firibgarlar yuboradigan zararli ilovalardan himoya qiladi."));
+                items.add(UItem.asCheck(ID_SCAM, "Firibgarlikdan ogohlantirish").setChecked(MgMessageTools.isScamGuardEnabled()));
+                items.add(UItem.asShadow("APK blok: chatlardagi .apk (Android ilova) fayllari ko'rsatilmaydi va ochilmaydi. Ogohlantirish: kontaktingizda yo'q odam karta raqami, SMS kod, pul o'tkazish yoki shubhali havola bilan yozsa, chatni ochganingizda ogohlantiriladi."));
                 items.add(UItem.asHeader("Notanishlardan himoya"));
                 items.add(UItem.asCheck(ID_STRANGER_ON, "Notanishlardan himoya").setChecked(org.telegram.messenger.MgStrangers.isEnabled(currentAccount)));
                 items.add(UItem.asCheck(ID_STRANGER_NOTIFY, "Notanishlardan bildirishnoma").setChecked(org.telegram.messenger.MgStrangers.isNotifyEnabled()));
@@ -273,6 +294,32 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asHeader("Qo'shilish so'rovlari"));
                 items.add(UItem.asCheck(ID_AJ_ALL, "Barcha chatlarda avtomatik qabul qilish").setChecked(MgChatFeatures.isAutoAcceptAll()));
                 items.add(UItem.asShadow("Siz admin bo'lgan (taklif qilish huquqi bor) kanal va guruhlarga kelgan qo'shilish so'rovlari avtomatik qabul qilinadi. Bitta chat uchun: chatni oching → ⋮ → \"Qo'shilish so'rovlari\"."));
+                break;
+            }
+            case PAGE_PRAYER: {
+                org.telegram.messenger.MgPlaces.Place pl = org.telegram.messenger.MgPrayer.getPlace();
+                items.add(UItem.asHeader("Chatlar ro'yxatida ko'rsatish"));
+                items.add(UItem.asButton(ID_CHIP_MODE, R.drawable.msg_views, "Nimani ko'rsatish", MgInfoChip.MODE_NAMES[Math.max(0, Math.min(3, MgInfoChip.getMode()))]));
+                items.add(UItem.asButton(ID_CHIP_STYLE, R.drawable.msg_palette, "Ko'rinish uslubi", MgInfoChip.STYLE_NAMES[Math.max(0, Math.min(MgInfoChip.STYLE_NAMES.length - 1, MgInfoChip.getStyleIndex()))]));
+                items.add(UItem.asShadow("Chatlar ro'yxati tepasida, ⋮ tugmasining chap tomonida kichik belgi chiqadi: keyingi namozgacha qolgan vaqt yoki ob-havo. Uni bossangiz, bugungi barcha vaqtlar va 3 kunlik ob-havo ochiladi."));
+                items.add(UItem.asHeader("Joylashuv"));
+                items.add(UItem.asButton(ID_PR_REGION, R.drawable.msg_map, "Viloyat", org.telegram.messenger.MgPlaces.findRegion(org.telegram.messenger.MgPrayer.getRegionKey()).name));
+                items.add(UItem.asButton(ID_PR_PLACE, R.drawable.msg_location, "Shahar / tuman", pl.name));
+                items.add(UItem.asHeader("Namoz vaqtlari"));
+                items.add(UItem.asButton(ID_PR_TODAY, R.drawable.msg_calendar2, "Bugungi vaqtlar"));
+                items.add(UItem.asCheck(ID_PR_NOTIFY, "Namoz vaqtini eslatish").setChecked(org.telegram.messenger.MgPrayerAlarm.isEnabled()));
+                int before = org.telegram.messenger.MgPrayerAlarm.getBefore();
+                items.add(UItem.asButton(ID_PR_BEFORE, R.drawable.msg_recent, "Qachon", before == 0 ? "Vaqt kirganda" : before + " daqiqa oldin"));
+                items.add(UItem.asButton(ID_PR_WHICH, R.drawable.msg_list, "Qaysi namozlar"));
+                items.add(UItem.asButton(ID_PR_ADJUST, R.drawable.msg_customize, "Vaqtlarni tuzatish (daqiqa)"));
+                items.add(UItem.asShadow("Vaqtlar internetsiz, tanlangan tuman koordinatasi bo'yicha O'zbekiston musulmonlari idorasi taqvimi uslubida hisoblanadi. Masjidingiz jadvalidan farq qilsa, \"Vaqtlarni tuzatish\"da moslang."));
+                items.add(UItem.asHeader("Ob-havo"));
+                {
+                    org.telegram.messenger.MgWeather.Data wd = org.telegram.messenger.MgWeather.getCached();
+                    items.add(UItem.asButton(ID_WX_REFRESH, R.drawable.msg_retry, "Ob-havoni yangilash",
+                            wd == null ? "" : org.telegram.messenger.MgWeather.icon(wd.code) + " " + org.telegram.messenger.MgWeather.temp(wd.temp)));
+                }
+                items.add(UItem.asShadow("Ob-havo Open-Meteo xizmatidan olinadi (internet kerak), har 30 daqiqada yangilanadi."));
                 break;
             }
             case PAGE_BACKUP:
@@ -537,6 +584,104 @@ public class MgSettingsPage extends UniversalFragment {
                 setChecked(view, v);
                 break;
             }
+            case ID_TEMPLATES:
+                MgMessageTools.showTemplates(this, null);
+                break;
+            case ID_SCAM:
+                toggle(view, "scam_guard", true);
+                break;
+            case ID_CLEANUP:
+                presentFragment(new MgCleanupActivity());
+                break;
+            case ID_CHIP_MODE: {
+                AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+                b.setTitle("Chatlar ro'yxatida ko'rsatish");
+                b.setItems(MgInfoChip.MODE_NAMES, (d, w) -> {
+                    MgConfig.setInt("chip_mode", w);
+                    if (w == MgInfoChip.MODE_WEATHER || w == MgInfoChip.MODE_BOTH) {
+                        org.telegram.messenger.MgWeather.refresh(false, null);
+                    }
+                    listView.adapter.update(true);
+                });
+                showDialog(b.create());
+                break;
+            }
+            case ID_CHIP_STYLE: {
+                CharSequence[] names = new CharSequence[MgInfoChip.STYLE_NAMES.length];
+                String[] samples = {"( Asr · 1:24 )", "[ Asr · 1:24 ]", "Asr · 1:24", "( 🕌 1:24 )", "( Asr · 1:24 ) rangli"};
+                for (int i = 0; i < names.length; i++) {
+                    names[i] = MgInfoChip.STYLE_NAMES[i] + "   " + samples[i];
+                }
+                AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+                b.setTitle("Ko'rinish uslubi");
+                b.setItems(names, (d, w) -> {
+                    MgConfig.setInt("chip_style", w);
+                    listView.adapter.update(true);
+                });
+                showDialog(b.create());
+                break;
+            }
+            case ID_PR_REGION: {
+                org.telegram.messenger.MgPlaces.Region[] rs = org.telegram.messenger.MgPlaces.REGIONS;
+                CharSequence[] names = new CharSequence[rs.length];
+                for (int i = 0; i < rs.length; i++) {
+                    names[i] = rs[i].name;
+                }
+                AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+                b.setTitle("Viloyatni tanlang");
+                b.setItems(names, (d, w) -> {
+                    org.telegram.messenger.MgPrayer.setPlace(rs[w].key, rs[w].places[0].name);
+                    listView.adapter.update(true);
+                    AndroidUtilities.runOnUIThread(() -> showPlacePicker(), 250);
+                });
+                showDialog(b.create());
+                break;
+            }
+            case ID_PR_PLACE:
+                showPlacePicker();
+                break;
+            case ID_PR_TODAY:
+                MgInfoChip.showDetails(this);
+                break;
+            case ID_PR_NOTIFY: {
+                boolean v = !org.telegram.messenger.MgPrayerAlarm.isEnabled();
+                org.telegram.messenger.MgPrayerAlarm.setEnabled(v);
+                setChecked(view, v);
+                if (v && android.os.Build.VERSION.SDK_INT >= 33 && getParentActivity() != null
+                        && getParentActivity().checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    getParentActivity().requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1);
+                }
+                break;
+            }
+            case ID_PR_BEFORE: {
+                final int[] opts = {0, 5, 10, 15, 20, 30};
+                CharSequence[] names = new CharSequence[opts.length];
+                for (int i = 0; i < opts.length; i++) {
+                    names[i] = opts[i] == 0 ? "Vaqt kirganda" : opts[i] + " daqiqa oldin";
+                }
+                AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+                b.setTitle("Qachon eslatilsin?");
+                b.setItems(names, (d, w) -> {
+                    org.telegram.messenger.MgPrayerAlarm.setBefore(opts[w]);
+                    listView.adapter.update(true);
+                });
+                showDialog(b.create());
+                break;
+            }
+            case ID_PR_WHICH:
+                showWhichDialog(new int[]{0, 2, 3, 4, 5}, 0);
+                break;
+            case ID_PR_ADJUST:
+                showAdjustDialog();
+                break;
+            case ID_WX_REFRESH:
+                org.telegram.messenger.MgWeather.refresh(true, d -> {
+                    if (listView != null) {
+                        listView.adapter.update(true);
+                    }
+                    BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, d == null ? "Ob-havo olinmadi — internetni tekshiring" : "Yangilandi: " + org.telegram.messenger.MgWeather.icon(d.code) + " " + org.telegram.messenger.MgWeather.temp(d.temp) + ", " + org.telegram.messenger.MgWeather.describe(d.code)).show();
+                });
+                break;
             case ID_CHAT_FINDER:
                 presentFragment(new org.fenixuz.ui.chat_finder.ChatFinder());
                 break;
@@ -601,6 +746,80 @@ public class MgSettingsPage extends UniversalFragment {
         if (listView != null) {
             listView.adapter.update(false);
         }
+    }
+
+    private void showPlacePicker() {
+        if (getParentActivity() == null) {
+            return;
+        }
+        org.telegram.messenger.MgPlaces.Region r = org.telegram.messenger.MgPlaces.findRegion(org.telegram.messenger.MgPrayer.getRegionKey());
+        CharSequence[] names = new CharSequence[r.places.length];
+        for (int i = 0; i < names.length; i++) {
+            names[i] = r.places[i].name;
+        }
+        AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+        b.setTitle(r.name);
+        b.setItems(names, (d, w) -> {
+            org.telegram.messenger.MgPrayer.setPlace(r.key, r.places[w].name);
+            org.telegram.messenger.MgPrayerAlarm.schedule(getParentActivity());
+            org.telegram.messenger.MgWeather.refresh(true, x -> {
+                if (listView != null) {
+                    listView.adapter.update(true);
+                }
+            });
+            listView.adapter.update(true);
+        });
+        showDialog(b.create());
+    }
+
+    /** Har bir namozni navbat bilan yoqish/o'chirish oynasi */
+    private void showWhichDialog(int[] idx, int unused) {
+        if (getParentActivity() == null) {
+            return;
+        }
+        CharSequence[] names = new CharSequence[idx.length];
+        for (int i = 0; i < idx.length; i++) {
+            names[i] = (org.telegram.messenger.MgPrayerAlarm.isPrayerEnabled(idx[i]) ? "✅  " : "⬜  ") + org.telegram.messenger.MgPrayer.NAMES[idx[i]];
+        }
+        AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+        b.setTitle("Qaysi namozlar eslatilsin?");
+        b.setItems(names, (d, w) -> {
+            org.telegram.messenger.MgPrayerAlarm.setPrayerEnabled(idx[w], !org.telegram.messenger.MgPrayerAlarm.isPrayerEnabled(idx[w]));
+            AndroidUtilities.runOnUIThread(() -> showWhichDialog(idx, 0), 150);
+        });
+        b.setPositiveButton("Tayyor", null);
+        showDialog(b.create());
+    }
+
+    private void showAdjustDialog() {
+        if (getParentActivity() == null) {
+            return;
+        }
+        int[] t = org.telegram.messenger.MgPrayer.today();
+        CharSequence[] names = new CharSequence[6];
+        for (int i = 0; i < 6; i++) {
+            int off = org.telegram.messenger.MgPrayer.getUserOffset(i);
+            names[i] = org.telegram.messenger.MgPrayer.NAMES[i] + " — " + org.telegram.messenger.MgPrayer.hhmm(t[i]) + (off != 0 ? "  (" + (off > 0 ? "+" : "") + off + ")" : "");
+        }
+        AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+        b.setTitle("Qaysi vaqtni tuzatasiz?");
+        b.setItems(names, (d, w) -> AndroidUtilities.runOnUIThread(() -> {
+            final int[] opts = {-10, -5, -3, -2, -1, 0, 1, 2, 3, 5, 10};
+            CharSequence[] on = new CharSequence[opts.length];
+            for (int i = 0; i < opts.length; i++) {
+                on[i] = opts[i] == 0 ? "Tuzatishsiz" : (opts[i] > 0 ? "+" : "") + opts[i] + " daqiqa";
+            }
+            AlertDialog.Builder b2 = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+            b2.setTitle(org.telegram.messenger.MgPrayer.NAMES[w]);
+            b2.setItems(on, (d2, k) -> {
+                org.telegram.messenger.MgPrayer.setUserOffset(w, opts[k]);
+                org.telegram.messenger.MgPrayerAlarm.schedule(getParentActivity());
+                AndroidUtilities.runOnUIThread(this::showAdjustDialog, 150);
+            });
+            showDialog(b2.create());
+        }, 150));
+        b.setPositiveButton("Tayyor", null);
+        showDialog(b.create());
     }
 
     private void editAutoAnswerText(boolean enableAfter) {

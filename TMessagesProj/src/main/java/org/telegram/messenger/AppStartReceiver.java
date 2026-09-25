@@ -23,6 +23,7 @@ public class AppStartReceiver extends BroadcastReceiver {
                     SharedConfig.saveConfig();
                 }
                 ApplicationLoader.startPushService();
+                MgPrayerAlarm.schedule(context); // MilliyGram: qayta yoqilgandan keyin namoz eslatmasi
             });
         }
     }

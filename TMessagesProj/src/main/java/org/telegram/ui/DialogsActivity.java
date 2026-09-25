@@ -724,6 +724,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private final static int mg_leave_chats = 131;  // MilliyGram: kanal/guruhlardan chiqish
     private final static int mg_stop_bots = 132;    // MilliyGram: botlarni to'xtatish va tozalash
     private ActionBarMenuSubItem mgTrustItem;
+    private ActionBarMenuItem mgInfoChipHolder;
     private ActionBarMenuSubItem mgAddToGroupItem;
     private ActionBarMenuSubItem mgPreviewItem;
     private int mgArchiveKind; // MilliyGram: arxivni turlar bo'yicha saralash
@@ -3467,6 +3468,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             ActionBarMenuItem mgKindItem = menu.addItem(9051, R.drawable.msg_media);
             mgKindItem.setContentDescription("Arxivni saralash");
             mgKindItem.setOnClickListener(v -> mgShowArchiveKindPicker());
+        }
+        if (initialDialogsType == DIALOGS_TYPE_DEFAULT && folderId == 0 && communityId == 0) {
+            // MilliyGram: namoz vaqti / ob-havo chipi (⋮ tugmasining chap tomonida)
+            mgInfoChipHolder = MgInfoChip.attach(DialogsActivity.this, menu, context);
         }
         if (initialDialogsType == DIALOGS_TYPE_DEFAULT) {
             optionsItem = menu.addItem(4, R.drawable.ic_ab_other);
@@ -6849,12 +6854,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         selectedDialogsCountTextView.setTextSize(18);
         selectedDialogsCountTextView.setTypeface(AndroidUtilities.bold());
         selectedDialogsCountTextView.setTextColor(getThemedColor(Theme.key_actionBarActionModeDefaultIcon));
-        actionMode.addView(selectedDialogsCountTextView, LayoutHelper.createLinear(0, LayoutHelper.MATCH_PARENT, 1.0f, hasMainTabs ? 18 : 72, 0, 0, 0));
+        selectedDialogsCountTextView.setMinimumWidth(dp(44)); // MilliyGram: 3-4 xonali son ham to'liq ko'rinsin
+        actionMode.addView(selectedDialogsCountTextView, LayoutHelper.createLinear(0, LayoutHelper.MATCH_PARENT, 1.0f, hasMainTabs ? 8 : 72, 0, 0, 0));
         selectedDialogsCountTextView.setOnTouchListener((v, event) -> true);
 
         ActionBarMenuItem mgRangeItem = actionMode.addItemWithWidth(mg_select_range, R.drawable.mg_select_range, dp(42), "Oraliqni belgilash");
         ActionBarMenuItem mgAllItem = actionMode.addItemWithWidth(mg_select_all, R.drawable.mg_select_all, dp(42), "Hammasini belgilash");
-        ActionBarMenuItem mgFavoriteItem = actionMode.addItemWithWidth(mg_favorite, R.drawable.msg_fave, dp(42), "Tanlanganlarga qo'shish");
         pinItem = actionMode.addItemWithWidth(pin, R.drawable.msg_pin, dp(42));
         muteItem = actionMode.addItemWithWidth(mute, R.drawable.msg_mute, dp(42));
         archive2Item = actionMode.addItemWithWidth(archive2, R.drawable.msg_archive, dp(42));
@@ -6862,6 +6867,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         ActionBarMenuItem otherItem = actionMode.addItemWithWidth(0, R.drawable.ic_ab_other, dp(42), LocaleController.getString(R.string.AccDescrMoreOptions));
         actionMode.addView(new View(getContext()), LayoutHelper.createLinear(5, LayoutHelper.MATCH_PARENT));
+        otherItem.addSubItem(mg_favorite, R.drawable.msg_fave, "Tanlanganlarga qo'shish");
         archiveItem = otherItem.addSubItem(archive, R.drawable.msg_archive, LocaleController.getString(R.string.Archive));
         pin2Item = otherItem.addSubItem(pin2, R.drawable.msg_pin, LocaleController.getString(R.string.DialogPin));
         addToFolderItem = otherItem.addSubItem(add_to_folder, R.drawable.msg_addfolder, LocaleController.getString(R.string.FilterAddTo));
@@ -6887,7 +6893,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         actionModeViews.add(mgRangeItem);
         actionModeViews.add(mgAllItem);
-        actionModeViews.add(mgFavoriteItem);
         actionModeViews.add(pinItem);
         actionModeViews.add(archive2Item);
         actionModeViews.add(muteItem);
@@ -7346,6 +7351,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @Override
     public void onResume() {
         super.onResume();
+        MgInfoChip.refreshHolder(mgInfoChipHolder); // MilliyGram
+        if (org.telegram.messenger.MgPrayerAlarm.isEnabled()) {
+            org.telegram.messenger.MgPrayerAlarm.schedule(ApplicationLoader.applicationContext);
+        }
         if (dialogStoriesCell != null) {
             dialogStoriesCell.onResume();
         }
