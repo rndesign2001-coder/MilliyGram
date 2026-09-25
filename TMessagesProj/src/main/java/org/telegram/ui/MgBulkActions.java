@@ -96,7 +96,7 @@ public class MgBulkActions {
             }
             final int n = targets.size();
             AndroidUtilities.runOnUIThread(() -> {
-                mc.getNotificationCenter().postNotificationName(NotificationCenter.dialogsNeedReload);
+                NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.dialogsNeedReload);
                 try {
                     BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, n + " ta kanal/guruhdan chiqildi").show();
                 } catch (Throwable ignore) {
