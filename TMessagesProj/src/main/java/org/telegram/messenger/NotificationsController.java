@@ -1020,6 +1020,12 @@ public class NotificationsController extends BaseController implements Notificat
     }
 
     public void processNewMessages(ArrayList<MessageObject> messageObjects, boolean isLast, boolean isFcm, CountDownLatch countDownLatch) {
+        if (!isFcm) {
+            try {
+                MgAutoAnswer.onNewMessages(currentAccount, messageObjects); // MilliyGram: avto-javob
+            } catch (Throwable ignore) {
+            }
+        }
         if (BuildVars.LOGS_ENABLED) {
             FileLog.d("NotificationsController: processNewMessages msgs.size()=" + (messageObjects == null ? "null" : messageObjects.size()) + " isLast=" + isLast + " isFcm=" + isFcm + ")");
         }
@@ -3274,6 +3280,9 @@ public class NotificationsController extends BaseController implements Notificat
     private int getNotifyOverride(SharedPreferences preferences, long dialog_id, long topicId) {
         if (!MgConfig.isHiddenNotifyEnabled() && MgConfig.isDialogHidden(currentAccount, dialog_id)) {
             return 2; // MilliyGram: yashirin chat — bildirishnoma yo'q
+        }
+        if (!MgStrangers.isNotifyEnabled() && MgStrangers.belongsInInbox(currentAccount, dialog_id)) {
+            return 2; // MilliyGram: notanishdan — ovozsiz
         }
         int notifyOverride = dialogsNotificationsFacade.getProperty(NotificationsSettingsFacade.PROPERTY_NOTIFY, dialog_id, topicId, -1);
         if (notifyOverride == 3) {

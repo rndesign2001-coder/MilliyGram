@@ -3759,6 +3759,21 @@ public class ChatActivity extends BaseFragment implements
                 } else if (id == MgChatTools.MENU_STATS) {
                     MgChatTools.stats(ChatActivity.this, messages);
                     return;
+                } else if (id == MgChatFeatures.MENU_AUTO_TEXT) {
+                    MgChatFeatures.showAutoTextEditor(ChatActivity.this, currentAccount, dialog_id);
+                    return;
+                } else if (id == MgChatFeatures.MENU_AUTO_TRANSLATE) {
+                    MgChatFeatures.showAutoTranslatePicker(ChatActivity.this, currentAccount, dialog_id);
+                    return;
+                } else if (id == MgChatFeatures.MENU_JOIN_REQUESTS) {
+                    MgChatFeatures.showJoinRequests(ChatActivity.this, currentAccount, currentChat);
+                    return;
+                } else if (id == MgChatFeatures.MENU_JOIN_ALL) {
+                    MgChatFeatures.joinAllAccounts(ChatActivity.this, currentAccount, currentChat);
+                    return;
+                } else if (id == MgChatFeatures.MENU_STRANGER) {
+                    MgChatFeatures.toggleStranger(ChatActivity.this, currentAccount, dialog_id);
+                    return;
                 } else if (id == MgChatLock.MENU_ID_COPY_ID) {
                     long mgId = dialog_id;
                     if (currentChat != null) {
@@ -4528,8 +4543,22 @@ public class ChatActivity extends BaseFragment implements
                     org.telegram.messenger.MgConfig.isDialogLocked(currentAccount, dialog_id) ? "Qulfni olish" : "Chatni qulflash");
                 headerItem.lazilyAddSubItem(MgChatLock.MENU_ID_HIDE, R.drawable.msg_archive,
                     org.telegram.messenger.MgConfig.isDialogHidden(currentAccount, dialog_id) ? "Yashirishdan chiqarish" : "Chatni yashirish");
-                headerItem.lazilyAddSubItem(MgChatTools.MENU_STATS, R.drawable.msg_stats, "📊 Chat statistikasi");
-                headerItem.lazilyAddSubItem(MgChatTools.MENU_EXPORT, R.drawable.msg_download, "📄 Chatni eksport qilish");
+                headerItem.lazilyAddSubItem(MgChatTools.MENU_STATS, R.drawable.msg_stats, "Chat statistikasi");
+                headerItem.lazilyAddSubItem(MgChatTools.MENU_EXPORT, R.drawable.msg_download, "Chatni eksport qilish");
+                // MilliyGram: avtomatlashtirish
+                if (currentEncryptedChat == null && (currentChat == null || ChatObject.canSendMessages(currentChat))) {
+                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_AUTO_TEXT, R.drawable.msg_text_outlined, MgChatFeatures.autoTextMenuTitle(currentAccount, dialog_id));
+                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_AUTO_TRANSLATE, R.drawable.msg_translate, MgChatFeatures.autoTranslateMenuTitle(currentAccount, dialog_id));
+                }
+                if (currentChat != null && ChatObject.canUserDoAdminAction(currentChat, ChatObject.ACTION_INVITE)) {
+                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_JOIN_REQUESTS, R.drawable.msg_requests, "Qo'shilish so'rovlari");
+                }
+                if (MgChatFeatures.canJoinAll(currentChat)) {
+                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_JOIN_ALL, R.drawable.msg_contact_add, "Barcha akkauntlardan qo'shilish");
+                }
+                if (MgChatFeatures.canToggleStranger(currentAccount, currentUser)) {
+                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_STRANGER, R.drawable.msg_usersearch, MgChatFeatures.strangerMenuTitle(currentAccount, dialog_id));
+                }
             }
             boolean addedSettings = false;
             if (!isTopic) {

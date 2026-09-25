@@ -28,6 +28,7 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
             MgSettingsPage.PAGE_CHATLIST,
             MgSettingsPage.PAGE_STORIES,
             MgSettingsPage.PAGE_MESSAGES,
+            MgSettingsPage.PAGE_AUTOMATION,
             MgSettingsPage.PAGE_THEMES,
             MgSettingsPage.PAGE_PROFILE,
             MgSettingsPage.PAGE_NOTIFY,
@@ -40,6 +41,7 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
             R.drawable.msg_groups,
             R.drawable.msg_menu_stories,
             R.drawable.msg_discussion,
+            R.drawable.msg_bots,
             R.drawable.msg_theme,
             R.drawable.msg_openprofile,
             R.drawable.msg_notifications,
@@ -72,7 +74,7 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
             showAboutDialog();
         } else if (item.id == ID_DESIGN) {
             presentFragment(new MgDesignActivity());
-        } else if (item.id >= MgSettingsPage.PAGE_GENERAL && item.id <= MgSettingsPage.PAGE_BACKUP) {
+        } else if (item.id >= MgSettingsPage.PAGE_GENERAL && item.id <= MgSettingsPage.PAGE_AUTOMATION) {
             presentFragment(new MgSettingsPage(item.id));
         }
     }

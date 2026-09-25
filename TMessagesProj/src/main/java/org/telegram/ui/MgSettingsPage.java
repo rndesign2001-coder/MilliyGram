@@ -47,6 +47,7 @@ public class MgSettingsPage extends UniversalFragment {
     public static final int PAGE_PRIVACY = 8;
     public static final int PAGE_DATA = 9;
     public static final int PAGE_BACKUP = 10;
+    public static final int PAGE_AUTOMATION = 11;
 
     // Element identifikatorlari
     private static final int ID_SIMPLE_MODE = 1;
@@ -80,6 +81,15 @@ public class MgSettingsPage extends UniversalFragment {
     private static final int ID_AUTODOWNLOAD = 81;
     private static final int ID_PROXY = 82;
     private static final int ID_STORAGE = 83;
+    private static final int ID_AA_ON = 100;
+    private static final int ID_AA_TEXT = 101;
+    private static final int ID_AA_SCOPE = 102;
+    private static final int ID_AA_COOLDOWN = 103;
+    private static final int ID_AA_RESET = 104;
+    private static final int ID_AT_PREVIEW = 105;
+    private static final int ID_AJ_ALL = 106;
+    private static final int ID_STRANGER_ON = 110;
+    private static final int ID_STRANGER_NOTIFY = 111;
     private static final int ID_EXPORT = 90;
     private static final int ID_IMPORT = 91;
 
@@ -108,6 +118,7 @@ public class MgSettingsPage extends UniversalFragment {
             case PAGE_PRIVACY: return "Maxfiylik va xavfsizlik";
             case PAGE_DATA: return "Yuklamalar va trafik";
             case PAGE_BACKUP: return "Sozlamalarni saqlash";
+            case PAGE_AUTOMATION: return "Avtomatlashtirish";
         }
         return "MilliyGram";
     }
@@ -183,6 +194,11 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asButton(ID_HIDDEN, R.drawable.msg_stories_myhide, "Yashirin bo'lim"));
                 int locked = MgConfig.getLockedCount();
                 items.add(UItem.asButton(ID_LOCK, R.drawable.msg_secret, "Chat qulfi", locked > 0 ? String.valueOf(locked) : ""));
+                items.add(UItem.asShadow(null));
+                items.add(UItem.asHeader("Notanishlardan himoya"));
+                items.add(UItem.asCheck(ID_STRANGER_ON, "Notanishlardan himoya").setChecked(org.telegram.messenger.MgStrangers.isEnabled(currentAccount)));
+                items.add(UItem.asCheck(ID_STRANGER_NOTIFY, "Notanishlardan bildirishnoma").setChecked(org.telegram.messenger.MgStrangers.isNotifyEnabled()));
+                items.add(UItem.asShadow("Kontaktingizda bo'lmagan odamlarning shaxsiy chatlari asosiy ro'yxatdan olinib, \"Notanishlar\" jildiga tushadi va ovozsiz bo'ladi. Chatni asosiy ro'yxatga qaytarish: belgilab ⋮ → \"Notanish emas\". Faqat joriy akkaunt uchun."));
                 items.add(UItem.asShadow("Yashirin bo'lim va chat qulfi alohida kodlarga ega. Yashirin chatlarni ochish: bosh ekranda qidiruv tugmasini uzoq bosing."));
                 break;
             }
@@ -193,6 +209,23 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asButton(ID_PROXY, R.drawable.msg2_data, "Proksi menejeri"));
                 items.add(UItem.asShadow("Trafik tejash yoqilsa, mobil internetda rasm va videolar kamroq avtomatik yuklanadi. Bitta chat keshini tozalash: chatni belgilang → ⋮ → \"Keshni tozalash\"."));
                 break;
+            case PAGE_AUTOMATION: {
+                items.add(UItem.asHeader("Avto-javob"));
+                items.add(UItem.asCheck(ID_AA_ON, "Avto-javobni yoqish").setChecked(org.telegram.messenger.MgAutoAnswer.isEnabled()));
+                String t = org.telegram.messenger.MgAutoAnswer.getText();
+                items.add(UItem.asButton(ID_AA_TEXT, R.drawable.msg_edit, "Javob matni", t.isEmpty() ? "kiritilmagan" : (t.length() > 18 ? t.substring(0, 18) + "…" : t)));
+                items.add(UItem.asButton(ID_AA_SCOPE, R.drawable.msg_contacts, "Kimlarga", org.telegram.messenger.MgAutoAnswer.SCOPE_NAMES[Math.max(0, Math.min(2, org.telegram.messenger.MgAutoAnswer.getScope()))]));
+                items.add(UItem.asButton(ID_AA_COOLDOWN, R.drawable.msg_recent, "Qanchalik tez-tez", org.telegram.messenger.MgAutoAnswer.cooldownName()));
+                items.add(UItem.asButton(ID_AA_RESET, R.drawable.msg_reset, "Javob berilganlar ro'yxatini tozalash"));
+                items.add(UItem.asShadow("Shaxsiy chatga kelgan xabarga avtomatik javob yuboriladi. Siz o'zingiz yozgan chatga tanlangan vaqt ichida qayta avto-javob ketmaydi. Botlar va Telegram xizmat akkauntlariga javob berilmaydi. Ilova ishlab turgan paytda ishlaydi."));
+                items.add(UItem.asHeader("Avto-tarjima va avto-imzo"));
+                items.add(UItem.asCheck(ID_AT_PREVIEW, "Tarjimani yuborishdan oldin ko'rsatish").setChecked(MgChatFeatures.isAutoTranslatePreview()));
+                items.add(UItem.asShadow("Chatni oching → ⋮ → \"Avto-tarjima\" — shu chatga yozganlaringiz tanlangan tilga o'girilib yuboriladi. ⋮ → \"Avto-imzo\" — har bir xabar oxiriga imzo qo'shiladi."));
+                items.add(UItem.asHeader("Qo'shilish so'rovlari"));
+                items.add(UItem.asCheck(ID_AJ_ALL, "Barcha chatlarda avtomatik qabul qilish").setChecked(MgChatFeatures.isAutoAcceptAll()));
+                items.add(UItem.asShadow("Siz admin bo'lgan (taklif qilish huquqi bor) kanal va guruhlarga kelgan qo'shilish so'rovlari avtomatik qabul qilinadi. Bitta chat uchun: chatni oching → ⋮ → \"Qo'shilish so'rovlari\"."));
+                break;
+            }
             case PAGE_BACKUP:
                 items.add(UItem.asButton(ID_EXPORT, R.drawable.msg_copy, "Sozlamalarni nusxalash"));
                 items.add(UItem.asButton(ID_IMPORT, R.drawable.msg_download, "Sozlamalarni tiklash"));
@@ -344,6 +377,74 @@ public class MgSettingsPage extends UniversalFragment {
             case ID_IMPORT:
                 showImportDialog();
                 break;
+            case ID_AA_ON: {
+                boolean v = !org.telegram.messenger.MgAutoAnswer.isEnabled();
+                if (v && org.telegram.messenger.MgAutoAnswer.getText().isEmpty()) {
+                    editAutoAnswerText(true);
+                    break;
+                }
+                org.telegram.messenger.MgAutoAnswer.setEnabled(v);
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(v);
+                }
+                break;
+            }
+            case ID_AA_TEXT:
+                editAutoAnswerText(false);
+                break;
+            case ID_AA_SCOPE: {
+                AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+                b.setTitle("Kimlarga javob berilsin?");
+                CharSequence[] names = new CharSequence[org.telegram.messenger.MgAutoAnswer.SCOPE_NAMES.length];
+                for (int i = 0; i < names.length; i++) {
+                    names[i] = org.telegram.messenger.MgAutoAnswer.SCOPE_NAMES[i] + (i == org.telegram.messenger.MgAutoAnswer.getScope() ? "  ✓" : "");
+                }
+                b.setItems(names, (d, w) -> {
+                    MgConfig.setInt("aa_scope", w);
+                    listView.adapter.update(true);
+                });
+                showDialog(b.create());
+                break;
+            }
+            case ID_AA_COOLDOWN: {
+                AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+                b.setTitle("Bitta chatga qanchalik tez-tez javob berilsin?");
+                CharSequence[] names = new CharSequence[org.telegram.messenger.MgAutoAnswer.COOLDOWN_NAMES.length];
+                for (int i = 0; i < names.length; i++) {
+                    names[i] = org.telegram.messenger.MgAutoAnswer.COOLDOWN_NAMES[i] + (org.telegram.messenger.MgAutoAnswer.COOLDOWNS[i] == org.telegram.messenger.MgAutoAnswer.getCooldownHours() ? "  ✓" : "");
+                }
+                b.setItems(names, (d, w) -> {
+                    MgConfig.setInt("aa_cooldown", org.telegram.messenger.MgAutoAnswer.COOLDOWNS[w]);
+                    listView.adapter.update(true);
+                });
+                showDialog(b.create());
+                break;
+            }
+            case ID_AA_RESET:
+                org.telegram.messenger.MgAutoAnswer.clearAnswered();
+                BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, "Tozalandi: endi hamma chatga yana javob beriladi").show();
+                break;
+            case ID_AT_PREVIEW:
+                toggle(view, "at_preview", false);
+                break;
+            case ID_AJ_ALL:
+                toggle(view, "aj_all", false);
+                break;
+            case ID_STRANGER_ON: {
+                boolean v = !org.telegram.messenger.MgStrangers.isEnabled(currentAccount);
+                org.telegram.messenger.MgStrangers.setEnabled(currentAccount, v);
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(v);
+                }
+                if (v) {
+                    int n = org.telegram.messenger.MgStrangers.countInbox(currentAccount);
+                    BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, n > 0 ? n + " ta notanish chat \"Notanishlar\" jildiga o'tkazildi" : "Himoya yoqildi").show();
+                }
+                break;
+            }
+            case ID_STRANGER_NOTIFY:
+                toggle(view, "stranger_notify", false);
+                break;
         }
     }
 
@@ -358,6 +459,45 @@ public class MgSettingsPage extends UniversalFragment {
     @Override
     protected boolean onLongClick(UItem item, View view, int position, float x, float y) {
         return false;
+    }
+
+    private void editAutoAnswerText(boolean enableAfter) {
+        Context context = getParentActivity();
+        if (context == null) {
+            return;
+        }
+        EditTextBoldCursor editText = new EditTextBoldCursor(context);
+        editText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
+        editText.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
+        editText.setHintTextColor(Theme.getColor(Theme.key_dialogTextHint));
+        editText.setCursorColor(Theme.getColor(Theme.key_dialogTextBlack));
+        editText.setBackground(null);
+        editText.setLineColors(Theme.getColor(Theme.key_windowBackgroundWhiteInputField), Theme.getColor(Theme.key_windowBackgroundWhiteInputFieldActivated), Theme.getColor(Theme.key_text_RedRegular));
+        editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        editText.setMaxLines(8);
+        editText.setHint("Masalan: Salom! Hozir band edim, tez orada javob beraman.");
+        editText.setText(org.telegram.messenger.MgAutoAnswer.getText());
+        FrameLayout frameLayout = new FrameLayout(context);
+        frameLayout.addView(editText, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP, 24, 6, 24, 0));
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, getResourceProvider());
+        builder.setTitle("Avto-javob matni");
+        builder.setView(frameLayout);
+        builder.setPositiveButton("Saqlash", (dialog, which) -> {
+            String t = editText.getText() == null ? "" : editText.getText().toString().trim();
+            org.telegram.messenger.MgAutoAnswer.setText(t);
+            if (t.isEmpty()) {
+                org.telegram.messenger.MgAutoAnswer.setEnabled(false);
+            } else if (enableAfter) {
+                org.telegram.messenger.MgAutoAnswer.setEnabled(true);
+            }
+            listView.adapter.update(true);
+        });
+        builder.setNegativeButton("Bekor qilish", null);
+        showDialog(builder.create());
+        AndroidUtilities.runOnUIThread(() -> {
+            editText.requestFocus();
+            AndroidUtilities.showKeyboard(editText);
+        }, 250);
     }
 
     private void toggleGhost(View view) {
