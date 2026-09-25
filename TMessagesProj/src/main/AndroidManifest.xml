@@ -92,6 +92,9 @@
             <action android:name="android.intent.action.VIEW"/>
             <data android:scheme="ton"/>
         </intent>
+        <intent>
+            <action android:name="android.speech.RecognitionService"/>
+        </intent>
     </queries>
 
     <application
@@ -394,6 +397,15 @@
 				  android:taskAffinity="${applicationId}.voip_feedback"
                   android:excludeFromRecents="true"
                 android:theme="@style/Theme.TMessages.TransparentWithAlerts"/>
+
+        <!-- MilliyGram: javobsiz xabar eslatmasi -->
+        <receiver
+            android:name="org.fenixuz.utils.ReminderReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="org.fenixuz.REMINDER_FIRE"/>
+            </intent-filter>
+        </receiver>
 
         <receiver
             android:name=".AutoMessageHeardReceiver"

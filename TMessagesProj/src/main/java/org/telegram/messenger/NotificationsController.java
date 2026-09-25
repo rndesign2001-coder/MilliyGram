@@ -834,6 +834,12 @@ public class NotificationsController extends BaseController implements Notificat
     }
 
     public void processReadMessages(LongSparseIntArray inbox, long dialogId, int maxDate, int maxId, boolean isPopup) {
+        if (inbox != null && inbox.size() > 0) {
+            try {
+                org.fenixuz.utils.MessageReminder.INSTANCE.onRead(true); // MilliyGram: o'qildi — eslatma bekor
+            } catch (Throwable ignore) {
+            }
+        }
         ArrayList<MessageObject> popupArrayRemove = new ArrayList<>(0);
         notificationsQueue.postRunnable(() -> {
             if (inbox != null) {
@@ -1019,7 +1025,42 @@ public class NotificationsController extends BaseController implements Notificat
         });
     }
 
+    // MilliyGram: javobsiz xabar eslatmasi — faqat ovozi o'chirilmagan, yashirilmagan shaxsiy chatlardagi kiruvchi xabarlar
+    private void mgReminderOnNew(ArrayList<MessageObject> messageObjects) {
+        try {
+            if (messageObjects == null || messageObjects.isEmpty() || !org.fenixuz.utils.MessageReminder.INSTANCE.isEnabled()
+                    || !MgConfig.isAccountNotifyEnabled(currentAccount)) {
+                return;
+            }
+            ArrayList<MessageObject> list = null;
+            for (int i = 0; i < messageObjects.size(); i++) {
+                MessageObject m = messageObjects.get(i);
+                if (m == null || m.isOut() || !DialogObject.isUserDialog(m.getDialogId())) {
+                    continue;
+                }
+                long did = m.getDialogId();
+                TLRPC.User u = getMessagesController().getUser(did);
+                if (u != null && (u.bot || UserObject.isService(u.id))) {
+                    continue;
+                }
+                if (getMessagesController().isDialogMuted(did, 0) || MgConfig.isDialogHidden(currentAccount, did)
+                        || MgStrangers.belongsInInbox(currentAccount, did)) {
+                    continue;
+                }
+                if (list == null) {
+                    list = new ArrayList<>();
+                }
+                list.add(m);
+            }
+            if (list != null) {
+                org.fenixuz.utils.MessageReminder.INSTANCE.onNewMessages(list);
+            }
+        } catch (Throwable ignore) {
+        }
+    }
+
     public void processNewMessages(ArrayList<MessageObject> messageObjects, boolean isLast, boolean isFcm, CountDownLatch countDownLatch) {
+        mgReminderOnNew(messageObjects);
         if (!isFcm) {
             try {
                 MgAutoAnswer.onNewMessages(currentAccount, messageObjects); // MilliyGram: avto-javob

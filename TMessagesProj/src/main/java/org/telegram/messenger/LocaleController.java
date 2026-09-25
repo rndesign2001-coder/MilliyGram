@@ -1463,9 +1463,32 @@ public class LocaleController {
             }
         }
         if (value == null) {
+            value = mgByName(key);
+            if (value == null) {
+                value = mgByName(fallback);
+            }
+        }
+        if (value == null) {
             value = "LOC_ERR:" + key;
         }
         return value;
+    }
+
+    // MilliyGram: resurs ID orqali topilmasa, satrni nomi (xeshi) bo'yicha to'g'ridan-to'g'ri ichki lug'atdan olish
+    private String mgByName(String name) {
+        if (name == null || name.isEmpty()) {
+            return null;
+        }
+        try {
+            checkLocalizationInternal();
+            String v = localizationInternal.getByResName(name);
+            if (v == null && localizationInternalDefault != null) {
+                v = localizationInternalDefault.getByResName(name);
+            }
+            return v;
+        } catch (Throwable e) {
+            return null;
+        }
     }
 
     // MilliyGram: bu satrlar Telegram serveridagi tarjimalar bilan almashtirilmaydi
@@ -1617,8 +1640,16 @@ public class LocaleController {
                 } catch (Exception e2) {}
             }
             if (value == null) {
-                int resourceId = getLocalizedStringByName(key + "_other");
-                value = getInstance().getLocalizedString(resourceId);
+                try {
+                    int resourceId = getLocalizedStringByName(key + "_other");
+                    value = getInstance().getLocalizedString(resourceId);
+                } catch (Exception e2) {}
+            }
+            if (value == null) {
+                value = getInstance().mgByName(param);
+            }
+            if (value == null) {
+                value = getInstance().mgByName(key + "_other");
             }
             value = value.replace("%d", "%1$s");
             value = value.replace("%1$d", "%1$s");
@@ -1694,6 +1725,12 @@ public class LocaleController {
                 }
             }
 
+            if (value == null) {
+                value = getInstance().mgByName(key);
+                if (value == null) {
+                    value = getInstance().mgByName(fallback);
+                }
+            }
             if (getInstance().currentLocale != null) {
                 return String.format(getInstance().currentLocale, value, args);
             } else {
@@ -1739,6 +1776,12 @@ public class LocaleController {
                 }
             }
 
+            if (value == null) {
+                value = getInstance().mgByName(key);
+                if (value == null) {
+                    value = getInstance().mgByName(fallback);
+                }
+            }
             SpannableStringBuilder builder = new SpannableStringBuilder(value);
             for (int i = 0; i < args.length; i++) {
                 String formatter = "s";
@@ -4520,7 +4563,16 @@ public class LocaleController {
 
 
     private static int getLocalizedStringByName(String key) {
-        return ApplicationLoader.applicationContext.getResources().getIdentifier(key, "string", ApplicationLoader.applicationContext.getPackageName());
+        android.content.res.Resources r = ApplicationLoader.applicationContext.getResources();
+        int id = r.getIdentifier(key, "string", ApplicationLoader.applicationContext.getPackageName());
+        if (id == 0) {
+            // MilliyGram: ilova ID (uz.milliygram.app) resurs paketi nomidan farq qilishi mumkin
+            id = r.getIdentifier(key, "string", "org.telegram.messenger.regular");
+            if (id == 0) {
+                id = r.getIdentifier(key, "string", "org.telegram.messenger");
+            }
+        }
+        return id;
     }
 
     private String getLocalizedString(@StringRes int stringRes) {

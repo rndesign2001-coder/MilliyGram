@@ -1700,6 +1700,8 @@ public class ChatActivity extends BaseFragment implements
     private final static int charge_fee = 72;
 
     private final static int chat_menu_topic_create = 73;
+    private final static int mg_select_range = 9040; // MilliyGram: oraliqni belgilash
+    private final static int mg_select_all = 9041;   // MilliyGram: yuklangan hammasini belgilash
 
     private final static int id_chat_compose_panel = 1000;
 
@@ -3748,6 +3750,10 @@ public class ChatActivity extends BaseFragment implements
         actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
             @Override
             public void onItemClick(final int id) {
+                if (id == mg_select_range || id == mg_select_all) {
+                    mgSelectMessages(id == mg_select_all);
+                    return;
+                }
                 if (id == MgChatLock.MENU_ID) {
                     MgChatLock.toggleLock(ChatActivity.this, currentAccount, dialog_id);
                     return;
@@ -3771,6 +3777,9 @@ public class ChatActivity extends BaseFragment implements
                     return;
                 } else if (id == MgChatFeatures.MENU_JOIN_ALL) {
                     MgChatFeatures.joinAllAccounts(ChatActivity.this, currentAccount, currentChat);
+                    return;
+                } else if (id == MgChatFeatures.MENU_VOICE_TYPING) {
+                    MgVoiceTyping.open(ChatActivity.this);
                     return;
                 } else if (id == MgChatFeatures.MENU_ONE_TIME_VOICE) {
                     MgChatFeatures.toggleOneTimeVoice(ChatActivity.this, currentAccount, dialog_id);
@@ -4556,6 +4565,9 @@ public class ChatActivity extends BaseFragment implements
                 if (currentEncryptedChat == null && (currentChat == null || ChatObject.canSendMessages(currentChat))) {
                     headerItem.lazilyAddSubItem(MgChatFeatures.MENU_AUTO_TEXT, R.drawable.msg_text_outlined, MgChatFeatures.autoTextMenuTitle(currentAccount, dialog_id));
                     headerItem.lazilyAddSubItem(MgChatFeatures.MENU_AUTO_TRANSLATE, R.drawable.msg_translate, MgChatFeatures.autoTranslateMenuTitle(currentAccount, dialog_id));
+                    if (MgVoiceTyping.isAvailable(getParentActivity())) {
+                        headerItem.lazilyAddSubItem(MgChatFeatures.MENU_VOICE_TYPING, R.drawable.input_mic, "Ovoz bilan yozish");
+                    }
                 }
                 if (currentChat != null && ChatObject.canUserDoAdminAction(currentChat, ChatObject.ACTION_INVITE)) {
                     headerItem.lazilyAddSubItem(MgChatFeatures.MENU_JOIN_REQUESTS, R.drawable.msg_requests, "Qo'shilish so'rovlari");
@@ -10444,6 +10456,10 @@ public class ChatActivity extends BaseFragment implements
             if (isSavedMessages) {
                 actionModeViews.add(actionMode.addItemWithWidth(tag_message, R.drawable.menu_tag_edit, dp(48), LocaleController.getString(R.string.AccDescrTagMessage)));
             }
+            if (!isReport()) {
+                actionModeViews.add(actionMode.addItemWithWidth(mg_select_range, R.drawable.mg_select_range, dp(44), "Oraliqni belgilash"));
+                actionModeViews.add(actionMode.addItemWithWidth(mg_select_all, R.drawable.mg_select_all, dp(44), "Hammasini belgilash"));
+            }
             actionModeViews.add(actionMode.addItemWithWidth(star, R.drawable.msg_fave, dp(48), LocaleController.getString(R.string.AddToFavorites)));
             actionModeViews.add(actionMode.addItemWithWidth(copy, R.drawable.msg_copy, dp(48), LocaleController.getString(R.string.Copy)));
             if (!isSavedMessages && getDialogId() != UserObject.VERIFY) {
@@ -10452,6 +10468,8 @@ public class ChatActivity extends BaseFragment implements
             actionModeViews.add(actionMode.addItemWithWidth(share, R.drawable.msg_shareout, dp(48), LocaleController.getString(R.string.ShareFile)));
             actionModeViews.add(actionMode.addItemWithWidth(delete, R.drawable.msg_delete, dp(48), LocaleController.getString(R.string.Delete)));
         } else {
+            actionModeViews.add(actionMode.addItemWithWidth(mg_select_range, R.drawable.mg_select_range, dp(44), "Oraliqni belgilash"));
+            actionModeViews.add(actionMode.addItemWithWidth(mg_select_all, R.drawable.mg_select_all, dp(44), "Hammasini belgilash"));
             actionModeViews.add(actionMode.addItemWithWidth(edit, R.drawable.msg_edit, dp(48), LocaleController.getString(R.string.Edit)));
             actionModeViews.add(actionMode.addItemWithWidth(star, R.drawable.msg_fave, dp(48), LocaleController.getString(R.string.AddToFavorites)));
             actionModeViews.add(actionMode.addItemWithWidth(copy, R.drawable.msg_copy, dp(48), LocaleController.getString(R.string.Copy)));
@@ -19529,6 +19547,105 @@ public class ChatActivity extends BaseFragment implements
         addToSelectedMessages(message, outside);
         updateActionModeTitle();
         updateVisibleRows();
+    }
+
+    // ================= MilliyGram: oraliq / hammasini belgilash =================
+
+    private boolean mgCanSelect(MessageObject m) {
+        if (m == null || m.getId() == 0) {
+            return false;
+        }
+        if (threadMessageObjects != null && threadMessageObjects.contains(m) && !isThreadChat()) {
+            return false;
+        }
+        if (m.isAnyGift() || m.isSponsored() || m.isEphemeral() || m.isWallpaperAction()) {
+            return false;
+        }
+        int type = getMessageType(m);
+        if (type < 2 || type == 20 || type == MessageObject.TYPE_SUGGEST_PHOTO || m.type == MessageObject.TYPE_JOINED_CHANNEL || m.type == MessageObject.TYPE_GIFT_STARS) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean mgIsSelected(MessageObject m) {
+        int index = m.getDialogId() == dialog_id ? 0 : 1;
+        return selectedMessagesIds[index].indexOfKey(m.getId()) >= 0;
+    }
+
+    /**
+     * all == false: birinchi va oxirgi belgilangan xabar orasidagi hamma xabarlarni belgilaydi.
+     * all == true: chatda yuklangan hamma xabarlarni belgilaydi (Telegram cheklovi — 100 tagacha).
+     */
+    private void mgSelectMessages(boolean all) {
+        if (messages == null || messages.isEmpty() || !actionBar.isActionModeShowed()) {
+            return;
+        }
+        int lo = -1, hi = -1;
+        for (int i = 0; i < messages.size(); i++) {
+            MessageObject m = messages.get(i);
+            if (m != null && mgIsSelected(m)) {
+                if (lo < 0) {
+                    lo = i;
+                }
+                hi = i;
+            }
+        }
+        if (!all && (lo < 0 || lo == hi)) {
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, "Oraliqni belgilash uchun avval ikkita xabarni belgilang: birinchisini va oxirgisini").show();
+            return;
+        }
+        int from, to, step;
+        if (all) {
+            // Belgilangan xabardan boshlab ikki tomonga: avval yangi xabarlar, keyin eskilar
+            from = 0;
+            to = messages.size() - 1;
+            step = 1;
+        } else {
+            from = lo;
+            to = hi;
+            step = 1;
+        }
+        final int limit = 100;
+        int added = 0;
+        boolean capped = false;
+        ArrayList<Integer> order = new ArrayList<>();
+        if (all && lo >= 0) {
+            // belgilangan joy atrofidan kengayib boradi — foydalanuvchi ko'rib turgan joy birinchi
+            int center = lo;
+            order.add(center);
+            for (int d = 1; center - d >= from || center + d <= to; d++) {
+                if (center + d <= to) order.add(center + d);
+                if (center - d >= from) order.add(center - d);
+            }
+        } else {
+            for (int i = from; i <= to; i += step) {
+                order.add(i);
+            }
+        }
+        for (int k = 0; k < order.size(); k++) {
+            MessageObject m = messages.get(order.get(k));
+            if (!mgCanSelect(m) || mgIsSelected(m)) {
+                continue;
+            }
+            if (selectedMessagesIds[0].size() + selectedMessagesIds[1].size() >= limit) {
+                capped = true;
+                break;
+            }
+            addToSelectedMessages(m, false, false);
+            added++;
+        }
+        addToSelectedMessages(null, false, true);
+        updateActionModeTitle();
+        updateVisibleRows();
+        int total = selectedMessagesIds[0].size() + selectedMessagesIds[1].size();
+        if (capped) {
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, "Belgilandi: " + total + " ta. Telegram bir vaqtda ko'pi bilan 100 ta xabarni belgilashga ruxsat beradi").show();
+        } else if (added == 0) {
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, all ? "Yuklangan hamma xabarlar allaqachon belgilangan" : "Oraliqdagi hamma xabarlar allaqachon belgilangan").show();
+        } else if (all) {
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, "Yuklangan " + total + " ta xabar belgilandi. Ko'proq kerak bo'lsa, yuqoriga suring va yana bosing").show();
+        }
     }
 
     private void updateActionModeTitle() {

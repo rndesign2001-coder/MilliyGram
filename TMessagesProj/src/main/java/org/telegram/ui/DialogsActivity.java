@@ -719,6 +719,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private final static int mg_chat_settings = 126;
     private final static int mg_preview = 127;
     private final static int mg_trust = 128;
+    private final static int mg_select_range = 129; // MilliyGram: oraliqni belgilash
+    private final static int mg_select_all = 130;   // MilliyGram: hammasini belgilash
+    private final static int mg_leave_chats = 131;  // MilliyGram: kanal/guruhlardan chiqish
+    private final static int mg_stop_bots = 132;    // MilliyGram: botlarni to'xtatish va tozalash
     private ActionBarMenuSubItem mgTrustItem;
     private ActionBarMenuSubItem mgAddToGroupItem;
     private ActionBarMenuSubItem mgPreviewItem;
@@ -4079,6 +4083,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 } else if (id == mg_hide) {
                     MgHiddenActivity.hideDialogs(DialogsActivity.this, currentAccount, new ArrayList<>(selectedDialogs));
                     hideActionMode(true);
+                } else if (id == mg_select_range || id == mg_select_all) {
+                    mgSelectDialogs(id == mg_select_all);
+                } else if (id == mg_leave_chats) {
+                    MgBulkActions.leaveChats(DialogsActivity.this, currentAccount, new ArrayList<>(selectedDialogs), () -> hideActionMode(true));
+                } else if (id == mg_stop_bots) {
+                    MgBulkActions.stopBots(DialogsActivity.this, currentAccount, new ArrayList<>(selectedDialogs), () -> hideActionMode(true));
                 } else if (id == mg_favorite) {
                     mgAddToFavorites(new ArrayList<>(selectedDialogs));
                     hideActionMode(true);
@@ -6842,13 +6852,15 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         actionMode.addView(selectedDialogsCountTextView, LayoutHelper.createLinear(0, LayoutHelper.MATCH_PARENT, 1.0f, hasMainTabs ? 18 : 72, 0, 0, 0));
         selectedDialogsCountTextView.setOnTouchListener((v, event) -> true);
 
-        ActionBarMenuItem mgFavoriteItem = actionMode.addItemWithWidth(mg_favorite, R.drawable.msg_fave, dp(48), "Tanlanganlarga qo'shish");
-        pinItem = actionMode.addItemWithWidth(pin, R.drawable.msg_pin, dp(48));
-        muteItem = actionMode.addItemWithWidth(mute, R.drawable.msg_mute, dp(48));
-        archive2Item = actionMode.addItemWithWidth(archive2, R.drawable.msg_archive, dp(48));
-        deleteItem = actionMode.addItemWithWidth(delete, R.drawable.msg_delete, dp(48), LocaleController.getString(R.string.Delete));
+        ActionBarMenuItem mgRangeItem = actionMode.addItemWithWidth(mg_select_range, R.drawable.mg_select_range, dp(42), "Oraliqni belgilash");
+        ActionBarMenuItem mgAllItem = actionMode.addItemWithWidth(mg_select_all, R.drawable.mg_select_all, dp(42), "Hammasini belgilash");
+        ActionBarMenuItem mgFavoriteItem = actionMode.addItemWithWidth(mg_favorite, R.drawable.msg_fave, dp(42), "Tanlanganlarga qo'shish");
+        pinItem = actionMode.addItemWithWidth(pin, R.drawable.msg_pin, dp(42));
+        muteItem = actionMode.addItemWithWidth(mute, R.drawable.msg_mute, dp(42));
+        archive2Item = actionMode.addItemWithWidth(archive2, R.drawable.msg_archive, dp(42));
+        deleteItem = actionMode.addItemWithWidth(delete, R.drawable.msg_delete, dp(42), LocaleController.getString(R.string.Delete));
 
-        ActionBarMenuItem otherItem = actionMode.addItemWithWidth(0, R.drawable.ic_ab_other, dp(48), LocaleController.getString(R.string.AccDescrMoreOptions));
+        ActionBarMenuItem otherItem = actionMode.addItemWithWidth(0, R.drawable.ic_ab_other, dp(42), LocaleController.getString(R.string.AccDescrMoreOptions));
         actionMode.addView(new View(getContext()), LayoutHelper.createLinear(5, LayoutHelper.MATCH_PARENT));
         archiveItem = otherItem.addSubItem(archive, R.drawable.msg_archive, LocaleController.getString(R.string.Archive));
         pin2Item = otherItem.addSubItem(pin2, R.drawable.msg_pin, LocaleController.getString(R.string.DialogPin));
@@ -6865,12 +6877,16 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         otherItem.addSubItem(mg_chat_settings, R.drawable.msg_settings, "Chatlar sozlamalari");
         mgPreviewItem = otherItem.addSubItem(mg_preview, R.drawable.msg_views, "Chat ko'rinishi");
         mgTrustItem = otherItem.addSubItem(mg_trust, R.drawable.msg_usersearch, "Notanish emas");
+        otherItem.addSubItem(mg_leave_chats, R.drawable.msg_leave, "Kanal va guruhlardan chiqish");
+        otherItem.addSubItem(mg_stop_bots, R.drawable.msg_block, "Botlarni to'xtatish va tozalash");
 
         muteItem.setOnLongClickListener(e -> {
             performSelectedDialogsAction(selectedDialogs, mute, true, true);
             return true;
         });
 
+        actionModeViews.add(mgRangeItem);
+        actionModeViews.add(mgAllItem);
         actionModeViews.add(mgFavoriteItem);
         actionModeViews.add(pinItem);
         actionModeViews.add(archive2Item);
@@ -7744,6 +7760,66 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         updateFloatingButtonVisibility(true);
         updateDialogsHint();
+    }
+
+    // MilliyGram: oraliqni / hammasini belgilash (joriy jild ro'yxati bo'yicha)
+    private void mgSelectDialogs(boolean all) {
+        if (viewPages == null || viewPages[0] == null) {
+            return;
+        }
+        ArrayList<TLRPC.Dialog> list = getDialogsArray(currentAccount, viewPages[0].dialogsType, folderId, dialogsListFrozen);
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+        int lo = -1, hi = -1;
+        for (int i = 0; i < list.size(); i++) {
+            TLRPC.Dialog d = list.get(i);
+            if (d != null && !(d instanceof TLRPC.TL_dialogFolder) && selectedDialogs.contains(d.id)) {
+                if (lo < 0) {
+                    lo = i;
+                }
+                hi = i;
+            }
+        }
+        if (!all && (lo < 0 || lo == hi)) {
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, "Oraliqni belgilash uchun avval ikkita chatni belgilang: birinchisini va oxirgisini").show();
+            return;
+        }
+        int from = all ? 0 : lo;
+        int to = all ? list.size() - 1 : hi;
+        int added = 0;
+        for (int i = from; i <= to; i++) {
+            TLRPC.Dialog d = list.get(i);
+            if (d == null || d instanceof TLRPC.TL_dialogFolder || d.id == 0 || selectedDialogs.contains(d.id)) {
+                continue;
+            }
+            if (onlySelect && getMessagesController().isForum(d.id)) {
+                continue;
+            }
+            selectedDialogs.add(d.id);
+            added++;
+        }
+        for (int p = 0; p < viewPages.length; p++) {
+            if (viewPages[p] == null || viewPages[p].listView == null) {
+                continue;
+            }
+            for (int c = 0; c < viewPages[p].listView.getChildCount(); c++) {
+                View child = viewPages[p].listView.getChildAt(c);
+                if (child instanceof DialogCell) {
+                    DialogCell cell = (DialogCell) child;
+                    cell.setChecked(selectedDialogs.contains(cell.getDialogId()), true);
+                }
+            }
+        }
+        updateCounters(false);
+        if (selectedDialogsCountTextView != null) {
+            selectedDialogsCountTextView.setNumber(selectedDialogs.size(), true);
+        }
+        if (added == 0) {
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, all ? "Ro'yxatdagi hamma chatlar allaqachon belgilangan" : "Oraliqdagi hamma chatlar allaqachon belgilangan").show();
+        } else if (all) {
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, "Belgilandi: " + selectedDialogs.size() + " ta chat").show();
+        }
     }
 
     public boolean addOrRemoveSelectedDialog(long did, View cell) {

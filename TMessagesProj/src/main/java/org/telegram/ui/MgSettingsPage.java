@@ -97,6 +97,10 @@ public class MgSettingsPage extends UniversalFragment {
     private static final int ID_CONFIRM_GIF = 123;
     private static final int ID_ROUND_FRONT = 124;
     private static final int ID_APK_BLOCK = 125;
+    private static final int ID_REMIND_ON = 126;
+    private static final int ID_REMIND_DELAY = 127;
+    private static final int ID_REMIND_SOUND = 128;
+    private static final int ID_CHAT_FINDER = 129;
     private static final int ID_ACC_NOTIFY_BASE = 2000;
     private static final int ID_EXPORT = 90;
     private static final int ID_IMPORT = 91;
@@ -145,6 +149,9 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asCheck(ID_HOLIDAY, "Bayram tabriklari").setChecked(MgConfig.isHolidayDecorEnabled()));
                 items.add(UItem.asCheck(ID_SHAKE, "Silkitib yashirish").setChecked(MgConfig.isShakeToHide()));
                 items.add(UItem.asShadow("Oddiy rejimda xabarlar kattaroq shriftda ko'rinadi. Bayram kunlari sarlavhada tabrik chiqadi. Telefonni silkitsangiz, yashirin bo'lim va qulflangan chatlar darhol yopiladi."));
+                items.add(UItem.asHeader("Qidiruv"));
+                items.add(UItem.asButton(ID_CHAT_FINDER, R.drawable.msg_search, "Foydalanuvchi nomini tekshirish"));
+                items.add(UItem.asShadow("@username yozing — band yoki bo'shligini darhol ko'rsatadi va mavjud bo'lsa, chatni ochadi."));
                 break;
             case PAGE_CHATLIST: {
                 items.add(UItem.asHeader("Jildlar"));
@@ -183,7 +190,7 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asShadow("Tasodifan yuborib yuborishning oldini oladi. Ovozli xabar yozib bo'lingach darhol ketmaydi — avval tinglab, keyin yuborasiz."));
                 items.add(UItem.asHeader("Doira video"));
                 items.add(UItem.asCheck(ID_ROUND_FRONT, "Old kamera bilan boshlash").setChecked(org.fenixuz.utils.CameraSituation.INSTANCE.isFront()));
-                items.add(UItem.asShadow("O'chirilsa, doira video orqa kamera bilan boshlanadi. Galereyadagi videoni doira qilib yuborish: videoni tanlang → pastdagi ⏺ (kamera) tugmasini bosing. Bir martalik ovozli xabar: chat → ⋮ → \"Bir martalik ovoz\"."));
+                items.add(UItem.asShadow("O'chirilsa, doira video orqa kamera bilan boshlanadi. Galereyadagi videoni doira qilib yuborish: videoni tanlang → pastdagi ⏺ (kamera) tugmasini bosing. Bir martalik ovozli xabar: chat → ⋮ → \"Bir martalik ovoz\". Gapirib yozish (tarjima bilan): chat → ⋮ → \"Ovoz bilan yozish\"."));
                 break;
             case PAGE_THEMES:
                 items.add(UItem.asButton(ID_THEMES, R.drawable.msg_theme, "MilliyGram mavzulari", MgThemesActivity.currentName()));
@@ -207,6 +214,11 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asShadow("Belgilangan vaqtda bildirishnomalar kelmaydi. Xabarlar yo'qolmaydi."));
                 items.add(UItem.asButton(ID_NOTIFY_SETTINGS, R.drawable.msg_notifications, "Telegram bildirishnomalari"));
                 items.add(UItem.asShadow(null));
+                items.add(UItem.asHeader("Javobsiz xabar eslatmasi"));
+                items.add(UItem.asCheck(ID_REMIND_ON, "Eslatib turish").setChecked(org.fenixuz.utils.MessageReminder.INSTANCE.isEnabled()));
+                items.add(UItem.asButton(ID_REMIND_DELAY, R.drawable.msg_recent, "Qancha vaqtdan keyin", org.fenixuz.utils.MessageReminder.INSTANCE.getDelayMin() + " daqiqa"));
+                items.add(UItem.asButton(ID_REMIND_SOUND, R.drawable.msg_filled_data_music, "Ovoz", org.fenixuz.utils.MessageReminder.INSTANCE.getSound() == 1 ? "Budilnik" : "Bildirishnoma"));
+                items.add(UItem.asShadow("Shaxsiy chatga kelgan xabarni belgilangan vaqt ichida o'qimasangiz, telefon bir marta jiringlab eslatadi. Xabarni o'qishingiz bilan eslatma bekor bo'ladi. Ovozi o'chirilgan, yashirin va notanish chatlar hisobga olinmaydi."));
                 if (org.telegram.messenger.UserConfig.getActivatedAccountsCount() > 1) {
                     items.add(UItem.asHeader("Akkauntlar bo'yicha"));
                     for (int a = 0; a < org.telegram.messenger.UserConfig.MAX_ACCOUNT_COUNT; a++) {
@@ -523,6 +535,40 @@ public class MgSettingsPage extends UniversalFragment {
                 boolean v = !org.fenixuz.utils.ApkShield.isEnabled();
                 org.fenixuz.utils.ApkShield.setEnabled(v);
                 setChecked(view, v);
+                break;
+            }
+            case ID_CHAT_FINDER:
+                presentFragment(new org.fenixuz.ui.chat_finder.ChatFinder());
+                break;
+            case ID_REMIND_ON: {
+                boolean v = !org.fenixuz.utils.MessageReminder.INSTANCE.isEnabled();
+                org.fenixuz.utils.MessageReminder.INSTANCE.setEnabled(v);
+                setChecked(view, v);
+                break;
+            }
+            case ID_REMIND_DELAY: {
+                final int[] opts = {2, 5, 10, 15, 30, 59};
+                CharSequence[] names = new CharSequence[opts.length];
+                for (int i = 0; i < opts.length; i++) {
+                    names[i] = opts[i] + " daqiqa";
+                }
+                AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+                b.setTitle("Eslatma vaqti");
+                b.setItems(names, (d, w) -> {
+                    org.fenixuz.utils.MessageReminder.INSTANCE.setDelayMin(opts[w]);
+                    listView.adapter.update(true);
+                });
+                showDialog(b.create());
+                break;
+            }
+            case ID_REMIND_SOUND: {
+                AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+                b.setTitle("Eslatma ovozi");
+                b.setItems(new CharSequence[]{"Bildirishnoma ovozi (yumshoq)", "Budilnik ovozi (baland)"}, (d, w) -> {
+                    org.fenixuz.utils.MessageReminder.INSTANCE.setSound(w);
+                    listView.adapter.update(true);
+                });
+                showDialog(b.create());
                 break;
             }
             case ID_STRANGER_NOTIFY:
