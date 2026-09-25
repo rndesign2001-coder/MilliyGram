@@ -269,6 +269,8 @@ android {
 tasks.withType(JavaCompile).configureEach {
     options.fork = true
     options.forkOptions.jvmArgs += ["-Xss4m"]
+    options.forkOptions.memoryMaximumSize = "6g"
+    options.forkOptions.memoryInitialSize = "1g"
 }
 
 
