@@ -731,6 +731,12 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
             if (type == TYPE_KICKED) {
                 doneItem = menu.addItemWithWidth(done_button, R.drawable.ic_ab_done, dp(56), getString("Done", R.string.Done));
             }
+            if (type == TYPE_USERS && MgMembersActivity.canUse(currentChat)) {
+                // MilliyGram: a'zolarni belgilab ommaviy chiqarish / o'chirilgan hisoblarni tozalash
+                ActionBarMenuItem mgClean = menu.addItem(9070, R.drawable.mg_select_all);
+                mgClean.setContentDescription("A'zolarni tozalash");
+                mgClean.setOnClickListener(v -> presentFragment(new MgMembersActivity(chatId)));
+            }
         } else if (type == TYPE_ADMIN && ChatObject.isChannelAndNotMegaGroup(currentChat) && ChatObject.hasAdminRights(currentChat)) {
             ActionBarMenu menu = actionBar.createMenu();
             doneItem = menu.addItemWithWidth(done_button, R.drawable.ic_ab_done, dp(56), getString("Done", R.string.Done));

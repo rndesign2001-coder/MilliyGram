@@ -3780,6 +3780,11 @@ public class ChatActivity extends BaseFragment implements
                 } else if (id == MgChatFeatures.MENU_JOIN_ALL) {
                     MgChatFeatures.joinAllAccounts(ChatActivity.this, currentAccount, currentChat);
                     return;
+                } else if (id == MgChatFeatures.MENU_MEMBERS_CLEAN) {
+                    if (currentChat != null) {
+                        presentFragment(new MgMembersActivity(currentChat.id));
+                    }
+                    return;
                 } else if (id == MgChatFeatures.MENU_TEMPLATES) {
                     MgMessageTools.showTemplates(ChatActivity.this, ChatActivity.this);
                     return;
@@ -4577,6 +4582,9 @@ public class ChatActivity extends BaseFragment implements
                 }
                 if (currentChat != null && ChatObject.canUserDoAdminAction(currentChat, ChatObject.ACTION_INVITE)) {
                     headerItem.lazilyAddSubItem(MgChatFeatures.MENU_JOIN_REQUESTS, R.drawable.msg_requests, "Qo'shilish so'rovlari");
+                }
+                if (MgMembersActivity.canUse(currentChat)) {
+                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_MEMBERS_CLEAN, R.drawable.msg_leave, "A'zolarni tozalash");
                 }
                 if (MgChatFeatures.canJoinAll(currentChat)) {
                     headerItem.lazilyAddSubItem(MgChatFeatures.MENU_JOIN_ALL, R.drawable.msg_contact_add, "Barcha akkauntlardan qo'shilish");
