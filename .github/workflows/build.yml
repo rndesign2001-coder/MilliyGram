@@ -69,7 +69,7 @@ jobs:
           touch build.log
           mkdir -p /tmp/logs && cd /tmp/logs
           git init -q && git checkout -q -b ci-logs
-          { echo "run=${GITHUB_RUN_NUMBER} sha=${GITHUB_SHA} status=${{ job.status }}"; grep -n -E "error:|FAILED|What went wrong|e: |Exception" $GITHUB_WORKSPACE/build.log | head -200; echo ---; tail -300 $GITHUB_WORKSPACE/build.log; } > log.txt
+          { echo "run=${GITHUB_RUN_NUMBER} sha=${GITHUB_SHA} status=${{ job.status }}"; grep -n -E "error:|FAILED|What went wrong|e: |Exception|StackOverflow" $GITHUB_WORKSPACE/build.log | grep -v "note: " | head -500; echo ---; tail -300 $GITHUB_WORKSPACE/build.log; } > log.txt
           git add log.txt
           git -c user.name=ci -c user.email=ci@local commit -q -m "log run ${GITHUB_RUN_NUMBER}"
           git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ci-logs

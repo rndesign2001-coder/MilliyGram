@@ -266,6 +266,11 @@ android {
     namespace 'org.telegram.messenger'
 }
 
+tasks.withType(JavaCompile).configureEach {
+    options.fork = true
+    options.forkOptions.jvmArgs += ["-Xss4m"]
+}
+
 
 def getProps(String propName) {
     def propsFile = rootProject.file('local.properties')
