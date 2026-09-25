@@ -1508,6 +1508,29 @@ public class NotificationsController extends BaseController implements Notificat
         });
     }
 
+    public void fenixDismissStrangers() {
+        notificationsQueue.postRunnable(() -> {
+            try {
+                LongSparseIntArray toDismiss = null;
+                for (int i = 0; i < pushDialogs.size(); i++) {
+                    long did = pushDialogs.keyAt(i);
+                    if (DialogObject.isUserDialog(did)
+                            && org.fenixuz.utils.StrangerShield.belongsInInbox(currentAccount, getMessagesController().getUser(did), did)) {
+                        if (toDismiss == null) {
+                            toDismiss = new LongSparseIntArray();
+                        }
+                        toDismiss.put(did, 0);
+                    }
+                }
+                if (toDismiss != null) {
+                    processDialogsUpdateRead(toDismiss);
+                }
+            } catch (Exception e) {
+                FileLog.e(e);
+            }
+        });
+    }
+
     public void processLoadedUnreadMessages(LongSparseArray<Integer> dialogs, ArrayList<TLRPC.Message> messages, ArrayList<MessageObject> push, ArrayList<TLRPC.User> users, ArrayList<TLRPC.Chat> chats, ArrayList<TLRPC.EncryptedChat> encryptedChats, Collection<StoryNotification> storyPushes) {
         getMessagesController().putUsers(users, true);
         getMessagesController().putChats(chats, true);

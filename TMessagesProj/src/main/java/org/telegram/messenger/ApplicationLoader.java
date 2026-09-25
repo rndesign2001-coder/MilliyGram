@@ -353,6 +353,20 @@ public class ApplicationLoader extends Application {
 
         LauncherIconController.tryFixLauncherIconIfNeeded();
         ProxyRotationController.init();
+
+        Thread historyWarmup = new Thread(() -> {
+            try {
+                org.fenixuz.utils.DeletedMsg.INSTANCE.warmUp();
+                org.fenixuz.utils.EditMessage.INSTANCE.warmUp();
+            } catch (Throwable ignore) {
+            } finally {
+                AndroidUtilities.runOnUIThread(() ->
+                    NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.novagramHistoryWarmedUp));
+            }
+        }, "novagram-history-warmup");
+        historyWarmup.setDaemon(true);
+        historyWarmup.setPriority(Thread.MIN_PRIORITY);
+        historyWarmup.start();
     }
 
     public static void startPushService() {

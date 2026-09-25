@@ -2105,6 +2105,21 @@ public class PeerStoriesView extends SizeNotifierFrameLayout implements Notifica
                             }
                         }
 
+                        boolean fenixNativeSaveShown = !unsupported && allowShare && !currentStory.isLive
+                                && UserConfig.getInstance(currentAccount).isPremium();
+                        if (org.fenixuz.utils.StoryDownload.INSTANCE.isEnabled() && !fenixNativeSaveShown
+                                && !unsupported && !currentStory.isLive
+                                && currentStory.storyItem != null
+                                && !(currentStory.storyItem instanceof TL_stories.TL_storyItemSkipped)) {
+                            ActionBarMenuItem.addItem(popupLayout, R.drawable.msg_gallery,
+                                    org.fenixuz.utils.LanguageCode.INSTANCE.getMyTitles(299), false, resourcesProvider).setOnClickListener(v -> {
+                                saveToGallery();
+                                if (popupMenu != null) {
+                                    popupMenu.dismiss();
+                                }
+                            });
+                        }
+
                         if (!MessagesController.getInstance(currentAccount).premiumFeaturesBlocked() && !isChannel) {
                             createStealthModeItem(popupLayout);
                         }
@@ -7040,6 +7055,9 @@ public class PeerStoriesView extends SizeNotifierFrameLayout implements Notifica
                         userStories = userFull.stories;
                     }
                 }
+            }
+            if (org.fenixuz.utils.GhostStory.INSTANCE.getGhostMode() || org.fenixuz.utils.GhostVariable.INSTANCE.getGhostMode()) {
+                return;
             }
             if (isActive && this.storyItem != null && userStories != null && ((!StoriesUtilities.hasExpiredViews(storyItem) && (this.storyItem.id > userStories.max_read_id || this.storyItem.id > storiesController.dialogIdToMaxReadId.get(dialogId, 0))) || isSelf)) {
                 if (storyViewer.overrideUserStories != null) {

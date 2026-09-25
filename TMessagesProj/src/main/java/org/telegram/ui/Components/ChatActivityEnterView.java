@@ -117,6 +117,7 @@ import org.telegram.ui.recyclerview.ChatListItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import org.telegram.messenger.AccountInstance;
+import org.fenixuz.utils.ConfirmDialogsPref;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.AnimationNotificationsLocker;
 import org.telegram.messenger.ApplicationLoader;
@@ -3000,6 +3001,16 @@ public class ChatActivityEnterView extends FrameLayout implements
                                     });
                                     return true;
                                 }
+                                // Fenix confirm-to-send: enter the listen/trim preview instead of sending.
+                                if (ConfirmDialogsPref.INSTANCE.getConfirmVoice()) {
+                                    MediaController.getInstance().toggleRecordingPause(voiceOnce);
+                                    delegate.needStartRecordAudio(0);
+                                    if (slideText != null) {
+                                        slideText.setEnabled(false);
+                                    }
+                                    getParent().requestDisallowInterceptTouchEvent(true);
+                                    return true;
+                                }
                                 MediaController.getInstance().stopRecording(isInScheduleMode() ? 3 : 1, true, 0, voiceOnce, 0);
                                 delegate.needStartRecordAudio(0);
                             }
@@ -3117,6 +3128,15 @@ public class ChatActivityEnterView extends FrameLayout implements
                                 }
                                 if (recordingAudioVideo && isInScheduleMode()) {
                                     AlertsCreator.createScheduleDatePickerDialog(parentActivity, parentFragment.getDialogId(), (notify, scheduleDate, scheduleRepeatPeriod) -> MediaController.getInstance().stopRecording(1, notify, scheduleDate, false, 0), () -> MediaController.getInstance().stopRecording(0, false, 0, false, 0), resourcesProvider);
+                                }
+                                // Fenix confirm-to-send: enter the listen/trim preview instead of sending.
+                                if (ConfirmDialogsPref.INSTANCE.getConfirmVoice()) {
+                                    MediaController.getInstance().toggleRecordingPause(voiceOnce);
+                                    delegate.needStartRecordAudio(0);
+                                    if (slideText != null) {
+                                        slideText.setEnabled(false);
+                                    }
+                                    return true;
                                 }
                                 delegate.needStartRecordAudio(0);
                                 MediaController.getInstance().stopRecording(isInScheduleMode() ? 3 : 1, true, 0, voiceOnce, 0);

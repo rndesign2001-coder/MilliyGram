@@ -132,6 +132,12 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.zxing.common.detector.MathUtils;
 
+import org.fenixuz.utils.LanguageCode;
+import org.fenixuz.ui.message_history.MessageHistory;
+import org.fenixuz.utils.By;
+import org.fenixuz.utils.DeletedMsg;
+import org.fenixuz.utils.EditMessage;
+
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
@@ -1195,6 +1201,7 @@ public class ChatActivity extends BaseFragment implements
     private float switchingFromTopicsProgress;
 
     public final static int OPTION_RETRY = 0;
+    public final static int OPTION_FENIX_EDIT_HISTORY = 1000;
     public final static int OPTION_DELETE = 1;
     public final static int OPTION_FORWARD = 2;
     public final static int OPTION_COPY = 3;
@@ -2994,7 +3001,8 @@ public class ChatActivity extends BaseFragment implements
             .add(NotificationCenter.invalidateMotionBackground)
             .add(NotificationCenter.didSetNewWallpapper)
             .add(NotificationCenter.didApplyNewTheme)
-            .add(NotificationCenter.goingToPreviewTheme);
+            .add(NotificationCenter.goingToPreviewTheme)
+            .add(NotificationCenter.novagramHistoryWarmedUp);
 
         if (chatMode == MODE_EDIT_BUSINESS_LINK) {
             observersGroup.add(NotificationCenter.businessLinksUpdated);
@@ -3352,6 +3360,40 @@ public class ChatActivity extends BaseFragment implements
 
         if (selectionReactionsOverlay != null && selectionReactionsOverlay.isVisible()) {
             selectionReactionsOverlay.setHiddenByScroll(true);
+        }
+    }
+
+    public void fenixRenderHeartFrame(MessageObject obj, CharSequence heart) {
+        if (obj == null || obj.messageOwner == null || heart == null) {
+            return;
+        }
+        obj.messageOwner.message = heart.toString();
+        obj.messageOwner.entities = new ArrayList<>();
+        obj.applyNewText(heart);
+        if (obj.messageText instanceof android.text.Spannable) {
+            org.telegram.messenger.Emoji.EmojiSpan[] spans = ((android.text.Spannable) obj.messageText)
+                    .getSpans(0, obj.messageText.length(), org.telegram.messenger.Emoji.EmojiSpan.class);
+            if (spans != null && spans.length > 0) {
+                android.text.TextPaint bigPaint = (Theme.chat_msgTextPaintEmoji != null
+                        && Theme.chat_msgTextPaintEmoji.length > 0 && Theme.chat_msgTextPaintEmoji[0] != null)
+                        ? Theme.chat_msgTextPaintEmoji[0] : Theme.chat_msgTextPaint;
+                int size = (int) (bigPaint.getTextSize() + AndroidUtilities.dp(4));
+                for (org.telegram.messenger.Emoji.EmojiSpan s : spans) {
+                    s.replaceFontMetrics(bigPaint.getFontMetricsInt(), size);
+                }
+                obj.resetLayout();
+                obj.generateLayout(null);
+            }
+        }
+        if (chatListView == null) {
+            return;
+        }
+        for (int i = 0; i < chatListView.getChildCount(); i++) {
+            android.view.View child = chatListView.getChildAt(i);
+            if (child instanceof ChatMessageCell && ((ChatMessageCell) child).getMessageObject() == obj) {
+                ((ChatMessageCell) child).forceResetMessageObject();
+                break;
+            }
         }
     }
 
@@ -20515,8 +20557,37 @@ public class ChatActivity extends BaseFragment implements
         }
     }
 
+    private void fenixRefreshDeletedMarks() {
+        if (chatListView == null) {
+            return;
+        }
+        for (int i = 0; i < chatListView.getChildCount(); i++) {
+            android.view.View child = chatListView.getChildAt(i);
+            if (!(child instanceof ChatMessageCell)) {
+                continue;
+            }
+            ChatMessageCell cell = (ChatMessageCell) child;
+            MessageObject msg = cell.getMessageObject();
+            if (msg == null || msg.messageOwner == null) {
+                continue;
+            }
+            if (msg.deletedBy != null && !msg.deletedBy.isEmpty()) {
+                continue;
+            }
+            String mark = DeletedMsg.INSTANCE.whoDelete(dialog_id, msg.messageOwner.id);
+            if (mark != null && !mark.isEmpty()) {
+                msg.deletedBy = mark;
+                cell.forceResetMessageObject();
+            }
+        }
+    }
+
     @Override
     public void didReceivedNotification(int id, int account, final Object... args) {
+        if (id == NotificationCenter.novagramHistoryWarmedUp) {
+            fenixRefreshDeletedMarks();
+            return;
+        }
         if (id == NotificationCenter.messagesDidLoad) {
             didReceivedNotification_messagesDidLoad(id, account, args);
         } else {
@@ -22319,7 +22390,66 @@ public class ChatActivity extends BaseFragment implements
                 scheduleNowDialog.dismiss();
                 scheduleNowDialog = null;
             }
-            processDeletedMessages(markAsDeletedMessages, channelId, sent, !movedToScheduled);
+            // Fenix delete-save: keep deleted messages visible (and tag who deleted them) based on the chosen mode.
+            boolean fenixDeletedBy = DeletedMsg.INSTANCE.getMyDelete();
+            int fenixDeletedType = DeletedMsg.INSTANCE.getCheckType();
+            By fenixBy = fenixDeletedBy ? By.Me : By.You;
+            if (fenixDeletedBy) {
+                DeletedMsg.INSTANCE.setMyDelete(false);
+            }
+            ArrayList<Integer> fenixUnsent = new ArrayList<>();
+            ArrayList<Integer> fenixKeepable = new ArrayList<>();
+            for (int i = 0; i < markAsDeletedMessages.size(); i++) {
+                Integer fenixId = markAsDeletedMessages.get(i);
+                if (fenixId == null) {
+                    continue;
+                }
+                MessageObject fenixMsg = messagesDict[0].get(fenixId);
+                boolean fenixSending = fenixMsg != null && fenixMsg.messageOwner != null
+                        && fenixMsg.messageOwner.send_state != MessageObject.MESSAGE_SEND_STATE_SENT;
+                if (fenixSending) {
+                    fenixUnsent.add(fenixId);
+                } else {
+                    fenixKeepable.add(fenixId);
+                }
+            }
+            ArrayList<MessageObject> fenixMessageObjects = DeletedMsg.INSTANCE.notify(fenixKeepable, messages, dialog_id);
+            for (int i = 0; i < fenixMessageObjects.size(); i++) {
+                MessageObject old = messagesDict[0].get(fenixMessageObjects.get(i).getId());
+                int index = this.messages.indexOf(old);
+                if (index < 0) {
+                    continue;
+                }
+                this.messages.get(index).forceUpdate = true;
+                this.messages.get(index).deletedBy = DeletedMsg.INSTANCE.whoDeleteStr(fenixBy);
+                if (chatAdapter != null) {
+                    final int fenixPosition = chatAdapter.messagesStartRow + index;
+                    if (chatAdapter.messagesStartRow >= 0 && fenixPosition < chatAdapter.messagesEndRow) {
+                        chatAdapter.notifyItemChanged(fenixPosition);
+                    }
+                }
+            }
+            if (DeletedMsg.SIMPLE == fenixDeletedType) {
+                processDeletedMessages(markAsDeletedMessages, channelId, sent, !movedToScheduled);
+            } else if (DeletedMsg.SECOND == fenixDeletedType) {
+                if (fenixBy == By.Me) {
+                    processDeletedMessages(markAsDeletedMessages, channelId, sent, !movedToScheduled);
+                } else if (!fenixUnsent.isEmpty()) {
+                    processDeletedMessages(fenixUnsent, channelId, sent, !movedToScheduled);
+                }
+            } else if (DeletedMsg.ALL == fenixDeletedType) {
+                ArrayList<Integer> fenixM = new ArrayList<>();
+                if (fenixBy == By.Me) {
+                    fenixM.addAll(DeletedMsg.INSTANCE.sortDeletedIds(dialog_id, fenixKeepable));
+                }
+                fenixM.addAll(fenixUnsent);
+                if (!fenixM.isEmpty()) {
+                    processDeletedMessages(fenixM, channelId, sent, !movedToScheduled);
+                }
+            }
+            if (actionBar != null && actionBar.isActionModeShowed() && fenixBy == By.Me) {
+                clearSelectionMode();
+            }
             if (movedToScheduled && chatMode != ChatActivity.MODE_SCHEDULED) {
                 getMessagesController().forceNoReload(dialog_id, ChatActivity.MODE_SCHEDULED);
                 openScheduledMessages(scheduledMessageId, true);
@@ -33328,6 +33458,10 @@ public class ChatActivity extends BaseFragment implements
         }
         boolean preserveDim = false;
         switch (option) {
+            case OPTION_FENIX_EDIT_HISTORY: {
+                presentFragment(new org.fenixuz.ui.message_history.MessageHistory(selectedObject, dialog_id));
+                break;
+            }
             case OPTION_RETRY: {
                 final MessageObject object = selectedObject;
                 final MessageObject.GroupedMessages group = selectedObjectGroup;
@@ -37736,6 +37870,10 @@ public class ChatActivity extends BaseFragment implements
                     //    pinnedBottom = true;
                     //}
 
+                    // Fenix delete-save: restore the "deleted" mark for saved-deleted messages across sessions.
+                    if (message.deletedBy == null || message.deletedBy.isEmpty()) {
+                        message.deletedBy = DeletedMsg.INSTANCE.whoDelete(dialog_id, message.messageOwner.id);
+                    }
                     messageCell.setShowTopic(true);
                     messageCell.setMessageObject(message, groupedMessages, pinnedBottom, pinnedTop, firstInChat, lastInChatList);
                     messageCell.setSpoilersSuppressed(chatListView.getScrollState() != RecyclerView.SCROLL_STATE_IDLE);
@@ -46232,6 +46370,11 @@ public class ChatActivity extends BaseFragment implements
                     items.add(LocaleController.getString(chatMode == MODE_SAVED && threadMessageId != getUserConfig().getClientUserId() ? R.string.Remove : R.string.Delete));
                     options.add(OPTION_DELETE);
                     icons.add(deleteIconRes);
+                }
+                if (((message.messageOwner.flags & TLRPC.MESSAGE_FLAG_EDITED) != 0 || message.isEditing()) && EditMessage.INSTANCE.getEditMode()) {
+                    items.add(LanguageCode.INSTANCE.getMyTitles(390));
+                    options.add(OPTION_FENIX_EDIT_HISTORY);
+                    icons.add(R.drawable.menu_views_recent);
                 }
             } else {
                 if ((allowChatActions || isEphemeralFromBot) && (primaryMessage == null || !primaryMessage.isWelcomeMessage()) && !isInsideContainer && chatMode != MODE_WELCOME_MESSAGES) {

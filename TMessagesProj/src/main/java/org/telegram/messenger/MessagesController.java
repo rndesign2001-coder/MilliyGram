@@ -9331,6 +9331,13 @@ public class MessagesController extends BaseController implements NotificationCe
         deleteMessages(messages, randoms, encryptedChat, dialogId, forAll, mode, false, 0, null, topicId);
     }
 
+    // Fenix delete-save: tracks who deleted the messages (By.Me = current user via delete dialog, By.You = server-pushed).
+    public org.fenixuz.utils.By whoDeleted = org.fenixuz.utils.By.You;
+    public void deleteMessages(ArrayList<Integer> messages, ArrayList<Long> randoms, TLRPC.EncryptedChat encryptedChat, long dialogId, int topicId, boolean forAll, int mode, org.fenixuz.utils.By whoDeleted) {
+        this.whoDeleted = whoDeleted;
+        deleteMessages(messages, randoms, encryptedChat, dialogId, forAll, mode, false, 0, null, topicId);
+    }
+
     public void deleteMessages(ArrayList<Integer> messages, ArrayList<Long> randoms, TLRPC.EncryptedChat encryptedChat, long dialogId, int topicId, boolean forAll, int mode, boolean cacheOnly) {
         deleteMessages(messages, randoms, encryptedChat, dialogId, forAll, mode, cacheOnly, 0, null, topicId);
     }
@@ -9365,14 +9372,14 @@ public class MessagesController extends BaseController implements NotificationCe
                 }
             }
             if (scheduled) {
-                getMessagesStorage().markMessagesAsDeleted(dialogId, messages, true, false, ChatActivity.MODE_SCHEDULED, 0);
+                getMessagesStorage().markMessagesAsDeleted(dialogId, messages, true, false, ChatActivity.MODE_SCHEDULED, 0, false, whoDeleted);
             } else if (quickReplies) {
                 if (mode == ChatActivity.MODE_QUICK_REPLIES) {
                     QuickRepliesController.getInstance(currentAccount).deleteLocalMessages(messages);
                 }
-                getMessagesStorage().markMessagesAsDeleted(dialogId, messages, true, false, ChatActivity.MODE_QUICK_REPLIES, topicId);
+                getMessagesStorage().markMessagesAsDeleted(dialogId, messages, true, false, ChatActivity.MODE_QUICK_REPLIES, topicId, false, whoDeleted);
             } else if (welcomeMessages) {
-                getMessagesStorage().markMessagesAsDeleted(dialogId, messages, true, false, ChatActivity.MODE_WELCOME_MESSAGES, topicId);
+                getMessagesStorage().markMessagesAsDeleted(dialogId, messages, true, false, ChatActivity.MODE_WELCOME_MESSAGES, topicId, false, whoDeleted);
             } else {
                 if (channelId == 0) {
                     for (int a = 0; a < messages.size(); a++) {
@@ -9385,8 +9392,9 @@ public class MessagesController extends BaseController implements NotificationCe
                 } else {
                     markDialogMessageAsDeleted(dialogId, messages);
                 }
-                getMessagesStorage().markMessagesAsDeleted(dialogId, messages, true, forAll, 0, topicId);
-                getMessagesStorage().updateDialogsWithDeletedMessages(dialogId, channelId, messages, null);
+                final ArrayList<Integer> storageMessages = new ArrayList<>(messages);
+                getMessagesStorage().markMessagesAsDeleted(dialogId, storageMessages, true, forAll, 0, topicId, false, whoDeleted);
+                getMessagesStorage().updateDialogsWithDeletedMessages(dialogId, channelId, storageMessages, null);
             }
             getNotificationCenter().postNotificationName(NotificationCenter.messagesDeleted, messages, channelId, scheduled, false, movedToScheduled, movedToScheduledMessageId);
         } else {
@@ -14417,6 +14425,9 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public void markMessageContentAsRead(MessageObject messageObject) {
+        if (org.fenixuz.utils.ChatPreviewState.INSTANCE.isGhost(messageObject.getDialogId())) {
+            return;
+        }
         if (messageObject.scheduled) {
             return;
         }
@@ -18060,6 +18071,11 @@ public class MessagesController extends BaseController implements NotificationCe
                         });
                     }
                     if (!obj.isOut()) {
+                        try {
+                            if (obj.messageOwner.peer_id.user_id != 0) {
+                                org.fenixuz.ui.auto_answer.AutoAnswer.INSTANCE.processSendingText(userId, obj);
+                            }
+                        } catch (Exception e) {}
                         getMessagesStorage().getStorageQueue().postRunnable(() -> AndroidUtilities.runOnUIThread(() -> getNotificationsController().processNewMessages(objArr, true, false, null)));
                     }
                     getMessagesStorage().putMessages(arr, false, true, false, 0, 0, 0);
@@ -20702,6 +20718,7 @@ public class MessagesController extends BaseController implements NotificationCe
                     } else if (baseUpdate instanceof TL_update.TL_updatePendingJoinRequests) {
                         TL_update.TL_updatePendingJoinRequests update = (TL_update.TL_updatePendingJoinRequests) baseUpdate;
                         getMemberRequestsController().onPendingRequestsUpdated(update);
+                        org.fenixuz.utils.AutoAcceptJoin.INSTANCE.maybeAccept(currentAccount, update);
                     } else if (baseUpdate instanceof TL_update.TL_updateSavedRingtones) {
                         getMediaDataController().ringtoneDataStore.loadUserRingtones(true);
                     } else if (baseUpdate instanceof TL_update.TL_updateTranscribeAudio) {

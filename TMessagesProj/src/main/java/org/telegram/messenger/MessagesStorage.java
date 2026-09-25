@@ -29,6 +29,9 @@ import android.util.SparseIntArray;
 import androidx.annotation.UiThread;
 import androidx.collection.LongSparseArray;
 
+import org.fenixuz.utils.By;
+import org.fenixuz.utils.DeletedMsg;
+import org.fenixuz.utils.WhoDeletedMsg;
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.SQLite.SQLiteCursor;
 import org.telegram.SQLite.SQLiteDatabase;
@@ -2964,8 +2967,8 @@ public class MessagesStorage extends BaseController {
                             unreadCount += contacts[1][1];
                         }
                     }
-                }
-                if ((flags & MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS) != 0) {
+                if ((flags & MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS) != 0
+                        && !(a == N && org.fenixuz.utils.StrangerShield.INSTANCE.isEnabled(currentAccount))) {
                     if ((flags & MessagesController.DIALOG_FILTER_FLAG_ONLY_ARCHIVED) == 0) {
                         unreadCount += nonContacts[0][0];
                         if ((flags & MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_MUTED) == 0) {
@@ -3645,6 +3648,21 @@ public class MessagesStorage extends BaseController {
     public void saveDialogFilter(MessagesController.DialogFilter filter, boolean atBegin, boolean peers) {
         storageQueue.postRunnable(() -> {
             saveDialogFilterInternal(filter, atBegin, peers);
+            calcUnreadCounters(false);
+            AndroidUtilities.runOnUIThread(() -> {
+                ArrayList<MessagesController.DialogFilter> filters = getMessagesController().dialogFilters;
+                for (int a = 0, N = filters.size(); a < N; a++) {
+                    filters.get(a).unreadCount = filters.get(a).pendingUnreadCount;
+                }
+                mainUnreadCount = pendingMainUnreadCount;
+                archiveUnreadCount = pendingArchiveUnreadCount;
+                getNotificationCenter().postNotificationName(NotificationCenter.updateInterfaces, MessagesController.UPDATE_MASK_READ_DIALOG_MESSAGE);
+            });
+        });
+    }
+
+    public void fenixRecalcMainUnread() {
+        storageQueue.postRunnable(() -> {
             calcUnreadCounters(false);
             AndroidUtilities.runOnUIThread(() -> {
                 ArrayList<MessagesController.DialogFilter> filters = getMessagesController().dialogFilters;
@@ -6492,8 +6510,8 @@ public class MessagesStorage extends BaseController {
                             unreadCount += contacts[1][1];
                         }
                     }
-                }
-                if ((flags & MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS) != 0) {
+                if ((flags & MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS) != 0
+                        && !(a == N && org.fenixuz.utils.StrangerShield.INSTANCE.isEnabled(currentAccount))) {
                     if ((flags & MessagesController.DIALOG_FILTER_FLAG_ONLY_ARCHIVED) == 0) {
                         unreadCount += nonContacts[0][0];
                         if ((flags & MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_MUTED) == 0) {
@@ -14514,8 +14532,67 @@ public class MessagesStorage extends BaseController {
     }
 
     private ArrayList<Long> markMessagesAsDeletedInternal(long dialogId, ArrayList<Integer> messages, boolean deleteFiles, int mode, int threadMessageId) {
+        return markMessagesAsDeletedInternal(dialogId, messages, deleteFiles, mode, threadMessageId, false, By.You);
+    }
+
+    private ArrayList<Long> markMessagesAsDeletedInternal(long dialogId, ArrayList<Integer> messages, boolean deleteFiles, int mode, int threadMessageId, boolean clear, By whoDeleted) {
         SQLiteCursor cursor = null;
         SQLitePreparedStatement state = null;
+
+        // Fenix delete-save: capture deleted messages instead of removing them, depending on the chosen mode.
+        int deletedType = DeletedMsg.INSTANCE.getCheckType();
+        if ((DeletedMsg.SECOND == deletedType || DeletedMsg.ALL == deletedType) && !clear) {
+            ArrayList<Integer> savable = new ArrayList<>();
+            for (int i = 0; i < messages.size(); i++) {
+                Integer id = messages.get(i);
+                if (id != null) {
+                    savable.add(id);
+                }
+            }
+            if (!savable.isEmpty()) {
+                ArrayList<WhoDeletedMsg> found = new ArrayList<>();
+                try {
+                    String myIds = TextUtils.join(",", savable);
+                    if (dialogId != 0) {
+                        cursor = database.queryFinalized(String.format(Locale.US, "SELECT uid, mid FROM messages_v2 WHERE mid IN(%s) AND uid = %d AND send_state = 0", myIds, dialogId));
+                    } else {
+                        cursor = database.queryFinalized(String.format(Locale.US, "SELECT uid, mid FROM messages_v2 WHERE mid IN(%s) AND is_channel = 0 AND send_state = 0", myIds));
+                    }
+                    while (cursor.next()) {
+                        found.add(new WhoDeletedMsg(cursor.longValue(0), cursor.intValue(1), whoDeleted));
+                    }
+                } catch (Exception e) {
+                } finally {
+                    if (cursor != null) {
+                        cursor.dispose();
+                        cursor = null;
+                    }
+                }
+
+                if (!found.isEmpty()) {
+                    if (DeletedMsg.SECOND == deletedType && By.Me != whoDeleted) {
+                        ArrayList<WhoDeletedMsg> deletedMsgs = DeletedMsg.INSTANCE.getAllIds();
+                        deletedMsgs.addAll(found);
+                        DeletedMsg.INSTANCE.saveDeletedMessagesId(deletedMsgs);
+                        for (int i = 0; i < found.size(); i++) {
+                            messages.remove(found.get(i).getId());
+                        }
+                    } else if (DeletedMsg.ALL == deletedType) {
+                        ArrayList<WhoDeletedMsg> deletedMsgs = DeletedMsg.INSTANCE.getAllIds();
+                        ArrayList<Integer> alreadySaved = new ArrayList<>();
+                        if (By.Me == whoDeleted) {
+                            alreadySaved.addAll(DeletedMsg.INSTANCE.sortDeletedIds(dialogId, savable));
+                        }
+                        deletedMsgs.addAll(found);
+                        DeletedMsg.INSTANCE.saveDeletedMessagesId(deletedMsgs);
+                        for (int i = 0; i < found.size(); i++) {
+                            messages.remove(found.get(i).getId());
+                        }
+                        messages.addAll(alreadySaved);
+                    }
+                }
+            }
+        }
         try {
             if (getUserConfig().getClientUserId() == dialogId) {
                 database.executeFast(String.format(Locale.US, "DELETE FROM tag_message_id WHERE mid IN(%s)", TextUtils.join(",", messages))).stepThis().dispose();
@@ -15311,14 +15388,34 @@ public class MessagesStorage extends BaseController {
         executeInStorageQueue(() -> updateDialogsWithDeletedMessagesInternal(dialogId, channelId, messages, additionalDialogsToUpdate));
     }
 
+    public void updateDialogsWithDeletedMessages(long dialogId, long channelId, ArrayList<Integer> messages, ArrayList<Long> additionalDialogsToUpdate, boolean useQueue) {
+        if (useQueue) {
+            storageQueue.postRunnable(() -> updateDialogsWithDeletedMessagesInternal(dialogId, channelId, messages, additionalDialogsToUpdate));
+        } else {
+            updateDialogsWithDeletedMessagesInternal(dialogId, channelId, messages, additionalDialogsToUpdate);
+        }
+    }
+
     public ArrayList<Long> markMessagesAsDeleted(long dialogId, ArrayList<Integer> messages, boolean useQueue, boolean deleteFiles, int mode, int topicId) {
         if (messages.isEmpty()) {
             return null;
         }
         if (useQueue) {
-            storageQueue.postRunnable(() -> markMessagesAsDeletedInternal(dialogId, messages, deleteFiles, mode, topicId));
+            storageQueue.postRunnable(() -> markMessagesAsDeletedInternal(dialogId, messages, deleteFiles, mode, topicId, false, By.You));
         } else {
-            return markMessagesAsDeletedInternal(dialogId, messages, deleteFiles, mode, topicId);
+            return markMessagesAsDeletedInternal(dialogId, messages, deleteFiles, mode, topicId, false, By.You);
+        }
+        return null;
+    }
+
+    public ArrayList<Long> markMessagesAsDeleted(long dialogId, ArrayList<Integer> messages, boolean useQueue, boolean deleteFiles, int mode, int topicId, boolean clear, By whoDeleted) {
+        if (messages.isEmpty()) {
+            return null;
+        }
+        if (useQueue) {
+            storageQueue.postRunnable(() -> markMessagesAsDeletedInternal(dialogId, messages, deleteFiles, mode, topicId, clear, whoDeleted));
+        } else {
+            return markMessagesAsDeletedInternal(dialogId, messages, deleteFiles, mode, topicId, clear, whoDeleted);
         }
         return null;
     }
@@ -16278,6 +16375,9 @@ public class MessagesStorage extends BaseController {
                                 if (data != null) {
                                     TLRPC.Message oldMessage = TLRPC.Message.TLdeserialize(data, data.readInt32(false), false);
                                     oldMessage.readAttachPath(data, getUserConfig().clientUserId);
+                                    if (org.fenixuz.utils.EditMessage.INSTANCE.getEditMode()) {
+                                        org.fenixuz.utils.EditMessage.INSTANCE.saveEditedMsg(oldMessage, dialogId);
+                                    }
                                     data.reuse();
                                     if (reactionUpdates != null) {
                                         reactionUpdates.add(new SavedReactionsUpdate(selfId, oldMessage, message));

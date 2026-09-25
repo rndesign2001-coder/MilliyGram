@@ -92,6 +92,7 @@ import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.MessagesStorage;
+import org.fenixuz.utils.DeletedMsg;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.NotificationsController;
 import org.telegram.messenger.OneUIUtilities;
@@ -8120,6 +8121,7 @@ public class AlertsCreator {
         }
 
         AlertDialog.OnButtonClickListener deleteAction = (dialogInterface, i) -> {
+            DeletedMsg.INSTANCE.setMyDelete(true);
             ArrayList<Integer> ids = null;
             long thisDialogId = dialogId;
             if (isSavedMessages) {

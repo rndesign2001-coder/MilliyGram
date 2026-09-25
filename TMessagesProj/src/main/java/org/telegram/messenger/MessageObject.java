@@ -223,6 +223,7 @@ public class MessageObject {
     public int dateKeyInt;
     public String monthKey;
     public boolean deleted;
+    public String deletedBy;
     public boolean deletedByThanos;
     public float audioProgress;
     public float forceSeekTo = -1;
@@ -342,6 +343,8 @@ public class MessageObject {
     public TLRPC.TL_channelAdminLogEvent currentEvent;
 
     public boolean forceUpdate;
+
+    public boolean hideSpetialFunction;
 
     public SendAnimationData sendAnimationData;
 
@@ -5928,6 +5931,9 @@ public class MessageObject {
             String restrictionReason = MessagesController.getInstance(currentAccount).getRestrictionReason(messageOwner.restriction_reason);
             if (!TextUtils.isEmpty(restrictionReason)) {
                 messageText = restrictionReason;
+                isRestrictedMessage = true;
+            } else if (org.fenixuz.utils.ApkShield.INSTANCE.shouldHide(messageOwner)) {
+                messageText = org.fenixuz.utils.LanguageCode.INSTANCE.getMyTitles(377);
                 isRestrictedMessage = true;
             } else if (messageOwner.rich_message != null) {
                 messageText = formatRichMessage(messageOwner.rich_message, isOutOwner());

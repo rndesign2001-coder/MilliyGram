@@ -19,6 +19,8 @@ import android.view.View;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.fenixuz.utils.By;
+import org.fenixuz.utils.DeletedMsg;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BotWebViewVibrationEffect;
 import org.telegram.messenger.ChatObject;
@@ -1118,10 +1120,12 @@ public class DeleteMessagesBottomSheet extends BottomSheetWithRecyclerListView {
             }
         } else {
             if (!supergroupMessageIds.isEmpty()) {
-                MessagesController.getInstance(currentAccount).deleteMessages(supergroupMessageIds, null, null, -inChat.id, topicId, false, mode);
+                DeletedMsg.INSTANCE.setMyDelete(true);
+                MessagesController.getInstance(currentAccount).deleteMessages(supergroupMessageIds, null, null, -inChat.id, topicId, false, mode, By.Me);
             }
             if (!groupMessageIds.isEmpty()) {
-                MessagesController.getInstance(currentAccount).deleteMessages(groupMessageIds, null, null, mergeDialogId, topicId, true, mode);
+                DeletedMsg.INSTANCE.setMyDelete(true);
+                MessagesController.getInstance(currentAccount).deleteMessages(groupMessageIds, null, null, mergeDialogId, topicId, true, mode, By.Me);
             }
         }
 

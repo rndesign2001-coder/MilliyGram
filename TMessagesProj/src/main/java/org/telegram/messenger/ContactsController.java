@@ -1983,6 +1983,13 @@ public class ContactsController extends BaseController {
         sortedUsersSectionsArray = sortedSectionsArray;
     }
 
+    public void rebuildSecretFilteredSections() {
+        AndroidUtilities.runOnUIThread(() -> {
+            buildContactsSectionsArrays(false);
+            getNotificationCenter().postNotificationName(NotificationCenter.contactsDidLoad);
+        });
+    }
+
     public static boolean hasContactsPermission() {
         if (Build.VERSION.SDK_INT >= 23) {
             return ApplicationLoader.applicationContext.checkSelfPermission(android.Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED;

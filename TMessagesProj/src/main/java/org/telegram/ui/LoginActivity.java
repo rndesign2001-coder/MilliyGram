@@ -1683,6 +1683,30 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
         needFinishActivity(afterSignup, res.setup_password_required, res.otherwise_relogin_days);
     }
 
+    public void onAuthSuccessForQr(TLRPC.TL_auth_authorization auth) {
+        onAuthSuccess(auth);
+    }
+
+    public void onQrLoginNeedPassword() {
+        TL_account.getPassword req = new TL_account.getPassword();
+        ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+            if (error == null) {
+                TL_account.Password password = (TL_account.Password) response;
+                if (!TwoStepVerificationActivity.canHandleCurrentPassword(password, true)) {
+                    AlertsCreator.showUpdateAppAlert(getParentActivity(), LocaleController.getString(R.string.UpdateAppAlert), true);
+                    return;
+                }
+                Bundle bundle = new Bundle();
+                SerializedData data = new SerializedData(password.getObjectSize());
+                password.serializeToStream(data);
+                bundle.putString("password", Utilities.bytesToHex(data.toByteArray()));
+                setPage(VIEW_PASSWORD, true, bundle, false);
+            } else {
+                needShowAlert(LocaleController.getString(R.string.RestorePasswordNoEmailTitle), error.text);
+            }
+        }), ConnectionsManager.RequestFlagFailOnServerErrors | ConnectionsManager.RequestFlagWithoutLogin);
+    }
+
     private void fillNextCodeParams(Bundle params, TL_account.sentEmailCode res) {
         params.putString("emailPattern", res.email_pattern);
         params.putInt("length", res.length);
