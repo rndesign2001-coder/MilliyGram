@@ -18071,11 +18071,6 @@ public class MessagesController extends BaseController implements NotificationCe
                         });
                     }
                     if (!obj.isOut()) {
-                        try {
-                            if (obj.messageOwner.peer_id.user_id != 0) {
-                                org.fenixuz.ui.auto_answer.AutoAnswer.INSTANCE.processSendingText(userId, obj);
-                            }
-                        } catch (Exception e) {}
                         getMessagesStorage().getStorageQueue().postRunnable(() -> AndroidUtilities.runOnUIThread(() -> getNotificationsController().processNewMessages(objArr, true, false, null)));
                     }
                     getMessagesStorage().putMessages(arr, false, true, false, 0, 0, 0);

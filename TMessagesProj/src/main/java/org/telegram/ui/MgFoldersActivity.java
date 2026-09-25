@@ -74,7 +74,7 @@ public class MgFoldersActivity extends UniversalFragment {
                 items.add(UItem.asButtonCheck(ID_LOCAL_BASE + i, e.name, sub).setChecked(e.enabled));
             }
             items.add(UItem.asButton(ID_NEW_CATEGORY, R.drawable.msg_add, "Yangi toifa yaratish"));
-            items.add(UItem.asShadow("Yoqish/yashirish uchun bosing. Nomini yoki ikonkasini o'zgartirish uchun uzoq bosing.\n\n• Admin — siz admin bo'lgan barcha guruh va kanallar\n• Mening kanallarim / guruhlarim — o'zingiz ochganlari"));
+            items.add(UItem.asShadow("Yoqish/yashirish uchun bosing. Nomini yoki ikonkasini o'zgartirish uchun uzoq bosing.\n\n• Admin — siz egasi yoki admini bo'lgan barcha guruh va kanallar\n• Mening kanallarim / guruhlarim — o'zingiz egasi bo'lganlar\n• Admin kanallar / guruhlar — siz admin, lekin egasi boshqa odam\n• Notanishlar — kontaktda yo'q odamlar (himoya yoqilganda)"));
         }
 
         hiddenTabs.clear();
@@ -162,20 +162,18 @@ public class MgFoldersActivity extends UniversalFragment {
         if (getParentActivity() == null) {
             return;
         }
-        final ArrayList<String> keys = new ArrayList<>(MgLocalFolders.ICONS.keySet());
-        CharSequence[] names = new CharSequence[keys.size()];
-        int[] icons = new int[keys.size()];
-        for (int i = 0; i < keys.size(); i++) {
-            names[i] = MgLocalFolders.ICON_NAMES.get(keys.get(i));
-            icons[i] = MgLocalFolders.ICONS.get(keys.get(i));
+        String cur = MgConfig.getString("folder_icon_" + currentAccount + "_" + filterId, null);
+        if (cur == null) {
+            for (MgLocalFolders.Entry e : entries) {
+                if (e.id == filterId) {
+                    cur = e.icon;
+                }
+            }
         }
-        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
-        builder.setTitle("Jild ikonkasi");
-        builder.setItems(names, icons, (dialog, which) -> {
-            MgLocalFolders.setIconKey(currentAccount, filterId, keys.get(which));
+        MgIconPicker.show(this, "Jild ikonkasi", cur, key -> {
+            MgLocalFolders.setIconKey(currentAccount, filterId, key);
             listView.adapter.update(true);
         });
-        showDialog(builder.create());
     }
 
     private void showRename(MgLocalFolders.Entry e) {

@@ -35,6 +35,8 @@ public class MgLocalFolders {
     public static final int TYPE_ADMIN_GROUPS = 3;
     public static final int TYPE_CUSTOM = 4; // foydalanuvchi toifasi (faqat tanlangan chatlar)
     public static final int TYPE_STRANGERS = 5; // notanishlar (kontaktda yo'q shaxsiy chatlar)
+    public static final int TYPE_MOD_CHANNELS = 6; // admin (lekin egasi emas) kanallar
+    public static final int TYPE_MOD_GROUPS = 7;   // admin (lekin egasi emas) guruhlar
 
     public static final int CUSTOM_MIN = 920;
     public static final int CUSTOM_MAX = 989;
@@ -62,6 +64,8 @@ public class MgLocalFolders {
         icon("unread", R.drawable.msg_markunread, "O'qilmagan");
         icon("admin_channels", R.drawable.msg_channel_create, "Mening kanallarim");
         icon("admin_groups", R.drawable.msg_groups_create, "Mening guruhlarim");
+        icon("mod_channels", R.drawable.msg_channel, "Admin kanallar");
+        icon("mod_groups", R.drawable.msg_groups, "Admin guruhlar");
         icon("archive", R.drawable.msg_archive, "Arxiv");
         icon("chat", R.drawable.msg_discussion, "Suhbat");
         icon("category", R.drawable.msg_folders, "Toifa");
@@ -112,6 +116,8 @@ public class MgLocalFolders {
             new Def(906, "admin", "Admin", MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_ADMIN, "admin", false, 6),
             new Def(907, "admin_channels", "Mening kanallarim", MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_ADMIN_CHANNELS, "admin_channels", false, 7),
             new Def(908, "admin_groups", "Mening guruhlarim", MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_ADMIN_GROUPS, "admin_groups", false, 8),
+            new Def(910, "mod_channels", "Admin kanallar", MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_MOD_CHANNELS, "mod_channels", false, 10),
+            new Def(911, "mod_groups", "Admin guruhlar", MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_MOD_GROUPS, "mod_groups", false, 11),
             new Def(909, "strangers", "Notanishlar", MessagesController.DIALOG_FILTER_FLAG_CONTACTS | MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS, TYPE_STRANGERS, "strangers", false, 9),
     };
 
@@ -568,17 +574,23 @@ public class MgLocalFolders {
             return false;
         }
         TLRPC.Chat chat = mc.getChat(-dialogId);
-        if (chat == null || ChatObject.isNotInChat(chat)) {
+        if (chat == null || ChatObject.isNotInChat(chat) || chat.deactivated || chat.migrated_to != null && !(chat.migrated_to instanceof TLRPC.TL_inputChannelEmpty)) {
             return false;
         }
         boolean broadcast = ChatObject.isChannelAndNotMegaGroup(chat);
+        boolean owner = chat.creator;
+        boolean admin = !owner && chat.admin_rights != null;
         switch (filter.mgLocalType) {
             case TYPE_ADMIN_CHANNELS:
-                return chat.creator && broadcast;
+                return owner && broadcast;
             case TYPE_ADMIN_GROUPS:
-                return chat.creator && !broadcast;
+                return owner && !broadcast;
+            case TYPE_MOD_CHANNELS:
+                return admin && broadcast;
+            case TYPE_MOD_GROUPS:
+                return admin && !broadcast;
             case TYPE_ADMIN:
-                return chat.creator || chat.admin_rights != null;
+                return owner || admin;
         }
         return false;
     }

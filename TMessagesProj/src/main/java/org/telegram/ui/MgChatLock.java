@@ -104,21 +104,54 @@ public class MgChatLock {
     /** Chat menyusidagi "Qulflash / Qulfni olish" */
     public static void toggleLock(BaseFragment fragment, int account, long dialogId) {
         if (MgConfig.isDialogLocked(account, dialogId)) {
-            askPin(fragment, "Qulfni olish", ok -> {
+            String scope = MgConfig.lockScopeFor(account, dialogId);
+            askLock(fragment, scope, "Qulfni olish", ok -> {
                 if (ok) {
                     MgConfig.setDialogLocked(account, dialogId, false);
+                    if (!MgConfig.SCOPE_CHAT.equals(scope)) {
+                        MgConfig.removeLock(scope);
+                    }
                     BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, "Chat qulfdan chiqarildi").show();
                 }
             });
-        } else if (!MgConfig.hasPin()) {
-            createPin(fragment, () -> {
-                MgConfig.setDialogLocked(account, dialogId, true);
-                BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, "Chat qulflandi. Keyingi safar PIN so'raladi").show();
-            });
-        } else {
-            MgConfig.setDialogLocked(account, dialogId, true);
-            BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, "Chat qulflandi. Keyingi safar PIN so'raladi").show();
+            return;
         }
+        Context context = fragment.getParentActivity();
+        if (context == null) {
+            return;
+        }
+        CharSequence[] items = {
+                MgConfig.hasPin() ? "Umumiy parol bilan" : "Umumiy parol yaratish",
+                "Shu chat uchun alohida PIN kod",
+                "Shu chat uchun alohida grafik kalit"
+        };
+        int[] icons = {R.drawable.msg_secret, R.drawable.msg_permissions, R.drawable.msg_customize};
+        AlertDialog.Builder b = new AlertDialog.Builder(context, fragment.getResourceProvider());
+        b.setTitle("Chatni qulflash");
+        b.setItems(items, icons, (d, which) -> {
+            if (which == 0) {
+                if (!MgConfig.hasPin()) {
+                    createPin(fragment, () -> lockDone(fragment, account, dialogId));
+                } else {
+                    lockDone(fragment, account, dialogId);
+                }
+            } else {
+                String scope = MgConfig.dialogScope(account, dialogId);
+                String type = which == 2 ? MgConfig.LOCK_PATTERN : MgConfig.LOCK_PIN;
+                MgLockScreen.create(context, scope, type, ok -> {
+                    if (ok) {
+                        lockDone(fragment, account, dialogId);
+                    }
+                });
+            }
+        });
+        fragment.showDialog(b.create());
+    }
+
+    private static void lockDone(BaseFragment fragment, int account, long dialogId) {
+        MgConfig.setDialogLocked(account, dialogId, true);
+        BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check,
+                MgConfig.hasOwnLock(account, dialogId) ? "Chat alohida parol bilan qulflandi" : "Chat qulflandi. Keyingi safar parol so'raladi").show();
     }
 
     /**
@@ -145,6 +178,7 @@ public class MgChatLock {
         text.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));
         text.setGravity(Gravity.CENTER);
         overlay.addView(text, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 0, 12, 0, 0));
+        overlay.setTag(dialogId);
         ((ViewGroup) fragmentView).addView(overlay, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         overlay.setOnClickListener(v -> ask(fragment, overlay));
         if (!preview) {
@@ -156,7 +190,9 @@ public class MgChatLock {
         if (fragment.getParentActivity() == null || overlay.getParent() == null) {
             return;
         }
-        askPin(fragment, "Chat qulflangan", ok -> {
+        long did = overlay.getTag() instanceof Long ? (Long) overlay.getTag() : 0;
+        int acc = fragment.getCurrentAccount();
+        askLock(fragment, did != 0 ? MgConfig.lockScopeFor(acc, did) : MgConfig.SCOPE_CHAT, "Chat qulflangan", ok -> {
             if (ok) {
                 if (overlay.getParent() instanceof ViewGroup) {
                     ((ViewGroup) overlay.getParent()).removeView(overlay);

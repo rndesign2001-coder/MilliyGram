@@ -103,6 +103,12 @@ public class MgAccountMenu {
             o.dismiss();
             showAliasDialog(fragment, account);
         });
+        boolean notifyOn = org.telegram.messenger.MgConfig.isAccountNotifyEnabled(account);
+        sub.add(notifyOn ? R.drawable.msg_mute : R.drawable.msg_unmute, notifyOn ? "Bildirishnomalarni o'chirish" : "Bildirishnomalarni yoqish", () -> {
+            org.telegram.messenger.MgConfig.setAccountNotifyEnabled(account, !notifyOn);
+            o.dismiss();
+            BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, !notifyOn ? "Bu akkaunt bildirishnomalari yoqildi" : "Bu akkauntdan bildirishnoma kelmaydi").show();
+        });
         sub.add(R.drawable.msg_archive, "Yashirish", () -> {
             o.dismiss();
             hideAccount(fragment, account);

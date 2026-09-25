@@ -4137,6 +4137,11 @@ public class NotificationsController extends BaseController implements Notificat
             dismissNotification();
             return;
         }
+        if (!MgConfig.isAccountNotifyEnabled(currentAccount)) {
+            // MilliyGram: bu akkaunt bildirishnomalari o'chirilgan
+            dismissNotification();
+            return;
+        }
         if (MgConfig.isFocusActiveNow()) {
             // MilliyGram: fokus rejimi — bildirishnoma ko'rsatilmaydi
             dismissNotification();

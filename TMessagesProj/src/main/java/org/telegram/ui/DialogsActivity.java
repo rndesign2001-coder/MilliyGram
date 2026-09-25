@@ -7098,17 +7098,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (filter == null || getParentActivity() == null) {
             return;
         }
-        final ArrayList<String> keys = new ArrayList<>(org.telegram.messenger.MgLocalFolders.ICONS.keySet());
-        CharSequence[] names = new CharSequence[keys.size()];
-        int[] icons = new int[keys.size()];
-        for (int i = 0; i < keys.size(); i++) {
-            names[i] = org.telegram.messenger.MgLocalFolders.ICON_NAMES.get(keys.get(i));
-            icons[i] = org.telegram.messenger.MgLocalFolders.ICONS.get(keys.get(i));
-        }
-        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
-        builder.setTitle("Jild ikonkasi");
-        builder.setItems(names, icons, (dialog, which) -> org.telegram.messenger.MgLocalFolders.setIconKey(currentAccount, filter.id, keys.get(which)));
-        showDialog(builder.create());
+        String cur = org.telegram.messenger.MgLocalFolders.getIconKey(currentAccount, filter);
+        MgIconPicker.show(this, filter.isDefault() ? "Jild ikonkasi" : "\"" + filter.name + "\" ikonkasi", cur,
+                key -> org.telegram.messenger.MgLocalFolders.setIconKey(currentAccount, filter.id, key));
     }
 
     /** Tanlangan chatlarni "Tanlanganlar" jildiga qo'shadi (jild bo'lmasa yaratadi) */

@@ -90,6 +90,8 @@ public class MgSettingsPage extends UniversalFragment {
     private static final int ID_AJ_ALL = 106;
     private static final int ID_STRANGER_ON = 110;
     private static final int ID_STRANGER_NOTIFY = 111;
+    private static final int ID_LOCK_ANIM = 112;
+    private static final int ID_ACC_NOTIFY_BASE = 2000;
     private static final int ID_EXPORT = 90;
     private static final int ID_IMPORT = 91;
 
@@ -188,6 +190,19 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asShadow("Belgilangan vaqtda bildirishnomalar kelmaydi. Xabarlar yo'qolmaydi."));
                 items.add(UItem.asButton(ID_NOTIFY_SETTINGS, R.drawable.msg_notifications, "Telegram bildirishnomalari"));
                 items.add(UItem.asShadow(null));
+                if (org.telegram.messenger.UserConfig.getActivatedAccountsCount() > 1) {
+                    items.add(UItem.asHeader("Akkauntlar bo'yicha"));
+                    for (int a = 0; a < org.telegram.messenger.UserConfig.MAX_ACCOUNT_COUNT; a++) {
+                        org.telegram.messenger.UserConfig uc = org.telegram.messenger.UserConfig.getInstance(a);
+                        if (!uc.isClientActivated()) {
+                            continue;
+                        }
+                        String alias = MgConfig.getAccountAlias(a);
+                        String name = alias != null && !alias.isEmpty() ? alias : org.telegram.messenger.UserObject.getUserName(uc.getCurrentUser());
+                        items.add(UItem.asCheck(ID_ACC_NOTIFY_BASE + a, name).setChecked(MgConfig.isAccountNotifyEnabled(a)));
+                    }
+                    items.add(UItem.asShadow("O'chirilgan akkauntdan bildirishnoma kelmaydi. Akkauntlar ro'yxatida ⚙ tugmasi orqali ham o'zgartirish mumkin."));
+                }
                 break;
             case PAGE_PRIVACY: {
                 items.add(UItem.asCheck(ID_GHOST, "Sharpa rejimi").setChecked(MgGhostMode.isEnabled(currentAccount)));
@@ -195,6 +210,8 @@ public class MgSettingsPage extends UniversalFragment {
                 int locked = MgConfig.getLockedCount();
                 items.add(UItem.asButton(ID_LOCK, R.drawable.msg_secret, "Chat qulfi", locked > 0 ? String.valueOf(locked) : ""));
                 items.add(UItem.asShadow(null));
+                items.add(UItem.asCheck(ID_LOCK_ANIM, "Qulf ekranida animatsiyali fon").setChecked(MgConfig.getBool("lock_animated_bg", true)));
+                items.add(UItem.asShadow("Chatni qulflashda umumiy parol yoki shu chatga alohida PIN / grafik kalit tanlash mumkin: chat → ⋮ → \"Chatni qulflash\"."));
                 items.add(UItem.asHeader("Notanishlardan himoya"));
                 items.add(UItem.asCheck(ID_STRANGER_ON, "Notanishlardan himoya").setChecked(org.telegram.messenger.MgStrangers.isEnabled(currentAccount)));
                 items.add(UItem.asCheck(ID_STRANGER_NOTIFY, "Notanishlardan bildirishnoma").setChecked(org.telegram.messenger.MgStrangers.isNotifyEnabled()));
@@ -244,6 +261,9 @@ public class MgSettingsPage extends UniversalFragment {
 
     @Override
     protected void onClick(UItem item, View view, int position, float x, float y) {
+        if (item.id >= ID_ACC_NOTIFY_BASE && mgHandleAccountNotify(item, view)) {
+            return;
+        }
         switch (item.id) {
             case ID_SIMPLE_MODE: {
                 boolean value = !MgConfig.isSimpleMode();
@@ -442,10 +462,31 @@ public class MgSettingsPage extends UniversalFragment {
                 }
                 break;
             }
+            case ID_LOCK_ANIM:
+                toggle(view, "lock_animated_bg", true);
+                break;
             case ID_STRANGER_NOTIFY:
                 toggle(view, "stranger_notify", false);
                 break;
         }
+    }
+
+    @Override
+    protected boolean onLongClick(UItem item, View view, int position, float x, float y) {
+        return false;
+    }
+
+    private boolean mgHandleAccountNotify(UItem item, View view) {
+        int a = item.id - ID_ACC_NOTIFY_BASE;
+        if (a < 0 || a >= org.telegram.messenger.UserConfig.MAX_ACCOUNT_COUNT) {
+            return false;
+        }
+        boolean v = !MgConfig.isAccountNotifyEnabled(a);
+        MgConfig.setAccountNotifyEnabled(a, v);
+        if (view instanceof TextCheckCell) {
+            ((TextCheckCell) view).setChecked(v);
+        }
+        return true;
     }
 
     @Override
@@ -454,11 +495,6 @@ public class MgSettingsPage extends UniversalFragment {
         if (listView != null) {
             listView.adapter.update(false);
         }
-    }
-
-    @Override
-    protected boolean onLongClick(UItem item, View view, int position, float x, float y) {
-        return false;
     }
 
     private void editAutoAnswerText(boolean enableAfter) {

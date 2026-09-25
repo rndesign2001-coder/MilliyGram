@@ -55,6 +55,21 @@ public class MgConfig {
         }
     }
 
+    /** Akkaunt bo'yicha bildirishnomalar */
+    public static boolean isAccountNotifyEnabled(int account) {
+        return getBool("acc_notify_" + account, true);
+    }
+
+    public static void setAccountNotifyEnabled(int account, boolean on) {
+        setBool("acc_notify_" + account, on);
+        try {
+            if (!on) {
+                NotificationsController.getInstance(account).showNotifications();
+            }
+        } catch (Throwable ignore) {
+        }
+    }
+
     /** Arxiv qatori barcha jild tablarida ko'rinadimi */
     public static boolean isArchiveInAllTabs() {
         return getBool("archive_all_tabs", true);
@@ -222,7 +237,27 @@ public class MgConfig {
     public static final String SCOPE_HIDDEN = "hidden";
 
     private static String k(String scope, String chatKey, String hiddenKey) {
-        return SCOPE_HIDDEN.equals(scope) ? hiddenKey : chatKey;
+        if (SCOPE_HIDDEN.equals(scope)) {
+            return hiddenKey;
+        }
+        if (scope != null && scope.startsWith("dlg_")) {
+            return scope + "_" + chatKey; // chatning alohida paroli
+        }
+        return chatKey;
+    }
+
+    /** Bitta chatning alohida qulf "doirasi" */
+    public static String dialogScope(int account, long dialogId) {
+        return "dlg_" + account + "_" + dialogId;
+    }
+
+    public static boolean hasOwnLock(int account, long dialogId) {
+        return hasLock(dialogScope(account, dialogId));
+    }
+
+    /** Chatni ochish uchun qaysi kod so'raladi */
+    public static String lockScopeFor(int account, long dialogId) {
+        return hasOwnLock(account, dialogId) ? dialogScope(account, dialogId) : SCOPE_CHAT;
     }
 
     public static boolean hasLock(String scope) {
@@ -283,7 +318,7 @@ public class MgConfig {
     }
 
     public static boolean isDialogLocked(int account, long dialogId) {
-        if (dialogId == 0 || !hasPin()) {
+        if (dialogId == 0 || !hasPin() && !hasOwnLock(account, dialogId)) {
             return false;
         }
         return getLockedDialogs(account).contains(String.valueOf(dialogId));
@@ -568,7 +603,7 @@ public class MgConfig {
             JSONObject values = new JSONObject();
             for (Map.Entry<String, ?> e : prefs().getAll().entrySet()) {
                 String key = e.getKey();
-                if (key.startsWith("chat_pin") || key.startsWith("hidden_pin") || key.startsWith("hidden_lock") || key.startsWith("locked_dialogs_") || key.startsWith("hidden_dialogs_") || key.startsWith("hidden_account_") || key.startsWith("ghost_") || key.startsWith("account_alias_") || key.startsWith("mg_local_folders_") || key.equals("main_account") || key.equals("lock_type") || key.equals("fake_name")) {
+                if (key.startsWith("chat_pin") || key.startsWith("dlg_") || key.startsWith("hidden_pin") || key.startsWith("hidden_lock") || key.startsWith("locked_dialogs_") || key.startsWith("hidden_dialogs_") || key.startsWith("hidden_account_") || key.startsWith("ghost_") || key.startsWith("account_alias_") || key.startsWith("mg_local_folders_") || key.equals("main_account") || key.equals("lock_type") || key.equals("fake_name")) {
                     continue;
                 }
                 Object v = e.getValue();
@@ -600,7 +635,7 @@ public class MgConfig {
             Iterator<String> keys = values.keys();
             while (keys.hasNext()) {
                 String key = keys.next();
-                if (key.startsWith("chat_pin") || key.startsWith("hidden_pin") || key.startsWith("hidden_lock") || key.startsWith("locked_dialogs_") || key.startsWith("hidden_dialogs_") || key.startsWith("hidden_account_") || key.startsWith("ghost_") || key.startsWith("account_alias_") || key.startsWith("mg_local_folders_") || key.equals("main_account") || key.equals("lock_type") || key.equals("fake_name")) {
+                if (key.startsWith("chat_pin") || key.startsWith("dlg_") || key.startsWith("hidden_pin") || key.startsWith("hidden_lock") || key.startsWith("locked_dialogs_") || key.startsWith("hidden_dialogs_") || key.startsWith("hidden_account_") || key.startsWith("ghost_") || key.startsWith("account_alias_") || key.startsWith("mg_local_folders_") || key.equals("main_account") || key.equals("lock_type") || key.equals("fake_name")) {
                     continue;
                 }
                 JSONObject item = values.getJSONObject(key);

@@ -42,6 +42,7 @@ import org.telegram.messenger.R;
 import org.telegram.messenger.Utilities;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.LayoutHelper;
+import org.telegram.ui.Components.MotionBackgroundDrawable;
 import org.telegram.ui.Components.RLottieImageView;
 
 import java.util.ArrayList;
@@ -58,6 +59,8 @@ public class MgLockScreen extends Dialog {
 
     private final int mode;
     private final String scope;
+    private final boolean mgAnim = MgConfig.getBool("lock_animated_bg", true);
+    private MotionBackgroundDrawable mgBg;
     private final String lockType;
     private final Utilities.Callback<Boolean> callback;
     private boolean resultSent;
@@ -100,7 +103,28 @@ public class MgLockScreen extends Dialog {
 
         setCancelable(false);
         windowView = new FrameLayout(context);
-        windowView.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+        if (mgAnim) {
+            // Telegram parol ekrani uslubi: harakatlanuvchi gradient + milliy naqsh
+            float[] hsv = new float[3];
+            android.graphics.Color.colorToHSV(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4), hsv);
+            int c1 = android.graphics.Color.HSVToColor(new float[]{hsv[0], Math.min(1f, hsv[1] * 0.9f + 0.1f), 0.55f});
+            int c2 = android.graphics.Color.HSVToColor(new float[]{(hsv[0] + 25) % 360, Math.min(1f, hsv[1] * 0.8f + 0.1f), 0.78f});
+            int c3 = android.graphics.Color.HSVToColor(new float[]{(hsv[0] + 340) % 360, Math.min(1f, hsv[1] * 0.9f + 0.1f), 0.42f});
+            int c4 = android.graphics.Color.HSVToColor(new float[]{(hsv[0] + 50) % 360, Math.min(1f, hsv[1] * 0.7f + 0.1f), 0.65f});
+            mgBg = new MotionBackgroundDrawable(c1, c2, c3, c4, false);
+            try {
+                android.graphics.Bitmap pattern = org.telegram.messenger.SvgHelper.getBitmap(R.raw.mg_pattern, AndroidUtilities.displaySize.x, AndroidUtilities.displaySize.y, android.graphics.Color.BLACK, 1f, org.telegram.messenger.SvgHelper.ScaleMode.ByWidth);
+                if (pattern != null) {
+                    mgBg.setPatternBitmap(28, pattern);
+                    mgBg.setPatternColorFilter(mgBg.getPatternColor());
+                }
+            } catch (Throwable ignore) {
+            }
+            mgBg.setParentView(windowView);
+            windowView.setBackground(mgBg);
+        } else {
+            windowView.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+        }
         windowView.setClickable(true);
 
         LinearLayout content = new LinearLayout(context);
@@ -120,13 +144,13 @@ public class MgLockScreen extends Dialog {
         titleView = new TextView(context);
         titleView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 21);
         titleView.setTypeface(AndroidUtilities.bold());
-        titleView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+        titleView.setTextColor(col(Theme.key_windowBackgroundWhiteBlackText));
         titleView.setGravity(Gravity.CENTER);
         content.addView(titleView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 24, 12, 24, 0));
 
         subtitleView = new TextView(context);
         subtitleView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
-        subtitleView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));
+        subtitleView.setTextColor(col(Theme.key_windowBackgroundWhiteGrayText));
         subtitleView.setGravity(Gravity.CENTER);
         content.addView(subtitleView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 32, 6, 32, 0));
 
@@ -159,22 +183,54 @@ public class MgLockScreen extends Dialog {
         TextView cancel = new TextView(context);
         cancel.setText("Bekor qilish");
         cancel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
-        cancel.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
+        cancel.setTextColor(col(Theme.key_windowBackgroundWhiteBlueText4));
         cancel.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(10), AndroidUtilities.dp(16), AndroidUtilities.dp(10));
-        cancel.setBackground(Theme.createSelectorDrawable(Theme.getColor(Theme.key_listSelector), Theme.RIPPLE_MASK_ROUNDRECT_6DP));
+        cancel.setBackground(Theme.createSelectorDrawable(col(Theme.key_listSelector), Theme.RIPPLE_MASK_ROUNDRECT_6DP));
         cancel.setOnClickListener(v -> finish(false));
         bottom.addView(cancel, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT));
         if (isPattern() && canUseFingerprint()) {
             TextView finger = new TextView(context);
             finger.setText("Barmoq izi");
             finger.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
-            finger.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
+            finger.setTextColor(col(Theme.key_windowBackgroundWhiteBlueText4));
             finger.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(10), AndroidUtilities.dp(16), AndroidUtilities.dp(10));
-            finger.setBackground(Theme.createSelectorDrawable(Theme.getColor(Theme.key_listSelector), Theme.RIPPLE_MASK_ROUNDRECT_6DP));
+            finger.setBackground(Theme.createSelectorDrawable(col(Theme.key_listSelector), Theme.RIPPLE_MASK_ROUNDRECT_6DP));
             finger.setOnClickListener(v -> showBiometric());
             bottom.addView(finger, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, 16, 0, 0, 0));
         }
         content.addView(bottom, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 8, 0, 8));
+    }
+
+    // Animatsiyali fonda oq matn va shaffof tugmalar
+    private int col(int key) {
+        if (!mgAnim) {
+            return Theme.getColor(key);
+        }
+        if (key == Theme.key_windowBackgroundWhiteBlackText || key == Theme.key_windowBackgroundWhiteBlueText4) {
+            return 0xFFFFFFFF;
+        }
+        if (key == Theme.key_windowBackgroundWhiteGrayText) {
+            return 0xD9FFFFFF;
+        }
+        if (key == Theme.key_windowBackgroundWhiteHintText) {
+            return 0x66FFFFFF;
+        }
+        if (key == Theme.key_windowBackgroundGray) {
+            return 0x2EFFFFFF;
+        }
+        if (key == Theme.key_listSelector) {
+            return 0x40FFFFFF;
+        }
+        if (key == Theme.key_text_RedRegular) {
+            return 0xFFFFC2C2;
+        }
+        return Theme.getColor(key);
+    }
+
+    private void mgBgNext() {
+        if (mgBg != null) {
+            mgBg.switchToNextPosition(true);
+        }
     }
 
     private boolean isPattern() {
@@ -260,18 +316,18 @@ public class MgLockScreen extends Dialog {
         LinearLayout button = new LinearLayout(context);
         button.setOrientation(LinearLayout.VERTICAL);
         button.setGravity(Gravity.CENTER);
-        button.setBackground(Theme.createSimpleSelectorCircleDrawable(AndroidUtilities.dp(76), Theme.getColor(Theme.key_windowBackgroundGray), Theme.getColor(Theme.key_listSelector)));
+        button.setBackground(Theme.createSimpleSelectorCircleDrawable(AndroidUtilities.dp(76), col(Theme.key_windowBackgroundGray), col(Theme.key_listSelector)));
         TextView d = new TextView(context);
         d.setText(String.valueOf(digit));
         d.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30);
-        d.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+        d.setTextColor(col(Theme.key_windowBackgroundWhiteBlackText));
         d.setGravity(Gravity.CENTER);
         button.addView(d, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL));
         if (!TextUtils.isEmpty(letters)) {
             TextView l = new TextView(context);
             l.setText(letters);
             l.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 10);
-            l.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));
+            l.setTextColor(col(Theme.key_windowBackgroundWhiteGrayText));
             l.setGravity(Gravity.CENTER);
             button.addView(l, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 0, -4, 0, 0));
         }
@@ -280,6 +336,7 @@ public class MgLockScreen extends Dialog {
                 return;
             }
             haptic(v);
+            mgBgNext();
             input.append(digit);
             updateDots();
             onPinChanged();
@@ -291,8 +348,8 @@ public class MgLockScreen extends Dialog {
         ImageView button = new ImageView(context);
         button.setScaleType(ImageView.ScaleType.CENTER);
         button.setImageResource(icon);
-        button.setColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
-        button.setBackground(Theme.createSimpleSelectorCircleDrawable(AndroidUtilities.dp(76), 0, Theme.getColor(Theme.key_listSelector)));
+        button.setColorFilter(col(Theme.key_windowBackgroundWhiteBlackText));
+        button.setBackground(Theme.createSimpleSelectorCircleDrawable(AndroidUtilities.dp(76), 0, col(Theme.key_listSelector)));
         button.setOnClickListener(listener);
         return button;
     }
@@ -312,8 +369,8 @@ public class MgLockScreen extends Dialog {
         dotsLayout.removeAllViews();
         int expected = expectedLength();
         int count = Math.max(expected > 0 ? expected : 4, input.length());
-        int accent = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4);
-        int empty = Theme.getColor(Theme.key_windowBackgroundWhiteHintText);
+        int accent = col(Theme.key_windowBackgroundWhiteBlueText4);
+        int empty = col(Theme.key_windowBackgroundWhiteHintText);
         for (int i = 0; i < count; i++) {
             View dot = new View(getContext());
             dot.setBackground(circle(i < input.length() ? accent : empty));
@@ -377,12 +434,12 @@ public class MgLockScreen extends Dialog {
 
     private void onError(String text) {
         subtitleView.setText(text);
-        subtitleView.setTextColor(Theme.getColor(Theme.key_text_RedRegular));
+        subtitleView.setTextColor(col(Theme.key_text_RedRegular));
         View target = dotsLayout != null ? dotsLayout : patternView;
         if (target != null) {
             AndroidUtilities.shakeViewSpring(target, 5, () -> {
                 clearInput();
-                subtitleView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));
+                subtitleView.setTextColor(col(Theme.key_windowBackgroundWhiteGrayText));
             });
         } else {
             clearInput();
@@ -467,9 +524,9 @@ public class MgLockScreen extends Dialog {
 
         PatternView(Context context) {
             super(context);
-            dotPaint.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteHintText));
-            activePaint.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
-            linePaint.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
+            dotPaint.setColor(col(Theme.key_windowBackgroundWhiteHintText));
+            activePaint.setColor(col(Theme.key_windowBackgroundWhiteBlueText4));
+            linePaint.setColor(col(Theme.key_windowBackgroundWhiteBlueText4));
             linePaint.setAlpha(170);
             linePaint.setStyle(Paint.Style.STROKE);
             linePaint.setStrokeWidth(AndroidUtilities.dp(5));
