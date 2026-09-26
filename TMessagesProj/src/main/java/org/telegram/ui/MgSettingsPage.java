@@ -115,6 +115,16 @@ public class MgSettingsPage extends UniversalFragment {
     private static final int ID_PR_WHICH = 147;
     private static final int ID_PR_ADJUST = 148;
     private static final int ID_WX_REFRESH = 149;
+    private static final int ID_SAVE_BTN = 150;
+    private static final int ID_LIVE_ON = 151;
+    private static final int ID_LIVE_SCENE = 152;
+    private static final int ID_LIVE_MODE = 153;
+    private static final int ID_LIVE_DIM = 154;
+    private static final int ID_LIVE_PREVIEW = 155;
+    private static final int ID_MY_CARD = 156;
+    private static final int ID_GR_INTERVAL = 157;
+    private static final int ID_GR_AUTO = 158;
+    private static final int ID_GR_LIST = 159;
     private static final int ID_ACC_NOTIFY_BASE = 2000;
     private static final int ID_EXPORT = 90;
     private static final int ID_IMPORT = 91;
@@ -197,6 +207,9 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asHeader("Maxsus uzatish"));
                 items.add(UItem.asButton(ID_SIGNATURE, R.drawable.msg_edit, "Imzo", MgConfig.getString("mg_cf_signature", "").isEmpty() ? "yo'q" : "bor"));
                 items.add(UItem.asShadow("Xabarni uzoq bosing → \"Maxsus uzatish\": matnni tahrirlab, havola va @larni tozalab, tarjima qilib, o'z nomingizdan uzating."));
+                items.add(UItem.asHeader("Xabarlar yonida"));
+                items.add(UItem.asCheck(ID_SAVE_BTN, "Bulutcha — tez saqlash tugmasi").setChecked(MgConfig.getBool("mg_save_btn", true)));
+                items.add(UItem.asShadow("Har bir xabar yonidagi ☁ tugmasi xabarni bir bosishda \"Saqlangan xabarlar\"ga saqlaydi. Uzatish taqiqlangan chatlarda chiqmaydi."));
                 items.add(UItem.asHeader("Tezkor shablonlar"));
                 items.add(UItem.asButton(ID_TEMPLATES, R.drawable.msg_saved, "Shablonlarni boshqarish", String.valueOf(MgMessageTools.templates().size())));
                 items.add(UItem.asShadow("Ko'p yoziladigan gaplarni saqlang: chat → ⋮ → \"Tezkor shablonlar\" orqali bir bosishda qo'yiladi. Xabarni uzoq bosib \"Lotinga/Kirillga o'girish\" va \"Keyin eslatish\" ham mavjud."));
@@ -218,12 +231,21 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asButton(ID_DESIGN, R.drawable.msg_palette, "Dizayn (ranglarni sozlash)"));
                 items.add(UItem.asButton(ID_CHAT_SETTINGS, R.drawable.msg_msgbubble3, "Chat sozlamalari (shrift, burchaklar)"));
                 items.add(UItem.asShadow("Har bir milliy mavzuning o'z naqshli chat foni bor. \"Dizayn\" bo'limida har bir ekran rangini alohida o'zgartirish mumkin."));
+                items.add(UItem.asHeader("Jonli fon"));
+                items.add(UItem.asCheck(ID_LIVE_ON, "Jonli chat foni").setChecked(MgLiveBackground.isEnabled()));
+                items.add(UItem.asButton(ID_LIVE_SCENE, R.drawable.msg_background, "Manzara", MgLiveBackground.SCENES[MgLiveBackground.getScene()]));
+                items.add(UItem.asButton(ID_LIVE_MODE, R.drawable.msg_recent, "Vaqt", MgLiveBackground.MODES[MgLiveBackground.getMode()]));
+                items.add(UItem.asButton(ID_LIVE_DIM, R.drawable.msg_brightness_low, "Qoraytirish", MgLiveBackground.getDim() + "%"));
+                items.add(UItem.asButton(ID_LIVE_PREVIEW, R.drawable.msg_views, "Ko'rib chiqish"));
+                items.add(UItem.asShadow("Chat foni kun vaqtiga qarab o'zgaradi: tong, kun, shom, tun. Vaqtlar tanlangan hududingizning quyosh chiqishi va botishi bo'yicha hisoblanadi (Namoz vaqti va ob-havo bo'limi). Hozir: " + MgLiveBackground.SLOT_NAMES[MgLiveBackground.currentSlot()] + "."));
                 break;
             case PAGE_PROFILE: {
                 String fake = MgConfig.getFakeName();
                 items.add(UItem.asCheck(ID_SHOW_ID, "Profilda ID ko'rsatish").setChecked(MgConfig.getBool("show_profile_id", true)));
                 items.add(UItem.asButton(ID_FAKE_NAME, R.drawable.msg_openprofile, "Yolg'on ism", fake == null || fake.isEmpty() ? "o'chirilgan" : fake));
                 items.add(UItem.asShadow("ID qatorini bossangiz, nusxalanadi. Yolg'on ism faqat sizning ekraningizda ko'rinadi (skrinshotlar uchun)."));
+                items.add(UItem.asButton(ID_MY_CARD, R.drawable.msg_qrcode, "Profil kartam (QR bilan)"));
+                items.add(UItem.asShadow("Profilingizni chiroyli vizitka rasmiga aylantiring va ulashing. Kanal yoki guruh kartasi: chat → ⋮ → \"Profil kartasi (QR)\"."));
                 break;
             }
             case PAGE_NOTIFY:
@@ -280,6 +302,11 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asShadow("Trafik tejash yoqilsa, mobil internetda rasm va videolar kamroq avtomatik yuklanadi. Bitta chat keshini tozalash: chatni belgilang → ⋮ → \"Keshni tozalash\"."));
                 break;
             case PAGE_AUTOMATION: {
+                items.add(UItem.asHeader("Obunachilar kundaligi"));
+                items.add(UItem.asButton(ID_GR_LIST, R.drawable.msg_stats, "Kuzatilayotgan kanallar", String.valueOf(org.telegram.messenger.MgGrowth.trackedChats(currentAccount).size())));
+                items.add(UItem.asButton(ID_GR_INTERVAL, R.drawable.msg_recent, "Qanchalik tez-tez yozilsin", "har " + org.telegram.messenger.MgGrowth.getIntervalHours() + " soatda"));
+                items.add(UItem.asCheck(ID_GR_AUTO, "Admin bo'lgan kanal/guruhlarni avtomatik kuzatish").setChecked(org.telegram.messenger.MgGrowth.isAutoAdmin()));
+                items.add(UItem.asShadow("Obunachi soni muntazam yozib boriladi va grafik chiziladi: reklama bergan yoki nakrutka kirgan kunlar ko'rinib turadi. Istalgan kanalni qo'shish: kanal → ⋮ → \"Obunachilar kundaligi\". Har tekshiruv bitta kichik so'rov, ilova tezligiga ta'sir qilmaydi."));
                 items.add(UItem.asHeader("Avto-javob"));
                 items.add(UItem.asCheck(ID_AA_ON, "Avto-javobni yoqish").setChecked(org.telegram.messenger.MgAutoAnswer.isEnabled()));
                 String t = org.telegram.messenger.MgAutoAnswer.getText();
@@ -584,6 +611,61 @@ public class MgSettingsPage extends UniversalFragment {
                 setChecked(view, v);
                 break;
             }
+            case ID_LIVE_ON: {
+                boolean v = !MgLiveBackground.isEnabled();
+                MgLiveBackground.setEnabled(v);
+                setChecked(view, v);
+                break;
+            }
+            case ID_LIVE_SCENE:
+                pick("Manzara", MgLiveBackground.SCENES, w -> MgLiveBackground.set("live_scene", w));
+                break;
+            case ID_LIVE_MODE:
+                pick("Vaqt", MgLiveBackground.MODES, w -> MgLiveBackground.set("live_mode", w));
+                break;
+            case ID_LIVE_DIM: {
+                String[] names = new String[MgLiveBackground.DIMS.length];
+                for (int i = 0; i < names.length; i++) {
+                    names[i] = MgLiveBackground.DIMS[i] == 0 ? "Yo'q" : MgLiveBackground.DIMS[i] + "%";
+                }
+                pick("Qoraytirish (matn o'qilishi uchun)", names, w -> MgLiveBackground.set("live_dim", MgLiveBackground.DIMS[w]));
+                break;
+            }
+            case ID_LIVE_PREVIEW:
+                showLivePreview();
+                break;
+            case ID_MY_CARD:
+                MgProfileCard.show(this, getUserConfig().getClientUserId());
+                break;
+            case ID_GR_INTERVAL: {
+                String[] names = new String[org.telegram.messenger.MgGrowth.INTERVALS.length];
+                for (int i = 0; i < names.length; i++) {
+                    names[i] = "Har " + org.telegram.messenger.MgGrowth.INTERVALS[i] + " soatda";
+                }
+                pick("Qanchalik tez-tez yozilsin", names, w -> org.telegram.messenger.MgGrowth.setIntervalHours(org.telegram.messenger.MgGrowth.INTERVALS[w]));
+                break;
+            }
+            case ID_GR_AUTO:
+                toggle(view, "gr_auto", true);
+                break;
+            case ID_GR_LIST: {
+                java.util.ArrayList<Long> ids = org.telegram.messenger.MgGrowth.trackedChats(currentAccount);
+                if (ids.isEmpty()) {
+                    BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, "Hozircha yo'q. Kanal → ⋮ → \"Obunachilar kundaligi\" orqali qo'shing").show();
+                    break;
+                }
+                String[] names = new String[ids.size()];
+                for (int i = 0; i < ids.size(); i++) {
+                    org.telegram.tgnet.TLRPC.Chat c = getMessagesController().getChat(ids.get(i));
+                    java.util.ArrayList<org.telegram.messenger.MgGrowth.Point> pts = org.telegram.messenger.MgGrowth.points(currentAccount, ids.get(i));
+                    names[i] = (c == null ? String.valueOf(ids.get(i)) : c.title) + (pts.isEmpty() ? "" : " · " + pts.get(pts.size() - 1).count);
+                }
+                pick("Kuzatilayotgan kanallar", names, w -> presentFragment(new MgGrowthActivity(ids.get(w))));
+                break;
+            }
+            case ID_SAVE_BTN:
+                toggle(view, "mg_save_btn", true);
+                break;
             case ID_TEMPLATES:
                 MgMessageTools.showTemplates(this, null);
                 break;
@@ -748,6 +830,69 @@ public class MgSettingsPage extends UniversalFragment {
         }
     }
 
+    private void pick(String title, String[] names, org.telegram.messenger.Utilities.Callback<Integer> cb) {
+        if (getParentActivity() == null) {
+            return;
+        }
+        AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+        b.setTitle(title);
+        b.setItems(names, (d, w) -> {
+            cb.run(w);
+            if (listView != null) {
+                listView.adapter.update(true);
+            }
+        });
+        showDialog(b.create());
+    }
+
+    private void showLivePreview() {
+        Context context = getParentActivity();
+        if (context == null) {
+            return;
+        }
+        int scene = MgLiveBackground.currentScene();
+        android.widget.LinearLayout row = new android.widget.LinearLayout(context);
+        row.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+        row.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(4), AndroidUtilities.dp(16), AndroidUtilities.dp(4));
+        int cur = MgLiveBackground.currentSlot();
+        for (int i = 0; i < 4; i++) {
+            android.widget.LinearLayout col = new android.widget.LinearLayout(context);
+            col.setOrientation(android.widget.LinearLayout.VERTICAL);
+            col.setGravity(Gravity.CENTER_HORIZONTAL);
+            android.widget.ImageView iv = new android.widget.ImageView(context);
+            iv.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
+            android.graphics.BitmapFactory.Options o = new android.graphics.BitmapFactory.Options();
+            o.inSampleSize = 4;
+            try {
+                int[] res = scene == 0
+                        ? new int[]{R.drawable.mg_live_registon_tong, R.drawable.mg_live_registon_kun, R.drawable.mg_live_registon_shom, R.drawable.mg_live_registon_tun}
+                        : new int[]{R.drawable.mg_live_city_tong, R.drawable.mg_live_city_kun, R.drawable.mg_live_city_shom, R.drawable.mg_live_city_tun};
+                iv.setImageBitmap(android.graphics.BitmapFactory.decodeResource(context.getResources(), res[i], o));
+            } catch (Throwable ignore) {
+            }
+            android.graphics.drawable.GradientDrawable frame = new android.graphics.drawable.GradientDrawable();
+            frame.setCornerRadius(AndroidUtilities.dp(8));
+            frame.setStroke(AndroidUtilities.dp(i == cur ? 3 : 0), Theme.getColor(Theme.key_featuredStickers_addButton));
+            if (android.os.Build.VERSION.SDK_INT >= 23) {
+                iv.setForeground(frame);
+            }
+            iv.setClipToOutline(true);
+            col.addView(iv, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 130));
+            android.widget.TextView tv = new android.widget.TextView(context);
+            tv.setText(MgLiveBackground.SLOT_NAMES[i] + (i == cur ? " •" : ""));
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+            tv.setTextColor(Theme.getColor(i == cur ? Theme.key_featuredStickers_addButton : Theme.key_dialogTextBlack));
+            tv.setGravity(Gravity.CENTER);
+            col.addView(tv, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 4, 0, 0));
+            row.addView(col, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f, 3, 0, 3, 0));
+        }
+        AlertDialog.Builder b = new AlertDialog.Builder(context, getResourceProvider());
+        b.setTitle(MgLiveBackground.SCENES[scene] + " — kun davomida");
+        b.setView(row);
+        b.setPositiveButton("Yopish", null);
+        showDialog(b.create());
+    }
+
     private void showPlacePicker() {
         if (getParentActivity() == null) {
             return;
@@ -799,27 +944,133 @@ public class MgSettingsPage extends UniversalFragment {
         CharSequence[] names = new CharSequence[6];
         for (int i = 0; i < 6; i++) {
             int off = org.telegram.messenger.MgPrayer.getUserOffset(i);
-            names[i] = org.telegram.messenger.MgPrayer.NAMES[i] + " — " + org.telegram.messenger.MgPrayer.hhmm(t[i]) + (off != 0 ? "  (" + (off > 0 ? "+" : "") + off + ")" : "");
+            names[i] = org.telegram.messenger.MgPrayer.NAMES[i] + " — " + org.telegram.messenger.MgPrayer.hhmm(t[i]) + (off != 0 ? "  (" + (off > 0 ? "+" : "") + off + " daq)" : "");
         }
         AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
         b.setTitle("Qaysi vaqtni tuzatasiz?");
-        b.setItems(names, (d, w) -> AndroidUtilities.runOnUIThread(() -> {
-            final int[] opts = {-10, -5, -3, -2, -1, 0, 1, 2, 3, 5, 10};
-            CharSequence[] on = new CharSequence[opts.length];
-            for (int i = 0; i < opts.length; i++) {
-                on[i] = opts[i] == 0 ? "Tuzatishsiz" : (opts[i] > 0 ? "+" : "") + opts[i] + " daqiqa";
+        b.setItems(names, (d, w) -> AndroidUtilities.runOnUIThread(() -> showAdjustInput(w), 150));
+        b.setNeutralButton("Hammasini tiklash", (d, w) -> {
+            for (int i = 0; i < 6; i++) {
+                org.telegram.messenger.MgPrayer.setUserOffset(i, 0);
             }
-            AlertDialog.Builder b2 = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
-            b2.setTitle(org.telegram.messenger.MgPrayer.NAMES[w]);
-            b2.setItems(on, (d2, k) -> {
-                org.telegram.messenger.MgPrayer.setUserOffset(w, opts[k]);
-                org.telegram.messenger.MgPrayerAlarm.schedule(getParentActivity());
-                AndroidUtilities.runOnUIThread(this::showAdjustDialog, 150);
-            });
-            showDialog(b2.create());
-        }, 150));
+            org.telegram.messenger.MgPrayerAlarm.schedule(getParentActivity());
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, "Tuzatishlar olib tashlandi").show();
+        });
         b.setPositiveButton("Tayyor", null);
         showDialog(b.create());
+    }
+
+    /** Istalgan tuzatish: "+35", "-12" yoki aniq vaqt "05:12" kiritiladi, natija darhol ko'rsatiladi */
+    private void showAdjustInput(int prayer) {
+        Context context = getParentActivity();
+        if (context == null) {
+            return;
+        }
+        final int base = org.telegram.messenger.MgPrayer.baseTimes()[prayer];
+        android.widget.LinearLayout box = new android.widget.LinearLayout(context);
+        box.setOrientation(android.widget.LinearLayout.VERTICAL);
+        android.widget.TextView info = new android.widget.TextView(context);
+        info.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+        info.setTextColor(Theme.getColor(Theme.key_dialogTextGray3));
+        info.setText("Hisoblangan vaqt: " + org.telegram.messenger.MgPrayer.hhmm(base) + "\nDaqiqa kiriting (masalan +35 yoki -12) yoki masjidingizdagi aniq vaqtni yozing (masalan 05:12).");
+        box.addView(info, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 4, 24, 8));
+        EditTextBoldCursor edit = new EditTextBoldCursor(context);
+        edit.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+        edit.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
+        edit.setHintTextColor(Theme.getColor(Theme.key_dialogTextHint));
+        edit.setCursorColor(Theme.getColor(Theme.key_dialogTextBlack));
+        edit.setBackground(null);
+        edit.setLineColors(Theme.getColor(Theme.key_windowBackgroundWhiteInputField), Theme.getColor(Theme.key_windowBackgroundWhiteInputFieldActivated), Theme.getColor(Theme.key_text_RedRegular));
+        edit.setInputType(InputType.TYPE_CLASS_PHONE);
+        edit.setGravity(Gravity.CENTER);
+        edit.setHint("+0");
+        int cur = org.telegram.messenger.MgPrayer.getUserOffset(prayer);
+        if (cur != 0) {
+            edit.setText((cur > 0 ? "+" : "") + cur);
+        }
+        box.addView(edit, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 0, 24, 0));
+        android.widget.TextView result = new android.widget.TextView(context);
+        result.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+        result.setGravity(Gravity.CENTER);
+        result.setTypeface(AndroidUtilities.bold());
+        result.setTextColor(Theme.getColor(Theme.key_featuredStickers_addButton));
+        box.addView(result, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 10, 24, 4));
+        final int[] parsed = {cur};
+        Runnable recalc = () -> {
+            Integer off = parseOffset(edit.getText() == null ? "" : edit.getText().toString(), base);
+            if (off == null) {
+                result.setText("Noto'g'ri qiymat");
+                result.setTextColor(Theme.getColor(Theme.key_text_RedRegular));
+                parsed[0] = Integer.MIN_VALUE;
+            } else {
+                parsed[0] = off;
+                int res = ((base + off) % 1440 + 1440) % 1440;
+                result.setText("Natija: " + org.telegram.messenger.MgPrayer.NAMES[prayer] + " " + org.telegram.messenger.MgPrayer.hhmm(res)
+                        + (off != 0 ? "  (" + (off > 0 ? "+" : "") + off + " daq)" : ""));
+                result.setTextColor(Theme.getColor(Theme.key_featuredStickers_addButton));
+            }
+        };
+        edit.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int st, int c, int a) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int st, int b, int c) {
+            }
+
+            @Override
+            public void afterTextChanged(android.text.Editable e) {
+                recalc.run();
+            }
+        });
+        recalc.run();
+        AlertDialog.Builder b = new AlertDialog.Builder(context, getResourceProvider());
+        b.setTitle(org.telegram.messenger.MgPrayer.NAMES[prayer] + " vaqtini tuzatish");
+        b.setView(box);
+        b.setPositiveButton("Saqlash", (d, w) -> {
+            if (parsed[0] == Integer.MIN_VALUE) {
+                BulletinFactory.of(this).createErrorBulletin("Qiymat noto'g'ri — saqlanmadi").show();
+                return;
+            }
+            org.telegram.messenger.MgPrayer.setUserOffset(prayer, parsed[0]);
+            org.telegram.messenger.MgPrayerAlarm.schedule(context);
+            AndroidUtilities.runOnUIThread(this::showAdjustDialog, 150);
+        });
+        b.setNegativeButton("Bekor qilish", null);
+        showDialog(b.create());
+        AndroidUtilities.runOnUIThread(() -> {
+            edit.requestFocus();
+            AndroidUtilities.showKeyboard(edit);
+        }, 250);
+    }
+
+    /** "+35" / "-12" / "35" → daqiqa; "05:12" / "5.12" → hisoblangan vaqtdan farq. Chegara: ±12 soat */
+    private static Integer parseOffset(String raw, int base) {
+        String s = raw.trim().replace(" ", "");
+        if (s.isEmpty() || s.equals("+") || s.equals("-")) {
+            return 0;
+        }
+        try {
+            if (s.contains(":") || s.contains(".") || s.contains(",")) {
+                String[] p = s.split("[:.,]");
+                if (p.length != 2) {
+                    return null;
+                }
+                int h = Integer.parseInt(p[0]), m = Integer.parseInt(p[1]);
+                if (h < 0 || h > 23 || m < 0 || m > 59) {
+                    return null;
+                }
+                int diff = h * 60 + m - base;
+                if (diff > 720) diff -= 1440;
+                if (diff < -720) diff += 1440;
+                return diff;
+            }
+            int v = Integer.parseInt(s.startsWith("+") ? s.substring(1) : s);
+            return Math.abs(v) <= 720 ? v : null;
+        } catch (Throwable e) {
+            return null;
+        }
     }
 
     private void editAutoAnswerText(boolean enableAfter) {

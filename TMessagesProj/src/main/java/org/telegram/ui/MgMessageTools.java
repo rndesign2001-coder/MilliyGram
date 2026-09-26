@@ -17,6 +17,7 @@ import org.json.JSONArray;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.MessageObject;
+import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.MgConfig;
 import org.telegram.messenger.MgTranslit;
@@ -417,5 +418,245 @@ public class MgMessageTools {
         if (btn != null) {
             btn.setTextColor(Theme.getColor(Theme.key_text_RedBold));
         }
+    }
+
+    // ================= Tez saqlash (bulutcha) =================
+
+    public static void quickSave(ChatActivity f, ArrayList<MessageObject> msgs) {
+        if (msgs == null || msgs.isEmpty()) {
+            return;
+        }
+        int account = f.getCurrentAccount();
+        long self = UserConfig.getInstance(account).getClientUserId();
+        SendMessagesHelper.getInstance(account).sendMessage(msgs, self, false, false, true, 0, 0);
+        BulletinFactory.of(f).createSimpleBulletin(R.raw.saved_messages, msgs.size() > 1
+                ? msgs.size() + " ta xabar Saqlangan xabarlarga saqlandi"
+                : "Saqlangan xabarlarga saqlandi").show();
+    }
+
+    // ================= Matnning bir qismidan nusxa olish =================
+
+    public static void showSelectText(BaseFragment f, String text) {
+        Context ctx = f.getParentActivity();
+        if (ctx == null || TextUtils.isEmpty(text)) {
+            return;
+        }
+        org.telegram.ui.ActionBar.BottomSheet.Builder b = new org.telegram.ui.ActionBar.BottomSheet.Builder(ctx, false, f.getResourceProvider());
+        android.widget.LinearLayout box = new android.widget.LinearLayout(ctx);
+        box.setOrientation(android.widget.LinearLayout.VERTICAL);
+        TextView title = new TextView(ctx);
+        title.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+        title.setTextColor(Theme.getColor(Theme.key_dialogTextGray3));
+        title.setText("Kerakli qismini barmoq bilan belgilang");
+        box.addView(title, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 22, 16, 22, 10));
+        TextView tv = new TextView(ctx);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+        tv.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
+        tv.setTextIsSelectable(true);
+        tv.setHighlightColor(Theme.multAlpha(Theme.getColor(Theme.key_featuredStickers_addButton), 0.35f));
+        tv.setText(text);
+        tv.setLineSpacing(AndroidUtilities.dp(2), 1f);
+        android.widget.ScrollView scroll = new android.widget.ScrollView(ctx) {
+            @Override
+            protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+                int max = (int) (AndroidUtilities.displaySize.y * 0.6f);
+                super.onMeasure(widthMeasureSpec, android.view.View.MeasureSpec.makeMeasureSpec(max, android.view.View.MeasureSpec.AT_MOST));
+            }
+        };
+        scroll.addView(tv);
+        scroll.setPadding(AndroidUtilities.dp(22), 0, AndroidUtilities.dp(22), 0);
+        box.addView(scroll, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+        android.widget.LinearLayout buttons = new android.widget.LinearLayout(ctx);
+        buttons.setGravity(Gravity.END);
+        TextView copyAll = makeTextButton(ctx, "HAMMASINI NUSXALASH");
+        TextView copySel = makeTextButton(ctx, "BELGILANGANINI NUSXALASH");
+        buttons.addView(copyAll);
+        buttons.addView(copySel);
+        box.addView(buttons, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 52, 8, 4, 8, 4));
+        b.setCustomView(box);
+        org.telegram.ui.ActionBar.BottomSheet sheet = b.create();
+        copyAll.setOnClickListener(v -> {
+            AndroidUtilities.addToClipboard(text);
+            sheet.dismiss();
+            BulletinFactory.of(f).createCopyBulletin("Matn nusxalandi").show();
+        });
+        copySel.setOnClickListener(v -> {
+            int st = Math.max(0, Math.min(tv.getSelectionStart(), tv.getSelectionEnd()));
+            int en = Math.max(tv.getSelectionStart(), tv.getSelectionEnd());
+            if (en <= st) {
+                title.setText("⚠️ Avval matnning bir qismini barmoq bilan belgilang");
+                title.setTextColor(Theme.getColor(Theme.key_text_RedRegular));
+                return;
+            }
+            AndroidUtilities.addToClipboard(text.substring(st, Math.min(en, text.length())));
+            sheet.dismiss();
+            BulletinFactory.of(f).createCopyBulletin("Belgilangan qism nusxalandi").show();
+        });
+        f.showDialog(sheet);
+    }
+
+    private static TextView makeTextButton(Context ctx, String text) {
+        TextView t = new TextView(ctx);
+        t.setText(text);
+        t.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+        t.setTypeface(AndroidUtilities.bold());
+        t.setTextColor(Theme.getColor(Theme.key_featuredStickers_addButton));
+        t.setGravity(Gravity.CENTER);
+        t.setPadding(AndroidUtilities.dp(12), 0, AndroidUtilities.dp(12), 0);
+        t.setBackground(Theme.createSelectorDrawable(Theme.multAlpha(Theme.getColor(Theme.key_featuredStickers_addButton), 0.15f), 2));
+        return t;
+    }
+
+    // ================= Xabar tafsilotlari =================
+
+    private static String fullDate(int unix) {
+        if (unix <= 0) {
+            return "—";
+        }
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(unix * 1000L);
+        String[] months = {"yanvar", "fevral", "mart", "aprel", "may", "iyun", "iyul", "avgust", "sentabr", "oktabr", "noyabr", "dekabr"};
+        return String.format(java.util.Locale.US, "%d-%s %d, %02d:%02d:%02d", c.get(Calendar.DAY_OF_MONTH), months[c.get(Calendar.MONTH)],
+                c.get(Calendar.YEAR), c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), c.get(Calendar.SECOND));
+    }
+
+    private static String peerName(int account, TLRPC.Peer peer) {
+        if (peer == null) {
+            return null;
+        }
+        MessagesController mc = MessagesController.getInstance(account);
+        long id = MessageObject.getPeerId(peer);
+        if (id > 0) {
+            TLRPC.User u = mc.getUser(id);
+            String un = u == null ? null : UserObject.getPublicUsername(u);
+            return (u == null ? "?" : UserObject.getUserName(u)) + (un != null ? " (@" + un + ")" : "") + " · ID " + id;
+        }
+        TLRPC.Chat c = mc.getChat(-id);
+        String un = c == null ? null : ChatObject.getPublicUsername(c);
+        return (c == null ? "?" : c.title) + (un != null ? " (@" + un + ")" : "") + " · ID " + (-id);
+    }
+
+    public static void showDetails(ChatActivity f, MessageObject m, MessageObject.GroupedMessages group) {
+        Context ctx = f.getParentActivity();
+        if (ctx == null || m == null || m.messageOwner == null) {
+            return;
+        }
+        int account = f.getCurrentAccount();
+        TLRPC.Message msg = m.messageOwner;
+        StringBuilder sb = new StringBuilder();
+        sb.append("🆔 Xabar ID: ").append(m.getId()).append('\n');
+        sb.append("💬 Chat: ").append(peerName(account, msg.peer_id)).append('\n');
+        String from = peerName(account, msg.from_id);
+        if (from != null) {
+            sb.append("👤 Yuboruvchi: ").append(from).append('\n');
+        }
+        if (!TextUtils.isEmpty(msg.post_author)) {
+            sb.append("✍️ Imzo: ").append(msg.post_author).append('\n');
+        }
+        sb.append("🕒 Yuborilgan: ").append(fullDate(msg.date)).append('\n');
+        if (msg.edit_date > 0 && !msg.edit_hide) {
+            sb.append("✏️ Tahrirlangan: ").append(fullDate(msg.edit_date)).append('\n');
+        }
+        if (msg.fwd_from != null) {
+            String ff = peerName(account, msg.fwd_from.from_id);
+            if (ff == null && !TextUtils.isEmpty(msg.fwd_from.from_name)) {
+                ff = msg.fwd_from.from_name + " (yashirin profil)";
+            }
+            sb.append("↪️ Uzatilgan: ").append(ff == null ? "—" : ff).append('\n');
+            sb.append("   Asl sanasi: ").append(fullDate(msg.fwd_from.date)).append('\n');
+            if (msg.fwd_from.channel_post != 0) {
+                sb.append("   Asl post ID: ").append(msg.fwd_from.channel_post).append('\n');
+            }
+        }
+        if (msg.reply_to != null && msg.reply_to.reply_to_msg_id != 0) {
+            sb.append("↩️ Javob: #").append(msg.reply_to.reply_to_msg_id).append(" xabarga").append('\n');
+        }
+        if (msg.via_bot_id != 0) {
+            TLRPC.User bot = MessagesController.getInstance(account).getUser(msg.via_bot_id);
+            sb.append("🤖 Bot orqali: ").append(bot == null ? String.valueOf(msg.via_bot_id) : "@" + UserObject.getPublicUsername(bot)).append('\n');
+        }
+        if (msg.views > 0) {
+            sb.append("👁 Ko'rishlar: ").append(msg.views).append('\n');
+        }
+        if (msg.forwards > 0) {
+            sb.append("🔁 Ulashishlar: ").append(msg.forwards).append('\n');
+        }
+        int replies = m.getRepliesCount();
+        if (replies > 0) {
+            sb.append("💭 Izohlar: ").append(replies).append('\n');
+        }
+        if (msg.grouped_id != 0) {
+            sb.append("🖼 Albom: ").append(group != null && group.messages != null ? group.messages.size() + " ta element" : "ha").append('\n');
+        }
+        String text = messageText(m, group);
+        if (!TextUtils.isEmpty(text)) {
+            sb.append("🔤 Matn: ").append(text.length()).append(" belgi, ").append(text.trim().isEmpty() ? 0 : text.trim().split("\\s+").length).append(" so'z");
+            if (msg.entities != null && !msg.entities.isEmpty()) {
+                sb.append(", ").append(msg.entities.size()).append(" ta format/havola");
+            }
+            sb.append('\n');
+        }
+        TLRPC.Document doc = m.getDocument();
+        if (doc != null) {
+            String name = m.getFileName();
+            sb.append("📎 Fayl: ").append(TextUtils.isEmpty(name) ? "—" : name).append('\n');
+            sb.append("   Hajmi: ").append(AndroidUtilities.formatFileSize(doc.size)).append(" · ").append(doc.mime_type).append('\n');
+            sb.append("   DC: ").append(doc.dc_id).append('\n');
+            double dur = m.getDuration();
+            if (dur > 0) {
+                int d = (int) Math.round(dur);
+                sb.append("   Davomiyligi: ").append(d / 60).append(":").append(String.format(java.util.Locale.US, "%02d", d % 60)).append('\n');
+            }
+            for (TLRPC.DocumentAttribute a : doc.attributes) {
+                if (a instanceof TLRPC.TL_documentAttributeVideo || a instanceof TLRPC.TL_documentAttributeImageSize) {
+                    if (a.w > 0 && a.h > 0) {
+                        sb.append("   O'lcham: ").append(a.w).append("×").append(a.h).append('\n');
+                        break;
+                    }
+                }
+            }
+        } else if (msg.media instanceof TLRPC.TL_messageMediaPhoto && msg.media.photo != null) {
+            TLRPC.PhotoSize big = FileLoader.getClosestPhotoSizeWithSize(msg.media.photo.sizes, AndroidUtilities.getPhotoSize());
+            sb.append("🖼 Rasm");
+            if (big != null) {
+                sb.append(": ").append(big.w).append("×").append(big.h);
+                if (big.size > 0) {
+                    sb.append(" · ").append(AndroidUtilities.formatFileSize(big.size));
+                }
+            }
+            sb.append(" · DC ").append(msg.media.photo.dc_id).append('\n');
+        }
+        if (msg.ttl_period > 0) {
+            sb.append("⏳ Avto-o'chish: ").append(msg.ttl_period / 3600).append(" soatdan keyin").append('\n');
+        }
+        if (msg.silent) {
+            sb.append("🔕 Ovozsiz yuborilgan").append('\n');
+        }
+        if (msg.noforwards) {
+            sb.append("🚫 Uzatish taqiqlangan").append('\n');
+        }
+        String link = messageLink(f, m);
+        if (link != null) {
+            sb.append("🔗 ").append(link).append('\n');
+        }
+        final String out = sb.toString().trim();
+        TextView tv = new TextView(ctx);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+        tv.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
+        tv.setLineSpacing(AndroidUtilities.dp(3), 1f);
+        tv.setTextIsSelectable(true);
+        tv.setText(out);
+        android.widget.ScrollView scroll = new android.widget.ScrollView(ctx);
+        scroll.setPadding(AndroidUtilities.dp(24), AndroidUtilities.dp(4), AndroidUtilities.dp(24), AndroidUtilities.dp(4));
+        scroll.addView(tv);
+        AlertDialog.Builder b = new AlertDialog.Builder(ctx, f.getResourceProvider());
+        b.setTitle("Xabar tafsilotlari");
+        b.setView(scroll);
+        b.setPositiveButton("Yopish", null);
+        b.setNeutralButton("Nusxalash", (d, w) -> {
+            AndroidUtilities.addToClipboard(out);
+            BulletinFactory.of(f).createCopyBulletin("Tafsilotlar nusxalandi").show();
+        });
+        f.showDialog(b.create());
     }
 }

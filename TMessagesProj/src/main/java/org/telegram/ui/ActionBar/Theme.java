@@ -9989,6 +9989,11 @@ public class Theme {
     }
 
     public static Drawable getCachedWallpaperNonBlocking() {
+        // MilliyGram: jonli fon (vaqtga qarab o'zgaradigan Registon / Toshkent Siti)
+        Drawable mgLive = org.telegram.ui.MgLiveBackground.getDrawable();
+        if (mgLive != null) {
+            return mgLive;
+        }
         if (themedWallpaper != null) {
             return themedWallpaper;
         } else {

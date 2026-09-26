@@ -249,10 +249,14 @@ public class MgInfoChip extends TextView {
         wx.setTextColor(black);
         wx.setLineSpacing(AndroidUtilities.dp(3), 1f);
         box.addView(wx, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 14, 0, 0));
+        final int[] sun = MgPrayer.sunTimes();
+        final int dayLen = ((sun[1] - sun[0]) % 1440 + 1440) % 1440;
+        final String sunLine = "🌅 Quyosh chiqishi " + MgPrayer.hhmm(sun[0]) + "   🌇 Botishi " + MgPrayer.hhmm(sun[1])
+                + "\nKun uzunligi: " + (dayLen / 60) + " soat " + (dayLen % 60) + " daqiqa";
         Runnable fillWeather = () -> {
             MgWeather.Data d = MgWeather.getCached();
             if (d == null) {
-                wx.setText("Ob-havo yuklanmoqda… (internet kerak)");
+                wx.setText("Ob-havo yuklanmoqda… (internet kerak)\n\n" + sunLine);
                 return;
             }
             SpannableStringBuilder sb = new SpannableStringBuilder();
@@ -269,6 +273,7 @@ public class MgInfoChip extends TextView {
                 sb.append("\n").append(days[i]).append(":  ").append(MgWeather.icon(d.dayCode[i])).append(" ")
                         .append(MgWeather.temp(d.dayMax[i])).append(" / ").append(MgWeather.temp(d.dayMin[i]));
             }
+            sb.append("\n\n").append(sunLine);
             wx.setText(sb);
         };
         fillWeather.run();

@@ -6969,6 +6969,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         viewPages[a].dialogsAdapter.setDialogsType(viewPages[a].dialogsType);
         viewPages[a].layoutManager.scrollToPositionWithOffset(mgArchiveType(viewPages[a].dialogsType) && hasHiddenArchive() && viewPages[a].archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN ? 1 : 0, (int) scrollYOffset);
         checkListLoad(viewPages[a]);
+        mgRepairEmptyPageSoon();
     }
 
     private boolean scrollBarVisible = true;
@@ -7352,6 +7353,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     public void onResume() {
         super.onResume();
         MgInfoChip.refreshHolder(mgInfoChipHolder); // MilliyGram
+        MgLiveBackground.startTicker();
+        if (folderId == 0 && !onlySelect) {
+            org.telegram.messenger.MgGrowth.tick(currentAccount);
+        }
+        mgRepairEmptyPageSoon();
         if (org.telegram.messenger.MgPrayerAlarm.isEnabled()) {
             org.telegram.messenger.MgPrayerAlarm.schedule(ApplicationLoader.applicationContext);
         }
@@ -10904,6 +10910,75 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
     }
 
+    // ================= MilliyGram: bo'sh ko'rinib qolgan jildni tiklash =================
+    // Ba'zan (jildlar qayta yuklanganda yoki foydalanuvchi/chat ma'lumotlari keyinroq kelganda) tanlangan jild
+    // eski obyektga bog'lanib qoladi yoki ro'yxati hisoblanmay qoladi va jild bo'sh ko'rinadi. Bu yerda jildga
+    // tegishli chat borligi tekshiriladi va kerak bo'lsa ro'yxat qayta hisoblanadi.
+    private long mgLastRepair;
+    private final Runnable mgRepairRunnable = this::mgRepairEmptyPage;
+
+    private void mgRepairEmptyPageSoon() {
+        AndroidUtilities.cancelRunOnUIThread(mgRepairRunnable);
+        AndroidUtilities.runOnUIThread(mgRepairRunnable, 350);
+    }
+
+    private void mgRepairEmptyPage() {
+        try {
+            if (viewPages == null || viewPages[0] == null || dialogsListFrozen || onlySelect || folderId != 0 || communityId != 0 || isPaused) {
+                return;
+            }
+            ViewPage vp = viewPages[0];
+            if (vp.dialogsType != 7 && vp.dialogsType != 8) {
+                return;
+            }
+            MessagesController mc = getMessagesController();
+            int idx = vp.dialogsType == 8 ? 1 : 0;
+            MessagesController.DialogFilter f = mc.selectedDialogFilter[idx];
+            if (vp.selectedType >= 0 && vp.selectedType < mc.getDialogFilters().size()) {
+                MessagesController.DialogFilter expected = mc.getDialogFilters().get(vp.selectedType);
+                if (expected != null && !expected.isDefault() && expected != f) {
+                    // eski (almashtirilgan) jild obyekti — yangisini tanlash
+                    mc.selectDialogFilter(expected, idx);
+                    f = expected;
+                    reloadViewPageDialogs(vp, false);
+                }
+            }
+            if (f == null) {
+                return;
+            }
+            ArrayList<TLRPC.Dialog> cur = getDialogsArray(currentAccount, vp.dialogsType, folderId, false);
+            boolean empty = cur == null || cur.isEmpty() || (cur.size() == 1 && cur.get(0) instanceof TLRPC.TL_dialogFolder);
+            if (!empty) {
+                return;
+            }
+            long now = android.os.SystemClock.elapsedRealtime();
+            if (now - mgLastRepair < 1500) {
+                return;
+            }
+            ArrayList<TLRPC.Dialog> all = mc.getAllDialogs();
+            boolean any = false;
+            for (int i = 0; i < all.size() && i < 5000; i++) {
+                TLRPC.Dialog d = all.get(i);
+                if (d != null && !(d instanceof TLRPC.TL_dialogFolder) && f.includesDialog(getAccountInstance(), d.id, d)) {
+                    any = true;
+                    break;
+                }
+            }
+            if (!any) {
+                return; // jild haqiqatan bo'sh
+            }
+            mgLastRepair = now;
+            org.telegram.messenger.MgLocalFolders.resetUnreadCache();
+            mc.sortDialogs(null);
+            reloadViewPageDialogs(vp, false);
+            vp.setTranslationY(0);
+            vp.setTranslationX(0);
+            vp.listView.setAlpha(1f);
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
+    }
+
     private void reloadViewPageDialogs(ViewPage viewPage, boolean newMessage) {
         if (viewPage.getVisibility() != View.VISIBLE) {
             return;
@@ -10978,6 +11053,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 filterTabsView.checkTabsCounter();
             }
             slowedReloadAfterDialogClick = false;
+            mgRepairEmptyPageSoon();
         } else if (id == NotificationCenter.topicsDidLoaded) {
             updateVisibleRows(0);
         } else if (id == NotificationCenter.chatInfoDidLoad) {

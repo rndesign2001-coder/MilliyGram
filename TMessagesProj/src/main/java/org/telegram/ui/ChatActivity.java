@@ -1263,6 +1263,8 @@ public class ChatActivity extends BaseFragment implements
     public final static int OPTION_MG_CUSTOM_FORWARD = 9101;
     public final static int OPTION_MG_TRANSLIT = 9102;
     public final static int OPTION_MG_REMIND = 9103;
+    public final static int OPTION_MG_SELECT_TEXT = 9104;
+    public final static int OPTION_MG_DETAILS = 9105;
 
     private final static int[] allowedNotificationsDuringChatListAnimations = new int[]{
             NotificationCenter.messagesRead,
@@ -3780,6 +3782,14 @@ public class ChatActivity extends BaseFragment implements
                 } else if (id == MgChatFeatures.MENU_JOIN_ALL) {
                     MgChatFeatures.joinAllAccounts(ChatActivity.this, currentAccount, currentChat);
                     return;
+                } else if (id == MgChatFeatures.MENU_GROWTH) {
+                    if (currentChat != null) {
+                        presentFragment(new MgGrowthActivity(currentChat.id));
+                    }
+                    return;
+                } else if (id == MgChatFeatures.MENU_CARD) {
+                    MgProfileCard.show(ChatActivity.this, dialog_id);
+                    return;
                 } else if (id == MgChatFeatures.MENU_MEMBERS_CLEAN) {
                     if (currentChat != null) {
                         presentFragment(new MgMembersActivity(currentChat.id));
@@ -4582,6 +4592,12 @@ public class ChatActivity extends BaseFragment implements
                 }
                 if (currentChat != null && ChatObject.canUserDoAdminAction(currentChat, ChatObject.ACTION_INVITE)) {
                     headerItem.lazilyAddSubItem(MgChatFeatures.MENU_JOIN_REQUESTS, R.drawable.msg_requests, "Qo'shilish so'rovlari");
+                }
+                if (currentChat != null && ChatObject.isChannel(currentChat)) {
+                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_GROWTH, R.drawable.msg_stats, "Obunachilar kundaligi");
+                }
+                if (currentEncryptedChat == null && (currentUser != null || currentChat != null)) {
+                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_CARD, R.drawable.msg_qrcode, "Profil kartasi (QR)");
                 }
                 if (MgMembersActivity.canUse(currentChat)) {
                     headerItem.lazilyAddSubItem(MgChatFeatures.MENU_MEMBERS_CLEAN, R.drawable.msg_leave, "A'zolarni tozalash");
@@ -34617,6 +34633,17 @@ public class ChatActivity extends BaseFragment implements
                 MgCustomForward.open(this, selectedObject, selectedObjectGroup);
                 break;
             }
+            case OPTION_MG_SELECT_TEXT: {
+                final String mgT = MgMessageTools.messageText(selectedObject, selectedObjectGroup);
+                AndroidUtilities.runOnUIThread(() -> MgMessageTools.showSelectText(ChatActivity.this, mgT), 200);
+                break;
+            }
+            case OPTION_MG_DETAILS: {
+                final MessageObject mgMsg = selectedObject;
+                final MessageObject.GroupedMessages mgGroup = selectedObjectGroup;
+                AndroidUtilities.runOnUIThread(() -> MgMessageTools.showDetails(ChatActivity.this, mgMsg, mgGroup), 200);
+                break;
+            }
             case OPTION_MG_TRANSLIT: {
                 MgMessageTools.showTranslit(this, MgMessageTools.messageText(selectedObject, selectedObjectGroup));
                 break;
@@ -39626,6 +39653,21 @@ public class ChatActivity extends BaseFragment implements
         @Override
         public void didPressSideButton(ChatMessageCell cell) {
             if (getParentActivity() == null) {
+                return;
+            }
+            if (cell.isMgSaveSideButton()) {
+                MessageObject mgMsg = cell.getMessageObject();
+                ArrayList<MessageObject> mgList = new ArrayList<>();
+                if (mgMsg != null && mgMsg.getGroupId() != 0 && groupedMessagesMap.get(mgMsg.getGroupId()) != null) {
+                    mgList.addAll(groupedMessagesMap.get(mgMsg.getGroupId()).messages);
+                } else if (mgMsg != null) {
+                    mgList.add(mgMsg);
+                }
+                MgMessageTools.quickSave(ChatActivity.this, mgList);
+                try {
+                    cell.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP, android.view.HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+                } catch (Throwable ignore) {
+                }
                 return;
             }
             if (topicsTabs != null && threadMessageId == 0 && (cell.isForum || cell.isMonoForum)) {
@@ -46593,6 +46635,11 @@ public class ChatActivity extends BaseFragment implements
                     items.add(LocaleController.getString(R.string.Copy));
                     options.add(OPTION_COPY);
                     icons.add(R.drawable.msg_copy);
+                    if (!TextUtils.isEmpty(MgMessageTools.messageText(selectedObject, selectedObjectGroup))) {
+                        items.add("Matnning bir qismidan nusxa olish");
+                        options.add(OPTION_MG_SELECT_TEXT);
+                        icons.add(R.drawable.msg_text_outlined);
+                    }
                 }
                 if (!isThreadChat() && chatMode != MODE_SCHEDULED && currentChat != null && primaryMessage != null && (currentChat.has_link || primaryMessage.hasReplies()) && currentChat.megagroup && primaryMessage.canViewThread()) {
                     if (primaryMessage.hasReplies()) {
@@ -46673,6 +46720,11 @@ public class ChatActivity extends BaseFragment implements
                 options.add(OPTION_DELETE);
                 icons.add(deleteIconRes);
             }
+        }
+        if (selectedObject != null && selectedObject.getId() != 0 && !selectedObject.isSponsored()) {
+            items.add("Xabar tafsilotlari");
+            options.add(OPTION_MG_DETAILS);
+            icons.add(R.drawable.msg_info);
         }
 
         if (showWelcomeMessageRevertOption(primaryMessage)) {

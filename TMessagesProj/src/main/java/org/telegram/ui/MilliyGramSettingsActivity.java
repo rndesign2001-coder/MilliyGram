@@ -23,6 +23,11 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
     private static final int ID_ABOUT = 500;
     private static final int ID_DESIGN = 501;
     private static final int ID_TOUR = 502;
+    private static final int ID_RESULT_BASE = 10000;
+
+    private String mgQuery;
+    private ArrayList<Object[]> mgIndex; // {page, CharSequence text, int icon, String pageTitle}
+    private final ArrayList<Integer> mgResultPages = new ArrayList<>();
 
     private static final int[] PAGES = {
             MgSettingsPage.PAGE_GENERAL,
@@ -59,6 +64,10 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
 
     @Override
     protected void fillItems(ArrayList<UItem> items, UniversalAdapter adapter) {
+        if (mgQuery != null && !mgQuery.trim().isEmpty()) {
+            fillSearch(items);
+            return;
+        }
         items.add(UItem.asShadow(null));
         for (int i = 0; i < PAGES.length; i++) {
             items.add(UItem.asButton(PAGES[i], ICONS[i], MgSettingsPage.pageTitle(PAGES[i])));
@@ -78,6 +87,18 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
             showAboutDialog();
         } else if (item.id == ID_DESIGN) {
             presentFragment(new MgDesignActivity());
+        } else if (item.id >= ID_RESULT_BASE) {
+            int i = item.id - ID_RESULT_BASE;
+            if (i >= 0 && i < mgResultPages.size()) {
+                int page = mgResultPages.get(i);
+                if (page == ID_DESIGN) {
+                    presentFragment(new MgDesignActivity());
+                } else if (page == ID_TOUR) {
+                    startTour();
+                } else if (page > 0) {
+                    presentFragment(new MgSettingsPage(page));
+                }
+            }
         } else if (item.id == ID_TOUR) {
             startTour();
         } else if (item.id >= MgSettingsPage.PAGE_GENERAL && item.id <= MgSettingsPage.PAGE_PRAYER) {
@@ -88,6 +109,27 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
     @Override
     public android.view.View createView(android.content.Context context) {
         android.view.View v = super.createView(context);
+        org.telegram.ui.ActionBar.ActionBarMenu menu = actionBar.createMenu();
+        org.telegram.ui.ActionBar.ActionBarMenuItem searchItem = menu.addItem(0, R.drawable.outline_header_search).setIsSearchField(true)
+                .setActionBarMenuItemSearchListener(new org.telegram.ui.ActionBar.ActionBarMenuItem.ActionBarMenuItemSearchListener() {
+                    @Override
+                    public void onSearchCollapse() {
+                        mgQuery = null;
+                        if (listView != null) {
+                            listView.adapter.update(true);
+                        }
+                    }
+
+                    @Override
+                    public void onTextChanged(android.widget.EditText editText) {
+                        mgQuery = editText.getText() == null ? null : editText.getText().toString();
+                        if (listView != null) {
+                            listView.adapter.update(true);
+                        }
+                    }
+                });
+        searchItem.setSearchFieldHint("Sozlamalardan qidirish");
+        searchItem.setContentDescription("Sozlamalardan qidirish");
         if (!org.telegram.messenger.MgConfig.getBool("tour_done", false)) {
             org.telegram.messenger.AndroidUtilities.runOnUIThread(() -> {
                 if (getParentActivity() != null && fragmentView != null && fragmentView.isAttachedToWindow()) {
@@ -127,6 +169,72 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
             new org.fenixuz.ui.onboarding.FenixTour(getParentActivity(), (android.widget.FrameLayout) fragmentView, listView, steps).start();
         } catch (Throwable e) {
             org.telegram.messenger.FileLog.e(e);
+        }
+    }
+
+    private static String norm(CharSequence cs) {
+        String s = cs == null ? "" : cs.toString().toLowerCase();
+        return s.replace('ʻ', '\'').replace('’', '\'').replace('‘', '\'').replace('`', '\'').replace('ʼ', '\'');
+    }
+
+    /** Barcha bo'limlardagi sozlamalar nomlari bo'yicha indeks (bir marta quriladi) */
+    private void buildIndex() {
+        mgIndex = new ArrayList<>();
+        int[] pages = new int[PAGES.length + 1];
+        System.arraycopy(PAGES, 0, pages, 0, PAGES.length);
+        pages[PAGES.length] = MgSettingsPage.PAGE_BACKUP;
+        for (int page : pages) {
+            String title = MgSettingsPage.pageTitle(page);
+            int pageIcon = R.drawable.msg_settings;
+            for (int k = 0; k < PAGES.length; k++) {
+                if (PAGES[k] == page) {
+                    pageIcon = ICONS[k];
+                }
+            }
+            mgIndex.add(new Object[]{page, title, pageIcon, "Bo'lim"});
+            try {
+                MgSettingsPage pg = new MgSettingsPage(page);
+                ArrayList<UItem> tmp = new ArrayList<>();
+                pg.fillItems(tmp, null);
+                for (UItem u : tmp) {
+                    if (u == null || u.text == null || u.viewType == UniversalAdapter.VIEW_TYPE_SHADOW || u.viewType == UniversalAdapter.VIEW_TYPE_HEADER) {
+                        continue;
+                    }
+                    mgIndex.add(new Object[]{page, u.text, u.iconResId != 0 ? u.iconResId : pageIcon, title});
+                }
+            } catch (Throwable e) {
+                org.telegram.messenger.FileLog.e(e);
+            }
+        }
+        mgIndex.add(new Object[]{ID_DESIGN, "Dizayn (ranglarni sozlash)", R.drawable.msg_palette, "Bo'lim"});
+        mgIndex.add(new Object[]{ID_TOUR, "Qisqacha tanishtiruv", R.drawable.msg_help, "Bo'lim"});
+    }
+
+    private void fillSearch(ArrayList<UItem> items) {
+        if (mgIndex == null) {
+            buildIndex();
+        }
+        mgResultPages.clear();
+        String q = norm(mgQuery.trim());
+        String[] words = q.split("\\s+");
+        for (Object[] e : mgIndex) {
+            String hay = norm((CharSequence) e[1]) + " " + norm((String) e[3]);
+            boolean ok = true;
+            for (String w : words) {
+                if (!w.isEmpty() && !hay.contains(w)) {
+                    ok = false;
+                    break;
+                }
+            }
+            if (ok) {
+                mgResultPages.add((Integer) e[0]);
+                items.add(UItem.asButton(ID_RESULT_BASE + mgResultPages.size() - 1, (Integer) e[2], (CharSequence) e[1], (String) e[3]));
+            }
+        }
+        if (mgResultPages.isEmpty()) {
+            items.add(UItem.asShadow("\"" + mgQuery.trim() + "\" bo'yicha hech narsa topilmadi"));
+        } else {
+            items.add(UItem.asShadow("Topildi: " + mgResultPages.size() + ". Bosing — tegishli bo'lim ochiladi."));
         }
     }
 

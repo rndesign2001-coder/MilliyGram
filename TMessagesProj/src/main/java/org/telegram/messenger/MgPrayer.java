@@ -64,6 +64,21 @@ public final class MgPrayer {
 
     /** Bugungi (yoki berilgan kundagi) vaqtlar: kun boshidan daqiqalarda, Toshkent vaqti bilan */
     public static int[] times(Calendar day, MgPlaces.Place place) {
+        return times(day, place, true);
+    }
+
+    /** Foydalanuvchi tuzatishisiz (asl hisob) vaqtlar */
+    public static int[] baseTimes() {
+        return times(Calendar.getInstance(TZ), getPlace(), false);
+    }
+
+    /** [quyosh chiqishi, quyosh botishi] — sof astronomik, ehtiyot va tuzatishlarsiz */
+    public static int[] sunTimes() {
+        int[] t = times(Calendar.getInstance(TZ), getPlace(), false);
+        return new int[]{t[SUNRISE], ((t[MAGHRIB] - BASE_OFFSET[MAGHRIB]) % 1440 + 1440) % 1440};
+    }
+
+    public static int[] times(Calendar day, MgPlaces.Place place, boolean withUser) {
         int y = day.get(Calendar.YEAR), m = day.get(Calendar.MONTH) + 1, d = day.get(Calendar.DAY_OF_MONTH);
         double jDate = julian(y, m, d) - place.lon / (15.0 * 24.0);
         double tz = 5.0;
@@ -90,7 +105,7 @@ public final class MgPrayer {
             if (Double.isNaN(h)) {
                 h = i < 2 ? 5 : 20;
             }
-            int minutes = (int) Math.round(h * 60.0) + BASE_OFFSET[i] + getUserOffset(i);
+            int minutes = (int) Math.round(h * 60.0) + BASE_OFFSET[i] + (withUser ? getUserOffset(i) : 0);
             out[i] = ((minutes % 1440) + 1440) % 1440;
         }
         return out;
