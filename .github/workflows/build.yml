@@ -52,12 +52,28 @@ jobs:
           echo "$KEYSTORE_BASE64" | base64 -d > TMessagesProj/config/release.keystore
           if [ -n "$GOOGLE_SERVICES_JSON" ]; then echo "$GOOGLE_SERVICES_JSON" > TMessagesProj_App/google-services.json; fi
 
+      - name: Qo'shimcha swap (xotira yetmay qolmasligi uchun)
+        run: |
+          sudo fallocate -l 8G /swapfile_mg || sudo dd if=/dev/zero of=/swapfile_mg bs=1M count=8192
+          sudo chmod 600 /swapfile_mg && sudo mkswap /swapfile_mg && sudo swapon /swapfile_mg || true
+          free -h
+
       - name: APK yig'ish
         env:
           API_ID: ${{ secrets.API_ID }}
           API_HASH: ${{ secrets.API_HASH }}
         run: |
           set -o pipefail
+          touch build.log
+          # Jarayon davomida har 4 daqiqada logni ci-logs'ga yuborib turish (runner to'satdan o'chsa ham iz qolsin)
+          (
+            mkdir -p /tmp/live && cd /tmp/live && git init -q && git checkout -q -b ci-logs
+            while sleep 240; do
+              { echo "run=${GITHUB_RUN_NUMBER} sha=${GITHUB_SHA} status=running"; free -m | head -3; grep -n -E "error:|FAILED|What went wrong|e: |Exception|OutOfMemory" $GITHUB_WORKSPACE/build.log | grep -v "note: " | head -200; echo ---; tail -150 $GITHUB_WORKSPACE/build.log; } > log.txt
+              git add log.txt && git -c user.name=ci -c user.email=ci@local commit -q -m "live ${GITHUB_RUN_NUMBER}" || true
+              git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ci-logs || true
+            done
+          ) &
           ./gradlew :TMessagesProj_App:assembleAfatRelease --stacktrace \
             -PRELEASE_STORE_PASSWORD='${{ secrets.KEYSTORE_PASSWORD }}' \
             -PRELEASE_KEY_ALIAS='${{ secrets.KEY_ALIAS }}' \
