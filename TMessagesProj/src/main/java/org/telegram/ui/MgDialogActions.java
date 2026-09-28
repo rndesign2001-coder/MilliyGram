@@ -52,7 +52,9 @@ public class MgDialogActions {
     public static final int KIND_BOTS = 4;
     public static final int KIND_UNREAD = 5;
 
-    public static final String[] KIND_NAMES = {org.telegram.messenger.MgLang.t("Barcha chatlar"), org.telegram.messenger.MgLang.t("Foydalanuvchilar"), org.telegram.messenger.MgLang.t("Guruhlar"), org.telegram.messenger.MgLang.t("Kanallar"), org.telegram.messenger.MgLang.t("Botlar"), org.telegram.messenger.MgLang.t("O'qilmaganlar")};
+    public static String[] KIND_NAMES() {
+        return new String[]{org.telegram.messenger.MgLang.t("Barcha chatlar"), org.telegram.messenger.MgLang.t("Foydalanuvchilar"), org.telegram.messenger.MgLang.t("Guruhlar"), org.telegram.messenger.MgLang.t("Kanallar"), org.telegram.messenger.MgLang.t("Botlar"), org.telegram.messenger.MgLang.t("O'qilmaganlar")};
+    }
     public static final int[] KIND_ICONS = {R.drawable.msg_media, R.drawable.msg_contacts, R.drawable.msg_groups, R.drawable.msg_channel, R.drawable.msg_bots, R.drawable.msg_markunread};
 
     public static boolean matchesKind(MessagesController mc, TLRPC.Dialog d, int kind) {

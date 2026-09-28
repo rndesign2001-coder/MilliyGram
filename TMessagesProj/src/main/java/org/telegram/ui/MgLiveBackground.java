@@ -34,8 +34,12 @@ import java.util.Calendar;
  */
 public class MgLiveBackground {
 
-    public static final String[] MODES = {org.telegram.messenger.MgLang.t("Avtomatik (quyosh bo'yicha)"), org.telegram.messenger.MgLang.t("Doim tong"), org.telegram.messenger.MgLang.t("Doim kun"), org.telegram.messenger.MgLang.t("Doim shom"), org.telegram.messenger.MgLang.t("Doim tun")};
-    public static final String[] SLOT_NAMES = {org.telegram.messenger.MgLang.t("Tong"), org.telegram.messenger.MgLang.t("Kun"), org.telegram.messenger.MgLang.t("Shom"), org.telegram.messenger.MgLang.t("Tun")};
+    public static String[] MODES() {
+        return new String[]{org.telegram.messenger.MgLang.t("Avtomatik (quyosh bo'yicha)"), org.telegram.messenger.MgLang.t("Doim tong"), org.telegram.messenger.MgLang.t("Doim kun"), org.telegram.messenger.MgLang.t("Doim shom"), org.telegram.messenger.MgLang.t("Doim tun")};
+    }
+    public static String[] SLOT_NAMES() {
+        return new String[]{org.telegram.messenger.MgLang.t("Tong"), org.telegram.messenger.MgLang.t("Kun"), org.telegram.messenger.MgLang.t("Shom"), org.telegram.messenger.MgLang.t("Tun")};
+    }
     public static final int[] DIMS = {0, 10, 20, 30, 45};
     public static final int REQUEST_BASE = 7700;
 
@@ -238,9 +242,20 @@ public class MgLiveBackground {
             if (b == null) {
                 return false;
             }
+            // kamerada olingan suratlar EXIF bo'yicha buriladi (aks holda fon yonboshlab chiqadi)
+            int rotation = 0;
+            try (InputStream is = ctx.getContentResolver().openInputStream(uri)) {
+                if (is != null) {
+                    rotation = AndroidUtilities.getImageOrientation(is).first;
+                }
+            } catch (Throwable ignore) {
+            }
             float scale = Math.min(1f, maxSide / (float) Math.max(b.getWidth(), b.getHeight()));
-            if (scale < 1f) {
-                b = Bitmap.createScaledBitmap(b, Math.round(b.getWidth() * scale), Math.round(b.getHeight() * scale), true);
+            if (scale < 1f || rotation != 0) {
+                android.graphics.Matrix m = new android.graphics.Matrix();
+                m.postScale(scale, scale);
+                m.postRotate(rotation);
+                b = Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), m, true);
             }
             try (FileOutputStream os = new FileOutputStream(slotFile(slot))) {
                 b.compress(Bitmap.CompressFormat.JPEG, 92, os);

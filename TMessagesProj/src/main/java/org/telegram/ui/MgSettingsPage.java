@@ -204,10 +204,10 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Tarjima")));
                 items.add(UItem.asButton(ID_TR_IN, R.drawable.msg_translate, org.telegram.messenger.MgLang.t("Xabarlarni tarjima qilish tili"), MgTranslate.nameOf(TranslateAlert2.getToLanguage())));
                 items.add(UItem.asButton(ID_TR_OUT, R.drawable.msg_language, org.telegram.messenger.MgLang.t("Yozganimni tarjima qilish tili"), MgTranslate.nameOf(MgTranslate.lastOutgoingLang())));
-                items.add(UItem.asButton(ID_TR_ENGINE, R.drawable.msg_customize, org.telegram.messenger.MgLang.t("Tarjima xizmati"), MgTranslate.ENGINE_NAMES[Math.max(0, Math.min(2, MgTranslate.getEngine()))]));
+                items.add(UItem.asButton(ID_TR_ENGINE, R.drawable.msg_customize, org.telegram.messenger.MgLang.t("Tarjima xizmati"), MgTranslate.ENGINE_NAMES()[Math.max(0, Math.min(2, MgTranslate.getEngine()))]));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Yozgan matningizni tarjima qilish: yuborish tugmasini uzoq bosing → \"Tarjima qilib yozish\". Avtomatik rejimda Telegram tarjimoni ishlamasa, Google Tarjimon ishlatiladi.")));
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Maxsus uzatish")));
-                items.add(UItem.asButton(ID_SIGNATURE, R.drawable.msg_edit, org.telegram.messenger.MgLang.t("Imzo"), MgConfig.getString("mg_cf_signature", "").isEmpty() ? org.telegram.messenger.MgLang.t("yo'q") : "bor"));
+                items.add(UItem.asButton(ID_SIGNATURE, R.drawable.msg_edit, org.telegram.messenger.MgLang.t("Imzo"), MgConfig.getString("mg_cf_signature", "").isEmpty() ? org.telegram.messenger.MgLang.t("yo'q") : org.telegram.messenger.MgLang.t("bor")));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Xabarni uzoq bosing → \"Maxsus uzatish\": matnni tahrirlab, havola va @larni tozalab, tarjima qilib, o'z nomingizdan uzating.")));
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Xabarlar yonida")));
                 items.add(UItem.asCheck(ID_SAVE_BTN, org.telegram.messenger.MgLang.t("Bulutcha — tez saqlash tugmasi")).setChecked(MgConfig.getBool("mg_save_btn", true)));
@@ -216,7 +216,7 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asButton(ID_TEMPLATES, R.drawable.msg_saved, org.telegram.messenger.MgLang.t("Shablonlarni boshqarish"), String.valueOf(MgMessageTools.templates().size())));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Ko'p yoziladigan gaplarni saqlang: chat → ⋮ → \"Tezkor shablonlar\" orqali bir bosishda qo'yiladi. Xabarni uzoq bosib \"Lotinga/Kirillga o'girish\" va \"Keyin eslatish\" ham mavjud.")));
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Yozish")));
-                items.add(UItem.asButton(ID_TEXT_STYLE, R.drawable.msg_text_outlined, org.telegram.messenger.MgLang.t("Standart matn uslubi"), org.telegram.messenger.MgAutoText.STYLE_NAMES[org.telegram.messenger.MgAutoText.getDefaultStyle()]));
+                items.add(UItem.asButton(ID_TEXT_STYLE, R.drawable.msg_text_outlined, org.telegram.messenger.MgLang.t("Standart matn uslubi"), org.telegram.messenger.MgAutoText.STYLE_NAMES()[org.telegram.messenger.MgAutoText.getDefaultStyle()]));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Tanlangan uslub har bir oddiy matnli xabaringizga avtomatik qo'llanadi (buyruqlar, kod va faqat emojidan iborat xabarlar bundan mustasno).")));
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Yuborishdan oldin so'rash")));
                 items.add(UItem.asCheck(ID_CONFIRM_STICKER, org.telegram.messenger.MgLang.t("Stiker yuborishda")).setChecked(org.fenixuz.utils.ConfirmDialogsPref.INSTANCE.getConfirmSticker()));
@@ -236,13 +236,13 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Kun vaqtiga qarab fon")));
                 items.add(UItem.asCheck(ID_LIVE_ON, org.telegram.messenger.MgLang.t("Fonni vaqtga qarab almashtirish")).setChecked(MgLiveBackground.isSwitchOn()));
                 for (int slot = 0; slot < 4; slot++) {
-                    items.add(UItem.asButton(ID_LIVE_SLOT_BASE + slot, R.drawable.msg_background, MgLiveBackground.SLOT_NAMES[slot] + org.telegram.messenger.MgLang.t(" surati"),
+                    items.add(UItem.asButton(ID_LIVE_SLOT_BASE + slot, R.drawable.msg_background, MgLiveBackground.SLOT_NAMES()[slot] + org.telegram.messenger.MgLang.t(" surati"),
                             MgLiveBackground.hasSlot(slot) ? "tanlangan" : "tanlanmagan"));
                 }
-                items.add(UItem.asButton(ID_LIVE_MODE, R.drawable.msg_recent, org.telegram.messenger.MgLang.t("Vaqt"), MgLiveBackground.MODES[MgLiveBackground.getMode()]));
+                items.add(UItem.asButton(ID_LIVE_MODE, R.drawable.msg_recent, org.telegram.messenger.MgLang.t("Vaqt"), MgLiveBackground.MODES()[MgLiveBackground.getMode()]));
                 items.add(UItem.asButton(ID_LIVE_DIM, R.drawable.msg_brightness_low, org.telegram.messenger.MgLang.t("Qoraytirish"), MgLiveBackground.getDim() + "%"));
                 items.add(UItem.asButton(ID_LIVE_PREVIEW, R.drawable.msg_views, org.telegram.messenger.MgLang.t("Ko'rib chiqish")));
-                items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Tong, kun, shom va tun uchun o'zingiz yoqtirgan suratlarni tanlang (masalan, Registon yoki Toshkent Siti). Fon hududingizdagi quyosh chiqishi va botishiga qarab o'zi almashadi. Hozir: ") + MgLiveBackground.SLOT_NAMES[MgLiveBackground.currentSlot()] + "."));
+                items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Tong, kun, shom va tun uchun o'zingiz yoqtirgan suratlarni tanlang (masalan, Registon yoki Toshkent Siti). Fon hududingizdagi quyosh chiqishi va botishiga qarab o'zi almashadi. Hozir: ") + MgLiveBackground.SLOT_NAMES()[MgLiveBackground.currentSlot()] + "."));
                 break;
             case PAGE_PROFILE: {
                 String fake = MgConfig.getFakeName();
@@ -316,7 +316,7 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asCheck(ID_AA_ON, org.telegram.messenger.MgLang.t("Avto-javobni yoqish")).setChecked(org.telegram.messenger.MgAutoAnswer.isEnabled()));
                 String t = org.telegram.messenger.MgAutoAnswer.getText();
                 items.add(UItem.asButton(ID_AA_TEXT, R.drawable.msg_edit, org.telegram.messenger.MgLang.t("Javob matni"), t.isEmpty() ? "kiritilmagan" : (t.length() > 18 ? t.substring(0, 18) + "…" : t)));
-                items.add(UItem.asButton(ID_AA_SCOPE, R.drawable.msg_contacts, org.telegram.messenger.MgLang.t("Kimlarga"), org.telegram.messenger.MgAutoAnswer.SCOPE_NAMES[Math.max(0, Math.min(2, org.telegram.messenger.MgAutoAnswer.getScope()))]));
+                items.add(UItem.asButton(ID_AA_SCOPE, R.drawable.msg_contacts, org.telegram.messenger.MgLang.t("Kimlarga"), org.telegram.messenger.MgAutoAnswer.SCOPE_NAMES()[Math.max(0, Math.min(2, org.telegram.messenger.MgAutoAnswer.getScope()))]));
                 items.add(UItem.asButton(ID_AA_COOLDOWN, R.drawable.msg_recent, org.telegram.messenger.MgLang.t("Qanchalik tez-tez"), org.telegram.messenger.MgAutoAnswer.cooldownName()));
                 items.add(UItem.asButton(ID_AA_RESET, R.drawable.msg_reset, org.telegram.messenger.MgLang.t("Javob berilganlar ro'yxatini tozalash")));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Shaxsiy chatga kelgan xabarga avtomatik javob yuboriladi. Siz o'zingiz yozgan chatga tanlangan vaqt ichida qayta avto-javob ketmaydi. Botlar va Telegram xizmat akkauntlariga javob berilmaydi. Ilova ishlab turgan paytda ishlaydi.")));
@@ -331,8 +331,8 @@ public class MgSettingsPage extends UniversalFragment {
             case PAGE_PRAYER: {
                 org.telegram.messenger.MgPlaces.Place pl = org.telegram.messenger.MgPrayer.getPlace();
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Chatlar ro'yxatida ko'rsatish")));
-                items.add(UItem.asButton(ID_CHIP_MODE, R.drawable.msg_views, org.telegram.messenger.MgLang.t("Nimani ko'rsatish"), MgInfoChip.MODE_NAMES[Math.max(0, Math.min(3, MgInfoChip.getMode()))]));
-                items.add(UItem.asButton(ID_CHIP_STYLE, R.drawable.msg_palette, org.telegram.messenger.MgLang.t("Ko'rinish uslubi"), MgInfoChip.STYLE_NAMES[Math.max(0, Math.min(MgInfoChip.STYLE_NAMES.length - 1, MgInfoChip.getStyleIndex()))]));
+                items.add(UItem.asButton(ID_CHIP_MODE, R.drawable.msg_views, org.telegram.messenger.MgLang.t("Nimani ko'rsatish"), MgInfoChip.MODE_NAMES()[Math.max(0, Math.min(3, MgInfoChip.getMode()))]));
+                items.add(UItem.asButton(ID_CHIP_STYLE, R.drawable.msg_palette, org.telegram.messenger.MgLang.t("Ko'rinish uslubi"), MgInfoChip.STYLE_NAMES()[Math.max(0, Math.min(MgInfoChip.STYLE_NAMES().length - 1, MgInfoChip.getStyleIndex()))]));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Chatlar ro'yxati tepasida, ⋮ tugmasining chap tomonida kichik belgi chiqadi: keyingi namozgacha qolgan vaqt yoki ob-havo. Uni bossangiz, bugungi barcha vaqtlar va 3 kunlik ob-havo ochiladi.")));
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Joylashuv")));
                 items.add(UItem.asButton(ID_PR_REGION, R.drawable.msg_map, org.telegram.messenger.MgLang.t("Viloyat"), org.telegram.messenger.MgLang.t(org.telegram.messenger.MgPlaces.findRegion(org.telegram.messenger.MgPrayer.getRegionKey()).name)));
@@ -437,9 +437,9 @@ public class MgSettingsPage extends UniversalFragment {
             case ID_TR_ENGINE: {
                 AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
                 b.setTitle(org.telegram.messenger.MgLang.t("Tarjima xizmati"));
-                CharSequence[] names = new CharSequence[MgTranslate.ENGINE_NAMES.length];
+                CharSequence[] names = new CharSequence[MgTranslate.ENGINE_NAMES().length];
                 for (int i = 0; i < names.length; i++) {
-                    names[i] = MgTranslate.ENGINE_NAMES[i] + (i == MgTranslate.getEngine() ? "  ✓" : "");
+                    names[i] = MgTranslate.ENGINE_NAMES()[i] + (i == MgTranslate.getEngine() ? "  ✓" : "");
                 }
                 b.setItems(names, (d, which) -> {
                     MgConfig.setInt("mg_translate_engine", which);
@@ -532,9 +532,9 @@ public class MgSettingsPage extends UniversalFragment {
             case ID_AA_SCOPE: {
                 AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
                 b.setTitle(org.telegram.messenger.MgLang.t("Kimlarga javob berilsin?"));
-                CharSequence[] names = new CharSequence[org.telegram.messenger.MgAutoAnswer.SCOPE_NAMES.length];
+                CharSequence[] names = new CharSequence[org.telegram.messenger.MgAutoAnswer.SCOPE_NAMES().length];
                 for (int i = 0; i < names.length; i++) {
-                    names[i] = org.telegram.messenger.MgAutoAnswer.SCOPE_NAMES[i] + (i == org.telegram.messenger.MgAutoAnswer.getScope() ? "  ✓" : "");
+                    names[i] = org.telegram.messenger.MgAutoAnswer.SCOPE_NAMES()[i] + (i == org.telegram.messenger.MgAutoAnswer.getScope() ? "  ✓" : "");
                 }
                 b.setItems(names, (d, w) -> {
                     MgConfig.setInt("aa_scope", w);
@@ -546,9 +546,9 @@ public class MgSettingsPage extends UniversalFragment {
             case ID_AA_COOLDOWN: {
                 AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
                 b.setTitle(org.telegram.messenger.MgLang.t("Bitta chatga qanchalik tez-tez javob berilsin?"));
-                CharSequence[] names = new CharSequence[org.telegram.messenger.MgAutoAnswer.COOLDOWN_NAMES.length];
+                CharSequence[] names = new CharSequence[org.telegram.messenger.MgAutoAnswer.COOLDOWN_NAMES().length];
                 for (int i = 0; i < names.length; i++) {
-                    names[i] = org.telegram.messenger.MgAutoAnswer.COOLDOWN_NAMES[i] + (org.telegram.messenger.MgAutoAnswer.COOLDOWNS[i] == org.telegram.messenger.MgAutoAnswer.getCooldownHours() ? "  ✓" : "");
+                    names[i] = org.telegram.messenger.MgAutoAnswer.COOLDOWN_NAMES()[i] + (org.telegram.messenger.MgAutoAnswer.COOLDOWNS[i] == org.telegram.messenger.MgAutoAnswer.getCooldownHours() ? "  ✓" : "");
                 }
                 b.setItems(names, (d, w) -> {
                     MgConfig.setInt("aa_cooldown", org.telegram.messenger.MgAutoAnswer.COOLDOWNS[w]);
@@ -585,7 +585,7 @@ public class MgSettingsPage extends UniversalFragment {
             case ID_TEXT_STYLE: {
                 AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
                 b.setTitle(org.telegram.messenger.MgLang.t("Standart matn uslubi"));
-                b.setItems(org.telegram.messenger.MgAutoText.STYLE_NAMES, (d, w) -> {
+                b.setItems(org.telegram.messenger.MgAutoText.STYLE_NAMES(), (d, w) -> {
                     org.telegram.messenger.MgAutoText.setDefaultStyle(w);
                     listView.adapter.update(true);
                 });
@@ -631,7 +631,7 @@ public class MgSettingsPage extends UniversalFragment {
             case ID_LIVE_SLOT_BASE + 3: {
                 final int slot = item.id - ID_LIVE_SLOT_BASE;
                 if (MgLiveBackground.hasSlot(slot)) {
-                    pick(MgLiveBackground.SLOT_NAMES[slot] + org.telegram.messenger.MgLang.t(" surati"), new String[]{org.telegram.messenger.MgLang.t("Boshqa surat tanlash"), org.telegram.messenger.MgLang.t("Suratni olib tashlash")}, w -> {
+                    pick(MgLiveBackground.SLOT_NAMES()[slot] + org.telegram.messenger.MgLang.t(" surati"), new String[]{org.telegram.messenger.MgLang.t("Boshqa surat tanlash"), org.telegram.messenger.MgLang.t("Suratni olib tashlash")}, w -> {
                         if (w == 0) {
                             mgPickImage(slot);
                         } else {
@@ -644,7 +644,7 @@ public class MgSettingsPage extends UniversalFragment {
                 break;
             }
             case ID_LIVE_MODE:
-                pick(org.telegram.messenger.MgLang.t("Vaqt"), MgLiveBackground.MODES, w -> MgLiveBackground.set("live_mode", w));
+                pick(org.telegram.messenger.MgLang.t("Vaqt"), MgLiveBackground.MODES(), w -> MgLiveBackground.set("live_mode", w));
                 break;
             case ID_LIVE_DIM: {
                 String[] names = new String[MgLiveBackground.DIMS.length];
@@ -705,7 +705,7 @@ public class MgSettingsPage extends UniversalFragment {
             case ID_CHIP_MODE: {
                 AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
                 b.setTitle(org.telegram.messenger.MgLang.t("Chatlar ro'yxatida ko'rsatish"));
-                b.setItems(MgInfoChip.MODE_NAMES, (d, w) -> {
+                b.setItems(MgInfoChip.MODE_NAMES(), (d, w) -> {
                     MgConfig.setInt("chip_mode", w);
                     if (w == MgInfoChip.MODE_WEATHER || w == MgInfoChip.MODE_BOTH) {
                         org.telegram.messenger.MgWeather.refresh(false, null);
@@ -716,10 +716,10 @@ public class MgSettingsPage extends UniversalFragment {
                 break;
             }
             case ID_CHIP_STYLE: {
-                CharSequence[] names = new CharSequence[MgInfoChip.STYLE_NAMES.length];
+                CharSequence[] names = new CharSequence[MgInfoChip.STYLE_NAMES().length];
                 String[] samples = {org.telegram.messenger.MgLang.t("( Asr · 1:24 )"), org.telegram.messenger.MgLang.t("[ Asr · 1:24 ]"), org.telegram.messenger.MgLang.t("Asr · 1:24"), "( 🕌 1:24 )", org.telegram.messenger.MgLang.t("( Asr · 1:24 ) rangli")};
                 for (int i = 0; i < names.length; i++) {
-                    names[i] = MgInfoChip.STYLE_NAMES[i] + "   " + samples[i];
+                    names[i] = MgInfoChip.STYLE_NAMES()[i] + "   " + samples[i];
                 }
                 AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
                 b.setTitle(org.telegram.messenger.MgLang.t("Ko'rinish uslubi"));
@@ -876,7 +876,7 @@ public class MgSettingsPage extends UniversalFragment {
         try {
             android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_GET_CONTENT);
             intent.setType("image/*");
-            startActivityForResult(android.content.Intent.createChooser(intent, MgLiveBackground.SLOT_NAMES[slot] + org.telegram.messenger.MgLang.t(" surati")), MgLiveBackground.REQUEST_BASE + slot);
+            startActivityForResult(android.content.Intent.createChooser(intent, MgLiveBackground.SLOT_NAMES()[slot] + org.telegram.messenger.MgLang.t(" surati")), MgLiveBackground.REQUEST_BASE + slot);
         } catch (Throwable e) {
             BulletinFactory.of(this).createErrorBulletin(org.telegram.messenger.MgLang.t("Galereyani ochib bo'lmadi")).show();
         }
@@ -902,7 +902,7 @@ public class MgSettingsPage extends UniversalFragment {
                     if (listView != null) {
                         listView.adapter.update(true);
                     }
-                    BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, ok ? MgLiveBackground.SLOT_NAMES[slot] + org.telegram.messenger.MgLang.t(" surati saqlandi") : org.telegram.messenger.MgLang.t("Suratni ochib bo'lmadi")).show();
+                    BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, ok ? MgLiveBackground.SLOT_NAMES()[slot] + org.telegram.messenger.MgLang.t(" surati saqlandi") : org.telegram.messenger.MgLang.t("Suratni ochib bo'lmadi")).show();
                 });
             });
         }
@@ -932,7 +932,7 @@ public class MgSettingsPage extends UniversalFragment {
             iv.setClipToOutline(true);
             col.addView(iv, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 130));
             android.widget.TextView tv = new android.widget.TextView(context);
-            tv.setText(MgLiveBackground.SLOT_NAMES[i] + (i == cur ? " •" : "") + (th == null ? "\n—" : ""));
+            tv.setText(MgLiveBackground.SLOT_NAMES()[i] + (i == cur ? " •" : "") + (th == null ? "\n—" : ""));
             tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
             tv.setTextColor(Theme.getColor(i == cur ? Theme.key_featuredStickers_addButton : Theme.key_dialogTextBlack));
             tv.setGravity(Gravity.CENTER);
@@ -977,7 +977,7 @@ public class MgSettingsPage extends UniversalFragment {
         }
         CharSequence[] names = new CharSequence[idx.length];
         for (int i = 0; i < idx.length; i++) {
-            names[i] = (org.telegram.messenger.MgPrayerAlarm.isPrayerEnabled(idx[i]) ? "✅  " : "⬜  ") + org.telegram.messenger.MgPrayer.NAMES[idx[i]];
+            names[i] = (org.telegram.messenger.MgPrayerAlarm.isPrayerEnabled(idx[i]) ? "✅  " : "⬜  ") + org.telegram.messenger.MgPrayer.NAMES()[idx[i]];
         }
         AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
         b.setTitle(org.telegram.messenger.MgLang.t("Qaysi namozlar eslatilsin?"));
@@ -997,7 +997,7 @@ public class MgSettingsPage extends UniversalFragment {
         CharSequence[] names = new CharSequence[6];
         for (int i = 0; i < 6; i++) {
             int off = org.telegram.messenger.MgPrayer.getUserOffset(i);
-            names[i] = org.telegram.messenger.MgPrayer.NAMES[i] + " — " + org.telegram.messenger.MgPrayer.hhmm(t[i]) + (off != 0 ? "  (" + (off > 0 ? "+" : "") + off + org.telegram.messenger.MgLang.t(" daq)") : "");
+            names[i] = org.telegram.messenger.MgPrayer.NAMES()[i] + " — " + org.telegram.messenger.MgPrayer.hhmm(t[i]) + (off != 0 ? "  (" + (off > 0 ? "+" : "") + off + org.telegram.messenger.MgLang.t(" daq)") : "");
         }
         AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
         b.setTitle(org.telegram.messenger.MgLang.t("Qaysi vaqtni tuzatasiz?"));
@@ -1058,7 +1058,7 @@ public class MgSettingsPage extends UniversalFragment {
             } else {
                 parsed[0] = off;
                 int res = ((base + off) % 1440 + 1440) % 1440;
-                result.setText(org.telegram.messenger.MgLang.t("Natija: ") + org.telegram.messenger.MgPrayer.NAMES[prayer] + " " + org.telegram.messenger.MgPrayer.hhmm(res)
+                result.setText(org.telegram.messenger.MgLang.t("Natija: ") + org.telegram.messenger.MgPrayer.NAMES()[prayer] + " " + org.telegram.messenger.MgPrayer.hhmm(res)
                         + (off != 0 ? "  (" + (off > 0 ? "+" : "") + off + org.telegram.messenger.MgLang.t(" daq)") : ""));
                 result.setTextColor(Theme.getColor(Theme.key_featuredStickers_addButton));
             }
@@ -1079,7 +1079,7 @@ public class MgSettingsPage extends UniversalFragment {
         });
         recalc.run();
         AlertDialog.Builder b = new AlertDialog.Builder(context, getResourceProvider());
-        b.setTitle(org.telegram.messenger.MgPrayer.NAMES[prayer] + org.telegram.messenger.MgLang.t(" vaqtini tuzatish"));
+        b.setTitle(org.telegram.messenger.MgPrayer.NAMES()[prayer] + org.telegram.messenger.MgLang.t(" vaqtini tuzatish"));
         b.setView(box);
         b.setPositiveButton(org.telegram.messenger.MgLang.t("Saqlash"), (d, w) -> {
             if (parsed[0] == Integer.MIN_VALUE) {

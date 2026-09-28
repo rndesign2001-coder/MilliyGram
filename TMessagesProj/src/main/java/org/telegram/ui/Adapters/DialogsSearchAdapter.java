@@ -283,6 +283,18 @@ public class DialogsSearchAdapter extends RecyclerListView.SelectionAdapter {
     }
 
     private boolean filter(Object obj) {
+        // MilliyGram: yashirin bo'limdagi chatlar qidiruvda ko'rinmaydi
+        long mgDid = 0;
+        if (obj instanceof TLRPC.User) {
+            mgDid = ((TLRPC.User) obj).id;
+        } else if (obj instanceof TLRPC.Chat) {
+            mgDid = -((TLRPC.Chat) obj).id;
+        } else if (obj instanceof TLRPC.EncryptedChat) {
+            mgDid = DialogObject.makeEncryptedDialogId(((TLRPC.EncryptedChat) obj).id);
+        }
+        if (mgDid != 0 && org.telegram.messenger.MgConfig.isDialogHidden(currentAccount, mgDid)) {
+            return false;
+        }
         if (dialogsType != DialogsActivity.DIALOGS_TYPE_START_ATTACH_BOT) {
             return true;
         }
@@ -625,7 +637,7 @@ public class DialogsSearchAdapter extends RecyclerListView.SelectionAdapter {
                             TLRPC.Message message = res.messages.get(a);
                             long did = MessageObject.getDialogId(message);
                             int maxId = MessagesController.getInstance(currentAccount).deletedHistory.get(did);
-                            if (maxId != 0 && message.id <= maxId) {
+                            if (maxId != 0 && message.id <= maxId || org.telegram.messenger.MgConfig.isDialogHidden(currentAccount, did)) {
                                 continue;
                             }
                             MessageObject msg = messageObjects.get(a);

@@ -1872,6 +1872,12 @@ public class NotificationsController extends BaseController implements Notificat
         if (AndroidUtilities.needShowPasscode() || SharedConfig.isWaitingForPasscodeEnter) {
             return LocaleController.getString(R.string.NotificationHiddenMessage);
         }
+        if (MgConfig.isDialogLocked(currentAccount, messageObject.getDialogId())) {
+            if (preview != null) {
+                preview[0] = false;
+            }
+            return LocaleController.getString(R.string.NotificationHiddenMessage); // MilliyGram: qulflangan chat matni ko'rsatilmaydi
+        }
         long dialogId = messageObject.messageOwner.dialog_id;
         long chat_id = messageObject.messageOwner.peer_id.chat_id != 0 ? messageObject.messageOwner.peer_id.chat_id : messageObject.messageOwner.peer_id.channel_id;
         long fromId = messageObject.messageOwner.peer_id.user_id;
@@ -2557,6 +2563,12 @@ public class NotificationsController extends BaseController implements Notificat
     private String getStringForMessage(MessageObject messageObject, boolean shortMessage, boolean[] text, boolean[] preview) {
         if (AndroidUtilities.needShowPasscode() || SharedConfig.isWaitingForPasscodeEnter) {
             return LocaleController.getString(R.string.YouHaveNewMessage);
+        }
+        if (MgConfig.isDialogLocked(currentAccount, messageObject.getDialogId())) {
+            if (preview != null) {
+                preview[0] = false;
+            }
+            return LocaleController.getString(R.string.YouHaveNewMessage); // MilliyGram: qulflangan chat matni ko'rsatilmaydi
         }
         if (messageObject.isStoryPush || messageObject.isStoryMentionPush) {
             return "!" + messageObject.messageOwner.message;

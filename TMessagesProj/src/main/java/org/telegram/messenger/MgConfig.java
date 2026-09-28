@@ -348,6 +348,37 @@ public class MgConfig {
         }
     }
 
+    // ---------- Noto'g'ri urinishlar cheklovi ----------
+
+    private static final int FREE_ATTEMPTS = 5;
+
+    /** Qulf vaqtincha bloklangan bo'lsa, qolgan vaqt (ms), aks holda 0 */
+    public static long getLockoutRemaining(String scope) {
+        long until = 0;
+        try {
+            until = prefs().getLong("lock_until_" + scope, 0);
+        } catch (Throwable ignore) {
+        }
+        long left = until - System.currentTimeMillis();
+        // soat orqaga surilgan bo'lsa ham 10 daqiqadan ortiq kuttirmaydi
+        return left > 0 ? Math.min(left, 10 * 60 * 1000L) : 0;
+    }
+
+    /** Noto'g'ri urinishni hisobga oladi: 5 tadan keyin 30 s, keyin har safar ikki barobar (10 daqiqagacha) */
+    public static void onLockFailed(String scope) {
+        int fails = getInt("lock_fail_" + scope, 0) + 1;
+        SharedPreferences.Editor editor = prefs().edit().putInt("lock_fail_" + scope, fails);
+        if (fails >= FREE_ATTEMPTS) {
+            long delay = Math.min(30_000L << Math.min(fails - FREE_ATTEMPTS, 5), 10 * 60 * 1000L);
+            editor.putLong("lock_until_" + scope, System.currentTimeMillis() + delay);
+        }
+        editor.apply();
+    }
+
+    public static void onLockSuccess(String scope) {
+        prefs().edit().remove("lock_fail_" + scope).remove("lock_until_" + scope).apply();
+    }
+
     // ---------- Qulf turi (PIN / grafik kalit) ----------
 
     public static final String LOCK_PIN = "pin";
@@ -603,7 +634,7 @@ public class MgConfig {
             JSONObject values = new JSONObject();
             for (Map.Entry<String, ?> e : prefs().getAll().entrySet()) {
                 String key = e.getKey();
-                if (key.startsWith("chat_pin") || key.startsWith("dlg_") || key.startsWith("hidden_pin") || key.startsWith("hidden_lock") || key.startsWith("locked_dialogs_") || key.startsWith("hidden_dialogs_") || key.startsWith("hidden_account_") || key.startsWith("ghost_") || key.startsWith("account_alias_") || key.startsWith("mg_local_folders_") || key.equals("main_account") || key.equals("lock_type") || key.equals("fake_name")) {
+                if (key.startsWith("chat_pin") || key.startsWith("lock_fail_") || key.startsWith("lock_until_") || key.startsWith("dlg_") || key.startsWith("hidden_pin") || key.startsWith("hidden_lock") || key.startsWith("locked_dialogs_") || key.startsWith("hidden_dialogs_") || key.startsWith("hidden_account_") || key.startsWith("ghost_") || key.startsWith("account_alias_") || key.startsWith("mg_local_folders_") || key.equals("main_account") || key.equals("lock_type") || key.equals("fake_name")) {
                     continue;
                 }
                 Object v = e.getValue();
@@ -635,7 +666,7 @@ public class MgConfig {
             Iterator<String> keys = values.keys();
             while (keys.hasNext()) {
                 String key = keys.next();
-                if (key.startsWith("chat_pin") || key.startsWith("dlg_") || key.startsWith("hidden_pin") || key.startsWith("hidden_lock") || key.startsWith("locked_dialogs_") || key.startsWith("hidden_dialogs_") || key.startsWith("hidden_account_") || key.startsWith("ghost_") || key.startsWith("account_alias_") || key.startsWith("mg_local_folders_") || key.equals("main_account") || key.equals("lock_type") || key.equals("fake_name")) {
+                if (key.startsWith("chat_pin") || key.startsWith("lock_fail_") || key.startsWith("lock_until_") || key.startsWith("dlg_") || key.startsWith("hidden_pin") || key.startsWith("hidden_lock") || key.startsWith("locked_dialogs_") || key.startsWith("hidden_dialogs_") || key.startsWith("hidden_account_") || key.startsWith("ghost_") || key.startsWith("account_alias_") || key.startsWith("mg_local_folders_") || key.equals("main_account") || key.equals("lock_type") || key.equals("fake_name")) {
                     continue;
                 }
                 JSONObject item = values.getJSONObject(key);

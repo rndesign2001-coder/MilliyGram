@@ -82,6 +82,16 @@ public class MgReactions {
         head.append("\n").append(MgLang.t("Jami")).append(": ").append(total).append("\n\n");
         TLRPC.Chat chat = f.getCurrentChat();
         boolean broadcast = chat != null && ChatObject.isChannelAndNotMegaGroup(chat);
+        if (!broadcast && !r.can_see_list && r.recent_reactions != null && !r.recent_reactions.isEmpty()) {
+            // shaxsiy chatlarda to'liq ro'yxat so'rovi yo'q — oxirgi reaksiyalar xabarning o'zida keladi
+            StringBuilder sb = new StringBuilder(head);
+            for (TLRPC.MessagePeerReaction pr : r.recent_reactions) {
+                sb.append(reactionText(pr.reaction)).append("  ").append(peerText(mc, pr.peer_id))
+                        .append(pr.date > 0 ? "  · " + time(pr.date) : "").append("\n");
+            }
+            showText(f, MgLang.t("Reaksiya bildirganlar") + " (" + r.recent_reactions.size() + ")", sb.toString().trim());
+            return;
+        }
         if (broadcast || !r.can_see_list) {
             StringBuilder sb = new StringBuilder(head);
             if (!r.top_reactors.isEmpty()) {

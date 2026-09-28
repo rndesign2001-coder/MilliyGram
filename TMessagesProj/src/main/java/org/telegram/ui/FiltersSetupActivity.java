@@ -595,7 +595,7 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
         if (dialogFilters.size() < getMessagesController().dialogFiltersLimitPremium) {
             items.add(ItemInner.asButton(LocaleController.getString(R.string.CreateNewFilter)));
         }
-        items.add(ItemInner.asButton(MG_LOCAL_BUTTON)); // MilliyGram
+        items.add(ItemInner.asButton(MG_LOCAL_BUTTON())); // MilliyGram
         items.add(ItemInner.asShadow(null));
         folderTagsPosition = items.size();
         showTagsRow = items.size();
@@ -716,7 +716,7 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
                     presentFragment(new FilterCreateActivity(filter));
                 }
             } else if (item.viewType == VIEW_TYPE_BUTTON) {
-                if (item.text != null && MG_LOCAL_BUTTON.contentEquals(item.text)) {
+                if (item.text != null && MG_LOCAL_BUTTON().contentEquals(item.text)) {
                     presentFragment(new MgFoldersActivity());
                 } else {
                     createFolder(getParentLayout());
@@ -736,7 +736,9 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
         return fragmentView;
     }
 
-    private static final String MG_LOCAL_BUTTON = org.telegram.messenger.MgLang.t("Lokal jildlar, ikonkalar va yashirin jildlar");
+    private static String MG_LOCAL_BUTTON() {
+        return org.telegram.messenger.MgLang.t("Lokal jildlar, ikonkalar va yashirin jildlar");
+    }
 
     public void createFolder(INavigationLayout navigationLayout) {
         int mgCount = 0;

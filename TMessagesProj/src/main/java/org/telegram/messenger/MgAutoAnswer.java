@@ -25,11 +25,15 @@ public class MgAutoAnswer {
     public static final int SCOPE_ALL = 0;
     public static final int SCOPE_STRANGERS = 1;
     public static final int SCOPE_CONTACTS = 2;
-    public static final String[] SCOPE_NAMES = {org.telegram.messenger.MgLang.t("Barcha shaxsiy chatlar"), org.telegram.messenger.MgLang.t("Faqat kontaktda yo'qlar"), org.telegram.messenger.MgLang.t("Faqat kontaktlar")};
+    public static String[] SCOPE_NAMES() {
+        return new String[]{org.telegram.messenger.MgLang.t("Barcha shaxsiy chatlar"), org.telegram.messenger.MgLang.t("Faqat kontaktda yo'qlar"), org.telegram.messenger.MgLang.t("Faqat kontaktlar")};
+    }
 
     /** Soatlarda; 0 — har chatga faqat bir marta (ro'yxat tozalanguncha) */
     public static final int[] COOLDOWNS = {0, 1, 3, 6, 12, 24};
-    public static final String[] COOLDOWN_NAMES = {org.telegram.messenger.MgLang.t("Har chatga bir marta"), org.telegram.messenger.MgLang.t("1 soatda bir marta"), org.telegram.messenger.MgLang.t("3 soatda bir marta"), org.telegram.messenger.MgLang.t("6 soatda bir marta"), org.telegram.messenger.MgLang.t("12 soatda bir marta"), org.telegram.messenger.MgLang.t("Kuniga bir marta")};
+    public static String[] COOLDOWN_NAMES() {
+        return new String[]{org.telegram.messenger.MgLang.t("Har chatga bir marta"), org.telegram.messenger.MgLang.t("1 soatda bir marta"), org.telegram.messenger.MgLang.t("3 soatda bir marta"), org.telegram.messenger.MgLang.t("6 soatda bir marta"), org.telegram.messenger.MgLang.t("12 soatda bir marta"), org.telegram.messenger.MgLang.t("Kuniga bir marta")};
+    }
 
     public static boolean isEnabled() {
         return MgConfig.getBool("aa_on", false);
@@ -62,7 +66,7 @@ public class MgAutoAnswer {
         int h = getCooldownHours();
         for (int i = 0; i < COOLDOWNS.length; i++) {
             if (COOLDOWNS[i] == h) {
-                return COOLDOWN_NAMES[i];
+                return COOLDOWN_NAMES()[i];
             }
         }
         return h + org.telegram.messenger.MgLang.t(" soatda bir marta");

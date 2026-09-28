@@ -23,12 +23,14 @@ import java.util.ArrayList;
 public class MgTranslate {
 
     public static final String[] CODES = {"uz", "ru", "en", "tr", "kk", "ky", "tg", "ar", "de", "ko", "zh", "fr", "es", "fa"};
-    public static final String[] NAMES = {org.telegram.messenger.MgLang.t("🇺🇿 O'zbekcha"), org.telegram.messenger.MgLang.t("🇷🇺 Ruscha"), org.telegram.messenger.MgLang.t("🇬🇧 Inglizcha"), org.telegram.messenger.MgLang.t("🇹🇷 Turkcha"), org.telegram.messenger.MgLang.t("🇰🇿 Qozoqcha"), org.telegram.messenger.MgLang.t("🇰🇬 Qirg'izcha"), org.telegram.messenger.MgLang.t("🇹🇯 Tojikcha"), org.telegram.messenger.MgLang.t("🇸🇦 Arabcha"), org.telegram.messenger.MgLang.t("🇩🇪 Nemischa"), org.telegram.messenger.MgLang.t("🇰🇷 Koreyscha"), org.telegram.messenger.MgLang.t("🇨🇳 Xitoycha"), org.telegram.messenger.MgLang.t("🇫🇷 Fransuzcha"), org.telegram.messenger.MgLang.t("🇪🇸 Ispancha"), org.telegram.messenger.MgLang.t("🇮🇷 Forscha")};
+    public static String[] NAMES() {
+        return new String[]{org.telegram.messenger.MgLang.t("🇺🇿 O'zbekcha"), org.telegram.messenger.MgLang.t("🇷🇺 Ruscha"), org.telegram.messenger.MgLang.t("🇬🇧 Inglizcha"), org.telegram.messenger.MgLang.t("🇹🇷 Turkcha"), org.telegram.messenger.MgLang.t("🇰🇿 Qozoqcha"), org.telegram.messenger.MgLang.t("🇰🇬 Qirg'izcha"), org.telegram.messenger.MgLang.t("🇹🇯 Tojikcha"), org.telegram.messenger.MgLang.t("🇸🇦 Arabcha"), org.telegram.messenger.MgLang.t("🇩🇪 Nemischa"), org.telegram.messenger.MgLang.t("🇰🇷 Koreyscha"), org.telegram.messenger.MgLang.t("🇨🇳 Xitoycha"), org.telegram.messenger.MgLang.t("🇫🇷 Fransuzcha"), org.telegram.messenger.MgLang.t("🇪🇸 Ispancha"), org.telegram.messenger.MgLang.t("🇮🇷 Forscha")};
+    }
 
     public static String nameOf(String code) {
         for (int i = 0; i < CODES.length; i++) {
             if (CODES[i].equals(code)) {
-                return NAMES[i];
+                return NAMES()[i];
             }
         }
         return code;
@@ -62,9 +64,9 @@ public class MgTranslate {
             return;
         }
         String last = lastOutgoingLang();
-        CharSequence[] items = new CharSequence[NAMES.length];
-        for (int i = 0; i < NAMES.length; i++) {
-            items[i] = NAMES[i] + (CODES[i].equals(last) ? "  ✓" : "");
+        CharSequence[] items = new CharSequence[NAMES().length];
+        for (int i = 0; i < NAMES().length; i++) {
+            items[i] = NAMES()[i] + (CODES[i].equals(last) ? "  ✓" : "");
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getParentActivity(), fragment.getResourceProvider());
         builder.setTitle(title);
@@ -84,9 +86,9 @@ public class MgTranslate {
         if (fragment == null || fragment.getParentActivity() == null) {
             return;
         }
-        CharSequence[] items = new CharSequence[NAMES.length];
-        for (int i = 0; i < NAMES.length; i++) {
-            items[i] = NAMES[i] + (CODES[i].equals(current) ? "  ✓" : "");
+        CharSequence[] items = new CharSequence[NAMES().length];
+        for (int i = 0; i < NAMES().length; i++) {
+            items[i] = NAMES()[i] + (CODES[i].equals(current) ? "  ✓" : "");
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getParentActivity(), fragment.getResourceProvider());
         builder.setTitle(title);
@@ -97,7 +99,9 @@ public class MgTranslate {
     public static final int ENGINE_AUTO = 0;
     public static final int ENGINE_GOOGLE = 1;
     public static final int ENGINE_TELEGRAM = 2;
-    public static final String[] ENGINE_NAMES = {org.telegram.messenger.MgLang.t("Avtomatik (Telegram + Google)"), org.telegram.messenger.MgLang.t("Google Tarjimon"), "Telegram"};
+    public static String[] ENGINE_NAMES() {
+        return new String[]{org.telegram.messenger.MgLang.t("Avtomatik (Telegram + Google)"), org.telegram.messenger.MgLang.t("Google Tarjimon"), "Telegram"};
+    }
 
     public static int getEngine() {
         return MgConfig.getInt("mg_translate_engine", ENGINE_AUTO);

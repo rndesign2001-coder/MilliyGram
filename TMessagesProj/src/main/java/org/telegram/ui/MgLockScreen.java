@@ -256,6 +256,7 @@ public class MgLockScreen extends Dialog {
             BiometricPrompt prompt = new BiometricPrompt(LaunchActivity.instance, ContextCompat.getMainExecutor(getContext()), new BiometricPrompt.AuthenticationCallback() {
                 @Override
                 public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
+                    MgConfig.onLockSuccess(scope);
                     finish(true);
                 }
             });
@@ -388,7 +389,11 @@ public class MgLockScreen extends Dialog {
                 }
             } else if (pin.length() >= 4) {
                 // eski versiyada saqlangan PIN (uzunligi noma'lum)
+                if (checkLockedOut()) {
+                    return;
+                }
                 if (MgConfig.checkLock(scope, pin)) {
+                    MgConfig.onLockSuccess(scope);
                     MgConfig.setPinLength(scope, pin.length());
                     finish(true);
                 } else if (pin.length() >= 8) {
@@ -402,11 +407,17 @@ public class MgLockScreen extends Dialog {
 
     private void submit(String secret) {
         if (mode == MODE_VERIFY) {
+            if (checkLockedOut()) {
+                return;
+            }
             String stored = isPattern() ? MgConfig.PATTERN_PREFIX + secret : secret;
             if (MgConfig.checkLock(scope, stored)) {
+                MgConfig.onLockSuccess(scope);
                 finish(true);
             } else {
-                onError(org.telegram.messenger.MgLang.t("Noto'g'ri. Qayta urinib ko'ring"));
+                MgConfig.onLockFailed(scope);
+                long left = MgConfig.getLockoutRemaining(scope);
+                onError(left > 0 ? lockoutText(left) : org.telegram.messenger.MgLang.t("Noto'g'ri. Qayta urinib ko'ring"));
             }
         } else {
             if (firstEntry == null) {
@@ -422,6 +433,20 @@ public class MgLockScreen extends Dialog {
                 onError(org.telegram.messenger.MgLang.t("Mos kelmadi. Qaytadan boshlang"));
             }
         }
+    }
+
+    /** Juda ko'p noto'g'ri urinishdan keyin kiritishni vaqtincha bloklaydi */
+    private boolean checkLockedOut() {
+        long left = MgConfig.getLockoutRemaining(scope);
+        if (left <= 0) {
+            return false;
+        }
+        onError(lockoutText(left));
+        return true;
+    }
+
+    private static String lockoutText(long leftMs) {
+        return String.format(org.telegram.messenger.MgLang.t("Juda ko'p noto'g'ri urinish. %d soniyadan keyin qayta urinib ko'ring"), (int) Math.ceil(leftMs / 1000.0));
     }
 
     private void clearInput() {

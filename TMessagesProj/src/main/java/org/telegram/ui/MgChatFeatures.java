@@ -93,10 +93,10 @@ public class MgChatFeatures {
             return;
         }
         String cur = getAutoTranslateLang(account, did);
-        CharSequence[] items = new CharSequence[MgTranslate.NAMES.length + 1];
+        CharSequence[] items = new CharSequence[MgTranslate.NAMES().length + 1];
         items[0] = org.telegram.messenger.MgLang.t("O'chirilgan") + (cur == null ? "  ✓" : "");
-        for (int i = 0; i < MgTranslate.NAMES.length; i++) {
-            items[i + 1] = MgTranslate.NAMES[i] + (MgTranslate.CODES[i].equals(cur) ? "  ✓" : "");
+        for (int i = 0; i < MgTranslate.NAMES().length; i++) {
+            items[i + 1] = MgTranslate.NAMES()[i] + (MgTranslate.CODES[i].equals(cur) ? "  ✓" : "");
         }
         AlertDialog.Builder b = new AlertDialog.Builder(ctx, f.getResourceProvider());
         b.setTitle(org.telegram.messenger.MgLang.t("Bu chatga yozganlarim qaysi tilga tarjima qilinsin?"));

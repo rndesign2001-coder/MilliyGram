@@ -40,8 +40,12 @@ import org.telegram.ui.Components.LayoutHelper;
 public class MgInfoChip extends TextView {
 
     public static final int MODE_OFF = 0, MODE_PRAYER = 1, MODE_WEATHER = 2, MODE_BOTH = 3;
-    public static final String[] MODE_NAMES = {org.telegram.messenger.MgLang.t("O'chirilgan"), org.telegram.messenger.MgLang.t("Namoz vaqti"), org.telegram.messenger.MgLang.t("Ob-havo"), org.telegram.messenger.MgLang.t("Ikkalasi (almashib)")};
-    public static final String[] STYLE_NAMES = {org.telegram.messenger.MgLang.t("Kapsula"), org.telegram.messenger.MgLang.t("Chegarali"), org.telegram.messenger.MgLang.t("Oddiy matn"), org.telegram.messenger.MgLang.t("Ixcham"), org.telegram.messenger.MgLang.t("Rangli")};
+    public static String[] MODE_NAMES() {
+        return new String[]{org.telegram.messenger.MgLang.t("O'chirilgan"), org.telegram.messenger.MgLang.t("Namoz vaqti"), org.telegram.messenger.MgLang.t("Ob-havo"), org.telegram.messenger.MgLang.t("Ikkalasi (almashib)")};
+    }
+    public static String[] STYLE_NAMES() {
+        return new String[]{org.telegram.messenger.MgLang.t("Kapsula"), org.telegram.messenger.MgLang.t("Chegarali"), org.telegram.messenger.MgLang.t("Oddiy matn"), org.telegram.messenger.MgLang.t("Ixcham"), org.telegram.messenger.MgLang.t("Rangli")};
+    }
 
     public static int getMode() {
         return MgConfig.getInt("chip_mode", MODE_OFF);
@@ -177,7 +181,7 @@ public class MgInfoChip extends TextView {
         }
         if (text == null) {
             int[] n = MgPrayer.next();
-            text = compact ? "🕌 " + MgPrayer.left(n[1]) : MgPrayer.NAMES[n[0]] + " · " + MgPrayer.left(n[1]);
+            text = compact ? "🕌 " + MgPrayer.left(n[1]) : MgPrayer.NAMES()[n[0]] + " · " + MgPrayer.left(n[1]);
         }
         if (!TextUtils.equals(getText(), text)) {
             setText(text);
@@ -214,7 +218,7 @@ public class MgInfoChip extends TextView {
         nx.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
         nx.setTextColor(accent);
         nx.setTypeface(AndroidUtilities.bold());
-        nx.setText(MgPrayer.NAMES[next[0]] + org.telegram.messenger.MgLang.t(" namozigacha ") + MgPrayer.left(next[1]) + org.telegram.messenger.MgLang.t(" qoldi"));
+        nx.setText(MgPrayer.NAMES()[next[0]] + org.telegram.messenger.MgLang.t(" namozigacha ") + MgPrayer.left(next[1]) + org.telegram.messenger.MgLang.t(" qoldi"));
         box.addView(nx, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 8));
 
         for (int i = 0; i < 6; i++) {
@@ -230,7 +234,7 @@ public class MgInfoChip extends TextView {
             TextView name = new TextView(ctx);
             name.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
             name.setTextColor(i == cur ? accent : black);
-            name.setText(MgPrayer.NAMES[i] + (i == MgPrayer.SUNRISE ? org.telegram.messenger.MgLang.t(" chiqishi") : ""));
+            name.setText(MgPrayer.NAMES()[i] + (i == MgPrayer.SUNRISE ? org.telegram.messenger.MgLang.t(" chiqishi") : ""));
             if (i == cur) {
                 name.setTypeface(AndroidUtilities.bold());
             }

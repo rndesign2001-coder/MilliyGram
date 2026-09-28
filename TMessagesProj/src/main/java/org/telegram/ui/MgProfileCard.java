@@ -59,7 +59,9 @@ import java.util.HashMap;
 public class MgProfileCard {
 
     private static final int W = 1080, H = 1440;
-    public static final String[] STYLES = {org.telegram.messenger.MgLang.t("Moviy"), org.telegram.messenger.MgLang.t("Tungi"), org.telegram.messenger.MgLang.t("Zumrad"), org.telegram.messenger.MgLang.t("Oltin")};
+    public static String[] STYLES() {
+        return new String[]{org.telegram.messenger.MgLang.t("Moviy"), org.telegram.messenger.MgLang.t("Tungi"), org.telegram.messenger.MgLang.t("Zumrad"), org.telegram.messenger.MgLang.t("Oltin")};
+    }
     private static final int[][] GRAD = {
             {0xFF1E3C8C, 0xFF1AA3D9},
             {0xFF0F1026, 0xFF3A2C6E},
@@ -95,7 +97,7 @@ public class MgProfileCard {
         android.view.View neutral = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
         if (neutral != null) {
             neutral.setOnClickListener(v -> {
-                style[0] = (style[0] + 1) % STYLES.length;
+                style[0] = (style[0] + 1) % STYLES().length;
                 org.telegram.messenger.MgConfig.setInt("card_style", style[0]);
                 Bitmap nb = render(f.getCurrentAccount(), dialogId, style[0]);
                 if (nb != null) {

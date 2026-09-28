@@ -234,10 +234,12 @@ public class MgAutoText {
 
     // ================= Standart matn uslubi =================
 
-    public static final String[] STYLE_NAMES = {org.telegram.messenger.MgLang.t("Oddiy (o'chirilgan)"), org.telegram.messenger.MgLang.t("Qalin"), org.telegram.messenger.MgLang.t("Qiya"), org.telegram.messenger.MgLang.t("Monoshrift"), org.telegram.messenger.MgLang.t("Tagiga chizilgan"), org.telegram.messenger.MgLang.t("O'rtasiga chizilgan"), org.telegram.messenger.MgLang.t("Yashirin (spoyler)")};
+    public static String[] STYLE_NAMES() {
+        return new String[]{org.telegram.messenger.MgLang.t("Oddiy (o'chirilgan)"), org.telegram.messenger.MgLang.t("Qalin"), org.telegram.messenger.MgLang.t("Qiya"), org.telegram.messenger.MgLang.t("Monoshrift"), org.telegram.messenger.MgLang.t("Tagiga chizilgan"), org.telegram.messenger.MgLang.t("O'rtasiga chizilgan"), org.telegram.messenger.MgLang.t("Yashirin (spoyler)")};
+    }
 
     public static int getDefaultStyle() {
-        return Math.max(0, Math.min(STYLE_NAMES.length - 1, MgConfig.getInt("text_style", 0)));
+        return Math.max(0, Math.min(STYLE_NAMES().length - 1, MgConfig.getInt("text_style", 0)));
     }
 
     public static void setDefaultStyle(int style) {

@@ -7089,9 +7089,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (getParentActivity() == null) {
             return;
         }
-        CharSequence[] names = new CharSequence[MgDialogActions.KIND_NAMES.length];
+        CharSequence[] names = new CharSequence[MgDialogActions.KIND_NAMES().length];
         for (int i = 0; i < names.length; i++) {
-            names[i] = MgDialogActions.KIND_NAMES[i] + (i == mgArchiveKind ? "  ✓" : "");
+            names[i] = MgDialogActions.KIND_NAMES()[i] + (i == mgArchiveKind ? "  ✓" : "");
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
         builder.setTitle(org.telegram.messenger.MgLang.t("Arxivni saralash"));
@@ -7115,7 +7115,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             actionBar.setTitle(getString(R.string.ArchivedChats));
             actionBar.setSubtitle(null);
         } else {
-            actionBar.setTitle(MgDialogActions.KIND_NAMES[mgArchiveKind]);
+            actionBar.setTitle(MgDialogActions.KIND_NAMES()[mgArchiveKind]);
             actionBar.setSubtitle(getString(R.string.ArchivedChats));
         }
     }

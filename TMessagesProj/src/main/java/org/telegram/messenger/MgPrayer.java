@@ -18,7 +18,9 @@ import java.util.TimeZone;
 public final class MgPrayer {
 
     public static final int FAJR = 0, SUNRISE = 1, DHUHR = 2, ASR = 3, MAGHRIB = 4, ISHA = 5;
-    public static final String[] NAMES = {org.telegram.messenger.MgLang.t("Bomdod"), org.telegram.messenger.MgLang.t("Quyosh"), org.telegram.messenger.MgLang.t("Peshin"), org.telegram.messenger.MgLang.t("Asr"), org.telegram.messenger.MgLang.t("Shom"), org.telegram.messenger.MgLang.t("Xufton")};
+    public static String[] NAMES() {
+        return new String[]{org.telegram.messenger.MgLang.t("Bomdod"), org.telegram.messenger.MgLang.t("Quyosh"), org.telegram.messenger.MgLang.t("Peshin"), org.telegram.messenger.MgLang.t("Asr"), org.telegram.messenger.MgLang.t("Shom"), org.telegram.messenger.MgLang.t("Xufton")};
+    }
     /** Namoz bo'lmagan "Quyosh chiqishi" eslatma va "keyingi namoz" hisobidan chiqariladi */
     public static boolean isPrayer(int i) {
         return i != SUNRISE;

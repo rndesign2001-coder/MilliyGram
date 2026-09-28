@@ -148,9 +148,9 @@ public class MgPrayerAlarm extends BroadcastReceiver {
         int[] t = MgPrayer.today();
         MgPlaces.Place place = MgPrayer.getPlace();
         String title = before > 0
-                ? MgPrayer.NAMES[p] + org.telegram.messenger.MgLang.t(" namoziga ") + before + org.telegram.messenger.MgLang.t(" daqiqa qoldi")
-                : MgPrayer.NAMES[p] + org.telegram.messenger.MgLang.t(" namozi vaqti kirdi");
-        String text = MgPrayer.NAMES[p] + ": " + MgPrayer.hhmm(t[p]) + " · " + MgLang.t(place.name);
+                ? MgPrayer.NAMES()[p] + org.telegram.messenger.MgLang.t(" namoziga ") + before + org.telegram.messenger.MgLang.t(" daqiqa qoldi")
+                : MgPrayer.NAMES()[p] + org.telegram.messenger.MgLang.t(" namozi vaqti kirdi");
+        String text = MgPrayer.NAMES()[p] + ": " + MgPrayer.hhmm(t[p]) + " · " + MgLang.t(place.name);
         Intent launch = ctx.getPackageManager().getLaunchIntentForPackage(ctx.getPackageName());
         PendingIntent content = null;
         if (launch != null) {

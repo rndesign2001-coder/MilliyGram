@@ -2075,6 +2075,17 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 }
             }
 
+            if (message != null && draftMessage == null && !isFolderCell() && !isDialogFolder() && org.telegram.messenger.MgConfig.isDialogLocked(currentAccount, currentDialogId)) {
+                // MilliyGram: qulflangan chatning oxirgi xabari ro'yxatda ko'rinmaydi
+                messageString = "🔒 " + org.telegram.messenger.MgLang.t("Bu chat qulflangan");
+                messageNameString = null;
+                currentMessagePaint = Theme.dialogs_messagePaint[paintIndex];
+                drawForwardIcon = false;
+                drawGiftIcon = false;
+                thumbsCount = 0;
+                hasVideoThumb = false;
+            }
+
             if (!TextUtils.isEmpty(customMessage)) {
                 timeString = "";
             } else if (draftMessage != null) {
