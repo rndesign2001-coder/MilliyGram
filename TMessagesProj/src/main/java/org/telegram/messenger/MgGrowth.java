@@ -467,7 +467,8 @@ public final class MgGrowth {
                 }
             }
             if (ev.size() >= 100 && minId != Long.MAX_VALUE && page < 20) {
-                AndroidUtilities.runOnUIThread(() -> pageAdminLog(account, chatId, minId, lastSeen, add, maxSeen, page + 1, finish), 700);
+                final long nextMaxId = minId;
+                AndroidUtilities.runOnUIThread(() -> pageAdminLog(account, chatId, nextMaxId, lastSeen, add, maxSeen, page + 1, finish), 700);
             } else {
                 finish.run();
             }
