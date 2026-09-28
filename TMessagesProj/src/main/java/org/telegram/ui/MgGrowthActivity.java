@@ -66,7 +66,7 @@ public class MgGrowthActivity extends UniversalFragment {
     @Override
     protected CharSequence getTitle() {
         TLRPC.Chat c = getMessagesController().getChat(chatId);
-        return c != null ? c.title : "Obunachilar kundaligi";
+        return c != null ? c.title : org.telegram.messenger.MgLang.t("Obunachilar kundaligi");
     }
 
     private static class Day {
@@ -138,15 +138,15 @@ public class MgGrowthActivity extends UniversalFragment {
         head.setLineSpacing(AndroidUtilities.dp(3), 1f);
         SpannableStringBuilder sb = new SpannableStringBuilder();
         if (pts.isEmpty()) {
-            sb.append("Ma'lumot yig'ilmoqda… Birinchi yozuv hozir olinadi, grafik bir necha kundan keyin to'liq ko'rinadi.");
+            sb.append(org.telegram.messenger.MgLang.t("Ma'lumot yig'ilmoqda… Birinchi yozuv hozir olinadi, grafik bir necha kundan keyin to'liq ko'rinadi."));
         } else {
             MgGrowth.Point last = pts.get(pts.size() - 1);
             int s0 = sb.length();
-            sb.append(String.format(Locale.US, "%,d", last.count).replace(',', ' ')).append(" obunachi");
+            sb.append(String.format(Locale.US, "%,d", last.count).replace(',', ' ')).append(org.telegram.messenger.MgLang.t(" obunachi"));
             sb.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD), s0, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             sb.setSpan(new android.text.style.RelativeSizeSpan(1.4f), s0, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             int[][] per = {{86400, 0}, {7 * 86400, 0}, {30 * 86400, 0}};
-            String[] names = {"24 soat", "7 kun", "30 kun"};
+            String[] names = {org.telegram.messenger.MgLang.t("24 soat"), org.telegram.messenger.MgLang.t("7 kun"), org.telegram.messenger.MgLang.t("30 kun")};
             sb.append("\n");
             for (int i = 0; i < 3; i++) {
                 int ch = changeSince(pts, per[i][0]);
@@ -159,8 +159,31 @@ public class MgGrowthActivity extends UniversalFragment {
                 }
             }
             int sg = sb.length();
-            sb.append("\nYozuvlar: ").append(String.valueOf(pts.size())).append(" · har ").append(String.valueOf(MgGrowth.getIntervalHours())).append(" soatda");
+            sb.append(org.telegram.messenger.MgLang.t("\nYozuvlar: ")).append(String.valueOf(pts.size())).append(org.telegram.messenger.MgLang.t(" · har ")).append(String.valueOf(MgGrowth.getIntervalHours())).append(org.telegram.messenger.MgLang.t(" soatda"));
             sb.setSpan(new ForegroundColorSpan(gray), sg, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        java.util.TreeMap<Integer, int[]> hf = MgGrowth.flows(currentAccount, chatId);
+        if (!hf.isEmpty()) {
+            int today = MgGrowth.dayKey(System.currentTimeMillis() / 1000);
+            int[][] sums = new int[2][2];
+            int[] spans = {7, 30};
+            for (int k = 0; k < 2; k++) {
+                int from = MgGrowth.dayKey(System.currentTimeMillis() / 1000 - (spans[k] - 1) * 86400L);
+                for (java.util.Map.Entry<Integer, int[]> e : hf.entrySet()) {
+                    if (e.getKey() >= from && e.getKey() <= today) {
+                        sums[k][0] += e.getValue()[0];
+                        sums[k][1] += e.getValue()[1];
+                    }
+                }
+                sb.append(k == 0 ? "\n" : "   ").append(spans[k] + org.telegram.messenger.MgLang.t(" kun: "));
+                int a = sb.length();
+                sb.append("+").append(String.valueOf(sums[k][0]));
+                sb.setSpan(new ForegroundColorSpan(green), a, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                sb.append(" / ");
+                int b2 = sb.length();
+                sb.append("−").append(String.valueOf(sums[k][1]));
+                sb.setSpan(new ForegroundColorSpan(red), b2, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
         }
         head.setText(sb);
         items.add(UItem.asCustom(head));
@@ -168,57 +191,111 @@ public class MgGrowthActivity extends UniversalFragment {
             items.add(UItem.asCustom(new ChartView(ctx, pts), 220));
         }
         items.add(UItem.asShadow(null));
-        items.add(UItem.asButton(ID_REFRESH, R.drawable.msg_retry, "Hozir yangilash"));
-        items.add(UItem.asCheck(ID_TRACK, "Avtomatik kuzatish").setChecked(MgGrowth.isTracked(currentAccount, chatId)));
-        items.add(UItem.asButton(ID_CLEAR, R.drawable.msg_delete, "Tarixni tozalash").red());
-        items.add(UItem.asShadow("Obunachi soni har " + MgGrowth.getIntervalHours() + " soatda avtomatik yoziladi (Sozlamalar → Avtomatlashtirish). Ma'lumot faqat telefoningizda saqlanadi."));
+        items.add(UItem.asButton(ID_REFRESH, R.drawable.msg_retry, org.telegram.messenger.MgLang.t("Hozir yangilash")));
+        items.add(UItem.asCheck(ID_TRACK, org.telegram.messenger.MgLang.t("Avtomatik kuzatish")).setChecked(MgGrowth.isTracked(currentAccount, chatId)));
+        items.add(UItem.asButton(ID_CLEAR, R.drawable.msg_delete, org.telegram.messenger.MgLang.t("Tarixni tozalash")).red());
+        items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Obunachi soni har ") + MgGrowth.getIntervalHours() + org.telegram.messenger.MgLang.t(" soatda avtomatik yoziladi (Sozlamalar → Avtomatlashtirish). Ma'lumot faqat telefoningizda saqlanadi.")));
 
+        // ---- Kunlar bo'yicha: kirganlar / chiqqanlar ----
+        java.util.TreeMap<Integer, int[]> flows = MgGrowth.flows(currentAccount, chatId);
+        java.util.TreeMap<Integer, Integer> net = new java.util.TreeMap<>();
+        java.util.TreeMap<Integer, Integer> totals = new java.util.TreeMap<>();
         ArrayList<Day> ds = days(pts);
-        if (ds.size() >= 2) {
+        for (Day d : ds) {
+            int key = MgGrowth.dayKey(d.time);
+            totals.put(key, d.count);
+            if (!d.first) {
+                net.put(key, d.delta);
+            }
+        }
+        java.util.TreeSet<Integer> keys = new java.util.TreeSet<>(java.util.Collections.reverseOrder());
+        keys.addAll(flows.keySet());
+        keys.addAll(net.keySet());
+        if (!keys.isEmpty()) {
+            // keskin kunlarni aniqlash (kirganlar bo'yicha)
             double mean = 0, sq = 0;
             int n = 0;
-            for (Day d : ds) {
-                if (!d.first) {
-                    mean += d.delta;
-                    n++;
-                }
+            for (int[] v : flows.values()) {
+                mean += v[0];
+                n++;
             }
             mean = n > 0 ? mean / n : 0;
-            for (Day d : ds) {
-                if (!d.first) {
-                    sq += (d.delta - mean) * (d.delta - mean);
-                }
+            for (int[] v : flows.values()) {
+                sq += (v[0] - mean) * (v[0] - mean);
             }
             double std = n > 1 ? Math.sqrt(sq / (n - 1)) : 0;
+            double lMean = 0, lSq = 0;
+            for (int[] v : flows.values()) {
+                lMean += v[1];
+            }
+            lMean = n > 0 ? lMean / n : 0;
+            for (int[] v : flows.values()) {
+                lSq += (v[1] - lMean) * (v[1] - lMean);
+            }
+            double lStd = n > 1 ? Math.sqrt(lSq / (n - 1)) : 0;
+
             TextView list = new TextView(ctx);
             list.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
             list.setTextColor(black);
             list.setLineSpacing(AndroidUtilities.dp(6), 1f);
             list.setPadding(AndroidUtilities.dp(21), AndroidUtilities.dp(10), AndroidUtilities.dp(21), AndroidUtilities.dp(12));
             SpannableStringBuilder lb = new SpannableStringBuilder();
-            Calendar c = Calendar.getInstance();
-            for (int i = ds.size() - 1; i >= 1 && i >= ds.size() - 60; i--) {
-                Day d = ds.get(i);
-                c.setTimeInMillis(d.time * 1000L);
-                lb.append(String.format(Locale.US, "%02d.%02d.%d", c.get(Calendar.DAY_OF_MONTH), c.get(Calendar.MONTH) + 1, c.get(Calendar.YEAR) % 100)).append("   ");
-                int s = lb.length();
-                lb.append(signed(d.delta));
-                lb.setSpan(new ForegroundColorSpan(d.delta > 0 ? green : d.delta < 0 ? red : gray), s, lb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                int threshold = Math.max(30, d.count / 100);
-                if (n >= 3 && d.delta > mean + 2.5 * std && d.delta > threshold) {
-                    lb.append("   ⚡ keskin o'sish (reklama yoki nakrutka?)");
-                } else if (n >= 3 && d.delta < mean - 2.5 * std && d.delta < -threshold) {
-                    lb.append("   📉 keskin kamayish");
+            int shown = 0;
+            for (Integer key : keys) {
+                if (shown++ >= 90) {
+                    break;
                 }
-                int sg = lb.length();
-                lb.append("   (").append(String.format(Locale.US, "%,d", d.count).replace(',', ' ')).append(")");
-                lb.setSpan(new ForegroundColorSpan(gray), sg, lb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                lb.append(String.format(Locale.US, "%02d.%02d.%02d", key % 100, (key / 100) % 100, (key / 10000) % 100)).append("   ");
+                int[] f = flows.get(key);
+                if (f != null) {
+                    int s1 = lb.length();
+                    lb.append("+").append(String.valueOf(f[0]));
+                    lb.setSpan(new ForegroundColorSpan(green), s1, lb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    lb.append("  ");
+                    int s2 = lb.length();
+                    lb.append("−").append(String.valueOf(f[1]));
+                    lb.setSpan(new ForegroundColorSpan(red), s2, lb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    int d = f[0] - f[1];
+                    lb.append("  = ");
+                    int s3 = lb.length();
+                    lb.append(signed(d));
+                    lb.setSpan(new ForegroundColorSpan(d > 0 ? green : d < 0 ? red : gray), s3, lb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    if (n >= 4 && f[0] > mean + 2.5 * std && f[0] >= 20) {
+                        lb.append("  ⚡");
+                    }
+                    if (n >= 4 && f[1] > lMean + 2.5 * lStd && f[1] >= 20) {
+                        lb.append("  📉");
+                    }
+                } else {
+                    Integer d = net.get(key);
+                    int s3 = lb.length();
+                    lb.append(d == null ? "—" : signed(d));
+                    lb.setSpan(new ForegroundColorSpan(d == null ? gray : d > 0 ? green : d < 0 ? red : gray), s3, lb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    int sg = lb.length();
+                    lb.append(org.telegram.messenger.MgLang.t("  (sof)"));
+                    lb.setSpan(new ForegroundColorSpan(gray), sg, lb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+                Integer total = totals.get(key);
+                if (total != null) {
+                    int sg = lb.length();
+                    lb.append("   (").append(String.format(Locale.US, "%,d", total).replace(',', ' ')).append(")");
+                    lb.setSpan(new ForegroundColorSpan(gray), sg, lb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
                 lb.append("\n");
             }
             list.setText(lb);
-            items.add(UItem.asHeader("Kunlar bo'yicha o'zgarish"));
+            items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Kunlar bo'yicha: kirdi / chiqdi")));
             items.add(UItem.asCustom(list));
-            items.add(UItem.asShadow(null));
+            String src = MgGrowth.flowSource(currentAccount, chatId);
+            String note;
+            if ("stats".equals(src)) {
+                note = org.telegram.messenger.MgLang.t("Kirganlar va chiqqanlar Telegram'ning rasmiy kanal statistikasidan olingan. ⚡ — odatdagidan keskin ko'p kirgan kun (reklama yoki nakrutka), 📉 — keskin ko'p chiqqan kun.");
+            } else if ("log".equals(src)) {
+                note = org.telegram.messenger.MgLang.t("Kirganlar va chiqqanlar admin jurnalidan yig'iladi. Telegram jurnalni faqat 48 soat saqlaydi, shuning uchun ma'lumot kuzatish yoqilgan kundan boshlab to'planadi.");
+            } else {
+                note = org.telegram.messenger.MgLang.t("Siz bu kanalda admin emassiz, shuning uchun faqat obunachilar sonining sof o'zgarishi ko'rsatiladi (kirgan va chiqqanlarni alohida faqat adminlar ko'ra oladi).");
+            }
+            items.add(UItem.asShadow(note));
         }
     }
 
@@ -227,7 +304,7 @@ public class MgGrowthActivity extends UniversalFragment {
         if (item.id == ID_REFRESH) {
             MgGrowth.fetch(currentAccount, chatId, true, () -> {
                 refresh();
-                BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, "Yangilandi").show();
+                BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Yangilandi")).show();
             });
         } else if (item.id == ID_TRACK) {
             boolean v = !MgGrowth.isTracked(currentAccount, chatId);

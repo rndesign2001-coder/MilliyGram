@@ -50,7 +50,7 @@ public class MgHiddenActivity extends UniversalFragment {
             fragment.presentFragment(new MgHiddenActivity());
             return;
         }
-        MgChatLock.askLock(fragment, MgConfig.SCOPE_HIDDEN, "Yashirin bo'lim", ok -> {
+        MgChatLock.askLock(fragment, MgConfig.SCOPE_HIDDEN, org.telegram.messenger.MgLang.t("Yashirin bo'lim"), ok -> {
             if (ok) {
                 fragment.presentFragment(new MgHiddenActivity());
             }
@@ -62,7 +62,7 @@ public class MgHiddenActivity extends UniversalFragment {
         if (MgConfig.isDialogHidden(account, dialogId)) {
             MgConfig.setDialogHidden(account, dialogId, false);
             notifyChanged(account);
-            BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, "Chat yana ro'yxatda ko'rinadi").show();
+            BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Chat yana ro'yxatda ko'rinadi")).show();
         } else {
             ArrayList<Long> ids = new ArrayList<>();
             ids.add(dialogId);
@@ -78,7 +78,7 @@ public class MgHiddenActivity extends UniversalFragment {
             }
             notifyChanged(account);
             BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check,
-                    (dialogIds.size() > 1 ? dialogIds.size() + " ta chat yashirildi" : "Chat yashirildi") + ". Ko'rish: qidiruv tugmasini uzoq bosing").show();
+                    (dialogIds.size() > 1 ? dialogIds.size() + org.telegram.messenger.MgLang.t(" ta chat yashirildi") : org.telegram.messenger.MgLang.t("Chat yashirildi")) + org.telegram.messenger.MgLang.t(". Ko'rish: qidiruv tugmasini uzoq bosing")).show();
         };
         if (!MgConfig.hasLock(MgConfig.SCOPE_HIDDEN)) {
             MgChatLock.createLock(fragment, MgConfig.SCOPE_HIDDEN, MgConfig.LOCK_PIN, doHide);
@@ -96,7 +96,7 @@ public class MgHiddenActivity extends UniversalFragment {
 
     @Override
     protected CharSequence getTitle() {
-        return "Yashirin bo'lim";
+        return org.telegram.messenger.MgLang.t("Yashirin bo'lim");
     }
 
     private String encryptedName(long dialogId) {
@@ -108,7 +108,7 @@ public class MgHiddenActivity extends UniversalFragment {
                 return "🔒 " + UserObject.getUserName(user);
             }
         }
-        return "🔒 Maxfiy chat";
+        return org.telegram.messenger.MgLang.t("🔒 Maxfiy chat");
     }
 
     @Override
@@ -140,21 +140,21 @@ public class MgHiddenActivity extends UniversalFragment {
         }
         boolean empty = users.isEmpty() && groups.isEmpty() && channels.isEmpty() && bots.isEmpty() && encryptedIds.isEmpty();
         if (empty) {
-            items.add(UItem.asTopViewStatic("Hozircha yashirilgan chat yo'q.\n\nYashirish uchun: chatni belgilab ⋮ → \"Yashirish\" yoki chat ichida ⋮ → \"Chatni yashirish\".", R.drawable.msg_archive));
+            items.add(UItem.asTopViewStatic(org.telegram.messenger.MgLang.t("Hozircha yashirilgan chat yo'q.\n\nYashirish uchun: chatni belgilab ⋮ → \"Yashirish\" yoki chat ichida ⋮ → \"Chatni yashirish\"."), R.drawable.msg_archive));
             return;
         }
-        addSection(items, "Profillar", users);
-        addSection(items, "Guruhlar", groups);
-        addSection(items, "Kanallar", channels);
-        addSection(items, "Botlar", bots);
+        addSection(items, org.telegram.messenger.MgLang.t("Profillar"), users);
+        addSection(items, org.telegram.messenger.MgLang.t("Guruhlar"), groups);
+        addSection(items, org.telegram.messenger.MgLang.t("Kanallar"), channels);
+        addSection(items, org.telegram.messenger.MgLang.t("Botlar"), bots);
         if (!encryptedIds.isEmpty()) {
-            items.add(UItem.asHeader("Maxfiy chatlar"));
+            items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Maxfiy chatlar")));
             for (int i = 0; i < encryptedIds.size(); i++) {
                 items.add(UItem.asButton(ID_ENCRYPTED_BASE + i, R.drawable.msg_secret, encryptedName(encryptedIds.get(i))));
             }
             items.add(UItem.asShadow(null));
         }
-        items.add(UItem.asShadow("Chatni ochish uchun bosing. Umumiy ro'yxatga qaytarish uchun uzoq bosing."));
+        items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Chatni ochish uchun bosing. Umumiy ro'yxatga qaytarish uchun uzoq bosing.")));
     }
 
     private void addSection(ArrayList<UItem> items, String title, ArrayList<Long> ids) {
@@ -203,14 +203,14 @@ public class MgHiddenActivity extends UniversalFragment {
             return false;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
-        builder.setTitle("Yashirishdan chiqarish");
-        builder.setMessage("Bu chatni yana umumiy ro'yxatda ko'rsataylikmi?");
-        builder.setPositiveButton("Ko'rsatish", (dialog, which) -> {
+        builder.setTitle(org.telegram.messenger.MgLang.t("Yashirishdan chiqarish"));
+        builder.setMessage(org.telegram.messenger.MgLang.t("Bu chatni yana umumiy ro'yxatda ko'rsataylikmi?"));
+        builder.setPositiveButton(org.telegram.messenger.MgLang.t("Ko'rsatish"), (dialog, which) -> {
             MgConfig.setDialogHidden(currentAccount, dialogId, false);
             notifyChanged(currentAccount);
             listView.adapter.update(true);
         });
-        builder.setNegativeButton("Bekor qilish", null);
+        builder.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), null);
         showDialog(builder.create());
         return true;
     }

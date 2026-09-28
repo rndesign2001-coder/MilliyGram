@@ -84,7 +84,7 @@ public class MgChatFeatures {
 
     public static String autoTranslateMenuTitle(int account, long did) {
         String l = getAutoTranslateLang(account, did);
-        return l == null ? "Avto-tarjima" : "Avto-tarjima: " + MgTranslate.nameOf(l);
+        return l == null ? org.telegram.messenger.MgLang.t("Avto-tarjima") : org.telegram.messenger.MgLang.t("Avto-tarjima: ") + MgTranslate.nameOf(l);
     }
 
     public static void showAutoTranslatePicker(BaseFragment f, int account, long did) {
@@ -94,20 +94,20 @@ public class MgChatFeatures {
         }
         String cur = getAutoTranslateLang(account, did);
         CharSequence[] items = new CharSequence[MgTranslate.NAMES.length + 1];
-        items[0] = "O'chirilgan" + (cur == null ? "  ✓" : "");
+        items[0] = org.telegram.messenger.MgLang.t("O'chirilgan") + (cur == null ? "  ✓" : "");
         for (int i = 0; i < MgTranslate.NAMES.length; i++) {
             items[i + 1] = MgTranslate.NAMES[i] + (MgTranslate.CODES[i].equals(cur) ? "  ✓" : "");
         }
         AlertDialog.Builder b = new AlertDialog.Builder(ctx, f.getResourceProvider());
-        b.setTitle("Bu chatga yozganlarim qaysi tilga tarjima qilinsin?");
+        b.setTitle(org.telegram.messenger.MgLang.t("Bu chatga yozganlarim qaysi tilga tarjima qilinsin?"));
         b.setItems(items, (d, which) -> {
             if (which == 0) {
                 MgConfig.setString(atKey(account, did), null);
-                BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, "Avto-tarjima o'chirildi").show();
+                BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Avto-tarjima o'chirildi")).show();
             } else {
                 String code = MgTranslate.CODES[which - 1];
                 MgConfig.setString(atKey(account, did), code);
-                BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, "Yozgan xabarlaringiz " + MgTranslate.nameOf(code) + "ga tarjima qilinib yuboriladi").show();
+                BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Yozgan xabarlaringiz ") + MgTranslate.nameOf(code) + org.telegram.messenger.MgLang.t("ga tarjima qilinib yuboriladi")).show();
             }
         });
         f.showDialog(b.create());
@@ -127,7 +127,7 @@ public class MgChatFeatures {
     }
 
     public static String autoTextMenuTitle(int account, long did) {
-        return MgAutoText.isActive(account, did) ? "Avto-imzo: yoqilgan" : "Avto-imzo";
+        return MgAutoText.isActive(account, did) ? org.telegram.messenger.MgLang.t("Avto-imzo: yoqilgan") : org.telegram.messenger.MgLang.t("Avto-imzo");
     }
 
     public static void showAutoTextEditor(BaseFragment f, int account, long did) {
@@ -140,7 +140,7 @@ public class MgChatFeatures {
         root.setOrientation(LinearLayout.VERTICAL);
 
         TextCheckCell activeCell = new TextCheckCell(ctx, 23, true, f.getResourceProvider());
-        activeCell.setTextAndCheck("Yoqilgan", e.active || TextUtils.isEmpty(e.text), false);
+        activeCell.setTextAndCheck(org.telegram.messenger.MgLang.t("Yoqilgan"), e.active || TextUtils.isEmpty(e.text), false);
         activeCell.setOnClickListener(v -> activeCell.setChecked(!activeCell.isChecked()));
         root.addView(activeCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50));
 
@@ -148,7 +148,7 @@ public class MgChatFeatures {
         edit.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
         edit.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
         edit.setHintTextColor(Theme.getColor(Theme.key_dialogTextHint));
-        edit.setHint("Masalan: 👉 @mening_kanalim");
+        edit.setHint(org.telegram.messenger.MgLang.t("Masalan: 👉 @mening_kanalim"));
         edit.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
         edit.setSingleLine(false);
         edit.setMinLines(2);
@@ -170,19 +170,19 @@ public class MgChatFeatures {
         TextView hint = new TextView(ctx);
         hint.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
         hint.setTextColor(Theme.getColor(Theme.key_dialogTextGray3));
-        hint.setText("Bu imzo shu chatga yuboradigan har bir xabaringiz va media izohingiz oxiriga avtomatik qo'shiladi. Matnni belgilab qalin, kursiv yoki havola qilish mumkin. Stiker, ovozli xabar va doira videoga qo'shilmaydi.");
+        hint.setText(org.telegram.messenger.MgLang.t("Bu imzo shu chatga yuboradigan har bir xabaringiz va media izohingiz oxiriga avtomatik qo'shiladi. Matnni belgilab qalin, kursiv yoki havola qilish mumkin. Stiker, ovozli xabar va doira videoga qo'shilmaydi."));
         root.addView(hint, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 10, 24, 6));
 
         AlertDialog.Builder b = new AlertDialog.Builder(ctx, f.getResourceProvider());
-        b.setTitle("Avto-imzo");
+        b.setTitle(org.telegram.messenger.MgLang.t("Avto-imzo"));
         b.setView(root);
-        b.setPositiveButton("Saqlash", (d, w) -> {
+        b.setPositiveButton(org.telegram.messenger.MgLang.t("Saqlash"), (d, w) -> {
             CharSequence[] arr = {new SpannableStringBuilder(edit.getText())};
             ArrayList<TLRPC.MessageEntity> ents = MediaDataController.getInstance(account).getEntities(arr, true, false);
             String text = arr[0] == null ? "" : arr[0].toString().trim();
             if (text.isEmpty()) {
                 MgAutoText.save(account, did, false, "", null);
-                BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, "Avto-imzo o'chirildi").show();
+                BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Avto-imzo o'chirildi")).show();
             } else {
                 if (ents != null) {
                     for (int i = ents.size() - 1; i >= 0; i--) {
@@ -195,16 +195,16 @@ public class MgChatFeatures {
                     }
                 }
                 MgAutoText.save(account, did, activeCell.isChecked(), text, ents);
-                BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, activeCell.isChecked() ? "Avto-imzo yoqildi" : "Avto-imzo saqlandi (o'chiq)").show();
+                BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, activeCell.isChecked() ? org.telegram.messenger.MgLang.t("Avto-imzo yoqildi") : org.telegram.messenger.MgLang.t("Avto-imzo saqlandi (o'chiq)")).show();
             }
         });
         if (!TextUtils.isEmpty(e.text)) {
-            b.setNeutralButton("O'chirish", (d, w) -> {
+            b.setNeutralButton(org.telegram.messenger.MgLang.t("O'chirish"), (d, w) -> {
                 MgAutoText.save(account, did, false, "", null);
-                BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, "Avto-imzo o'chirildi").show();
+                BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Avto-imzo o'chirildi")).show();
             });
         }
-        b.setNegativeButton("Bekor qilish", null);
+        b.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), null);
         f.showDialog(b.create());
     }
 
@@ -300,7 +300,7 @@ public class MgChatFeatures {
             } catch (Throwable ignore) {
             }
             if (!(res instanceof TLRPC.TL_messages_chatInviteImporters)) {
-                BulletinFactory.of(f).createErrorBulletin(err != null ? "Xato: " + err.text : "So'rovlarni olib bo'lmadi").show();
+                BulletinFactory.of(f).createErrorBulletin(err != null ? org.telegram.messenger.MgLang.t("Xato: ") + err.text : org.telegram.messenger.MgLang.t("So'rovlarni olib bo'lmadi")).show();
                 return;
             }
             int pending = ((TLRPC.TL_messages_chatInviteImporters) res).count;
@@ -317,22 +317,22 @@ public class MgChatFeatures {
         ArrayList<CharSequence> items = new ArrayList<>();
         ArrayList<Integer> actions = new ArrayList<>();
         if (pending > 0) {
-            items.add("Hammasini qabul qilish (" + pending + ")");
+            items.add(org.telegram.messenger.MgLang.t("Hammasini qabul qilish (") + pending + ")");
             actions.add(1);
-            items.add("Hammasini rad etish (" + pending + ")");
+            items.add(org.telegram.messenger.MgLang.t("Hammasini rad etish (") + pending + ")");
             actions.add(2);
             if (pending > 1) {
-                items.add("Ma'lum sonini qabul qilish…");
+                items.add(org.telegram.messenger.MgLang.t("Ma'lum sonini qabul qilish…"));
                 actions.add(3);
-                items.add("Ma'lum sonini rad etish…");
+                items.add(org.telegram.messenger.MgLang.t("Ma'lum sonini rad etish…"));
                 actions.add(4);
             }
         }
-        items.add(auto ? "Avtomatik qabul qilishni o'chirish" : "Yangi so'rovlarni avtomatik qabul qilish");
+        items.add(auto ? org.telegram.messenger.MgLang.t("Avtomatik qabul qilishni o'chirish") : org.telegram.messenger.MgLang.t("Yangi so'rovlarni avtomatik qabul qilish"));
         actions.add(5);
         AlertDialog.Builder b = new AlertDialog.Builder(ctx, f.getResourceProvider());
-        b.setTitle("Qo'shilish so'rovlari");
-        b.setMessage(pending > 0 ? "Kutilayotgan so'rovlar: " + pending : "Hozircha kutilayotgan so'rov yo'q.");
+        b.setTitle(org.telegram.messenger.MgLang.t("Qo'shilish so'rovlari"));
+        b.setMessage(pending > 0 ? org.telegram.messenger.MgLang.t("Kutilayotgan so'rovlar: ") + pending : org.telegram.messenger.MgLang.t("Hozircha kutilayotgan so'rov yo'q."));
         b.setItems(items.toArray(new CharSequence[0]), (d, which) -> {
             int action = actions.get(which);
             switch (action) {
@@ -347,8 +347,8 @@ public class MgChatFeatures {
                 case 5:
                     setAutoAcceptChat(account, chat.id, !auto);
                     BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, !auto
-                            ? "Bu chatga yangi so'rovlar avtomatik qabul qilinadi"
-                            : "Avtomatik qabul qilish o'chirildi").show();
+                            ? org.telegram.messenger.MgLang.t("Bu chatga yangi so'rovlar avtomatik qabul qilinadi")
+                            : org.telegram.messenger.MgLang.t("Avtomatik qabul qilish o'chirildi")).show();
                     break;
             }
         });
@@ -376,9 +376,9 @@ public class MgChatFeatures {
         FrameLayout fl = new FrameLayout(ctx);
         fl.addView(et, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP, 24, 6, 24, 6));
         AlertDialog.Builder b = new AlertDialog.Builder(ctx, f.getResourceProvider());
-        b.setTitle("Nechtasi?");
+        b.setTitle(org.telegram.messenger.MgLang.t("Nechtasi?"));
         b.setView(fl);
-        b.setPositiveButton("Boshlash", (d, w) -> {
+        b.setPositiveButton(org.telegram.messenger.MgLang.t("Boshlash"), (d, w) -> {
             int n;
             try {
                 n = Integer.parseInt(et.getText().toString().trim());
@@ -389,7 +389,7 @@ public class MgChatFeatures {
                 cb.run(Math.min(n, max));
             }
         });
-        b.setNegativeButton("Bekor qilish", null);
+        b.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), null);
         f.showDialog(b.create());
         AndroidUtilities.runOnUIThread(() -> {
             et.requestFocus();
@@ -407,9 +407,9 @@ public class MgChatFeatures {
                 mc.processUpdates((TLRPC.Updates) res, false);
             }
             if (err == null) {
-                BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, (approve ? "Qabul qilindi: " : "Rad etildi: ") + pending + " ta so'rov").show();
+                BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, (approve ? org.telegram.messenger.MgLang.t("Qabul qilindi: ") : org.telegram.messenger.MgLang.t("Rad etildi: ")) + pending + org.telegram.messenger.MgLang.t(" ta so'rov")).show();
             } else {
-                BulletinFactory.of(f).createErrorBulletin("Xato: " + err.text).show();
+                BulletinFactory.of(f).createErrorBulletin(org.telegram.messenger.MgLang.t("Xato: ") + err.text).show();
             }
         }));
     }
@@ -422,7 +422,7 @@ public class MgChatFeatures {
         }
         final boolean[] cancelled = {false};
         final AlertDialog progress = new AlertDialog(ctx, AlertDialog.ALERT_TYPE_SPINNER);
-        progress.setMessage((approve ? "Qabul qilinmoqda" : "Rad etilmoqda") + ": 0 / " + target);
+        progress.setMessage((approve ? org.telegram.messenger.MgLang.t("Qabul qilinmoqda") : org.telegram.messenger.MgLang.t("Rad etilmoqda")) + ": 0 / " + target);
         progress.setCanCancel(true);
         progress.setOnCancelListener(d -> cancelled[0] = true);
         progress.show();
@@ -459,7 +459,7 @@ public class MgChatFeatures {
                 progress.dismiss();
             } catch (Throwable ignore) {
             }
-            BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, (approve ? "Qabul qilindi: " : "Rad etildi: ") + done + " ta so'rov").show();
+            BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, (approve ? org.telegram.messenger.MgLang.t("Qabul qilindi: ") : org.telegram.messenger.MgLang.t("Rad etildi: ")) + done + org.telegram.messenger.MgLang.t(" ta so'rov")).show();
         }
 
         void next() {
@@ -502,7 +502,7 @@ public class MgChatFeatures {
                     } catch (Throwable ignore) {
                     }
                     secs = Math.max(1, Math.min(secs, 30));
-                    progress.setMessage("Telegram cheklovi: " + secs + " soniya kutilmoqda…");
+                    progress.setMessage(org.telegram.messenger.MgLang.t("Telegram cheklovi: ") + secs + org.telegram.messenger.MgLang.t(" soniya kutilmoqda…"));
                     AndroidUtilities.runOnUIThread(this::next, secs * 1000L + 250);
                     return;
                 }
@@ -515,7 +515,7 @@ public class MgChatFeatures {
                         mc.processUpdates((TLRPC.Updates) res, false);
                     }
                 }
-                progress.setMessage((approve ? "Qabul qilinmoqda" : "Rad etilmoqda") + ": " + attempted + " / " + target);
+                progress.setMessage((approve ? org.telegram.messenger.MgLang.t("Qabul qilinmoqda") : org.telegram.messenger.MgLang.t("Rad etilmoqda")) + ": " + attempted + " / " + target);
                 AndroidUtilities.runOnUIThread(this::next, 120);
             }));
         }
@@ -563,10 +563,10 @@ public class MgChatFeatures {
             }
         }
         if (targets.isEmpty()) {
-            BulletinFactory.of(f).createErrorBulletin("Boshqa akkaunt yo'q").show();
+            BulletinFactory.of(f).createErrorBulletin(org.telegram.messenger.MgLang.t("Boshqa akkaunt yo'q")).show();
             return;
         }
-        BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, targets.size() + " ta akkauntdan qo'shilinmoqda…").show();
+        BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, targets.size() + org.telegram.messenger.MgLang.t(" ta akkauntdan qo'shilinmoqda…")).show();
         final String uname = username.toLowerCase(Locale.US);
         final AtomicInteger remaining = new AtomicInteger(targets.size());
         final AtomicInteger joined = new AtomicInteger();
@@ -628,9 +628,9 @@ public class MgChatFeatures {
             AndroidUtilities.runOnUIThread(() -> {
                 int j = joined.get();
                 if (j == total) {
-                    BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, "Barcha " + total + " ta akkaunt qo'shildi").show();
+                    BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Barcha ") + total + org.telegram.messenger.MgLang.t(" ta akkaunt qo'shildi")).show();
                 } else {
-                    BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, "Qo'shildi: " + j + " / " + total + " ta akkaunt").show();
+                    BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Qo'shildi: ") + j + " / " + total + org.telegram.messenger.MgLang.t(" ta akkaunt")).show();
                 }
             });
         }
@@ -639,7 +639,7 @@ public class MgChatFeatures {
     // ================= Notanishlar =================
 
     public static String strangerMenuTitle(int account, long did) {
-        return MgStrangers.belongsInInbox(account, did) ? "Notanish emas" : "Notanishlarga qaytarish";
+        return MgStrangers.belongsInInbox(account, did) ? org.telegram.messenger.MgLang.t("Notanish emas") : org.telegram.messenger.MgLang.t("Notanishlarga qaytarish");
     }
 
     public static boolean canToggleStranger(int account, TLRPC.User user) {
@@ -649,10 +649,10 @@ public class MgChatFeatures {
     public static void toggleStranger(BaseFragment f, int account, long did) {
         if (MgStrangers.belongsInInbox(account, did)) {
             MgStrangers.trust(account, did);
-            BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, "Chat asosiy ro'yxatga qaytarildi").show();
+            BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Chat asosiy ro'yxatga qaytarildi")).show();
         } else {
             MgStrangers.untrust(account, did);
-            BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, "Chat \"Notanishlar\" jildiga o'tkazildi").show();
+            BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Chat \"Notanishlar\" jildiga o'tkazildi")).show();
         }
         MgStrangers.refresh(account);
     }
@@ -668,14 +668,14 @@ public class MgChatFeatures {
     }
 
     public static String oneTimeVoiceMenuTitle(int account, long did) {
-        return isOneTimeVoice(account, did) ? "Bir martalik ovoz: yoqilgan" : "Bir martalik ovoz";
+        return isOneTimeVoice(account, did) ? org.telegram.messenger.MgLang.t("Bir martalik ovoz: yoqilgan") : org.telegram.messenger.MgLang.t("Bir martalik ovoz");
     }
 
     public static void toggleOneTimeVoice(BaseFragment f, int account, long did) {
         boolean on = !isOneTimeVoice(account, did);
         MgConfig.setBool("once_voice_" + account + "_" + did, on);
         BulletinFactory.of(f).createSimpleBulletin(R.raw.chats_infotip, on
-                ? "Bu chatda ovozli va doira xabarlar bir marta tinglanadigan bo'lib yuboriladi"
-                : "Bir martalik ovozli xabar o'chirildi").show();
+                ? org.telegram.messenger.MgLang.t("Bu chatda ovozli va doira xabarlar bir marta tinglanadigan bo'lib yuboriladi")
+                : org.telegram.messenger.MgLang.t("Bir martalik ovozli xabar o'chirildi")).show();
     }
 }

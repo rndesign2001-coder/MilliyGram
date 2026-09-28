@@ -57,28 +57,28 @@ public class MgBulkActions {
         }
         if (targets.isEmpty()) {
             BulletinFactory.of(f).createSimpleBulletin(R.raw.chats_infotip, owned > 0
-                    ? "Belgilanganlar faqat o'zingiz yaratgan kanal/guruhlar — ular tashlab ketilmaydi"
-                    : "Belgilanganlar orasida kanal yoki guruh yo'q").show();
+                    ? org.telegram.messenger.MgLang.t("Belgilanganlar faqat o'zingiz yaratgan kanal/guruhlar — ular tashlab ketilmaydi")
+                    : org.telegram.messenger.MgLang.t("Belgilanganlar orasida kanal yoki guruh yo'q")).show();
             return;
         }
         StringBuilder msg = new StringBuilder();
         if (channels > 0) {
-            msg.append(channels).append(" ta kanal");
+            msg.append(channels).append(org.telegram.messenger.MgLang.t(" ta kanal"));
         }
         if (groups > 0) {
             if (msg.length() > 0) {
-                msg.append(" va ");
+                msg.append(org.telegram.messenger.MgLang.t(" va "));
             }
-            msg.append(groups).append(" ta guruh");
+            msg.append(groups).append(org.telegram.messenger.MgLang.t(" ta guruh"));
         }
-        msg.append("dan chiqasizmi? Ular chatlar ro'yxatidan o'chadi.");
+        msg.append(org.telegram.messenger.MgLang.t("dan chiqasizmi? Ular chatlar ro'yxatidan o'chadi."));
         if (owned > 0) {
-            msg.append("\n\nO'zingiz yaratgan ").append(owned).append(" ta kanal/guruh tegilmaydi.");
+            msg.append(org.telegram.messenger.MgLang.t("\n\nO'zingiz yaratgan ")).append(owned).append(org.telegram.messenger.MgLang.t(" ta kanal/guruh tegilmaydi."));
         }
         AlertDialog.Builder b = new AlertDialog.Builder(f.getParentActivity(), f.getResourceProvider());
-        b.setTitle("Chiqish");
+        b.setTitle(org.telegram.messenger.MgLang.t("Chiqish"));
         b.setMessage(msg.toString());
-        b.setPositiveButton("Chiqish", (d, w) -> {
+        b.setPositiveButton(org.telegram.messenger.MgLang.t("Chiqish"), (d, w) -> {
             if (onStarted != null) {
                 onStarted.run();
             }
@@ -98,12 +98,12 @@ public class MgBulkActions {
             AndroidUtilities.runOnUIThread(() -> {
                 NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.dialogsNeedReload);
                 try {
-                    BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, n + " ta kanal/guruhdan chiqildi").show();
+                    BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, n + org.telegram.messenger.MgLang.t(" ta kanal/guruhdan chiqildi")).show();
                 } catch (Throwable ignore) {
                 }
             }, (long) n * STEP_MS + 300);
         });
-        b.setNegativeButton("Bekor qilish", null);
+        b.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), null);
         AlertDialog dialog = b.create();
         f.showDialog(dialog);
         TextView button = (TextView) dialog.getButton(AlertDialog.BUTTON_POSITIVE);
@@ -126,13 +126,13 @@ public class MgBulkActions {
             }
         }
         if (targets.isEmpty()) {
-            BulletinFactory.of(f).createSimpleBulletin(R.raw.chats_infotip, "Belgilanganlar orasida bot yo'q").show();
+            BulletinFactory.of(f).createSimpleBulletin(R.raw.chats_infotip, org.telegram.messenger.MgLang.t("Belgilanganlar orasida bot yo'q")).show();
             return;
         }
         AlertDialog.Builder b = new AlertDialog.Builder(f.getParentActivity(), f.getResourceProvider());
-        b.setTitle("Botlarni to'xtatish");
-        b.setMessage(targets.size() + " ta bot to'xtatiladi (bloklanadi), ular bilan yozishmalar tozalanadi va ro'yxatdan o'chadi. Bot sizga boshqa xabar yubora olmaydi.\n\nKeyinroq botni qayta ishga tushirish uchun uni ochib \"Qayta ishga tushirish\"ni bosing.");
-        b.setPositiveButton("To'xtatish", (d, w) -> {
+        b.setTitle(org.telegram.messenger.MgLang.t("Botlarni to'xtatish"));
+        b.setMessage(targets.size() + org.telegram.messenger.MgLang.t(" ta bot to'xtatiladi (bloklanadi), ular bilan yozishmalar tozalanadi va ro'yxatdan o'chadi. Bot sizga boshqa xabar yubora olmaydi.\n\nKeyinroq botni qayta ishga tushirish uchun uni ochib \"Qayta ishga tushirish\"ni bosing."));
+        b.setPositiveButton(org.telegram.messenger.MgLang.t("To'xtatish"), (d, w) -> {
             if (onStarted != null) {
                 onStarted.run();
             }
@@ -146,12 +146,12 @@ public class MgBulkActions {
             final int n = targets.size();
             AndroidUtilities.runOnUIThread(() -> {
                 try {
-                    BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, n + " ta bot to'xtatildi va tozalandi").show();
+                    BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, n + org.telegram.messenger.MgLang.t(" ta bot to'xtatildi va tozalandi")).show();
                 } catch (Throwable ignore) {
                 }
             }, (long) n * STEP_MS + 300);
         });
-        b.setNegativeButton("Bekor qilish", null);
+        b.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), null);
         AlertDialog dialog = b.create();
         f.showDialog(dialog);
         TextView button = (TextView) dialog.getButton(AlertDialog.BUTTON_POSITIVE);

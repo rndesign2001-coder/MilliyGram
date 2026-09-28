@@ -2502,7 +2502,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             if (activityMode == MODE_LOGIN) {
                 // MilliyGram: QR kod orqali kirish (boshqa qurilmadagi Telegram bilan skanerlanadi)
                 TextView mgQrLoginView = new TextView(context);
-                mgQrLoginView.setText("QR kod orqali kirish");
+                mgQrLoginView.setText(org.telegram.messenger.MgLang.t("QR kod orqali kirish"));
                 mgQrLoginView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
                 mgQrLoginView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
                 mgQrLoginView.setPadding(dp(4), dp(8), dp(4), dp(8));
@@ -2517,7 +2517,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 });
                 // MilliyGram: bot tokeni orqali kirish
                 TextView mgBotLoginView = new TextView(context);
-                mgBotLoginView.setText("Bot tokeni orqali kirish");
+                mgBotLoginView.setText(org.telegram.messenger.MgLang.t("Bot tokeni orqali kirish"));
                 mgBotLoginView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
                 mgBotLoginView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
                 mgBotLoginView.setPadding(dp(4), dp(8), dp(4), dp(8));

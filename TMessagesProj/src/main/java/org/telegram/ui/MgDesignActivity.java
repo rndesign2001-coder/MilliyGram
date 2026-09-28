@@ -55,14 +55,14 @@ public class MgDesignActivity extends UniversalFragment {
 
     @Override
     protected CharSequence getTitle() {
-        return screen >= 0 ? MgDesign.SCREENS[screen].title : "Dizayn";
+        return screen >= 0 ? MgDesign.SCREENS[screen].title : org.telegram.messenger.MgLang.t("Dizayn");
     }
 
     private UItem colorRow(int id, MgDesign.Item item) {
         Integer custom = MgDesign.getCustom(item);
         int color = custom != null ? custom : MgDesign.getEffective(item);
         UItem it = UItem.asButton(id, new MgThemesActivity.ColorDot(color, 0, custom != null), item.title);
-        it.textValue = custom != null ? "o'zgartirilgan" : null;
+        it.textValue = custom != null ? org.telegram.messenger.MgLang.t("o'zgartirilgan") : null;
         return it;
     }
 
@@ -71,39 +71,39 @@ public class MgDesignActivity extends UniversalFragment {
         String mode = MgDesign.isNight() ? "tungi" : "kunduzgi";
         if (screen >= 0) {
             MgDesign.Screen s = MgDesign.SCREENS[screen];
-            items.add(UItem.asHeader(s.title + " — " + mode + " rejim"));
+            items.add(UItem.asHeader(s.title + " — " + mode + org.telegram.messenger.MgLang.t(" rejim")));
             for (int i = 0; i < s.items.length; i++) {
                 items.add(colorRow(ID_ITEM_BASE + i, s.items[i]));
             }
-            items.add(UItem.asShadow("Rangni tanlash uchun bosing. \"Standart\" tugmasi rangni mavzudagi asl holiga qaytaradi. Kunduzgi va tungi rejim ranglari alohida saqlanadi."));
+            items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Rangni tanlash uchun bosing. \"Standart\" tugmasi rangni mavzudagi asl holiga qaytaradi. Kunduzgi va tungi rejim ranglari alohida saqlanadi.")));
             return;
         }
-        items.add(UItem.asCheck(ID_ENABLED, "MilliyGram dizaynidan foydalanish").setChecked(MgDesign.isEnabled()));
+        items.add(UItem.asCheck(ID_ENABLED, org.telegram.messenger.MgLang.t("MilliyGram dizaynidan foydalanish")).setChecked(MgDesign.isEnabled()));
         items.add(UItem.asShadow(null));
 
-        items.add(UItem.asHeader("Asosiy"));
+        items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Asosiy")));
         items.add(colorRow(ID_ACCENT, MgDesign.ACCENT));
-        items.add(UItem.asButton(ID_THEMES, R.drawable.msg_theme, "Milliy mavzular va chat fonlari"));
+        items.add(UItem.asButton(ID_THEMES, R.drawable.msg_theme, org.telegram.messenger.MgLang.t("Milliy mavzular va chat fonlari")));
         items.add(UItem.asShadow(null));
 
-        items.add(UItem.asHeader("Ekranlar"));
+        items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Ekranlar")));
         for (int i = 0; i < MgDesign.SCREENS.length; i++) {
             items.add(UItem.asButton(ID_SCREEN_BASE + i, (i + 1) + "  " + MgDesign.SCREENS[i].title));
         }
         items.add(UItem.asShadow(null));
 
-        items.add(UItem.asHeader("Dialog"));
+        items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Dialog")));
         items.add(colorRow(ID_DIALOG_BUTTONS, MgDesign.DIALOG_BUTTONS));
         items.add(colorRow(ID_DIALOG_BG, MgDesign.DIALOG_BG));
         items.add(colorRow(ID_DIALOG_TEXT, MgDesign.DIALOG_TEXT));
         items.add(UItem.asShadow(null));
 
-        items.add(UItem.asHeader("Dizayn"));
-        items.add(UItem.asButton(ID_SAVE, R.drawable.msg_download, "Mavzuni saqlash", ""));
-        items.add(UItem.asButton(ID_APPLY_FILE, R.drawable.msg_openin, "Mavzu faylini qo'llash"));
+        items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Dizayn")));
+        items.add(UItem.asButton(ID_SAVE, R.drawable.msg_download, org.telegram.messenger.MgLang.t("Mavzuni saqlash"), ""));
+        items.add(UItem.asButton(ID_APPLY_FILE, R.drawable.msg_openin, org.telegram.messenger.MgLang.t("Mavzu faylini qo'llash")));
         int count = MgDesign.customCount();
-        items.add(UItem.asButton(ID_RESET, R.drawable.msg_reset, "Mavzu sozlamalarini tiklash", count > 0 ? String.valueOf(count) : ""));
-        items.add(UItem.asShadow("Hozir " + mode + " rejim ranglari sozlanmoqda. Mavzu fayllari quyidagi papkada saqlanadi:\n" + shortPath()));
+        items.add(UItem.asButton(ID_RESET, R.drawable.msg_reset, org.telegram.messenger.MgLang.t("Mavzu sozlamalarini tiklash"), count > 0 ? String.valueOf(count) : ""));
+        items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Hozir ") + mode + org.telegram.messenger.MgLang.t(" rejim ranglari sozlanmoqda. Mavzu fayllari quyidagi papkada saqlanadi:\n") + shortPath()));
     }
 
     private String shortPath() {
@@ -176,13 +176,13 @@ public class MgDesignActivity extends UniversalFragment {
                     return;
                 }
                 AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
-                b.setTitle("Mavzu sozlamalarini tiklash");
-                b.setMessage("Joriy rejimdagi barcha o'zgartirilgan ranglar asl holiga qaytadi.");
-                b.setPositiveButton("Tiklash", (d, w) -> {
+                b.setTitle(org.telegram.messenger.MgLang.t("Mavzu sozlamalarini tiklash"));
+                b.setMessage(org.telegram.messenger.MgLang.t("Joriy rejimdagi barcha o'zgartirilgan ranglar asl holiga qaytadi."));
+                b.setPositiveButton(org.telegram.messenger.MgLang.t("Tiklash"), (d, w) -> {
                     MgDesign.resetCurrent();
                     MgDesign.applyNow(this);
                 });
-                b.setNegativeButton("Bekor qilish", null);
+                b.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), null);
                 AlertDialog dialog = b.create();
                 showDialog(dialog);
                 dialog.redPositive();
@@ -194,23 +194,23 @@ public class MgDesignActivity extends UniversalFragment {
     private void saveTheme() {
         File file = MgDesign.exportToFile();
         if (file == null || getParentActivity() == null) {
-            BulletinFactory.of(this).createErrorBulletin("Mavzuni saqlab bo'lmadi").show();
+            BulletinFactory.of(this).createErrorBulletin(org.telegram.messenger.MgLang.t("Mavzuni saqlab bo'lmadi")).show();
             return;
         }
         AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
-        b.setTitle("Mavzu saqlandi");
+        b.setTitle(org.telegram.messenger.MgLang.t("Mavzu saqlandi"));
         b.setMessage(file.getName() + "\n\n" + file.getParent());
-        b.setPositiveButton("Ulashish", (d, w) -> {
+        b.setPositiveButton(org.telegram.messenger.MgLang.t("Ulashish"), (d, w) -> {
             try {
                 Uri uri = FileProvider.getUriForFile(getParentActivity(), ApplicationLoader.getApplicationId() + ".provider", file);
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("application/octet-stream");
                 intent.putExtra(Intent.EXTRA_STREAM, uri);
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                getParentActivity().startActivity(Intent.createChooser(intent, "Mavzuni ulashish"));
+                getParentActivity().startActivity(Intent.createChooser(intent, org.telegram.messenger.MgLang.t("Mavzuni ulashish")));
             } catch (Throwable e) {
                 FileLog.e(e);
-                BulletinFactory.of(this).createErrorBulletin("Ulashib bo'lmadi").show();
+                BulletinFactory.of(this).createErrorBulletin(org.telegram.messenger.MgLang.t("Ulashib bo'lmadi")).show();
             }
         });
         b.setNegativeButton("OK", null);
@@ -224,8 +224,8 @@ public class MgDesignActivity extends UniversalFragment {
         ArrayList<File> files = MgDesign.listThemeFiles();
         if (files.isEmpty()) {
             AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
-            b.setTitle("Mavzu fayllari yo'q");
-            b.setMessage("Mavzu faylini (.mgtheme) quyidagi papkaga joylang va qayta urinib ko'ring:\n\n" + shortPath());
+            b.setTitle(org.telegram.messenger.MgLang.t("Mavzu fayllari yo'q"));
+            b.setMessage(org.telegram.messenger.MgLang.t("Mavzu faylini (.mgtheme) quyidagi papkaga joylang va qayta urinib ko'ring:\n\n") + shortPath());
             b.setPositiveButton("OK", null);
             showDialog(b.create());
             return;
@@ -235,14 +235,14 @@ public class MgDesignActivity extends UniversalFragment {
             names[i] = files.get(i).getName();
         }
         AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
-        b.setTitle("Mavzu faylini qo'llash");
+        b.setTitle(org.telegram.messenger.MgLang.t("Mavzu faylini qo'llash"));
         b.setItems(names, (d, which) -> {
             int count = MgDesign.importFromFile(files.get(which));
             if (count < 0) {
-                BulletinFactory.of(this).createErrorBulletin("Fayl noto'g'ri").show();
+                BulletinFactory.of(this).createErrorBulletin(org.telegram.messenger.MgLang.t("Fayl noto'g'ri")).show();
             } else {
                 MgDesign.applyNow(this);
-                AndroidUtilitiesPost.later(() -> BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, "Qo'llanildi: " + count + " ta rang").show());
+                AndroidUtilitiesPost.later(() -> BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Qo'llanildi: ") + count + org.telegram.messenger.MgLang.t(" ta rang")).show());
             }
         });
         showDialog(b.create());

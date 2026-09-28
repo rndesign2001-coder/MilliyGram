@@ -80,13 +80,13 @@ public class MgMessageTools {
         scroll.setPadding(AndroidUtilities.dp(24), AndroidUtilities.dp(4), AndroidUtilities.dp(24), AndroidUtilities.dp(4));
         scroll.addView(tv);
         AlertDialog.Builder b = new AlertDialog.Builder(ctx, f.getResourceProvider());
-        b.setTitle(cyr ? "Lotin yozuvida" : "Kirill yozuvida");
+        b.setTitle(cyr ? org.telegram.messenger.MgLang.t("Lotin yozuvida") : org.telegram.messenger.MgLang.t("Kirill yozuvida"));
         b.setView(scroll);
-        b.setPositiveButton("Nusxalash", (d, w) -> {
+        b.setPositiveButton(org.telegram.messenger.MgLang.t("Nusxalash"), (d, w) -> {
             AndroidUtilities.addToClipboard(out);
-            BulletinFactory.of(f).createCopyBulletin("Matn nusxalandi").show();
+            BulletinFactory.of(f).createCopyBulletin(org.telegram.messenger.MgLang.t("Matn nusxalandi")).show();
         });
-        b.setNegativeButton("Yopish", null);
+        b.setNegativeButton(org.telegram.messenger.MgLang.t("Yopish"), null);
         f.showDialog(b.create());
     }
 
@@ -98,9 +98,9 @@ public class MgMessageTools {
             return;
         }
         final int[] minutes = {30, 60, 180, -1, -2};
-        CharSequence[] names = {"30 daqiqadan keyin", "1 soatdan keyin", "3 soatdan keyin", "Ertaga soat 9:00 da", "Boshqa vaqt…"};
+        CharSequence[] names = {org.telegram.messenger.MgLang.t("30 daqiqadan keyin"), org.telegram.messenger.MgLang.t("1 soatdan keyin"), org.telegram.messenger.MgLang.t("3 soatdan keyin"), org.telegram.messenger.MgLang.t("Ertaga soat 9:00 da"), org.telegram.messenger.MgLang.t("Boshqa vaqt…")};
         AlertDialog.Builder b = new AlertDialog.Builder(ctx, f.getResourceProvider());
-        b.setTitle("Qachon eslatay?");
+        b.setTitle(org.telegram.messenger.MgLang.t("Qachon eslatay?"));
         b.setItems(names, (d, w) -> {
             Calendar c = Calendar.getInstance();
             if (minutes[w] > 0) {
@@ -143,7 +143,7 @@ public class MgMessageTools {
             forwarded = false;
         }
         String title = chatTitle(f);
-        StringBuilder sb = new StringBuilder("🔔 Eslatma");
+        StringBuilder sb = new StringBuilder(org.telegram.messenger.MgLang.t("🔔 Eslatma"));
         if (!TextUtils.isEmpty(title)) {
             sb.append(" · ").append(title);
         }
@@ -163,7 +163,7 @@ public class MgMessageTools {
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(date * 1000L);
         String when = String.format(java.util.Locale.US, "%02d.%02d %02d:%02d", c.get(Calendar.DAY_OF_MONTH), c.get(Calendar.MONTH) + 1, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE));
-        BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, "Eslatma qo'yildi: " + when + ". U \"Saqlangan xabarlar\"ga keladi").show();
+        BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Eslatma qo'yildi: ") + when + org.telegram.messenger.MgLang.t(". U \"Saqlangan xabarlar\"ga keladi")).show();
     }
 
     private static String chatTitle(ChatActivity f) {
@@ -222,7 +222,7 @@ public class MgMessageTools {
             }
             saveTemplates(list);
         }
-        BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, "Shablon saqlandi. Chat → ⋮ → \"Tezkor shablonlar\"").show();
+        BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Shablon saqlandi. Chat → ⋮ → \"Tezkor shablonlar\"")).show();
     }
 
     private static String preview(String s) {
@@ -242,9 +242,9 @@ public class MgMessageTools {
             items[i] = preview(list.get(i));
         }
         AlertDialog.Builder b = new AlertDialog.Builder(ctx, f.getResourceProvider());
-        b.setTitle("Tezkor shablonlar");
+        b.setTitle(org.telegram.messenger.MgLang.t("Tezkor shablonlar"));
         if (list.isEmpty()) {
-            b.setMessage("Hali shablon yo'q. Ko'p yoziladigan gaplarni (manzil, karta raqami, \"hozir bandman\"…) qo'shing — keyin bir bosishda yozish maydoniga qo'yiladi.\n\nYozgan matningizni yuborish tugmasini uzoq bosib ham \"Shablonga saqlash\" mumkin.");
+            b.setMessage(org.telegram.messenger.MgLang.t("Hali shablon yo'q. Ko'p yoziladigan gaplarni (manzil, karta raqami, \"hozir bandman\"…) qo'shing — keyin bir bosishda yozish maydoniga qo'yiladi.\n\nYozgan matningizni yuborish tugmasini uzoq bosib ham \"Shablonga saqlash\" mumkin."));
         } else {
             b.setItems(items, (d, w) -> {
                 if (chat != null) {
@@ -260,16 +260,16 @@ public class MgMessageTools {
                 }
             });
         }
-        b.setPositiveButton("+ Yangi", (d, w) -> editTemplate(f, list, -1));
+        b.setPositiveButton(org.telegram.messenger.MgLang.t("+ Yangi"), (d, w) -> editTemplate(f, list, -1));
         if (!list.isEmpty()) {
-            b.setNeutralButton("Tahrirlash", (d, w) -> {
+            b.setNeutralButton(org.telegram.messenger.MgLang.t("Tahrirlash"), (d, w) -> {
                 AlertDialog.Builder e = new AlertDialog.Builder(ctx, f.getResourceProvider());
-                e.setTitle("Qaysi shablon?");
+                e.setTitle(org.telegram.messenger.MgLang.t("Qaysi shablon?"));
                 e.setItems(items, (d2, i) -> editTemplate(f, list, i));
                 f.showDialog(e.create());
             });
         }
-        b.setNegativeButton("Yopish", null);
+        b.setNegativeButton(org.telegram.messenger.MgLang.t("Yopish"), null);
         f.showDialog(b.create());
     }
 
@@ -287,16 +287,16 @@ public class MgMessageTools {
         edit.setLineColors(Theme.getColor(Theme.key_windowBackgroundWhiteInputField), Theme.getColor(Theme.key_windowBackgroundWhiteInputFieldActivated), Theme.getColor(Theme.key_text_RedRegular));
         edit.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
         edit.setMaxLines(8);
-        edit.setHint("Masalan: Manzilim — Toshkent, Chilonzor 5-kvartal");
+        edit.setHint(org.telegram.messenger.MgLang.t("Masalan: Manzilim — Toshkent, Chilonzor 5-kvartal"));
         if (index >= 0) {
             edit.setText(list.get(index));
         }
         FrameLayout fl = new FrameLayout(ctx);
         fl.addView(edit, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP, 24, 6, 24, 0));
         AlertDialog.Builder b = new AlertDialog.Builder(ctx, f.getResourceProvider());
-        b.setTitle(index >= 0 ? "Shablonni tahrirlash" : "Yangi shablon");
+        b.setTitle(index >= 0 ? org.telegram.messenger.MgLang.t("Shablonni tahrirlash") : org.telegram.messenger.MgLang.t("Yangi shablon"));
         b.setView(fl);
-        b.setPositiveButton("Saqlash", (d, w) -> {
+        b.setPositiveButton(org.telegram.messenger.MgLang.t("Saqlash"), (d, w) -> {
             String t = edit.getText() == null ? "" : edit.getText().toString().trim();
             ArrayList<String> cur = templates();
             if (index >= 0 && index < cur.size()) {
@@ -309,10 +309,10 @@ public class MgMessageTools {
                 cur.add(0, t);
             }
             saveTemplates(cur);
-            BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, "Saqlandi").show();
+            BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Saqlandi")).show();
         });
         if (index >= 0) {
-            b.setNeutralButton("O'chirish", (d, w) -> {
+            b.setNeutralButton(org.telegram.messenger.MgLang.t("O'chirish"), (d, w) -> {
                 ArrayList<String> cur = templates();
                 if (index < cur.size()) {
                     cur.remove(index);
@@ -320,7 +320,7 @@ public class MgMessageTools {
                 }
             });
         }
-        b.setNegativeButton("Bekor qilish", null);
+        b.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), null);
         f.showDialog(b.create());
         AndroidUtilities.runOnUIThread(() -> {
             edit.requestFocus();
@@ -374,12 +374,12 @@ public class MgMessageTools {
                     continue;
                 }
                 String low = t.toLowerCase();
-                if (CARD.matcher(low).find() && !reasons.contains("karta raqami")) reasons.add("karta raqami");
-                if (CODE.matcher(low).find() && !reasons.contains("SMS kod so'rash")) reasons.add("SMS kod so'rash");
-                if (MONEY.matcher(low).find() && !reasons.contains("pul o'tkazishni so'rash")) reasons.add("pul o'tkazishni so'rash");
-                if (PRIZE.matcher(low).find() && !reasons.contains("\"yutuq\" yoki \"sovg'a\" va'dasi")) reasons.add("\"yutuq\" yoki \"sovg'a\" va'dasi");
-                if (SECRET.matcher(low).find() && !reasons.contains("karta ma'lumotlarini so'rash")) reasons.add("karta ma'lumotlarini so'rash");
-                if (LINK.matcher(low).find() && !reasons.contains("shubhali havola")) reasons.add("shubhali havola");
+                if (CARD.matcher(low).find() && !reasons.contains("karta raqami")) reasons.add(org.telegram.messenger.MgLang.t("karta raqami"));
+                if (CODE.matcher(low).find() && !reasons.contains("SMS kod so'rash")) reasons.add(org.telegram.messenger.MgLang.t("SMS kod so'rash"));
+                if (MONEY.matcher(low).find() && !reasons.contains("pul o'tkazishni so'rash")) reasons.add(org.telegram.messenger.MgLang.t("pul o'tkazishni so'rash"));
+                if (PRIZE.matcher(low).find() && !reasons.contains("\"yutuq\" yoki \"sovg'a\" va'dasi")) reasons.add(org.telegram.messenger.MgLang.t("\"yutuq\" yoki \"sovg'a\" va'dasi"));
+                if (SECRET.matcher(low).find() && !reasons.contains("karta ma'lumotlarini so'rash")) reasons.add(org.telegram.messenger.MgLang.t("karta ma'lumotlarini so'rash"));
+                if (LINK.matcher(low).find() && !reasons.contains("shubhali havola")) reasons.add(org.telegram.messenger.MgLang.t("shubhali havola"));
             }
             if (reasons.isEmpty()) {
                 return;
@@ -395,22 +395,22 @@ public class MgMessageTools {
             return;
         }
         StringBuilder sb = new StringBuilder();
-        sb.append(UserObject.getUserName(user)).append(" kontaktlaringizda yo'q, xabarlarida esa quyidagilar bor: ")
+        sb.append(UserObject.getUserName(user)).append(org.telegram.messenger.MgLang.t(" kontaktlaringizda yo'q, xabarlarida esa quyidagilar bor: "))
                 .append(TextUtils.join(", ", reasons)).append(".\n\n")
-                .append("• Hech kimga SMS kod, karta PIN-kodi, CVV va amal qilish muddatini aytmang.\n")
-                .append("• Bank, Telegram, Click, Payme xodimlari hech qachon kod so'ramaydi.\n")
-                .append("• Notanish havola va .apk fayllarni ochmang.\n")
-                .append("• Pul so'rashsa — shu odamga boshqa yo'l bilan (qo'ng'iroq qilib) tekshiring.");
+                .append(org.telegram.messenger.MgLang.t("• Hech kimga SMS kod, karta PIN-kodi, CVV va amal qilish muddatini aytmang.\n"))
+                .append(org.telegram.messenger.MgLang.t("• Bank, Telegram, Click, Payme xodimlari hech qachon kod so'ramaydi.\n"))
+                .append(org.telegram.messenger.MgLang.t("• Notanish havola va .apk fayllarni ochmang.\n"))
+                .append(org.telegram.messenger.MgLang.t("• Pul so'rashsa — shu odamga boshqa yo'l bilan (qo'ng'iroq qilib) tekshiring."));
         AlertDialog.Builder b = new AlertDialog.Builder(f.getParentActivity(), f.getResourceProvider());
-        b.setTitle("⚠️ Ehtiyot bo'ling");
+        b.setTitle(org.telegram.messenger.MgLang.t("⚠️ Ehtiyot bo'ling"));
         b.setMessage(sb.toString());
-        b.setPositiveButton("Tushundim", null);
-        b.setNeutralButton("Bu odamni taniyman", (d, w) -> MgConfig.setBool("scam_ok_" + account + "_" + did, true));
-        b.setNegativeButton("Bloklash", (d, w) -> {
+        b.setPositiveButton(org.telegram.messenger.MgLang.t("Tushundim"), null);
+        b.setNeutralButton(org.telegram.messenger.MgLang.t("Bu odamni taniyman"), (d, w) -> MgConfig.setBool("scam_ok_" + account + "_" + did, true));
+        b.setNegativeButton(org.telegram.messenger.MgLang.t("Bloklash"), (d, w) -> {
             MessagesController mc = MessagesController.getInstance(account);
             mc.blockPeer(did);
             mc.reportSpam(did, user, null, null, false);
-            BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, "Bloklandi va spam deb belgilandi").show();
+            BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Bloklandi va spam deb belgilandi")).show();
         });
         AlertDialog dialog = b.create();
         f.showDialog(dialog);
@@ -430,8 +430,8 @@ public class MgMessageTools {
         long self = UserConfig.getInstance(account).getClientUserId();
         SendMessagesHelper.getInstance(account).sendMessage(msgs, self, false, false, true, 0, 0);
         BulletinFactory.of(f).createSimpleBulletin(R.raw.saved_messages, msgs.size() > 1
-                ? msgs.size() + " ta xabar Saqlangan xabarlarga saqlandi"
-                : "Saqlangan xabarlarga saqlandi").show();
+                ? msgs.size() + org.telegram.messenger.MgLang.t(" ta xabar Saqlangan xabarlarga saqlandi")
+                : org.telegram.messenger.MgLang.t("Saqlangan xabarlarga saqlandi")).show();
     }
 
     // ================= Matnning bir qismidan nusxa olish =================
@@ -447,7 +447,7 @@ public class MgMessageTools {
         TextView title = new TextView(ctx);
         title.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
         title.setTextColor(Theme.getColor(Theme.key_dialogTextGray3));
-        title.setText("Kerakli qismini barmoq bilan belgilang");
+        title.setText(org.telegram.messenger.MgLang.t("Kerakli qismini barmoq bilan belgilang"));
         box.addView(title, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 22, 16, 22, 10));
         TextView tv = new TextView(ctx);
         tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
@@ -468,8 +468,8 @@ public class MgMessageTools {
         box.addView(scroll, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
         android.widget.LinearLayout buttons = new android.widget.LinearLayout(ctx);
         buttons.setGravity(Gravity.END);
-        TextView copyAll = makeTextButton(ctx, "HAMMASINI NUSXALASH");
-        TextView copySel = makeTextButton(ctx, "BELGILANGANINI NUSXALASH");
+        TextView copyAll = makeTextButton(ctx, org.telegram.messenger.MgLang.t("HAMMASINI NUSXALASH"));
+        TextView copySel = makeTextButton(ctx, org.telegram.messenger.MgLang.t("BELGILANGANINI NUSXALASH"));
         buttons.addView(copyAll);
         buttons.addView(copySel);
         box.addView(buttons, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 52, 8, 4, 8, 4));
@@ -478,19 +478,19 @@ public class MgMessageTools {
         copyAll.setOnClickListener(v -> {
             AndroidUtilities.addToClipboard(text);
             sheet.dismiss();
-            BulletinFactory.of(f).createCopyBulletin("Matn nusxalandi").show();
+            BulletinFactory.of(f).createCopyBulletin(org.telegram.messenger.MgLang.t("Matn nusxalandi")).show();
         });
         copySel.setOnClickListener(v -> {
             int st = Math.max(0, Math.min(tv.getSelectionStart(), tv.getSelectionEnd()));
             int en = Math.max(tv.getSelectionStart(), tv.getSelectionEnd());
             if (en <= st) {
-                title.setText("⚠️ Avval matnning bir qismini barmoq bilan belgilang");
+                title.setText(org.telegram.messenger.MgLang.t("⚠️ Avval matnning bir qismini barmoq bilan belgilang"));
                 title.setTextColor(Theme.getColor(Theme.key_text_RedRegular));
                 return;
             }
             AndroidUtilities.addToClipboard(text.substring(st, Math.min(en, text.length())));
             sheet.dismiss();
-            BulletinFactory.of(f).createCopyBulletin("Belgilangan qism nusxalandi").show();
+            BulletinFactory.of(f).createCopyBulletin(org.telegram.messenger.MgLang.t("Belgilangan qism nusxalandi")).show();
         });
         f.showDialog(sheet);
     }
@@ -544,80 +544,80 @@ public class MgMessageTools {
         int account = f.getCurrentAccount();
         TLRPC.Message msg = m.messageOwner;
         StringBuilder sb = new StringBuilder();
-        sb.append("🆔 Xabar ID: ").append(m.getId()).append('\n');
-        sb.append("💬 Chat: ").append(peerName(account, msg.peer_id)).append('\n');
+        sb.append(org.telegram.messenger.MgLang.t("🆔 Xabar ID: ")).append(m.getId()).append('\n');
+        sb.append(org.telegram.messenger.MgLang.t("💬 Chat: ")).append(peerName(account, msg.peer_id)).append('\n');
         String from = peerName(account, msg.from_id);
         if (from != null) {
-            sb.append("👤 Yuboruvchi: ").append(from).append('\n');
+            sb.append(org.telegram.messenger.MgLang.t("👤 Yuboruvchi: ")).append(from).append('\n');
         }
         if (!TextUtils.isEmpty(msg.post_author)) {
-            sb.append("✍️ Imzo: ").append(msg.post_author).append('\n');
+            sb.append(org.telegram.messenger.MgLang.t("✍️ Imzo: ")).append(msg.post_author).append('\n');
         }
-        sb.append("🕒 Yuborilgan: ").append(fullDate(msg.date)).append('\n');
+        sb.append(org.telegram.messenger.MgLang.t("🕒 Yuborilgan: ")).append(fullDate(msg.date)).append('\n');
         if (msg.edit_date > 0 && !msg.edit_hide) {
-            sb.append("✏️ Tahrirlangan: ").append(fullDate(msg.edit_date)).append('\n');
+            sb.append(org.telegram.messenger.MgLang.t("✏️ Tahrirlangan: ")).append(fullDate(msg.edit_date)).append('\n');
         }
         if (msg.fwd_from != null) {
             String ff = peerName(account, msg.fwd_from.from_id);
             if (ff == null && !TextUtils.isEmpty(msg.fwd_from.from_name)) {
-                ff = msg.fwd_from.from_name + " (yashirin profil)";
+                ff = msg.fwd_from.from_name + org.telegram.messenger.MgLang.t(" (yashirin profil)");
             }
-            sb.append("↪️ Uzatilgan: ").append(ff == null ? "—" : ff).append('\n');
-            sb.append("   Asl sanasi: ").append(fullDate(msg.fwd_from.date)).append('\n');
+            sb.append(org.telegram.messenger.MgLang.t("↪️ Uzatilgan: ")).append(ff == null ? "—" : ff).append('\n');
+            sb.append(org.telegram.messenger.MgLang.t("   Asl sanasi: ")).append(fullDate(msg.fwd_from.date)).append('\n');
             if (msg.fwd_from.channel_post != 0) {
-                sb.append("   Asl post ID: ").append(msg.fwd_from.channel_post).append('\n');
+                sb.append(org.telegram.messenger.MgLang.t("   Asl post ID: ")).append(msg.fwd_from.channel_post).append('\n');
             }
         }
         if (msg.reply_to != null && msg.reply_to.reply_to_msg_id != 0) {
-            sb.append("↩️ Javob: #").append(msg.reply_to.reply_to_msg_id).append(" xabarga").append('\n');
+            sb.append(org.telegram.messenger.MgLang.t("↩️ Javob: #")).append(msg.reply_to.reply_to_msg_id).append(org.telegram.messenger.MgLang.t(" xabarga")).append('\n');
         }
         if (msg.via_bot_id != 0) {
             TLRPC.User bot = MessagesController.getInstance(account).getUser(msg.via_bot_id);
-            sb.append("🤖 Bot orqali: ").append(bot == null ? String.valueOf(msg.via_bot_id) : "@" + UserObject.getPublicUsername(bot)).append('\n');
+            sb.append(org.telegram.messenger.MgLang.t("🤖 Bot orqali: ")).append(bot == null ? String.valueOf(msg.via_bot_id) : "@" + UserObject.getPublicUsername(bot)).append('\n');
         }
         if (msg.views > 0) {
-            sb.append("👁 Ko'rishlar: ").append(msg.views).append('\n');
+            sb.append(org.telegram.messenger.MgLang.t("👁 Ko'rishlar: ")).append(msg.views).append('\n');
         }
         if (msg.forwards > 0) {
-            sb.append("🔁 Ulashishlar: ").append(msg.forwards).append('\n');
+            sb.append(org.telegram.messenger.MgLang.t("🔁 Ulashishlar: ")).append(msg.forwards).append('\n');
         }
         int replies = m.getRepliesCount();
         if (replies > 0) {
-            sb.append("💭 Izohlar: ").append(replies).append('\n');
+            sb.append(org.telegram.messenger.MgLang.t("💭 Izohlar: ")).append(replies).append('\n');
         }
         if (msg.grouped_id != 0) {
-            sb.append("🖼 Albom: ").append(group != null && group.messages != null ? group.messages.size() + " ta element" : "ha").append('\n');
+            sb.append(org.telegram.messenger.MgLang.t("🖼 Albom: ")).append(group != null && group.messages != null ? group.messages.size() + org.telegram.messenger.MgLang.t(" ta element") : "ha").append('\n');
         }
         String text = messageText(m, group);
         if (!TextUtils.isEmpty(text)) {
-            sb.append("🔤 Matn: ").append(text.length()).append(" belgi, ").append(text.trim().isEmpty() ? 0 : text.trim().split("\\s+").length).append(" so'z");
+            sb.append(org.telegram.messenger.MgLang.t("🔤 Matn: ")).append(text.length()).append(org.telegram.messenger.MgLang.t(" belgi, ")).append(text.trim().isEmpty() ? 0 : text.trim().split("\\s+").length).append(org.telegram.messenger.MgLang.t(" so'z"));
             if (msg.entities != null && !msg.entities.isEmpty()) {
-                sb.append(", ").append(msg.entities.size()).append(" ta format/havola");
+                sb.append(", ").append(msg.entities.size()).append(org.telegram.messenger.MgLang.t(" ta format/havola"));
             }
             sb.append('\n');
         }
         TLRPC.Document doc = m.getDocument();
         if (doc != null) {
             String name = m.getFileName();
-            sb.append("📎 Fayl: ").append(TextUtils.isEmpty(name) ? "—" : name).append('\n');
-            sb.append("   Hajmi: ").append(AndroidUtilities.formatFileSize(doc.size)).append(" · ").append(doc.mime_type).append('\n');
+            sb.append(org.telegram.messenger.MgLang.t("📎 Fayl: ")).append(TextUtils.isEmpty(name) ? "—" : name).append('\n');
+            sb.append(org.telegram.messenger.MgLang.t("   Hajmi: ")).append(AndroidUtilities.formatFileSize(doc.size)).append(" · ").append(doc.mime_type).append('\n');
             sb.append("   DC: ").append(doc.dc_id).append('\n');
             double dur = m.getDuration();
             if (dur > 0) {
                 int d = (int) Math.round(dur);
-                sb.append("   Davomiyligi: ").append(d / 60).append(":").append(String.format(java.util.Locale.US, "%02d", d % 60)).append('\n');
+                sb.append(org.telegram.messenger.MgLang.t("   Davomiyligi: ")).append(d / 60).append(":").append(String.format(java.util.Locale.US, "%02d", d % 60)).append('\n');
             }
             for (TLRPC.DocumentAttribute a : doc.attributes) {
                 if (a instanceof TLRPC.TL_documentAttributeVideo || a instanceof TLRPC.TL_documentAttributeImageSize) {
                     if (a.w > 0 && a.h > 0) {
-                        sb.append("   O'lcham: ").append(a.w).append("×").append(a.h).append('\n');
+                        sb.append(org.telegram.messenger.MgLang.t("   O'lcham: ")).append(a.w).append("×").append(a.h).append('\n');
                         break;
                     }
                 }
             }
         } else if (msg.media instanceof TLRPC.TL_messageMediaPhoto && msg.media.photo != null) {
             TLRPC.PhotoSize big = FileLoader.getClosestPhotoSizeWithSize(msg.media.photo.sizes, AndroidUtilities.getPhotoSize());
-            sb.append("🖼 Rasm");
+            sb.append(org.telegram.messenger.MgLang.t("🖼 Rasm"));
             if (big != null) {
                 sb.append(": ").append(big.w).append("×").append(big.h);
                 if (big.size > 0) {
@@ -627,13 +627,13 @@ public class MgMessageTools {
             sb.append(" · DC ").append(msg.media.photo.dc_id).append('\n');
         }
         if (msg.ttl_period > 0) {
-            sb.append("⏳ Avto-o'chish: ").append(msg.ttl_period / 3600).append(" soatdan keyin").append('\n');
+            sb.append(org.telegram.messenger.MgLang.t("⏳ Avto-o'chish: ")).append(msg.ttl_period / 3600).append(org.telegram.messenger.MgLang.t(" soatdan keyin")).append('\n');
         }
         if (msg.silent) {
-            sb.append("🔕 Ovozsiz yuborilgan").append('\n');
+            sb.append(org.telegram.messenger.MgLang.t("🔕 Ovozsiz yuborilgan")).append('\n');
         }
         if (msg.noforwards) {
-            sb.append("🚫 Uzatish taqiqlangan").append('\n');
+            sb.append(org.telegram.messenger.MgLang.t("🚫 Uzatish taqiqlangan")).append('\n');
         }
         String link = messageLink(f, m);
         if (link != null) {
@@ -650,13 +650,38 @@ public class MgMessageTools {
         scroll.setPadding(AndroidUtilities.dp(24), AndroidUtilities.dp(4), AndroidUtilities.dp(24), AndroidUtilities.dp(4));
         scroll.addView(tv);
         AlertDialog.Builder b = new AlertDialog.Builder(ctx, f.getResourceProvider());
-        b.setTitle("Xabar tafsilotlari");
+        b.setTitle(org.telegram.messenger.MgLang.t("Xabar tafsilotlari"));
         b.setView(scroll);
-        b.setPositiveButton("Yopish", null);
-        b.setNeutralButton("Nusxalash", (d, w) -> {
+        b.setPositiveButton(org.telegram.messenger.MgLang.t("Yopish"), null);
+        b.setNeutralButton(org.telegram.messenger.MgLang.t("Nusxalash"), (d, w) -> {
             AndroidUtilities.addToClipboard(out);
-            BulletinFactory.of(f).createCopyBulletin("Tafsilotlar nusxalandi").show();
+            BulletinFactory.of(f).createCopyBulletin(org.telegram.messenger.MgLang.t("Tafsilotlar nusxalandi")).show();
         });
         f.showDialog(b.create());
+    }
+
+    /** Tanlangan xabarlarning ochiq havolalari (kanal/superguruh); yo'q bo'lsa null */
+    public static String linksFor(ChatActivity f, java.util.List<MessageObject> msgs) {
+        if (msgs == null || msgs.isEmpty()) {
+            return null;
+        }
+        java.util.LinkedHashSet<String> links = new java.util.LinkedHashSet<>();
+        java.util.HashSet<Long> groups = new java.util.HashSet<>();
+        for (MessageObject m : msgs) {
+            if (m == null) {
+                continue;
+            }
+            if (m.getGroupId() != 0 && !groups.add(m.getGroupId())) {
+                continue;
+            }
+            String l = messageLink(f, m);
+            if (l != null) {
+                links.add(l);
+            }
+        }
+        if (links.isEmpty()) {
+            return null;
+        }
+        return TextUtils.join("\n", links);
     }
 }

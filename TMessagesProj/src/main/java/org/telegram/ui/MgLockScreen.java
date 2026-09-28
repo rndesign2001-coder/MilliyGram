@@ -155,11 +155,11 @@ public class MgLockScreen extends Dialog {
         content.addView(subtitleView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 32, 6, 32, 0));
 
         if (mode == MODE_VERIFY) {
-            titleView.setText(TextUtils.isEmpty(title) ? "Qulf" : title);
-            subtitleView.setText(isPattern() ? "Grafik kalitni chizing" : "PIN kodni kiriting");
+            titleView.setText(TextUtils.isEmpty(title) ? org.telegram.messenger.MgLang.t("Qulf") : title);
+            subtitleView.setText(isPattern() ? org.telegram.messenger.MgLang.t("Grafik kalitni chizing") : org.telegram.messenger.MgLang.t("PIN kodni kiriting"));
         } else {
-            titleView.setText(isPattern() ? "Grafik kalit yarating" : "PIN kod yarating");
-            subtitleView.setText(isPattern() ? "Kamida 4 ta nuqtani birlashtiring" : "4 xonali PIN kod o'ylab toping");
+            titleView.setText(isPattern() ? org.telegram.messenger.MgLang.t("Grafik kalit yarating") : org.telegram.messenger.MgLang.t("PIN kod yarating"));
+            subtitleView.setText(isPattern() ? org.telegram.messenger.MgLang.t("Kamida 4 ta nuqtani birlashtiring") : org.telegram.messenger.MgLang.t("4 xonali PIN kod o'ylab toping"));
         }
 
         if (isPattern()) {
@@ -181,7 +181,7 @@ public class MgLockScreen extends Dialog {
         bottom.setOrientation(LinearLayout.HORIZONTAL);
         bottom.setGravity(Gravity.CENTER);
         TextView cancel = new TextView(context);
-        cancel.setText("Bekor qilish");
+        cancel.setText(org.telegram.messenger.MgLang.t("Bekor qilish"));
         cancel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
         cancel.setTextColor(col(Theme.key_windowBackgroundWhiteBlueText4));
         cancel.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(10), AndroidUtilities.dp(16), AndroidUtilities.dp(10));
@@ -190,7 +190,7 @@ public class MgLockScreen extends Dialog {
         bottom.addView(cancel, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT));
         if (isPattern() && canUseFingerprint()) {
             TextView finger = new TextView(context);
-            finger.setText("Barmoq izi");
+            finger.setText(org.telegram.messenger.MgLang.t("Barmoq izi"));
             finger.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
             finger.setTextColor(col(Theme.key_windowBackgroundWhiteBlueText4));
             finger.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(10), AndroidUtilities.dp(16), AndroidUtilities.dp(10));
@@ -261,8 +261,8 @@ public class MgLockScreen extends Dialog {
             });
             BiometricPrompt.PromptInfo info = new BiometricPrompt.PromptInfo.Builder()
                     .setTitle("MilliyGram")
-                    .setSubtitle("Barmoq izi bilan ochish")
-                    .setNegativeButtonText(isPattern() ? "Grafik kalit" : "PIN kod")
+                    .setSubtitle(org.telegram.messenger.MgLang.t("Barmoq izi bilan ochish"))
+                    .setNegativeButtonText(isPattern() ? org.telegram.messenger.MgLang.t("Grafik kalit") : org.telegram.messenger.MgLang.t("PIN kod"))
                     .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK)
                     .build();
             prompt.authenticate(info);
@@ -406,20 +406,20 @@ public class MgLockScreen extends Dialog {
             if (MgConfig.checkLock(scope, stored)) {
                 finish(true);
             } else {
-                onError("Noto'g'ri. Qayta urinib ko'ring");
+                onError(org.telegram.messenger.MgLang.t("Noto'g'ri. Qayta urinib ko'ring"));
             }
         } else {
             if (firstEntry == null) {
                 firstEntry = secret;
                 clearInput();
-                subtitleView.setText(isPattern() ? "Grafik kalitni yana bir marta chizing" : "PIN kodni takrorlang");
+                subtitleView.setText(isPattern() ? org.telegram.messenger.MgLang.t("Grafik kalitni yana bir marta chizing") : org.telegram.messenger.MgLang.t("PIN kodni takrorlang"));
                 duckView.playAnimation();
             } else if (firstEntry.equals(secret)) {
                 MgConfig.setLock(scope, lockType, secret);
                 finish(true);
             } else {
                 firstEntry = null;
-                onError("Mos kelmadi. Qaytadan boshlang");
+                onError(org.telegram.messenger.MgLang.t("Mos kelmadi. Qaytadan boshlang"));
             }
         }
     }
@@ -607,7 +607,7 @@ public class MgLockScreen extends Dialog {
                         }
                         submit(sb.toString());
                     } else if (!selected.isEmpty()) {
-                        onError("Kamida 4 ta nuqtani birlashtiring");
+                        onError(org.telegram.messenger.MgLang.t("Kamida 4 ta nuqtani birlashtiring"));
                     }
                     break;
             }

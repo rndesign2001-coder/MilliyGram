@@ -54,18 +54,18 @@ public class MgChatTools {
                 return c.title;
             }
         }
-        return m.isOut() ? "Siz" : "Noma'lum";
+        return m.isOut() ? org.telegram.messenger.MgLang.t("Siz") : org.telegram.messenger.MgLang.t("Noma'lum");
     }
 
     private static String mediaLabel(MessageObject m) {
-        if (m.isPhoto()) return "[Rasm]";
-        if (m.isRoundVideo()) return "[Doira video]";
-        if (m.isVideo()) return "[Video]";
-        if (m.isVoice()) return "[Ovozli xabar]";
-        if (m.isMusic()) return "[Musiqa]";
-        if (m.isSticker()) return "[Stiker]";
-        if (m.isGif()) return "[GIF]";
-        if (m.messageOwner != null && m.messageOwner.media instanceof TLRPC.TL_messageMediaDocument) return "[Fayl]";
+        if (m.isPhoto()) return org.telegram.messenger.MgLang.t("[Rasm]");
+        if (m.isRoundVideo()) return org.telegram.messenger.MgLang.t("[Doira video]");
+        if (m.isVideo()) return org.telegram.messenger.MgLang.t("[Video]");
+        if (m.isVoice()) return org.telegram.messenger.MgLang.t("[Ovozli xabar]");
+        if (m.isMusic()) return org.telegram.messenger.MgLang.t("[Musiqa]");
+        if (m.isSticker()) return org.telegram.messenger.MgLang.t("[Stiker]");
+        if (m.isGif()) return org.telegram.messenger.MgLang.t("[GIF]");
+        if (m.messageOwner != null && m.messageOwner.media instanceof TLRPC.TL_messageMediaDocument) return org.telegram.messenger.MgLang.t("[Fayl]");
         return null;
     }
 
@@ -87,16 +87,16 @@ public class MgChatTools {
         }
         ArrayList<MessageObject> list = chronological(loaded);
         if (list.isEmpty()) {
-            BulletinFactory.of(fragment).createErrorBulletin("Eksport uchun xabar yo'q").show();
+            BulletinFactory.of(fragment).createErrorBulletin(org.telegram.messenger.MgLang.t("Eksport uchun xabar yo'q")).show();
             return;
         }
         MessagesController mc = fragment.getMessagesController();
         SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.US);
         StringBuilder sb = new StringBuilder();
-        sb.append("MilliyGram — chat eksporti\n");
-        sb.append("Chat: ").append(chatTitle).append('\n');
-        sb.append("Xabarlar: ").append(list.size()).append(" ta (ekranda yuklanganlari)\n");
-        sb.append("Sana: ").append(df.format(new Date())).append("\n");
+        sb.append(org.telegram.messenger.MgLang.t("MilliyGram — chat eksporti\n"));
+        sb.append(org.telegram.messenger.MgLang.t("Chat: ")).append(chatTitle).append('\n');
+        sb.append(org.telegram.messenger.MgLang.t("Xabarlar: ")).append(list.size()).append(org.telegram.messenger.MgLang.t(" ta (ekranda yuklanganlari)\n"));
+        sb.append(org.telegram.messenger.MgLang.t("Sana: ")).append(df.format(new Date())).append("\n");
         sb.append("========================================\n\n");
         for (MessageObject m : list) {
             sb.append('[').append(df.format(new Date(m.messageOwner.date * 1000L))).append("] ");
@@ -131,10 +131,10 @@ public class MgChatTools {
             intent.setType("text/plain");
             intent.putExtra(Intent.EXTRA_STREAM, uri);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            fragment.getParentActivity().startActivity(Intent.createChooser(intent, "Chat eksporti"));
+            fragment.getParentActivity().startActivity(Intent.createChooser(intent, org.telegram.messenger.MgLang.t("Chat eksporti")));
         } catch (Throwable e) {
             FileLog.e(e);
-            BulletinFactory.of(fragment).createErrorBulletin("Eksport qilib bo'lmadi").show();
+            BulletinFactory.of(fragment).createErrorBulletin(org.telegram.messenger.MgLang.t("Eksport qilib bo'lmadi")).show();
         }
     }
 
@@ -145,7 +145,7 @@ public class MgChatTools {
         }
         ArrayList<MessageObject> list = chronological(loaded);
         if (list.isEmpty()) {
-            BulletinFactory.of(fragment).createErrorBulletin("Statistika uchun xabar yo'q").show();
+            BulletinFactory.of(fragment).createErrorBulletin(org.telegram.messenger.MgLang.t("Statistika uchun xabar yo'q")).show();
             return;
         }
         MessagesController mc = fragment.getMessagesController();
@@ -179,26 +179,26 @@ public class MgChatTools {
         StringBuilder sb = new StringBuilder();
         sb.append("📅 ").append(df.format(new Date(list.get(0).messageOwner.date * 1000L)))
                 .append(" — ").append(df.format(new Date(list.get(list.size() - 1).messageOwner.date * 1000L))).append("\n\n");
-        sb.append("💬 Jami xabarlar: ").append(list.size()).append("\n");
-        sb.append("📤 Siz yozganlar: ").append(out).append("\n");
-        sb.append("📝 So'zlar: ").append(words).append("\n\n");
-        sb.append("🖼 Rasmlar: ").append(photos).append("   🎬 Videolar: ").append(videos).append("\n");
-        sb.append("🎙 Ovozli: ").append(voices).append("   😀 Stikerlar: ").append(stickers).append("\n");
-        sb.append("📎 Fayllar: ").append(files).append("   🔗 Havolalar: ").append(links).append("\n\n");
-        sb.append("⏰ Eng faol vaqt: ").append(String.format(Locale.US, "%02d:00–%02d:00", bestHour, (bestHour + 1) % 24)).append("\n\n");
-        sb.append("🏆 Eng faollar:\n");
+        sb.append(org.telegram.messenger.MgLang.t("💬 Jami xabarlar: ")).append(list.size()).append("\n");
+        sb.append(org.telegram.messenger.MgLang.t("📤 Siz yozganlar: ")).append(out).append("\n");
+        sb.append(org.telegram.messenger.MgLang.t("📝 So'zlar: ")).append(words).append("\n\n");
+        sb.append(org.telegram.messenger.MgLang.t("🖼 Rasmlar: ")).append(photos).append(org.telegram.messenger.MgLang.t("   🎬 Videolar: ")).append(videos).append("\n");
+        sb.append(org.telegram.messenger.MgLang.t("🎙 Ovozli: ")).append(voices).append(org.telegram.messenger.MgLang.t("   😀 Stikerlar: ")).append(stickers).append("\n");
+        sb.append(org.telegram.messenger.MgLang.t("📎 Fayllar: ")).append(files).append(org.telegram.messenger.MgLang.t("   🔗 Havolalar: ")).append(links).append("\n\n");
+        sb.append(org.telegram.messenger.MgLang.t("⏰ Eng faol vaqt: ")).append(String.format(Locale.US, "%02d:00–%02d:00", bestHour, (bestHour + 1) % 24)).append("\n\n");
+        sb.append(org.telegram.messenger.MgLang.t("🏆 Eng faollar:\n"));
         String[] medals = {"🥇", "🥈", "🥉", "4.", "5."};
         for (int i = 0; i < Math.min(5, top.size()); i++) {
             sb.append(medals[i]).append(' ').append(top.get(i).getKey()).append(" — ").append(top.get(i).getValue()).append('\n');
         }
-        sb.append("\nStatistika ekranda yuklangan xabarlar bo'yicha. Ko'proq xabar uchun chatni yuqoriga aylantiring.");
+        sb.append(org.telegram.messenger.MgLang.t("\nStatistika ekranda yuklangan xabarlar bo'yicha. Ko'proq xabar uchun chatni yuqoriga aylantiring."));
         AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getParentActivity(), fragment.getResourceProvider());
-        builder.setTitle("📊 Chat statistikasi");
+        builder.setTitle(org.telegram.messenger.MgLang.t("📊 Chat statistikasi"));
         builder.setMessage(sb.toString());
         builder.setPositiveButton("OK", null);
-        builder.setNeutralButton("Nusxalash", (dialog, which) -> {
+        builder.setNeutralButton(org.telegram.messenger.MgLang.t("Nusxalash"), (dialog, which) -> {
             AndroidUtilities.addToClipboard(sb.toString());
-            BulletinFactory.of(fragment).createCopyBulletin("Statistika nusxalandi").show();
+            BulletinFactory.of(fragment).createCopyBulletin(org.telegram.messenger.MgLang.t("Statistika nusxalandi")).show();
         });
         fragment.showDialog(builder.create());
     }

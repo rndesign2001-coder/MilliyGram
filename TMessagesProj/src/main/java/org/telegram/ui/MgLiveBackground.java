@@ -5,12 +5,14 @@
 
 package org.telegram.ui;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -18,49 +20,44 @@ import org.telegram.messenger.FileLog;
 import org.telegram.messenger.MgConfig;
 import org.telegram.messenger.MgPrayer;
 import org.telegram.messenger.NotificationCenter;
-import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.Theme;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.Calendar;
 
 /**
- * Jonli chat foni: Registon yoki Toshkent Siti manzarasi kun vaqtiga qarab o'zgaradi —
- * tong, kun, shom, tun. Vaqtlar tanlangan hududning quyosh chiqishi/botishi bo'yicha hisoblanadi.
+ * Kun vaqtiga qarab o'zgaradigan chat foni: foydalanuvchi tong, kun, shom va tun uchun
+ * o'z suratlarini tanlaydi (masalan, Registon yoki Toshkent Siti). Vaqtlar tanlangan hududning
+ * quyosh chiqishi va botishi bo'yicha hisoblanadi.
  */
 public class MgLiveBackground {
 
-    public static final String[] SCENES = {"Registon", "Toshkent Siti", "Almashib (kunma-kun)"};
-    public static final String[] MODES = {"Avtomatik (quyosh bo'yicha)", "Doim tong", "Doim kun", "Doim shom", "Doim tun"};
-    public static final String[] SLOT_NAMES = {"Tong", "Kun", "Shom", "Tun"};
+    public static final String[] MODES = {org.telegram.messenger.MgLang.t("Avtomatik (quyosh bo'yicha)"), org.telegram.messenger.MgLang.t("Doim tong"), org.telegram.messenger.MgLang.t("Doim kun"), org.telegram.messenger.MgLang.t("Doim shom"), org.telegram.messenger.MgLang.t("Doim tun")};
+    public static final String[] SLOT_NAMES = {org.telegram.messenger.MgLang.t("Tong"), org.telegram.messenger.MgLang.t("Kun"), org.telegram.messenger.MgLang.t("Shom"), org.telegram.messenger.MgLang.t("Tun")};
     public static final int[] DIMS = {0, 10, 20, 30, 45};
-
-    private static final int[][] RES = {
-            {R.drawable.mg_live_registon_tong, R.drawable.mg_live_registon_kun, R.drawable.mg_live_registon_shom, R.drawable.mg_live_registon_tun},
-            {R.drawable.mg_live_city_tong, R.drawable.mg_live_city_kun, R.drawable.mg_live_city_shom, R.drawable.mg_live_city_tun},
-    };
+    public static final int REQUEST_BASE = 7700;
 
     private static String loadedKey;
     private static BitmapDrawable drawable;
-    private static volatile boolean enabledCache;
-    private static volatile boolean cacheReady;
+    private static volatile Boolean enabledCache;
 
     public static boolean isEnabled() {
-        if (!cacheReady) {
+        if (enabledCache == null) {
             enabledCache = MgConfig.getBool("live_bg", false);
-            cacheReady = true;
         }
-        return enabledCache;
+        return enabledCache && hasAny();
+    }
+
+    public static boolean isSwitchOn() {
+        return MgConfig.getBool("live_bg", false);
     }
 
     public static void setEnabled(boolean v) {
         MgConfig.setBool("live_bg", v);
         enabledCache = v;
-        cacheReady = true;
         onSettingsChanged();
-    }
-
-    public static int getScene() {
-        return Math.max(0, Math.min(2, MgConfig.getInt("live_scene", 0)));
     }
 
     public static int getMode() {
@@ -74,6 +71,41 @@ public class MgLiveBackground {
     public static void set(String key, int value) {
         MgConfig.setInt(key, value);
         onSettingsChanged();
+    }
+
+    public static File slotFile(int slot) {
+        return new File(ApplicationLoader.applicationContext.getFilesDir(), "mg_live_" + slot + ".jpg");
+    }
+
+    public static boolean hasSlot(int slot) {
+        return slotFile(slot).exists();
+    }
+
+    private static volatile Boolean hasAnyCache;
+
+    public static boolean hasAny() {
+        Boolean c = hasAnyCache;
+        if (c != null) {
+            return c;
+        }
+        boolean r = false;
+        for (int i = 0; i < 4; i++) {
+            if (hasSlot(i)) {
+                r = true;
+                break;
+            }
+        }
+        hasAnyCache = r;
+        return r;
+    }
+
+    private static boolean hasAnyRaw() {
+        for (int i = 0; i < 4; i++) {
+            if (hasSlot(i)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** 0 tong, 1 kun, 2 shom, 3 tun */
@@ -100,16 +132,21 @@ public class MgLiveBackground {
         }
     }
 
-    public static int currentScene() {
-        int scene = getScene();
-        if (scene == 2) {
-            return Calendar.getInstance().get(Calendar.DAY_OF_YEAR) % 2;
+    /** Joriy vaqt uchun surat bo'lmasa, eng yaqin mavjudi */
+    private static int effectiveSlot() {
+        int s = currentSlot();
+        int[][] order = {{0, 1, 2, 3}, {1, 0, 2, 3}, {2, 3, 1, 0}, {3, 2, 0, 1}};
+        for (int c : order[s]) {
+            if (hasSlot(c)) {
+                return c;
+            }
         }
-        return scene;
+        return -1;
     }
 
     private static String computeKey() {
-        return currentScene() + "_" + currentSlot() + "_" + getDim();
+        int s = effectiveSlot();
+        return s + "_" + getDim() + "_" + (s >= 0 ? slotFile(s).lastModified() : 0);
     }
 
     /** Theme.getCachedWallpaperNonBlocking() dan chaqiriladi; o'chiq bo'lsa null */
@@ -117,12 +154,16 @@ public class MgLiveBackground {
         if (!isEnabled()) {
             return null;
         }
+        int slot = effectiveSlot();
+        if (slot < 0) {
+            return null;
+        }
         String key = computeKey();
         if (drawable != null && key.equals(loadedKey)) {
             return drawable;
         }
         boolean changed = loadedKey != null && !key.equals(loadedKey);
-        BitmapDrawable d = load(currentScene(), currentSlot(), getDim());
+        BitmapDrawable d = load(slot, getDim());
         if (d == null) {
             return drawable;
         }
@@ -138,12 +179,16 @@ public class MgLiveBackground {
         return drawable;
     }
 
-    public static BitmapDrawable load(int scene, int slot, int dim) {
+    public static BitmapDrawable load(int slot, int dim) {
         try {
+            File f = slotFile(slot);
+            if (!f.exists()) {
+                return null;
+            }
             BitmapFactory.Options o = new BitmapFactory.Options();
             o.inPreferredConfig = Bitmap.Config.ARGB_8888;
             o.inMutable = true;
-            Bitmap b = BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), RES[scene][slot], o);
+            Bitmap b = BitmapFactory.decodeFile(f.getAbsolutePath(), o);
             if (b == null) {
                 return null;
             }
@@ -160,14 +205,67 @@ public class MgLiveBackground {
         }
     }
 
-    /** Vaqt oralig'i almashgan bo'lsa fonni yangilaydi (ilova ochilganda va har bir necha daqiqada) */
+    public static Bitmap thumb(int slot) {
+        try {
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inSampleSize = 4;
+            return BitmapFactory.decodeFile(slotFile(slot).getAbsolutePath(), o);
+        } catch (Throwable e) {
+            return null;
+        }
+    }
+
+    /** Galereyadan tanlangan suratni ekran o'lchamiga keltirib saqlaydi (asl sifatda, JPEG 92%) */
+    public static boolean importImage(Context ctx, Uri uri, int slot) {
+        try {
+            BitmapFactory.Options bounds = new BitmapFactory.Options();
+            bounds.inJustDecodeBounds = true;
+            try (InputStream is = ctx.getContentResolver().openInputStream(uri)) {
+                BitmapFactory.decodeStream(is, null, bounds);
+            }
+            int maxSide = Math.max(AndroidUtilities.displaySize.x, AndroidUtilities.displaySize.y);
+            maxSide = Math.max(1280, Math.min(maxSide, 2560));
+            int sample = 1;
+            while (Math.max(bounds.outWidth, bounds.outHeight) / (sample * 2) >= maxSide) {
+                sample *= 2;
+            }
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inSampleSize = sample;
+            Bitmap b;
+            try (InputStream is = ctx.getContentResolver().openInputStream(uri)) {
+                b = BitmapFactory.decodeStream(is, null, o);
+            }
+            if (b == null) {
+                return false;
+            }
+            float scale = Math.min(1f, maxSide / (float) Math.max(b.getWidth(), b.getHeight()));
+            if (scale < 1f) {
+                b = Bitmap.createScaledBitmap(b, Math.round(b.getWidth() * scale), Math.round(b.getHeight() * scale), true);
+            }
+            try (FileOutputStream os = new FileOutputStream(slotFile(slot))) {
+                b.compress(Bitmap.CompressFormat.JPEG, 92, os);
+            }
+            onSettingsChanged();
+            return true;
+        } catch (Throwable e) {
+            FileLog.e(e);
+            return false;
+        }
+    }
+
+    public static void removeImage(int slot) {
+        //noinspection ResultOfMethodCallIgnored
+        slotFile(slot).delete();
+        onSettingsChanged();
+    }
+
+    /** Vaqt oralig'i almashgan bo'lsa fonni yangilaydi */
     public static void check() {
         if (!isEnabled()) {
             return;
         }
-        String key = computeKey();
-        if (!key.equals(loadedKey)) {
-            Utils.run(() -> getDrawable());
+        if (!computeKey().equals(loadedKey)) {
+            org.telegram.messenger.Utilities.globalQueue.postRunnable(MgLiveBackground::getDrawable);
         }
     }
 
@@ -193,6 +291,7 @@ public class MgLiveBackground {
         synchronized (MgLiveBackground.class) {
             loadedKey = null;
             drawable = null;
+            hasAnyCache = null;
         }
         AndroidUtilities.runOnUIThread(() -> {
             Drawable d = getDrawable();
@@ -203,11 +302,5 @@ public class MgLiveBackground {
             }
             NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.didSetNewWallpapper);
         });
-    }
-
-    private static class Utils {
-        static void run(Runnable r) {
-            org.telegram.messenger.Utilities.globalQueue.postRunnable(r);
-        }
     }
 }

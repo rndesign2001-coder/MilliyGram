@@ -200,7 +200,7 @@ public class MgCustomForward {
             bb.setCornerRadius(AndroidUtilities.dp(10));
             bb.setColor(0x88000000);
             badge.setBackground(bb);
-            badge.setText(mediaLabel(first) + (st.items.size() > 1 ? "  ·  albom: " + st.items.size() + " ta" : ""));
+            badge.setText(mediaLabel(first) + (st.items.size() > 1 ? org.telegram.messenger.MgLang.t("  ·  albom: ") + st.items.size() + org.telegram.messenger.MgLang.t(" ta") : ""));
             preview.addView(badge, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.BOTTOM, 8, 0, 0, 8));
             GradientDrawable pbg = new GradientDrawable();
             pbg.setCornerRadius(AndroidUtilities.dp(10));
@@ -210,23 +210,23 @@ public class MgCustomForward {
             root.addView(preview, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, hasThumb ? 170 : 40, 24, 4, 24, 4));
 
             mediaCell = new TextCheckCell(ctx, 23, true, fragment.getResourceProvider());
-            mediaCell.setTextAndCheck("Mediani ham yuborish", st.withMedia, false);
+            mediaCell.setTextAndCheck(org.telegram.messenger.MgLang.t("Mediani ham yuborish"), st.withMedia, false);
             optionsBox.addView(mediaCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50));
             if (isPhotoOrDoc(first) && !captionless(first)) {
                 spoilerCell = new TextCheckCell(ctx, 23, true, fragment.getResourceProvider());
-                spoilerCell.setTextAndCheck("Spoiler bilan yashirish", st.spoiler, false);
+                spoilerCell.setTextAndCheck(org.telegram.messenger.MgLang.t("Spoiler bilan yashirish"), st.spoiler, false);
                 optionsBox.addView(spoilerCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50));
             }
         }
         TextCheckCell silentCell = new TextCheckCell(ctx, 23, true, fragment.getResourceProvider());
-        silentCell.setTextAndCheck("Ovozsiz yuborish", st.silent, false);
+        silentCell.setTextAndCheck(org.telegram.messenger.MgLang.t("Ovozsiz yuborish"), st.silent, false);
         optionsBox.addView(silentCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50));
 
         EditTextCaption edit = new EditTextCaption(ctx, fragment.getResourceProvider());
         edit.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
         edit.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
         edit.setHintTextColor(Theme.getColor(Theme.key_dialogTextHint));
-        edit.setHint(st.hasMedia ? "Izoh (bo'sh qoldirish mumkin)" : "Xabar matni");
+        edit.setHint(st.hasMedia ? org.telegram.messenger.MgLang.t("Izoh (bo'sh qoldirish mumkin)") : org.telegram.messenger.MgLang.t("Xabar matni"));
         edit.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
         edit.setSingleLine(false);
         edit.setMinLines(3);
@@ -241,7 +241,7 @@ public class MgCustomForward {
         ebg.setStroke(AndroidUtilities.dp(1), Theme.multAlpha(Theme.getColor(Theme.key_dialogTextBlack), 0.2f));
         edit.setBackground(ebg);
         edit.setText(st.text);
-        root.addView(sectionLabel(ctx, st.hasMedia ? "1. Izohni tahrirlang" : "1. Matnni tahrirlang"), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 10, 24, 6));
+        root.addView(sectionLabel(ctx, st.hasMedia ? org.telegram.messenger.MgLang.t("1. Izohni tahrirlang") : org.telegram.messenger.MgLang.t("1. Matnni tahrirlang")), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 10, 24, 6));
         root.addView(edit, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 0, 24, 0));
 
         // Formatlash paneli: matnni belgilab tugmani bosing (qayta bosish — olib tashlaydi)
@@ -253,15 +253,15 @@ public class MgCustomForward {
         fmtScroll.addView(fmt);
         root.addView(fmtScroll, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 44, 0, 8, 0, 0));
         final Runnable[] fmtSay = new Runnable[1];
-        addFmt(ctx, fmt, "B", android.graphics.Typeface.DEFAULT_BOLD, 0, "Qalin", edit, () -> edit.toggleStyleForSelection(org.telegram.ui.Components.TextStyleSpan.FLAG_STYLE_BOLD), fmtSay);
-        addFmt(ctx, fmt, "I", android.graphics.Typeface.create(android.graphics.Typeface.SERIF, android.graphics.Typeface.ITALIC), 0, "Qiya", edit, () -> edit.toggleStyleForSelection(org.telegram.ui.Components.TextStyleSpan.FLAG_STYLE_ITALIC), fmtSay);
-        addFmt(ctx, fmt, "U", null, android.graphics.Paint.UNDERLINE_TEXT_FLAG, "Tagiga chizilgan", edit, () -> edit.toggleStyleForSelection(org.telegram.ui.Components.TextStyleSpan.FLAG_STYLE_UNDERLINE), fmtSay);
-        addFmt(ctx, fmt, "S", null, android.graphics.Paint.STRIKE_THRU_TEXT_FLAG, "O'rtasiga chizilgan", edit, () -> edit.toggleStyleForSelection(org.telegram.ui.Components.TextStyleSpan.FLAG_STYLE_STRIKE), fmtSay);
-        addFmt(ctx, fmt, "</>", android.graphics.Typeface.MONOSPACE, 0, "Monoshrift", edit, () -> edit.toggleStyleForSelection(org.telegram.ui.Components.TextStyleSpan.FLAG_STYLE_MONO), fmtSay);
-        addFmt(ctx, fmt, "▒ Spoyler", null, 0, "Yashirin (spoyler)", edit, edit::makeSelectedSpoiler, fmtSay);
-        addFmt(ctx, fmt, "❝ Iqtibos", null, 0, "Iqtibos", edit, edit::makeSelectedQuote, fmtSay);
-        addFmt(ctx, fmt, "🔗 Havola", null, 0, "Havola", edit, edit::makeSelectedUrl, fmtSay);
-        addFmt(ctx, fmt, "✕ Oddiy", null, 0, "Formatsiz", edit, edit::makeSelectedRegular, fmtSay);
+        addFmt(ctx, fmt, "B", android.graphics.Typeface.DEFAULT_BOLD, 0, org.telegram.messenger.MgLang.t("Qalin"), edit, () -> edit.toggleStyleForSelection(org.telegram.ui.Components.TextStyleSpan.FLAG_STYLE_BOLD), fmtSay);
+        addFmt(ctx, fmt, "I", android.graphics.Typeface.create(android.graphics.Typeface.SERIF, android.graphics.Typeface.ITALIC), 0, org.telegram.messenger.MgLang.t("Qiya"), edit, () -> edit.toggleStyleForSelection(org.telegram.ui.Components.TextStyleSpan.FLAG_STYLE_ITALIC), fmtSay);
+        addFmt(ctx, fmt, "U", null, android.graphics.Paint.UNDERLINE_TEXT_FLAG, org.telegram.messenger.MgLang.t("Tagiga chizilgan"), edit, () -> edit.toggleStyleForSelection(org.telegram.ui.Components.TextStyleSpan.FLAG_STYLE_UNDERLINE), fmtSay);
+        addFmt(ctx, fmt, "S", null, android.graphics.Paint.STRIKE_THRU_TEXT_FLAG, org.telegram.messenger.MgLang.t("O'rtasiga chizilgan"), edit, () -> edit.toggleStyleForSelection(org.telegram.ui.Components.TextStyleSpan.FLAG_STYLE_STRIKE), fmtSay);
+        addFmt(ctx, fmt, "</>", android.graphics.Typeface.MONOSPACE, 0, org.telegram.messenger.MgLang.t("Monoshrift"), edit, () -> edit.toggleStyleForSelection(org.telegram.ui.Components.TextStyleSpan.FLAG_STYLE_MONO), fmtSay);
+        addFmt(ctx, fmt, org.telegram.messenger.MgLang.t("▒ Spoyler"), null, 0, org.telegram.messenger.MgLang.t("Yashirin (spoyler)"), edit, edit::makeSelectedSpoiler, fmtSay);
+        addFmt(ctx, fmt, org.telegram.messenger.MgLang.t("❝ Iqtibos"), null, 0, org.telegram.messenger.MgLang.t("Iqtibos"), edit, edit::makeSelectedQuote, fmtSay);
+        addFmt(ctx, fmt, org.telegram.messenger.MgLang.t("🔗 Havola"), null, 0, org.telegram.messenger.MgLang.t("Havola"), edit, edit::makeSelectedUrl, fmtSay);
+        addFmt(ctx, fmt, org.telegram.messenger.MgLang.t("✕ Oddiy"), null, 0, org.telegram.messenger.MgLang.t("Formatsiz"), edit, edit::makeSelectedRegular, fmtSay);
 
         TextView counter = new TextView(ctx);
         counter.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
@@ -283,13 +283,13 @@ public class MgCustomForward {
             }
             AndroidUtilities.runOnUIThread(hideStatus[0] = () -> status.setVisibility(View.GONE), 3500);
         };
-        fmtSay[0] = () -> say.run("Avval matnning bir qismini belgilang (bosib turing va suring)");
+        fmtSay[0] = () -> say.run(org.telegram.messenger.MgLang.t("Avval matnning bir qismini belgilang (bosib turing va suring)"));
         final TextCheckCell mediaCellF = mediaCell;
         Runnable updateCounter = () -> {
             int len = edit.length();
             boolean asCaption = st.hasMedia && (mediaCellF == null || mediaCellF.isChecked());
             int limit = asCaption ? MessagesController.getInstance(account).getCaptionMaxLengthLimit() : MessagesController.getInstance(account).maxMessageLength;
-            String extra = asCaption && len > limit ? "  · alohida xabar bo'lib ketadi" : "";
+            String extra = asCaption && len > limit ? org.telegram.messenger.MgLang.t("  · alohida xabar bo'lib ketadi") : "";
             counter.setText(len + " / " + limit + extra);
             counter.setTextColor(Theme.getColor(len > limit ? Theme.key_text_RedRegular : Theme.key_dialogTextGray3));
         };
@@ -321,12 +321,12 @@ public class MgCustomForward {
         silentCell.setOnClickListener(v -> ((TextCheckCell) v).setChecked(!((TextCheckCell) v).isChecked()));
 
         // Tezkor amallar (2 ustunli to'r)
-        root.addView(sectionLabel(ctx, "2. Tezkor amallar"), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 14, 24, 6));
+        root.addView(sectionLabel(ctx, org.telegram.messenger.MgLang.t("2. Tezkor amallar")), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 14, 24, 6));
         final LinearLayout tools = new ToolGrid(ctx);
         root.addView(tools, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 20, 0, 20, 6));
 
-        tools.addView(chip(ctx, "↺ Asl matn", v -> edit.setText(st.originalText)), null);
-        tools.addView(chip(ctx, "🔗 Havolalarni o'chirish", v -> {
+        tools.addView(chip(ctx, org.telegram.messenger.MgLang.t("↺ Asl matn"), v -> edit.setText(st.originalText)), null);
+        tools.addView(chip(ctx, org.telegram.messenger.MgLang.t("🔗 Havolalarni o'chirish"), v -> {
             Editable e = edit.getText();
             if (e == null) return;
             int removed = 0;
@@ -334,9 +334,9 @@ public class MgCustomForward {
                 e.removeSpan(s);
                 removed++;
             }
-            say.run(removed > 0 ? "✓ Yashirin havolalar olib tashlandi: " + removed : "Yashirin havola topilmadi");
+            say.run(removed > 0 ? org.telegram.messenger.MgLang.t("✓ Yashirin havolalar olib tashlandi: ") + removed : org.telegram.messenger.MgLang.t("Yashirin havola topilmadi"));
         }), null);
-        tools.addView(chip(ctx, "🧽 @ va linklarni tozalash", v -> {
+        tools.addView(chip(ctx, org.telegram.messenger.MgLang.t("🧽 @ va linklarni tozalash"), v -> {
             Editable e = edit.getText();
             if (e == null) return;
             ArrayList<int[]> ranges = new ArrayList<>();
@@ -348,9 +348,9 @@ public class MgCustomForward {
                 e.delete(ranges.get(i)[0], ranges.get(i)[1]);
             }
             cleanupWhitespace(e);
-            say.run(ranges.isEmpty() ? "Tozalanadigan narsa topilmadi" : "✓ Tozalandi: " + ranges.size() + " ta");
+            say.run(ranges.isEmpty() ? org.telegram.messenger.MgLang.t("Tozalanadigan narsa topilmadi") : org.telegram.messenger.MgLang.t("✓ Tozalandi: ") + ranges.size() + org.telegram.messenger.MgLang.t(" ta"));
         }), null);
-        tools.addView(chip(ctx, "🧹 Formatsiz", v -> {
+        tools.addView(chip(ctx, org.telegram.messenger.MgLang.t("🧹 Formatsiz"), v -> {
             Editable e = edit.getText();
             if (e == null) return;
             for (CharacterStyle s : e.getSpans(0, e.length(), CharacterStyle.class)) {
@@ -360,18 +360,18 @@ public class MgCustomForward {
                 e.removeSpan(s);
             }
         }), null);
-        tools.addView(chip(ctx, "🔁 Almashtirish", v -> showReplace(fragment, edit, say)), null);
-        tools.addView(chip(ctx, "✍️ Imzo", v -> addSignature(fragment, edit, say)), null);
-        tools.addView(chip(ctx, "🌐 Tarjima", v -> translateInEditor(fragment, account, edit, say, false)), null);
-        tools.addView(chip(ctx, "🌐+ Tarjimani qo'shish", v -> translateInEditor(fragment, account, edit, say, true)), null);
+        tools.addView(chip(ctx, org.telegram.messenger.MgLang.t("🔁 Almashtirish"), v -> showReplace(fragment, edit, say)), null);
+        tools.addView(chip(ctx, org.telegram.messenger.MgLang.t("✍️ Imzo"), v -> addSignature(fragment, edit, say)), null);
+        tools.addView(chip(ctx, org.telegram.messenger.MgLang.t("🌐 Tarjima"), v -> translateInEditor(fragment, account, edit, say, false)), null);
+        tools.addView(chip(ctx, org.telegram.messenger.MgLang.t("🌐+ Tarjimani qo'shish"), v -> translateInEditor(fragment, account, edit, say, true)), null);
 
-        root.addView(sectionLabel(ctx, "3. Yuborish"), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 14, 24, 0));
+        root.addView(sectionLabel(ctx, org.telegram.messenger.MgLang.t("3. Yuborish")), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 14, 24, 0));
         root.addView(optionsBox, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
 
         TextView hint = new TextView(ctx);
         hint.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
         hint.setTextColor(Theme.getColor(Theme.key_dialogTextGray3));
-        hint.setText("Xabar sizning nomingizdan, \"Forwarded from\" belgisisiz yuboriladi. Pastdagi \"Chatni tanlash\" tugmasini bosing.");
+        hint.setText(org.telegram.messenger.MgLang.t("Xabar sizning nomingizdan, \"Forwarded from\" belgisisiz yuboriladi. Pastdagi \"Chatni tanlash\" tugmasini bosing."));
         root.addView(hint, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 0, 24, 8));
 
         final TextCheckCell spoilerCellF = spoilerCell;
@@ -383,13 +383,13 @@ public class MgCustomForward {
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(ctx, fragment.getResourceProvider());
-        builder.setTitle("Maxsus uzatish");
+        builder.setTitle(org.telegram.messenger.MgLang.t("Maxsus uzatish"));
         builder.setView(scroll);
-        builder.setPositiveButton("Chatni tanlash ➜", (dialog, which) -> {
+        builder.setPositiveButton(org.telegram.messenger.MgLang.t("Chatni tanlash ➜"), (dialog, which) -> {
             saveState.run();
             if (!st.hasMedia || !st.withMedia) {
                 if (TextUtils.isEmpty(st.text.toString().trim())) {
-                    BulletinFactory.of(fragment).createErrorBulletin("Yuborish uchun matn yo'q").show();
+                    BulletinFactory.of(fragment).createErrorBulletin(org.telegram.messenger.MgLang.t("Yuborish uchun matn yo'q")).show();
                     AndroidUtilities.runOnUIThread(() -> showEditor(fragment, st), 250);
                     return;
                 }
@@ -398,7 +398,7 @@ public class MgCustomForward {
             AndroidUtilities.hideKeyboard(edit);
             openPicker(fragment, st);
         });
-        builder.setNegativeButton("Bekor qilish", null);
+        builder.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), null);
         AlertDialog dialog = builder.create();
         fragment.showDialog(dialog);
         AndroidUtilities.runOnUIThread(() -> {
@@ -479,17 +479,17 @@ public class MgCustomForward {
     }
 
     private static String mediaLabel(MessageObject m) {
-        if (m.isPhoto()) return "🖼 Rasm";
-        if (m.isRoundVideo()) return "⏺ Doira video";
-        if (m.isVideo()) return "🎬 Video";
-        if (m.isVoice()) return "🎙 Ovozli xabar";
-        if (m.isMusic()) return "🎵 Musiqa";
-        if (m.isSticker() || m.isAnimatedSticker()) return "😀 Stiker";
+        if (m.isPhoto()) return org.telegram.messenger.MgLang.t("🖼 Rasm");
+        if (m.isRoundVideo()) return org.telegram.messenger.MgLang.t("⏺ Doira video");
+        if (m.isVideo()) return org.telegram.messenger.MgLang.t("🎬 Video");
+        if (m.isVoice()) return org.telegram.messenger.MgLang.t("🎙 Ovozli xabar");
+        if (m.isMusic()) return org.telegram.messenger.MgLang.t("🎵 Musiqa");
+        if (m.isSticker() || m.isAnimatedSticker()) return org.telegram.messenger.MgLang.t("😀 Stiker");
         if (m.isGif()) return "GIF";
-        if (m.isPoll()) return "📊 So'rovnoma";
-        if (m.isDice()) return "🎲 Zar";
-        if (m.messageOwner != null && m.messageOwner.media != null && m.messageOwner.media.document != null) return "📎 Fayl";
-        return "📎 Media";
+        if (m.isPoll()) return org.telegram.messenger.MgLang.t("📊 So'rovnoma");
+        if (m.isDice()) return org.telegram.messenger.MgLang.t("🎲 Zar");
+        if (m.messageOwner != null && m.messageOwner.media != null && m.messageOwner.media.document != null) return org.telegram.messenger.MgLang.t("📎 Fayl");
+        return org.telegram.messenger.MgLang.t("📎 Media");
     }
 
     private static void cleanupWhitespace(Editable e) {
@@ -520,7 +520,7 @@ public class MgCustomForward {
         String lastFrom = MgConfig.getString("mg_cf_replace_from", "");
         String lastTo = MgConfig.getString("mg_cf_replace_to", "");
         org.telegram.ui.Components.EditTextBoldCursor[] fields = {from, to};
-        String[] hints = {"Nimani (masalan: @eski_kanal)", "Nimaga (masalan: @mening_kanalim)"};
+        String[] hints = {org.telegram.messenger.MgLang.t("Nimani (masalan: @eski_kanal)"), org.telegram.messenger.MgLang.t("Nimaga (masalan: @mening_kanalim)")};
         String[] values = {lastFrom, lastTo};
         for (int i = 0; i < 2; i++) {
             org.telegram.ui.Components.EditTextBoldCursor f = fields[i];
@@ -536,9 +536,9 @@ public class MgCustomForward {
             ll.addView(f, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 44, 24, 6, 24, 6));
         }
         AlertDialog.Builder b = new AlertDialog.Builder(ctx, fragment.getResourceProvider());
-        b.setTitle("🔁 Matnni almashtirish");
+        b.setTitle(org.telegram.messenger.MgLang.t("🔁 Matnni almashtirish"));
         b.setView(ll);
-        b.setPositiveButton("Almashtirish", (d, w) -> {
+        b.setPositiveButton(org.telegram.messenger.MgLang.t("Almashtirish"), (d, w) -> {
             String f = from.getText() == null ? "" : from.getText().toString();
             String t = to.getText() == null ? "" : to.getText().toString();
             if (f.isEmpty()) return;
@@ -556,9 +556,9 @@ public class MgCustomForward {
                 if (idx == 0) break;
                 idx = lower.lastIndexOf(fl, idx - 1);
             }
-            say.run(count > 0 ? "✓ Almashtirildi: " + count + " ta" : "\"" + f + "\" topilmadi");
+            say.run(count > 0 ? org.telegram.messenger.MgLang.t("✓ Almashtirildi: ") + count + org.telegram.messenger.MgLang.t(" ta") : "\"" + f + org.telegram.messenger.MgLang.t("\" topilmadi"));
         });
-        b.setNegativeButton("Bekor", null);
+        b.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor"), null);
         b.show();
     }
 
@@ -581,7 +581,7 @@ public class MgCustomForward {
         }
         e.append(sig);
         target.setSelection(target.length());
-        say.run("✓ Imzo qo'shildi (qayta bossangiz — tahrirlash)");
+        say.run(org.telegram.messenger.MgLang.t("✓ Imzo qo'shildi (qayta bossangiz — tahrirlash)"));
     }
 
     public static void editSignature(org.telegram.ui.ActionBar.BaseFragment fragment, Runnable after) {
@@ -595,7 +595,7 @@ public class MgCustomForward {
         f.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
         f.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
         f.setHintTextColor(Theme.getColor(Theme.key_dialogTextHint));
-        f.setHint("Masalan: 👉 @mening_kanalim");
+        f.setHint(org.telegram.messenger.MgLang.t("Masalan: 👉 @mening_kanalim"));
         f.setText(MgConfig.getString("mg_cf_signature", ""));
         f.setCursorColor(Theme.getColor(Theme.key_dialogTextBlack));
         f.setLineColors(Theme.getColor(Theme.key_windowBackgroundWhiteInputField), Theme.getColor(Theme.key_windowBackgroundWhiteInputFieldActivated), Theme.getColor(Theme.key_text_RedRegular));
@@ -603,16 +603,16 @@ public class MgCustomForward {
         FrameLayout fl = new FrameLayout(ctx);
         fl.addView(f, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP, 24, 6, 24, 6));
         AlertDialog.Builder b = new AlertDialog.Builder(ctx, fragment.getResourceProvider());
-        b.setTitle("✍️ Imzo");
-        b.setMessage("Maxsus uzatishda \"Imzo\" tugmasi bosilganda xabar oxiriga qo'shiladi.");
+        b.setTitle(org.telegram.messenger.MgLang.t("✍️ Imzo"));
+        b.setMessage(org.telegram.messenger.MgLang.t("Maxsus uzatishda \"Imzo\" tugmasi bosilganda xabar oxiriga qo'shiladi."));
         b.setView(fl);
-        b.setPositiveButton("Saqlash", (d, w) -> {
+        b.setPositiveButton(org.telegram.messenger.MgLang.t("Saqlash"), (d, w) -> {
             MgConfig.setString("mg_cf_signature", f.getText() == null ? "" : f.getText().toString().trim());
             if (after != null && !TextUtils.isEmpty(MgConfig.getString("mg_cf_signature", ""))) {
                 after.run();
             }
         });
-        b.setNegativeButton("Bekor", null);
+        b.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor"), null);
         if (overlay) {
             b.show();
         } else {
@@ -626,15 +626,15 @@ public class MgCustomForward {
         if (ctx == null) {
             return;
         }
-        MgTranslate.chooseLanguage(fragment, append ? "Tarjima qaysi tilda qo'shilsin?" : "Qaysi tilga tarjima qilinsin?", true, lang -> {
+        MgTranslate.chooseLanguage(fragment, append ? org.telegram.messenger.MgLang.t("Tarjima qaysi tilda qo'shilsin?") : org.telegram.messenger.MgLang.t("Qaysi tilga tarjima qilinsin?"), true, lang -> {
             CharSequence[] arr = {new SpannableStringBuilder(edit.getText())};
             ArrayList<TLRPC.MessageEntity> ents = MediaDataController.getInstance(account).getEntities(arr, true, false);
             String src = arr[0] == null ? "" : arr[0].toString();
             if (TextUtils.isEmpty(src.trim())) {
-                say.run("Tarjima uchun matn yo'q");
+                say.run(org.telegram.messenger.MgLang.t("Tarjima uchun matn yo'q"));
                 return;
             }
-            say.run("⏳ Tarjima qilinmoqda…");
+            say.run(org.telegram.messenger.MgLang.t("⏳ Tarjima qilinmoqda…"));
             MgTranslate.translate(account, src, ents, lang, (res, err) -> {
                 if (res != null) {
                     CharSequence tr = fromEntities(res.text, res.entities);
@@ -648,9 +648,9 @@ public class MgCustomForward {
                         edit.setText(tr);
                     }
                     edit.setSelection(edit.length());
-                    say.run("✓ Tarjima qilindi: " + MgTranslate.nameOf(lang));
+                    say.run(org.telegram.messenger.MgLang.t("✓ Tarjima qilindi: ") + MgTranslate.nameOf(lang));
                 } else {
-                    say.run("⚠️ " + (err == null ? "Tarjima qilib bo'lmadi" : err));
+                    say.run("⚠️ " + (err == null ? org.telegram.messenger.MgLang.t("Tarjima qilib bo'lmadi") : err));
                 }
             });
         });
@@ -698,9 +698,9 @@ public class MgCustomForward {
             final int total = dids.size();
             AndroidUtilities.runOnUIThread(() -> {
                 if (okF > 0) {
-                    BulletinFactory.of(fragment).createSimpleBulletin(R.raw.forward, total == 1 ? "Maxsus uzatildi" : "Maxsus uzatildi: " + okF + " ta chatga").show();
+                    BulletinFactory.of(fragment).createSimpleBulletin(R.raw.forward, total == 1 ? org.telegram.messenger.MgLang.t("Maxsus uzatildi") : org.telegram.messenger.MgLang.t("Maxsus uzatildi: ") + okF + org.telegram.messenger.MgLang.t(" ta chatga")).show();
                 } else {
-                    BulletinFactory.of(fragment).createErrorBulletin("Yuborib bo'lmadi").show();
+                    BulletinFactory.of(fragment).createErrorBulletin(org.telegram.messenger.MgLang.t("Yuborib bo'lmadi")).show();
                 }
             }, 250);
             return true;

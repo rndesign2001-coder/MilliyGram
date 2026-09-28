@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- MilliyGram: uzatish (tanlov menyusi bilan) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#00000000" android:strokeColor="#FFFFFFFF" android:strokeWidth="1.9"
+        android:strokeLineCap="round" android:strokeLineJoin="round"
+        android:pathData="M12.5,5 L18.5,11 L12.5,17 M18.5,11 L9.5,11 C6.2,11 3.8,13.4 3.8,16.7" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M16,19.2 L21.2,19.2 L18.6,22 Z" />
+</vector>

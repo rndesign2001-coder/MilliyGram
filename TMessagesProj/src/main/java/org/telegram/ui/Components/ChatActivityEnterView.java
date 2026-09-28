@@ -5125,12 +5125,12 @@ public class ChatActivityEnterView extends FrameLayout implements
             });
         }
         if (audioToSendMessageObject == null && messageEditText != null && !TextUtils.isEmpty(messageEditText.getText()) && parentFragment != null) {
-            options.add(R.drawable.msg_translate, "Tarjima qilib yozish", () -> {
+            options.add(R.drawable.msg_translate, org.telegram.messenger.MgLang.t("Tarjima qilib yozish"), () -> {
                 if (messageSendPreview != null) {
                     messageSendPreview.dismiss(false);
                     messageSendPreview = null;
                 }
-                AndroidUtilities.runOnUIThread(() -> org.telegram.ui.MgTranslate.chooseLanguage(parentFragment, "Qaysi tilga tarjima qilinsin?", lang -> {
+                AndroidUtilities.runOnUIThread(() -> org.telegram.ui.MgTranslate.chooseLanguage(parentFragment, org.telegram.messenger.MgLang.t("Qaysi tilga tarjima qilinsin?"), lang -> {
                     if (messageEditText == null) {
                         return;
                     }
@@ -5147,16 +5147,16 @@ public class ChatActivityEnterView extends FrameLayout implements
                             out = Emoji.replaceEmoji(out, messageEditText.getPaint().getFontMetricsInt(), false);
                             setFieldText(out);
                             messageEditText.setSelection(messageEditText.length());
-                            org.telegram.ui.Components.BulletinFactory.of(parentFragment).createSimpleBulletin(R.raw.contact_check, "Tarjima qilindi: " + org.telegram.ui.MgTranslate.nameOf(lang) + ". Tekshirib yuboring.").show();
+                            org.telegram.ui.Components.BulletinFactory.of(parentFragment).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Tarjima qilindi: ") + org.telegram.ui.MgTranslate.nameOf(lang) + org.telegram.messenger.MgLang.t(". Tekshirib yuboring.")).show();
                         } else if (parentFragment != null) {
-                            org.telegram.ui.Components.BulletinFactory.of(parentFragment).createErrorBulletin(err == null ? "Tarjima qilib bo'lmadi" : err).show();
+                            org.telegram.ui.Components.BulletinFactory.of(parentFragment).createErrorBulletin(err == null ? org.telegram.messenger.MgLang.t("Tarjima qilib bo'lmadi") : err).show();
                         }
                     });
                 }), 200);
             });
             // MilliyGram: Lotin ↔ Kirill va shablonga saqlash
             final boolean mgCyr = org.telegram.messenger.MgTranslit.isCyrillic(messageEditText.getText());
-            options.add(R.drawable.msg_language, mgCyr ? "Lotinga o'girish" : "Kirillga o'girish", () -> {
+            options.add(R.drawable.msg_language, mgCyr ? org.telegram.messenger.MgLang.t("Lotinga o'girish") : org.telegram.messenger.MgLang.t("Kirillga o'girish"), () -> {
                 if (messageSendPreview != null) {
                     messageSendPreview.dismiss(false);
                     messageSendPreview = null;
@@ -5176,7 +5176,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                     messageEditText.setSelection(messageEditText.length());
                 }, 150);
             });
-            options.add(R.drawable.msg_saved, "Shablonga saqlash", () -> {
+            options.add(R.drawable.msg_saved, org.telegram.messenger.MgLang.t("Shablonga saqlash"), () -> {
                 if (messageSendPreview != null) {
                     messageSendPreview.dismiss(false);
                     messageSendPreview = null;
@@ -7323,7 +7323,7 @@ public class ChatActivityEnterView extends FrameLayout implements
         final String src = arr[0] == null ? text.toString() : arr[0].toString();
         mgTranslating = true;
         final Bulletin progress = parentFragment == null ? null : BulletinFactory.of(parentFragment)
-                .createSimpleBulletin(R.raw.msg_translate, "Tarjima qilinmoqda: " + org.telegram.ui.MgTranslate.nameOf(lang) + "…").setDuration(30000).show();
+                .createSimpleBulletin(R.raw.msg_translate, org.telegram.messenger.MgLang.t("Tarjima qilinmoqda: ") + org.telegram.ui.MgTranslate.nameOf(lang) + "…").setDuration(30000).show();
         final boolean[] settled = {false};
         final Runnable watchdog = () -> {
             if (settled[0]) {
@@ -7336,7 +7336,7 @@ public class ChatActivityEnterView extends FrameLayout implements
             }
             mgSkipTranslateOnce = true;
             if (parentFragment != null) {
-                BulletinFactory.of(parentFragment).createErrorBulletin("Tarjima qilib bo'lmadi. Qayta bossangiz, asl matn yuboriladi").show();
+                BulletinFactory.of(parentFragment).createErrorBulletin(org.telegram.messenger.MgLang.t("Tarjima qilib bo'lmadi. Qayta bossangiz, asl matn yuboriladi")).show();
             }
         };
         AndroidUtilities.runOnUIThread(watchdog, 25000);
@@ -7359,7 +7359,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                 mgSkipTranslateOnce = true;
                 if (org.telegram.ui.MgChatFeatures.isAutoTranslatePreview()) {
                     if (parentFragment != null) {
-                        BulletinFactory.of(parentFragment).createSimpleBulletin(R.raw.msg_translate, "Tarjimani tekshirib, yana yuborish tugmasini bosing").show();
+                        BulletinFactory.of(parentFragment).createSimpleBulletin(R.raw.msg_translate, org.telegram.messenger.MgLang.t("Tarjimani tekshirib, yana yuborish tugmasini bosing")).show();
                     }
                 } else {
                     sendMessage();
@@ -7367,7 +7367,7 @@ public class ChatActivityEnterView extends FrameLayout implements
             } else {
                 mgSkipTranslateOnce = true;
                 if (parentFragment != null) {
-                    BulletinFactory.of(parentFragment).createErrorBulletin((err == null ? "Tarjima qilib bo'lmadi" : err) + ". Qayta bossangiz, asl matn yuboriladi").show();
+                    BulletinFactory.of(parentFragment).createErrorBulletin((err == null ? org.telegram.messenger.MgLang.t("Tarjima qilib bo'lmadi") : err) + org.telegram.messenger.MgLang.t(". Qayta bossangiz, asl matn yuboriladi")).show();
                 }
             }
         });

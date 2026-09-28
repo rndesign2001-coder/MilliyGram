@@ -52,7 +52,7 @@ public class MgDialogActions {
     public static final int KIND_BOTS = 4;
     public static final int KIND_UNREAD = 5;
 
-    public static final String[] KIND_NAMES = {"Barcha chatlar", "Foydalanuvchilar", "Guruhlar", "Kanallar", "Botlar", "O'qilmaganlar"};
+    public static final String[] KIND_NAMES = {org.telegram.messenger.MgLang.t("Barcha chatlar"), org.telegram.messenger.MgLang.t("Foydalanuvchilar"), org.telegram.messenger.MgLang.t("Guruhlar"), org.telegram.messenger.MgLang.t("Kanallar"), org.telegram.messenger.MgLang.t("Botlar"), org.telegram.messenger.MgLang.t("O'qilmaganlar")};
     public static final int[] KIND_ICONS = {R.drawable.msg_media, R.drawable.msg_contacts, R.drawable.msg_groups, R.drawable.msg_channel, R.drawable.msg_bots, R.drawable.msg_markunread};
 
     public static boolean matchesKind(MessagesController mc, TLRPC.Dialog d, int kind) {
@@ -102,7 +102,7 @@ public class MgDialogActions {
                 FileLog.e(e);
             }
         }
-        BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, dids.size() == 1 ? "Bosh ekranga qo'shildi" : "Bosh ekranga qo'shildi: " + dids.size() + " ta").show();
+        BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, dids.size() == 1 ? org.telegram.messenger.MgLang.t("Bosh ekranga qo'shildi") : org.telegram.messenger.MgLang.t("Bosh ekranga qo'shildi: ") + dids.size() + org.telegram.messenger.MgLang.t(" ta")).show();
     }
 
     // ---------- Toifalar ----------
@@ -120,24 +120,24 @@ public class MgDialogActions {
             Integer ic = MgLocalFolders.ICONS.get(cats.get(i).icon);
             icons[i] = ic == null ? R.drawable.msg_folders : ic;
         }
-        names[cats.size()] = "Yangi toifa yaratish";
+        names[cats.size()] = org.telegram.messenger.MgLang.t("Yangi toifa yaratish");
         icons[cats.size()] = R.drawable.msg_add;
         AlertDialog.Builder b = new AlertDialog.Builder(ctx, fragment.getResourceProvider());
-        b.setTitle("Toifaga qo'shish");
+        b.setTitle(org.telegram.messenger.MgLang.t("Toifaga qo'shish"));
         b.setItems(names, icons, (d, which) -> {
             if (which == cats.size()) {
-                askName(fragment, "Yangi toifa", "", name -> {
+                askName(fragment, org.telegram.messenger.MgLang.t("Yangi toifa"), "", name -> {
                     int id = MgLocalFolders.createCategory(account, name, dids);
                     if (id == 0) {
-                        BulletinFactory.of(fragment).createErrorBulletin("Toifalar soni chegaraga yetdi").show();
+                        BulletinFactory.of(fragment).createErrorBulletin(org.telegram.messenger.MgLang.t("Toifalar soni chegaraga yetdi")).show();
                     } else {
-                        BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, "\"" + name + "\" toifasi yaratildi").show();
+                        BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, "\"" + name + org.telegram.messenger.MgLang.t("\" toifasi yaratildi")).show();
                     }
                 });
             } else {
                 MgLocalFolders.Entry e = cats.get(which);
                 int added = MgLocalFolders.addToCategory(account, e.id, dids);
-                BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, added > 0 ? "\"" + e.name + "\" toifasiga qo'shildi" : "Allaqachon shu toifada").show();
+                BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, added > 0 ? "\"" + e.name + org.telegram.messenger.MgLang.t("\" toifasiga qo'shildi") : org.telegram.messenger.MgLang.t("Allaqachon shu toifada")).show();
             }
         });
         fragment.showDialog(b.create());
@@ -156,7 +156,7 @@ public class MgDialogActions {
         editText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
         editText.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
         editText.setHintTextColor(Theme.getColor(Theme.key_dialogTextHint));
-        editText.setHint("Nomi");
+        editText.setHint(org.telegram.messenger.MgLang.t("Nomi"));
         editText.setCursorColor(Theme.getColor(Theme.key_dialogTextBlack));
         editText.setBackground(null);
         editText.setLineColors(Theme.getColor(Theme.key_windowBackgroundWhiteInputField), Theme.getColor(Theme.key_windowBackgroundWhiteInputFieldActivated), Theme.getColor(Theme.key_text_RedRegular));
@@ -169,13 +169,13 @@ public class MgDialogActions {
         AlertDialog.Builder builder = new AlertDialog.Builder(ctx, fragment.getResourceProvider());
         builder.setTitle(title);
         builder.setView(frameLayout);
-        builder.setPositiveButton("Saqlash", (dialog, which) -> {
+        builder.setPositiveButton(org.telegram.messenger.MgLang.t("Saqlash"), (dialog, which) -> {
             String name = editText.getText() == null ? "" : editText.getText().toString().trim();
             if (!name.isEmpty()) {
                 cb.run(name.length() > 12 ? name.substring(0, 12) : name);
             }
         });
-        builder.setNegativeButton("Bekor qilish", null);
+        builder.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), null);
         fragment.showDialog(builder.create());
         AndroidUtilities.runOnUIThread(() -> {
             editText.requestFocus();
@@ -188,7 +188,7 @@ public class MgDialogActions {
     public static void addUserToGroup(BaseFragment fragment, int account, long userId) {
         TLRPC.User user = MessagesController.getInstance(account).getUser(userId);
         if (user == null || userId <= 0) {
-            BulletinFactory.of(fragment).createErrorBulletin("Faqat foydalanuvchini qo'shish mumkin").show();
+            BulletinFactory.of(fragment).createErrorBulletin(org.telegram.messenger.MgLang.t("Faqat foydalanuvchini qo'shish mumkin")).show();
             return;
         }
         Bundle args = new Bundle();
@@ -207,14 +207,14 @@ public class MgDialogActions {
                 return true;
             }
             AlertDialog.Builder builder = new AlertDialog.Builder(picker1.getParentActivity(), picker1.getResourceProvider());
-            builder.setTitle(ChatObject.isChannelAndNotMegaGroup(chat) ? "Kanalga qo'shish" : "Guruhga qo'shish");
-            builder.setMessage(AndroidUtilities.replaceTags("**" + UserObject.getUserName(user) + "** foydalanuvchisini **" + chat.title + "** ga qo'shasizmi?"));
-            builder.setPositiveButton("Qo'shish", (d, w) -> {
+            builder.setTitle(ChatObject.isChannelAndNotMegaGroup(chat) ? org.telegram.messenger.MgLang.t("Kanalga qo'shish") : org.telegram.messenger.MgLang.t("Guruhga qo'shish"));
+            builder.setMessage(AndroidUtilities.replaceTags("**" + UserObject.getUserName(user) + org.telegram.messenger.MgLang.t("** foydalanuvchisini **") + chat.title + org.telegram.messenger.MgLang.t("** ga qo'shasizmi?")));
+            builder.setPositiveButton(org.telegram.messenger.MgLang.t("Qo'shish"), (d, w) -> {
                 MessagesController.getInstance(account).addUserToChat(chat.id, user, 0, null, fragment, () -> AndroidUtilities.runOnUIThread(() ->
-                        BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, UserObject.getFirstName(user) + " — " + chat.title + " ga qo'shildi").show()));
+                        BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, UserObject.getFirstName(user) + " — " + chat.title + org.telegram.messenger.MgLang.t(" ga qo'shildi")).show()));
                 picker1.finishFragment();
             });
-            builder.setNegativeButton("Bekor qilish", null);
+            builder.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), null);
             picker1.showDialog(builder.create());
             return true;
         });
@@ -229,12 +229,12 @@ public class MgDialogActions {
             return;
         }
         AlertDialog.Builder b = new AlertDialog.Builder(ctx, fragment.getResourceProvider());
-        b.setTitle("Keshni tozalash");
+        b.setTitle(org.telegram.messenger.MgLang.t("Keshni tozalash"));
         b.setMessage(dids.size() == 1
-                ? "Bu chatdan yuklab olingan rasm, video, ovozli xabar va fayllar telefondan o'chiriladi. Xabarlarning o'zi o'chmaydi, kerak bo'lsa qayta yuklanadi."
-                : dids.size() + " ta chatdan yuklab olingan media fayllar telefondan o'chiriladi. Xabarlarning o'zi o'chmaydi.");
-        b.setPositiveButton("Tozalash", (d, w) -> doClearCache(fragment, account, new HashSet<>(dids)));
-        b.setNegativeButton("Bekor qilish", null);
+                ? org.telegram.messenger.MgLang.t("Bu chatdan yuklab olingan rasm, video, ovozli xabar va fayllar telefondan o'chiriladi. Xabarlarning o'zi o'chmaydi, kerak bo'lsa qayta yuklanadi.")
+                : dids.size() + org.telegram.messenger.MgLang.t(" ta chatdan yuklab olingan media fayllar telefondan o'chiriladi. Xabarlarning o'zi o'chmaydi."));
+        b.setPositiveButton(org.telegram.messenger.MgLang.t("Tozalash"), (d, w) -> doClearCache(fragment, account, new HashSet<>(dids)));
+        b.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), null);
         AlertDialog dialog = b.create();
         fragment.showDialog(dialog);
         dialog.redPositive();
@@ -275,9 +275,9 @@ public class MgDialogActions {
                 } catch (Throwable ignore) {
                 }
                 if (result[0] == 0) {
-                    BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, "Tozalanadigan kesh topilmadi").show();
+                    BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Tozalanadigan kesh topilmadi")).show();
                 } else {
-                    BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, "Tozalandi: " + result[0] + " ta fayl, " + formatSize(result[1])).show();
+                    BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Tozalandi: ") + result[0] + org.telegram.messenger.MgLang.t(" ta fayl, ") + formatSize(result[1])).show();
                 }
             });
         });

@@ -40,8 +40,8 @@ import org.telegram.ui.Components.LayoutHelper;
 public class MgInfoChip extends TextView {
 
     public static final int MODE_OFF = 0, MODE_PRAYER = 1, MODE_WEATHER = 2, MODE_BOTH = 3;
-    public static final String[] MODE_NAMES = {"O'chirilgan", "Namoz vaqti", "Ob-havo", "Ikkalasi (almashib)"};
-    public static final String[] STYLE_NAMES = {"Kapsula", "Chegarali", "Oddiy matn", "Ixcham", "Rangli"};
+    public static final String[] MODE_NAMES = {org.telegram.messenger.MgLang.t("O'chirilgan"), org.telegram.messenger.MgLang.t("Namoz vaqti"), org.telegram.messenger.MgLang.t("Ob-havo"), org.telegram.messenger.MgLang.t("Ikkalasi (almashib)")};
+    public static final String[] STYLE_NAMES = {org.telegram.messenger.MgLang.t("Kapsula"), org.telegram.messenger.MgLang.t("Chegarali"), org.telegram.messenger.MgLang.t("Oddiy matn"), org.telegram.messenger.MgLang.t("Ixcham"), org.telegram.messenger.MgLang.t("Rangli")};
 
     public static int getMode() {
         return MgConfig.getInt("chip_mode", MODE_OFF);
@@ -82,7 +82,7 @@ public class MgInfoChip extends TextView {
         holder.addView(chip, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, 28, Gravity.CENTER, 2, 0, 2, 0));
         holder.getLayoutParams().width = LayoutHelper.WRAP_CONTENT;
         holder.setOnClickListener(v -> showDetails(fragment));
-        holder.setContentDescription("Namoz vaqti va ob-havo");
+        holder.setContentDescription(org.telegram.messenger.MgLang.t("Namoz vaqti va ob-havo"));
         holder.setTag(chip);
         holder.setVisibility(getMode() == MODE_OFF ? View.GONE : View.VISIBLE);
         chip.setVisibility(getMode() == MODE_OFF ? View.GONE : View.VISIBLE);
@@ -207,14 +207,14 @@ public class MgInfoChip extends TextView {
         TextView loc = new TextView(ctx);
         loc.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
         loc.setTextColor(gray);
-        loc.setText("📍 " + place.name + " · " + MgPlaces.findRegion(MgPrayer.getRegionKey()).name);
+        loc.setText("📍 " + org.telegram.messenger.MgLang.t(place.name) + " · " + org.telegram.messenger.MgLang.t(MgPlaces.findRegion(MgPrayer.getRegionKey()).name));
         box.addView(loc, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 8));
 
         TextView nx = new TextView(ctx);
         nx.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
         nx.setTextColor(accent);
         nx.setTypeface(AndroidUtilities.bold());
-        nx.setText(MgPrayer.NAMES[next[0]] + " namozigacha " + MgPrayer.left(next[1]) + " qoldi");
+        nx.setText(MgPrayer.NAMES[next[0]] + org.telegram.messenger.MgLang.t(" namozigacha ") + MgPrayer.left(next[1]) + org.telegram.messenger.MgLang.t(" qoldi"));
         box.addView(nx, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 8));
 
         for (int i = 0; i < 6; i++) {
@@ -230,7 +230,7 @@ public class MgInfoChip extends TextView {
             TextView name = new TextView(ctx);
             name.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
             name.setTextColor(i == cur ? accent : black);
-            name.setText(MgPrayer.NAMES[i] + (i == MgPrayer.SUNRISE ? " chiqishi" : ""));
+            name.setText(MgPrayer.NAMES[i] + (i == MgPrayer.SUNRISE ? org.telegram.messenger.MgLang.t(" chiqishi") : ""));
             if (i == cur) {
                 name.setTypeface(AndroidUtilities.bold());
             }
@@ -251,12 +251,12 @@ public class MgInfoChip extends TextView {
         box.addView(wx, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 14, 0, 0));
         final int[] sun = MgPrayer.sunTimes();
         final int dayLen = ((sun[1] - sun[0]) % 1440 + 1440) % 1440;
-        final String sunLine = "🌅 Quyosh chiqishi " + MgPrayer.hhmm(sun[0]) + "   🌇 Botishi " + MgPrayer.hhmm(sun[1])
-                + "\nKun uzunligi: " + (dayLen / 60) + " soat " + (dayLen % 60) + " daqiqa";
+        final String sunLine = org.telegram.messenger.MgLang.t("🌅 Quyosh chiqishi ") + MgPrayer.hhmm(sun[0]) + org.telegram.messenger.MgLang.t("   🌇 Botishi ") + MgPrayer.hhmm(sun[1])
+                + org.telegram.messenger.MgLang.t("\nKun uzunligi: ") + (dayLen / 60) + org.telegram.messenger.MgLang.t(" soat ") + (dayLen % 60) + org.telegram.messenger.MgLang.t(" daqiqa");
         Runnable fillWeather = () -> {
             MgWeather.Data d = MgWeather.getCached();
             if (d == null) {
-                wx.setText("Ob-havo yuklanmoqda… (internet kerak)\n\n" + sunLine);
+                wx.setText(org.telegram.messenger.MgLang.t("Ob-havo yuklanmoqda… (internet kerak)\n\n") + sunLine);
                 return;
             }
             SpannableStringBuilder sb = new SpannableStringBuilder();
@@ -265,10 +265,10 @@ public class MgInfoChip extends TextView {
             sb.setSpan(new StyleSpan(Typeface.BOLD), s0, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             sb.setSpan(new RelativeSizeSpan(1.15f), s0, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             int s1 = sb.length();
-            sb.append("\nSezilishi ").append(MgWeather.temp(d.feels)).append(" · Namlik ").append(String.valueOf(d.humidity)).append("% · Shamol ")
-                    .append(String.valueOf(Math.round(d.wind))).append(" m/s");
+            sb.append(org.telegram.messenger.MgLang.t("\nSezilishi ")).append(MgWeather.temp(d.feels)).append(org.telegram.messenger.MgLang.t(" · Namlik ")).append(String.valueOf(d.humidity)).append(org.telegram.messenger.MgLang.t("% · Shamol "))
+                    .append(String.valueOf(Math.round(d.wind))).append(org.telegram.messenger.MgLang.t(" m/s"));
             sb.setSpan(new ForegroundColorSpan(gray), s1, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            String[] days = {"Bugun", "Ertaga", "Indinga"};
+            String[] days = {org.telegram.messenger.MgLang.t("Bugun"), org.telegram.messenger.MgLang.t("Ertaga"), org.telegram.messenger.MgLang.t("Indinga")};
             for (int i = 0; i < 3; i++) {
                 sb.append("\n").append(days[i]).append(":  ").append(MgWeather.icon(d.dayCode[i])).append(" ")
                         .append(MgWeather.temp(d.dayMax[i])).append(" / ").append(MgWeather.temp(d.dayMin[i]));
@@ -282,16 +282,16 @@ public class MgInfoChip extends TextView {
         TextView note = new TextView(ctx);
         note.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
         note.setTextColor(gray);
-        note.setText("Vaqtlar O'zbekiston musulmonlari idorasi taqvimi uslubida hisoblangan; mahalliy masjid jadvali bilan 1–2 daqiqa farq qilishi mumkin. Sozlamalarda tuzatish mumkin.");
+        note.setText(org.telegram.messenger.MgLang.t("Vaqtlar O'zbekiston musulmonlari idorasi taqvimi uslubida hisoblangan; mahalliy masjid jadvali bilan 1–2 daqiqa farq qilishi mumkin. Sozlamalarda tuzatish mumkin."));
         box.addView(note, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 12, 0, 0));
 
         ScrollView scroll = new ScrollView(ctx);
         scroll.addView(box);
         AlertDialog.Builder b = new AlertDialog.Builder(ctx, f.getResourceProvider());
-        b.setTitle("Namoz vaqtlari va ob-havo");
+        b.setTitle(org.telegram.messenger.MgLang.t("Namoz vaqtlari va ob-havo"));
         b.setView(scroll);
-        b.setPositiveButton("Yopish", null);
-        b.setNeutralButton("Sozlamalar", (d, w) -> f.presentFragment(new MgSettingsPage(MgSettingsPage.PAGE_PRAYER)));
+        b.setPositiveButton(org.telegram.messenger.MgLang.t("Yopish"), null);
+        b.setNeutralButton(org.telegram.messenger.MgLang.t("Sozlamalar"), (d, w) -> f.presentFragment(new MgSettingsPage(MgSettingsPage.PAGE_PRAYER)));
         f.showDialog(b.create());
     }
 }

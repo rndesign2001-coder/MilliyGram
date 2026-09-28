@@ -41,7 +41,7 @@ public class MgChatLockSettingsActivity extends UniversalFragment {
             fragment.presentFragment(new MgChatLockSettingsActivity());
             return;
         }
-        MgChatLock.askLock(fragment, S, "Chat qulfi sozlamalari", ok -> {
+        MgChatLock.askLock(fragment, S, org.telegram.messenger.MgLang.t("Chat qulfi sozlamalari"), ok -> {
             if (ok) {
                 fragment.presentFragment(new MgChatLockSettingsActivity());
             }
@@ -50,29 +50,29 @@ public class MgChatLockSettingsActivity extends UniversalFragment {
 
     @Override
     protected CharSequence getTitle() {
-        return "Chat qulfi";
+        return org.telegram.messenger.MgLang.t("Chat qulfi");
     }
 
     @Override
     protected void fillItems(ArrayList<UItem> items, UniversalAdapter adapter) {
         boolean has = MgConfig.hasLock(S);
         boolean pattern = MgConfig.LOCK_PATTERN.equals(MgConfig.getLockType(S));
-        items.add(UItem.asTopViewStatic("Qulflangan chat ochilganda kod so'raladi. Chatni qulflash: chat ichida ⋮ → \"Chatni qulflash\".", R.drawable.msg_secret));
-        items.add(UItem.asHeader("Kod"));
+        items.add(UItem.asTopViewStatic(org.telegram.messenger.MgLang.t("Qulflangan chat ochilganda kod so'raladi. Chatni qulflash: chat ichida ⋮ → \"Chatni qulflash\"."), R.drawable.msg_secret));
+        items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Kod")));
         if (has) {
-            items.add(UItem.asButton(ID_LOCK_TYPE, R.drawable.msg_secret, "Kod turi", pattern ? "Grafik kalit" : "PIN kod"));
-            items.add(UItem.asButton(ID_CHANGE_CODE, R.drawable.msg_edit, pattern ? "Grafik kalitni o'zgartirish" : "PIN kodni o'zgartirish"));
+            items.add(UItem.asButton(ID_LOCK_TYPE, R.drawable.msg_secret, org.telegram.messenger.MgLang.t("Kod turi"), pattern ? org.telegram.messenger.MgLang.t("Grafik kalit") : org.telegram.messenger.MgLang.t("PIN kod")));
+            items.add(UItem.asButton(ID_CHANGE_CODE, R.drawable.msg_edit, pattern ? org.telegram.messenger.MgLang.t("Grafik kalitni o'zgartirish") : org.telegram.messenger.MgLang.t("PIN kodni o'zgartirish")));
         } else {
-            items.add(UItem.asButton(ID_LOCK_TYPE, R.drawable.msg_secret, "Kod o'rnatish").accent());
+            items.add(UItem.asButton(ID_LOCK_TYPE, R.drawable.msg_secret, org.telegram.messenger.MgLang.t("Kod o'rnatish")).accent());
         }
-        items.add(UItem.asCheck(ID_FINGERPRINT, "Barmoq izi bilan ochish").setChecked(MgConfig.isFingerprintEnabled(S)));
+        items.add(UItem.asCheck(ID_FINGERPRINT, org.telegram.messenger.MgLang.t("Barmoq izi bilan ochish")).setChecked(MgConfig.isFingerprintEnabled(S)));
         if (pattern) {
-            items.add(UItem.asCheck(ID_INVISIBLE, "Ko'rinmas grafik kalit").setChecked(MgConfig.isPatternInvisible(S)));
+            items.add(UItem.asCheck(ID_INVISIBLE, org.telegram.messenger.MgLang.t("Ko'rinmas grafik kalit")).setChecked(MgConfig.isPatternInvisible(S)));
         }
-        items.add(UItem.asCheck(ID_VIBRATE, "Kiritishda tebranish").setChecked(MgConfig.isLockVibrate()));
-        items.add(UItem.asShadow("Qulflangan chatlar: " + MgConfig.getLockedCount()));
+        items.add(UItem.asCheck(ID_VIBRATE, org.telegram.messenger.MgLang.t("Kiritishda tebranish")).setChecked(MgConfig.isLockVibrate()));
+        items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Qulflangan chatlar: ") + MgConfig.getLockedCount()));
         if (has) {
-            items.add(UItem.asButton(ID_REMOVE, R.drawable.msg_delete, "Kodni va barcha qulflarni o'chirish").red());
+            items.add(UItem.asButton(ID_REMOVE, R.drawable.msg_delete, org.telegram.messenger.MgLang.t("Kodni va barcha qulflarni o'chirish")).red());
             items.add(UItem.asShadow(null));
         }
     }
@@ -92,8 +92,8 @@ public class MgChatLockSettingsActivity extends UniversalFragment {
                     return;
                 }
                 AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
-                builder.setTitle("Kod turi");
-                builder.setItems(new CharSequence[]{"PIN kod (4 raqam)", "Grafik kalit (tasvirli kod)"}, (dialog, which) ->
+                builder.setTitle(org.telegram.messenger.MgLang.t("Kod turi"));
+                builder.setItems(new CharSequence[]{org.telegram.messenger.MgLang.t("PIN kod (4 raqam)"), org.telegram.messenger.MgLang.t("Grafik kalit (tasvirli kod)")}, (dialog, which) ->
                         MgChatLock.createLock(this, S, which == 1 ? MgConfig.LOCK_PATTERN : MgConfig.LOCK_PIN, () -> listView.adapter.update(true)));
                 showDialog(builder.create());
                 break;
@@ -115,14 +115,14 @@ public class MgChatLockSettingsActivity extends UniversalFragment {
                     return;
                 }
                 AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
-                builder.setTitle("Chat qulfini o'chirish");
-                builder.setMessage("Kod o'chiriladi va barcha chatlar qulfdan chiqariladi.");
-                builder.setPositiveButton("O'chirish", (dialog, which) -> {
+                builder.setTitle(org.telegram.messenger.MgLang.t("Chat qulfini o'chirish"));
+                builder.setMessage(org.telegram.messenger.MgLang.t("Kod o'chiriladi va barcha chatlar qulfdan chiqariladi."));
+                builder.setPositiveButton(org.telegram.messenger.MgLang.t("O'chirish"), (dialog, which) -> {
                     MgConfig.removePinAndLocks();
-                    BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, "Chat qulfi o'chirildi").show();
+                    BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Chat qulfi o'chirildi")).show();
                     listView.adapter.update(true);
                 });
-                builder.setNegativeButton("Bekor qilish", null);
+                builder.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), null);
                 AlertDialog dialog = builder.create();
                 showDialog(dialog);
                 break;

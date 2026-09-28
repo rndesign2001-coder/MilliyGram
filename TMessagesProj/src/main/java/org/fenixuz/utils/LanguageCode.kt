@@ -10,7 +10,8 @@ import org.telegram.ui.ActionBar.AlertDialog
 
 
 object LanguageCode {
-    var languageCode = "uz"
+    val languageCode: String
+        get() = org.telegram.messenger.MgLang.lang()
 
     var languages = ArrayList<Language>()
     var titlesLanguages = ArrayList<TitleLanguages>()

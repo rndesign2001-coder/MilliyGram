@@ -140,7 +140,7 @@ public class MgShake implements SensorEventListener {
                 did = true;
             }
             if (did && layout != null && layout.getLastFragment() != null) {
-                BulletinFactory.of(layout.getLastFragment()).createSimpleBulletin(R.raw.contact_check, "📳 Hammasi yashirildi").show();
+                BulletinFactory.of(layout.getLastFragment()).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("📳 Hammasi yashirildi")).show();
             }
         } catch (Throwable e) {
             FileLog.e(e);

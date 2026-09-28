@@ -39,7 +39,7 @@ public class MgCleanupActivity extends UniversalFragment {
 
     @Override
     protected CharSequence getTitle() {
-        return "Kanallarni tozalash";
+        return org.telegram.messenger.MgLang.t("Kanallarni tozalash");
     }
 
     private void collect() {
@@ -78,12 +78,12 @@ public class MgCleanupActivity extends UniversalFragment {
     protected void fillItems(ArrayList<UItem> items, UniversalAdapter adapter) {
         collect();
         int n = selected.size();
-        items.add(UItem.asShadow("Ko'p xabari o'qilmay yotgan va uzoq vaqt jim turgan kanal/guruhlar. Keraksizlarini belgilab, birdaniga chiqib keting. O'zingiz yaratganlar va mahkamlanganlar ko'rsatilmaydi."));
-        items.add(UItem.asButton(ID_LEAVE, R.drawable.msg_leave, n > 0 ? "Belgilanganlardan chiqish (" + n + ")" : "Belgilanganlardan chiqish").red());
-        items.add(UItem.asButton(ID_SELECT_ALL, R.drawable.msg_select, "Hammasini belgilash / bekor qilish"));
+        items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Ko'p xabari o'qilmay yotgan va uzoq vaqt jim turgan kanal/guruhlar. Keraksizlarini belgilab, birdaniga chiqib keting. O'zingiz yaratganlar va mahkamlanganlar ko'rsatilmaydi.")));
+        items.add(UItem.asButton(ID_LEAVE, R.drawable.msg_leave, n > 0 ? org.telegram.messenger.MgLang.t("Belgilanganlardan chiqish (") + n + ")" : org.telegram.messenger.MgLang.t("Belgilanganlardan chiqish")).red());
+        items.add(UItem.asButton(ID_SELECT_ALL, R.drawable.msg_select, org.telegram.messenger.MgLang.t("Hammasini belgilash / bekor qilish")));
         int idx = 0;
         if (!unread.isEmpty()) {
-            items.add(UItem.asHeader("O'qilmayotganlar (" + UNREAD_MIN + "+ o'qilmagan)"));
+            items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("O'qilmayotganlar (") + UNREAD_MIN + org.telegram.messenger.MgLang.t("+ o'qilmagan)")));
             for (TLRPC.Dialog d : unread) {
                 ids.add(d.id);
                 items.add(UItem.asCheck(ID_BASE + idx, title(d) + " · " + d.unread_count).setChecked(selected.contains(d.id)));
@@ -91,17 +91,17 @@ public class MgCleanupActivity extends UniversalFragment {
             }
         }
         if (!inactive.isEmpty()) {
-            items.add(UItem.asHeader("Faolsizlar (" + INACTIVE_DAYS + "+ kun yangi xabar yo'q)"));
+            items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Faolsizlar (") + INACTIVE_DAYS + org.telegram.messenger.MgLang.t("+ kun yangi xabar yo'q)")));
             int now = ConnectionsManager.getInstance(currentAccount).getCurrentTime();
             for (TLRPC.Dialog d : inactive) {
                 ids.add(d.id);
                 int days = (now - d.last_message_date) / 86400;
-                items.add(UItem.asCheck(ID_BASE + idx, title(d) + " · " + days + " kun").setChecked(selected.contains(d.id)));
+                items.add(UItem.asCheck(ID_BASE + idx, title(d) + " · " + days + org.telegram.messenger.MgLang.t(" kun")).setChecked(selected.contains(d.id)));
                 idx++;
             }
         }
         if (unread.isEmpty() && inactive.isEmpty()) {
-            items.add(UItem.asShadow("Tozalashga arziydigan kanal yoki guruh topilmadi — hammasi joyida!"));
+            items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Tozalashga arziydigan kanal yoki guruh topilmadi — hammasi joyida!")));
         } else {
             items.add(UItem.asShadow(null));
         }
@@ -128,7 +128,7 @@ public class MgCleanupActivity extends UniversalFragment {
             listView.adapter.update(true);
         } else if (item.id == ID_LEAVE) {
             if (selected.isEmpty()) {
-                org.telegram.ui.Components.BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, "Avval ro'yxatdan kanal/guruhlarni belgilang").show();
+                org.telegram.ui.Components.BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, org.telegram.messenger.MgLang.t("Avval ro'yxatdan kanal/guruhlarni belgilang")).show();
                 return;
             }
             ArrayList<Long> list = new ArrayList<>(selected);

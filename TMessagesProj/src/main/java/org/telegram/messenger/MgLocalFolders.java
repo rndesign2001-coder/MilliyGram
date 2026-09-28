@@ -54,38 +54,38 @@ public class MgLocalFolders {
     }
 
     static {
-        icon("all", R.drawable.msg_media, "Barcha chatlar");
-        icon("private", R.drawable.msg_contacts, "Profillar");
-        icon("groups", R.drawable.msg_groups, "Guruhlar");
-        icon("channels", R.drawable.msg_channel, "Kanallar");
-        icon("bots", R.drawable.msg_bots, "Botlar");
-        icon("fave", R.drawable.msg_fave, "Tanlanganlar");
-        icon("admin", R.drawable.msg_admins, "Admin");
-        icon("unread", R.drawable.msg_markunread, "O'qilmagan");
-        icon("admin_channels", R.drawable.msg_channel_create, "Mening kanallarim");
-        icon("admin_groups", R.drawable.msg_groups_create, "Mening guruhlarim");
-        icon("mod_channels", R.drawable.msg_channel, "Admin kanallar");
-        icon("mod_groups", R.drawable.msg_groups, "Admin guruhlar");
-        icon("archive", R.drawable.msg_archive, "Arxiv");
-        icon("chat", R.drawable.msg_discussion, "Suhbat");
-        icon("category", R.drawable.msg_folders, "Toifa");
-        icon("strangers", R.drawable.msg_usersearch, "Notanishlar");
-        icon("folder", R.drawable.msg_folders, "Jild");
-        icon("home", R.drawable.msg_home, "Uy");
-        icon("work", R.drawable.msg_work, "Ish");
-        icon("secret", R.drawable.msg2_secret, "Maxfiy");
-        icon("gift", R.drawable.msg_gift_premium, "Sovg'a");
-        icon("like", R.drawable.msg_input_like, "Yoqtirilgan");
-        icon("cat", R.drawable.msg_emoji_cat, "Hayvonlar");
-        icon("travel", R.drawable.msg_emoji_travel, "Sayohat");
-        icon("flag", R.drawable.msg_emoji_flags, "Bayroq");
-        icon("music", R.drawable.msg_filled_data_music, "Musiqa");
-        icon("link", R.drawable.msg_link_folder, "Havola");
-        icon("location", R.drawable.msg_location, "Joy");
-        icon("palette", R.drawable.msg_palette, "Dizayn");
-        icon("mention", R.drawable.msg_mention, "Eslatmalar");
-        icon("muted", R.drawable.msg_folders_muted, "Ovozsiz");
-        icon("read", R.drawable.msg_folders_read, "O'qilgan");
+        icon("all", R.drawable.msg_media, org.telegram.messenger.MgLang.t("Barcha chatlar"));
+        icon("private", R.drawable.msg_contacts, org.telegram.messenger.MgLang.t("Profillar"));
+        icon("groups", R.drawable.msg_groups, org.telegram.messenger.MgLang.t("Guruhlar"));
+        icon("channels", R.drawable.msg_channel, org.telegram.messenger.MgLang.t("Kanallar"));
+        icon("bots", R.drawable.msg_bots, org.telegram.messenger.MgLang.t("Botlar"));
+        icon("fave", R.drawable.msg_fave, org.telegram.messenger.MgLang.t("Tanlanganlar"));
+        icon("admin", R.drawable.msg_admins, org.telegram.messenger.MgLang.t("Admin"));
+        icon("unread", R.drawable.msg_markunread, org.telegram.messenger.MgLang.t("O'qilmagan"));
+        icon("admin_channels", R.drawable.msg_channel_create, org.telegram.messenger.MgLang.t("Mening kanallarim"));
+        icon("admin_groups", R.drawable.msg_groups_create, org.telegram.messenger.MgLang.t("Mening guruhlarim"));
+        icon("mod_channels", R.drawable.msg_channel, org.telegram.messenger.MgLang.t("Admin kanallar"));
+        icon("mod_groups", R.drawable.msg_groups, org.telegram.messenger.MgLang.t("Admin guruhlar"));
+        icon("archive", R.drawable.msg_archive, org.telegram.messenger.MgLang.t("Arxiv"));
+        icon("chat", R.drawable.msg_discussion, org.telegram.messenger.MgLang.t("Suhbat"));
+        icon("category", R.drawable.msg_folders, org.telegram.messenger.MgLang.t("Toifa"));
+        icon("strangers", R.drawable.msg_usersearch, org.telegram.messenger.MgLang.t("Notanishlar"));
+        icon("folder", R.drawable.msg_folders, org.telegram.messenger.MgLang.t("Jild"));
+        icon("home", R.drawable.msg_home, org.telegram.messenger.MgLang.t("Uy"));
+        icon("work", R.drawable.msg_work, org.telegram.messenger.MgLang.t("Ish"));
+        icon("secret", R.drawable.msg2_secret, org.telegram.messenger.MgLang.t("Maxfiy"));
+        icon("gift", R.drawable.msg_gift_premium, org.telegram.messenger.MgLang.t("Sovg'a"));
+        icon("like", R.drawable.msg_input_like, org.telegram.messenger.MgLang.t("Yoqtirilgan"));
+        icon("cat", R.drawable.msg_emoji_cat, org.telegram.messenger.MgLang.t("Hayvonlar"));
+        icon("travel", R.drawable.msg_emoji_travel, org.telegram.messenger.MgLang.t("Sayohat"));
+        icon("flag", R.drawable.msg_emoji_flags, org.telegram.messenger.MgLang.t("Bayroq"));
+        icon("music", R.drawable.msg_filled_data_music, org.telegram.messenger.MgLang.t("Musiqa"));
+        icon("link", R.drawable.msg_link_folder, org.telegram.messenger.MgLang.t("Havola"));
+        icon("location", R.drawable.msg_location, org.telegram.messenger.MgLang.t("Joy"));
+        icon("palette", R.drawable.msg_palette, org.telegram.messenger.MgLang.t("Dizayn"));
+        icon("mention", R.drawable.msg_mention, org.telegram.messenger.MgLang.t("Eslatmalar"));
+        icon("muted", R.drawable.msg_folders_muted, org.telegram.messenger.MgLang.t("Ovozsiz"));
+        icon("read", R.drawable.msg_folders_read, org.telegram.messenger.MgLang.t("O'qilgan"));
     }
 
     // ---------- Standart lokal jildlar ----------
@@ -108,17 +108,17 @@ public class MgLocalFolders {
     }
 
     private static final Def[] DEFS = {
-            new Def(903, "private", "Profillar", MessagesController.DIALOG_FILTER_FLAG_CONTACTS | MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS | EXCL_ARCH, TYPE_NONE, "private", true, 1),
-            new Def(902, "groups", "Guruhlar", MessagesController.DIALOG_FILTER_FLAG_GROUPS | EXCL_ARCH, TYPE_NONE, "groups", true, 2),
-            new Def(904, "channels", "Kanallar", MessagesController.DIALOG_FILTER_FLAG_CHANNELS | EXCL_ARCH, TYPE_NONE, "channels", true, 3),
-            new Def(905, "bots", "Botlar", MessagesController.DIALOG_FILTER_FLAG_BOTS | EXCL_ARCH, TYPE_NONE, "bots", true, 4),
-            new Def(901, "unread", "O'qilmagan", MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS | MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_READ | EXCL_ARCH, TYPE_NONE, "unread", true, 5),
-            new Def(906, "admin", "Admin", MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_ADMIN, "admin", false, 6),
-            new Def(907, "admin_channels", "Mening kanallarim", MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_ADMIN_CHANNELS, "admin_channels", false, 7),
-            new Def(908, "admin_groups", "Mening guruhlarim", MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_ADMIN_GROUPS, "admin_groups", false, 8),
-            new Def(910, "mod_channels", "Admin kanallar", MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_MOD_CHANNELS, "mod_channels", false, 10),
-            new Def(911, "mod_groups", "Admin guruhlar", MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_MOD_GROUPS, "mod_groups", false, 11),
-            new Def(909, "strangers", "Notanishlar", MessagesController.DIALOG_FILTER_FLAG_CONTACTS | MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS, TYPE_STRANGERS, "strangers", false, 9),
+            new Def(903, "private", org.telegram.messenger.MgLang.t("Profillar"), MessagesController.DIALOG_FILTER_FLAG_CONTACTS | MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS | EXCL_ARCH, TYPE_NONE, "private", true, 1),
+            new Def(902, "groups", org.telegram.messenger.MgLang.t("Guruhlar"), MessagesController.DIALOG_FILTER_FLAG_GROUPS | EXCL_ARCH, TYPE_NONE, "groups", true, 2),
+            new Def(904, "channels", org.telegram.messenger.MgLang.t("Kanallar"), MessagesController.DIALOG_FILTER_FLAG_CHANNELS | EXCL_ARCH, TYPE_NONE, "channels", true, 3),
+            new Def(905, "bots", org.telegram.messenger.MgLang.t("Botlar"), MessagesController.DIALOG_FILTER_FLAG_BOTS | EXCL_ARCH, TYPE_NONE, "bots", true, 4),
+            new Def(901, "unread", org.telegram.messenger.MgLang.t("O'qilmagan"), MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS | MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_READ | EXCL_ARCH, TYPE_NONE, "unread", true, 5),
+            new Def(906, "admin", org.telegram.messenger.MgLang.t("Admin"), MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_ADMIN, "admin", false, 6),
+            new Def(907, "admin_channels", org.telegram.messenger.MgLang.t("Mening kanallarim"), MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_ADMIN_CHANNELS, "admin_channels", false, 7),
+            new Def(908, "admin_groups", org.telegram.messenger.MgLang.t("Mening guruhlarim"), MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_ADMIN_GROUPS, "admin_groups", false, 8),
+            new Def(910, "mod_channels", org.telegram.messenger.MgLang.t("Admin kanallar"), MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_MOD_CHANNELS, "mod_channels", false, 10),
+            new Def(911, "mod_groups", org.telegram.messenger.MgLang.t("Admin guruhlar"), MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_MOD_GROUPS, "mod_groups", false, 11),
+            new Def(909, "strangers", org.telegram.messenger.MgLang.t("Notanishlar"), MessagesController.DIALOG_FILTER_FLAG_CONTACTS | MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS, TYPE_STRANGERS, "strangers", false, 9),
     };
 
     public static class Entry {
@@ -639,9 +639,15 @@ public class MgLocalFolders {
         return new int[]{count, muted};
     }
 
-    /** Tab hisoblagichi: ovozli bo'lsa ular soni, aks holda ovozsizlar soni */
+    /**
+     * Tab hisoblagichi: standart holatda jilddagi barcha o'qilmagan chatlar (ovozi o'chirilganlar ham) soni.
+     * Sozlamada "faqat ovozlilar" tanlansa — Telegram'dagidek faqat ovozi yoqilganlar.
+     */
     public static int getUnreadCount(int account, MessagesController.DialogFilter filter) {
         int[] c = getUnreadCounts(account, filter);
+        if (MgConfig.getBool("tab_count_muted", true)) {
+            return c[0] + c[1];
+        }
         return c[0] > 0 ? c[0] : c[1];
     }
 

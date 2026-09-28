@@ -89,28 +89,28 @@ public class MgBotLogin {
         TextView info = new TextView(context);
         info.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
         info.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));
-        info.setText("Tokenni @BotFather dan olasiz (/mybots → bot → API Token). To'liq havolani ham joylashingiz mumkin — token o'zi ajratib olinadi.\n\n" +
-                "Bot sifatida kirganda cheklovlar bor:\n" +
-                "• kontaktlar va eski chatlar ko'rinmaydi;\n" +
-                "• chatlar ro'yxati botga kimdir yozgandan keyin to'ladi;\n" +
-                "• faqat botga /start bosgan odamlarga yoza olasiz;\n" +
-                "• guruh va kanallarga o'zingiz qo'shila olmaysiz.");
+        info.setText(org.telegram.messenger.MgLang.t("Tokenni @BotFather dan olasiz (/mybots → bot → API Token). To'liq havolani ham joylashingiz mumkin — token o'zi ajratib olinadi.\n\n") +
+                org.telegram.messenger.MgLang.t("Bot sifatida kirganda cheklovlar bor:\n") +
+                org.telegram.messenger.MgLang.t("• kontaktlar va eski chatlar ko'rinmaydi;\n") +
+                org.telegram.messenger.MgLang.t("• chatlar ro'yxati botga kimdir yozgandan keyin to'ladi;\n") +
+                org.telegram.messenger.MgLang.t("• faqat botga /start bosgan odamlarga yoza olasiz;\n") +
+                org.telegram.messenger.MgLang.t("• guruh va kanallarga o'zingiz qo'shila olmaysiz."));
         layout.addView(info, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 12, 24, 0));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context, fragment.getResourceProvider());
-        builder.setTitle("Bot tokeni orqali kirish");
+        builder.setTitle(org.telegram.messenger.MgLang.t("Bot tokeni orqali kirish"));
         builder.setView(layout);
-        builder.setPositiveButton("Kirish", (dialog, which) -> {
+        builder.setPositiveButton(org.telegram.messenger.MgLang.t("Kirish"), (dialog, which) -> {
             String token = cleanToken(editText.getText() == null ? "" : editText.getText().toString());
             if (!isValidToken(token)) {
                 // Oyna qayta ochiladi, kiritilgan matn yo'qolmaydi
                 AndroidUtilities.runOnUIThread(() -> show(fragment, account, onSuccess, token,
-                        token.isEmpty() ? "Tokenni kiriting" : "Token noto'g'ri ko'rinishda. To'g'risi: 123456789:AAE…(35 ta belgi)"), 150);
+                        token.isEmpty() ? org.telegram.messenger.MgLang.t("Tokenni kiriting") : org.telegram.messenger.MgLang.t("Token noto'g'ri ko'rinishda. To'g'risi: 123456789:AAE…(35 ta belgi)")), 150);
                 return;
             }
             login(fragment, account, token, onSuccess);
         });
-        builder.setNeutralButton("Joylash", (dialog, which) -> {
+        builder.setNeutralButton(org.telegram.messenger.MgLang.t("Joylash"), (dialog, which) -> {
             String clip = "";
             try {
                 android.content.ClipboardManager cm = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
@@ -123,9 +123,9 @@ public class MgBotLogin {
             final String token = cleanToken(clip);
             final boolean clipEmpty = clip.isEmpty();
             AndroidUtilities.runOnUIThread(() -> show(fragment, account, onSuccess, token,
-                    clipEmpty ? "Bufer bo'sh" : (isValidToken(token) ? null : "Buferdagi matnda token topilmadi")), 150);
+                    clipEmpty ? org.telegram.messenger.MgLang.t("Bufer bo'sh") : (isValidToken(token) ? null : org.telegram.messenger.MgLang.t("Buferdagi matnda token topilmadi"))), 150);
         });
-        builder.setNegativeButton("Bekor qilish", null);
+        builder.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), null);
         fragment.showDialog(builder.create());
         AndroidUtilities.runOnUIThread(() -> {
             editText.requestFocus();
@@ -136,14 +136,14 @@ public class MgBotLogin {
 
     private static String mapError(TLRPC.TL_error error) {
         if (error == null) {
-            return "Noma'lum xato";
+            return org.telegram.messenger.MgLang.t("Noma'lum xato");
         }
         String t = error.text == null ? "" : error.text;
         if (t.contains("ACCESS_TOKEN_INVALID")) {
-            return "Token noto'g'ri yoki bekor qilingan. @BotFather dan tokenni tekshiring.";
+            return org.telegram.messenger.MgLang.t("Token noto'g'ri yoki bekor qilingan. @BotFather dan tokenni tekshiring.");
         }
         if (t.contains("ACCESS_TOKEN_EXPIRED")) {
-            return "Token eskirgan (bekor qilingan). @BotFather → /revoke orqali yangisini oling.";
+            return org.telegram.messenger.MgLang.t("Token eskirgan (bekor qilingan). @BotFather → /revoke orqali yangisini oling.");
         }
         if (t.startsWith("FLOOD_WAIT")) {
             int secs = 0;
@@ -151,19 +151,19 @@ public class MgBotLogin {
                 secs = Integer.parseInt(t.substring(t.lastIndexOf('_') + 1));
             } catch (Throwable ignore) {
             }
-            String when = secs >= 3600 ? (secs / 3600) + " soat " + (secs % 3600 / 60) + " daqiqa" : secs >= 60 ? (secs / 60) + " daqiqa" : secs + " soniya";
-            return "Juda ko'p urinish bo'ldi. " + when + "dan keyin qayta urinib ko'ring.";
+            String when = secs >= 3600 ? (secs / 3600) + org.telegram.messenger.MgLang.t(" soat ") + (secs % 3600 / 60) + org.telegram.messenger.MgLang.t(" daqiqa") : secs >= 60 ? (secs / 60) + org.telegram.messenger.MgLang.t(" daqiqa") : secs + org.telegram.messenger.MgLang.t(" soniya");
+            return org.telegram.messenger.MgLang.t("Juda ko'p urinish bo'ldi. ") + when + org.telegram.messenger.MgLang.t("dan keyin qayta urinib ko'ring.");
         }
         if (t.contains("API_ID")) {
-            return "Ilova API kaliti Telegram tomonidan rad etildi (" + t + ").";
+            return org.telegram.messenger.MgLang.t("Ilova API kaliti Telegram tomonidan rad etildi (") + t + ").";
         }
         if (t.contains("USER_DEACTIVATED") || t.contains("BOT_") && t.contains("BAN")) {
-            return "Bu bot Telegram tomonidan bloklangan.";
+            return org.telegram.messenger.MgLang.t("Bu bot Telegram tomonidan bloklangan.");
         }
         if (error.code == -1000 || t.isEmpty()) {
-            return "Internetga ulanib bo'lmadi. Aloqani tekshirib, qayta urinib ko'ring.";
+            return org.telegram.messenger.MgLang.t("Internetga ulanib bo'lmadi. Aloqani tekshirib, qayta urinib ko'ring.");
         }
-        return "Xato: " + t;
+        return org.telegram.messenger.MgLang.t("Xato: ") + t;
     }
 
     private static void login(BaseFragment fragment, int account, String token, Utilities.Callback<TLRPC.TL_auth_authorization> onSuccess) {

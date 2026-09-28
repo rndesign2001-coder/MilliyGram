@@ -68,7 +68,7 @@ public class MgGhostMode {
      */
     public static void setEnabled(int account, boolean enable, Utilities.Callback<String> done) {
         if (!isReady(account)) {
-            done.run("Maxfiylik sozlamalari yuklanmoqda. Bir necha soniyadan keyin qayta urinib ko'ring.");
+            done.run(org.telegram.messenger.MgLang.t("Maxfiylik sozlamalari yuklanmoqda. Bir necha soniyadan keyin qayta urinib ko'ring."));
             return;
         }
         ContactsController cc = ContactsController.getInstance(account);

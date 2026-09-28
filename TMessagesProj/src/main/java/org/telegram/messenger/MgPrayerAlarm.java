@@ -139,8 +139,8 @@ public class MgPrayerAlarm extends BroadcastReceiver {
         if (Build.VERSION.SDK_INT >= 26) {
             NotificationManager nm = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
             if (nm != null && nm.getNotificationChannel(CHANNEL) == null) {
-                NotificationChannel ch = new NotificationChannel(CHANNEL, "Namoz vaqtlari", NotificationManager.IMPORTANCE_HIGH);
-                ch.setDescription("Namoz vaqti kirganini eslatish");
+                NotificationChannel ch = new NotificationChannel(CHANNEL, org.telegram.messenger.MgLang.t("Namoz vaqtlari"), NotificationManager.IMPORTANCE_HIGH);
+                ch.setDescription(org.telegram.messenger.MgLang.t("Namoz vaqti kirganini eslatish"));
                 nm.createNotificationChannel(ch);
             }
         }
@@ -148,9 +148,9 @@ public class MgPrayerAlarm extends BroadcastReceiver {
         int[] t = MgPrayer.today();
         MgPlaces.Place place = MgPrayer.getPlace();
         String title = before > 0
-                ? MgPrayer.NAMES[p] + " namoziga " + before + " daqiqa qoldi"
-                : MgPrayer.NAMES[p] + " namozi vaqti kirdi";
-        String text = MgPrayer.NAMES[p] + ": " + MgPrayer.hhmm(t[p]) + " · " + place.name;
+                ? MgPrayer.NAMES[p] + org.telegram.messenger.MgLang.t(" namoziga ") + before + org.telegram.messenger.MgLang.t(" daqiqa qoldi")
+                : MgPrayer.NAMES[p] + org.telegram.messenger.MgLang.t(" namozi vaqti kirdi");
+        String text = MgPrayer.NAMES[p] + ": " + MgPrayer.hhmm(t[p]) + " · " + MgLang.t(place.name);
         Intent launch = ctx.getPackageManager().getLaunchIntentForPackage(ctx.getPackageName());
         PendingIntent content = null;
         if (launch != null) {

@@ -35,7 +35,7 @@ public class MgThemesActivity extends UniversalFragment {
 
     @Override
     protected CharSequence getTitle() {
-        return "MilliyGram mavzulari";
+        return org.telegram.messenger.MgLang.t("MilliyGram mavzulari");
     }
 
     /** Rangli doira: TextCell ikonkaga rang filtri qo'yganda ham o'z rangini saqlaydi */
@@ -108,7 +108,7 @@ public class MgThemesActivity extends UniversalFragment {
                     int[] ids = night ? Theme.MG_THEME_NIGHT_IDS : Theme.MG_THEME_DAY_IDS;
                     for (int i = 0; i < ids.length; i++) {
                         if (ids[i] == t.currentAccentId) {
-                            return Theme.MG_THEME_NAMES[i];
+                            return org.telegram.messenger.MgLang.t(Theme.MG_THEME_NAMES[i]);
                         }
                     }
                 }
@@ -134,26 +134,26 @@ public class MgThemesActivity extends UniversalFragment {
 
     @Override
     protected void fillItems(ArrayList<UItem> items, UniversalAdapter adapter) {
-        items.add(UItem.asHeader("Kunduzgi mavzular"));
+        items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Kunduzgi mavzular")));
         for (int i = 0; i < Theme.MG_THEME_NAMES.length; i++) {
             if (i == Theme.MG_THEME_NAMES.length - 1 && Build.VERSION.SDK_INT < 31) {
                 continue;
             }
             boolean cur = isCurrent(false, i);
-            items.add(UItem.asButton(ID_DAY_BASE + i, dot(Theme.MG_THEME_COLORS[i], cur), Theme.MG_THEME_NAMES[i] + (cur ? "  ✓" : "")));
+            items.add(UItem.asButton(ID_DAY_BASE + i, dot(Theme.MG_THEME_COLORS[i], cur), org.telegram.messenger.MgLang.t(Theme.MG_THEME_NAMES[i]) + (cur ? "  ✓" : "")));
         }
         items.add(UItem.asShadow(null));
-        items.add(UItem.asHeader("Tungi mavzular"));
+        items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Tungi mavzular")));
         for (int i = 0; i < Theme.MG_THEME_NAMES.length; i++) {
             if (i == Theme.MG_THEME_NAMES.length - 1 && Build.VERSION.SDK_INT < 31) {
                 continue;
             }
             boolean cur = isCurrent(true, i);
-            items.add(UItem.asButton(ID_NIGHT_BASE + i, dot(Theme.MG_THEME_COLORS[i], cur), Theme.MG_THEME_NAMES[i] + (cur ? "  ✓" : "")));
+            items.add(UItem.asButton(ID_NIGHT_BASE + i, dot(Theme.MG_THEME_COLORS[i], cur), org.telegram.messenger.MgLang.t(Theme.MG_THEME_NAMES[i]) + (cur ? "  ✓" : "")));
         }
-        items.add(UItem.asShadow("Har bir mavzuning o'z milliy naqshli chat foni bor: Ko'k osmon — milliy naqsh, Feruza — girih, Oltin — suzani, Anor — anor, Paxta — paxta gullari, Atlas — abr naqshi. Material You ranglari telefon fon rasmidan olinadi (Android 12+)."));
-        items.add(UItem.asButton(ID_WALLPAPERS, R.drawable.msg_background, "Boshqa chat foni tanlash"));
-        items.add(UItem.asButton(ID_CHAT_SETTINGS, R.drawable.msg_palette, "Chat sozlamalari (shrift, burchaklar)"));
+        items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Har bir mavzuning o'z milliy naqshli chat foni bor: Ko'k osmon — milliy naqsh, Feruza — girih, Oltin — suzani, Anor — anor, Paxta — paxta gullari, Atlas — abr naqshi. Material You ranglari telefon fon rasmidan olinadi (Android 12+).")));
+        items.add(UItem.asButton(ID_WALLPAPERS, R.drawable.msg_background, org.telegram.messenger.MgLang.t("Boshqa chat foni tanlash")));
+        items.add(UItem.asButton(ID_CHAT_SETTINGS, R.drawable.msg_palette, org.telegram.messenger.MgLang.t("Chat sozlamalari (shrift, burchaklar)")));
         items.add(UItem.asShadow(null));
     }
 
@@ -168,7 +168,7 @@ public class MgThemesActivity extends UniversalFragment {
                 .putString(night ? "lastDarkTheme" : "lastDayTheme", info.getKey())
                 .commit();
         Theme.turnOffAutoNight(this);
-        final String name = Theme.MG_THEME_NAMES[idx];
+        final String name = org.telegram.messenger.MgLang.t(Theme.MG_THEME_NAMES[idx]);
         // Mavzu animatsiyasidan keyin barcha ekranlarni qayta chizish (eski ranglar qolib ketmasin)
         AndroidUtilities.runOnUIThread(() -> {
             if (getParentLayout() != null) {
@@ -179,7 +179,7 @@ public class MgThemesActivity extends UniversalFragment {
             if (listView != null) {
                 listView.adapter.update(true);
             }
-            BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, "Mavzu qo'llanildi: " + name).show();
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Mavzu qo'llanildi: ") + name).show();
         }, 900);
     }
 

@@ -104,17 +104,17 @@ public class MgColorPicker {
         }
 
         // Rang tusi va yorqinlik
-        TextView hueLabel = label(ctx, "Rang tusi");
+        TextView hueLabel = label(ctx, org.telegram.messenger.MgLang.t("Rang tusi"));
         root.addView(hueLabel, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 10, 0, 0));
         SeekBar hue = new SeekBar(ctx);
         hue.setMax(360);
         root.addView(hue, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 36));
-        TextView satLabel = label(ctx, "To'yinganlik");
+        TextView satLabel = label(ctx, org.telegram.messenger.MgLang.t("To'yinganlik"));
         root.addView(satLabel, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
         SeekBar sat = new SeekBar(ctx);
         sat.setMax(100);
         root.addView(sat, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 36));
-        TextView valLabel = label(ctx, "Yorqinlik");
+        TextView valLabel = label(ctx, org.telegram.messenger.MgLang.t("Yorqinlik"));
         root.addView(valLabel, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
         SeekBar val = new SeekBar(ctx);
         val.setMax(100);
@@ -199,11 +199,11 @@ public class MgColorPicker {
         AlertDialog.Builder b = new AlertDialog.Builder(ctx, fragment.getResourceProvider());
         b.setTitle(title);
         b.setView(scroll);
-        b.setPositiveButton("Saqlash", (d, w) -> onPick.run(color[0]));
+        b.setPositiveButton(org.telegram.messenger.MgLang.t("Saqlash"), (d, w) -> onPick.run(color[0]));
         if (hasCustom) {
-            b.setNeutralButton("Standart", (d, w) -> onPick.run(null));
+            b.setNeutralButton(org.telegram.messenger.MgLang.t("Standart"), (d, w) -> onPick.run(null));
         }
-        b.setNegativeButton("Bekor", null);
+        b.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor"), null);
         fragment.showDialog(b.create());
     }
 

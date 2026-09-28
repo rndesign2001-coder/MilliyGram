@@ -48,21 +48,21 @@ public class MgFoldersActivity extends UniversalFragment {
 
     @Override
     protected CharSequence getTitle() {
-        return "Jildlar";
+        return org.telegram.messenger.MgLang.t("Jildlar");
     }
 
     @Override
     protected void fillItems(ArrayList<UItem> items, UniversalAdapter adapter) {
         entries.clear();
         entries.addAll(MgLocalFolders.load(currentAccount));
-        items.add(UItem.asHeader("Ko'rinish"));
-        items.add(UItem.asCheck(ID_ICON_TABS, "Jildlarni ikonkada ko'rsatish").setChecked(MgConfig.isFolderIconTabs()));
-        items.add(UItem.asCheck(ID_LOCAL, "Lokal jildlar").setChecked(MgLocalFolders.isEnabledFeature()));
-        items.add(UItem.asButton(ID_EDIT_CLOUD, R.drawable.msg_folders, "Bulut jildlarini tahrirlash"));
-        items.add(UItem.asShadow("Lokal jildlar faqat shu telefonda ishlaydi, serverga yuborilmaydi va Telegram jild limitiga kirmaydi."));
+        items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Ko'rinish")));
+        items.add(UItem.asCheck(ID_ICON_TABS, org.telegram.messenger.MgLang.t("Jildlarni ikonkada ko'rsatish")).setChecked(MgConfig.isFolderIconTabs()));
+        items.add(UItem.asCheck(ID_LOCAL, org.telegram.messenger.MgLang.t("Lokal jildlar")).setChecked(MgLocalFolders.isEnabledFeature()));
+        items.add(UItem.asButton(ID_EDIT_CLOUD, R.drawable.msg_folders, org.telegram.messenger.MgLang.t("Bulut jildlarini tahrirlash")));
+        items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Lokal jildlar faqat shu telefonda ishlaydi, serverga yuborilmaydi va Telegram jild limitiga kirmaydi.")));
 
         if (MgLocalFolders.isEnabledFeature()) {
-            items.add(UItem.asHeader("Lokal jildlar"));
+            items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Lokal jildlar")));
             for (int i = 0; i < entries.size(); i++) {
                 MgLocalFolders.Entry e = entries.get(i);
                 Integer icon = MgLocalFolders.ICONS.get(e.icon);
@@ -70,11 +70,11 @@ public class MgFoldersActivity extends UniversalFragment {
                 if (custom != null && MgLocalFolders.ICONS.containsKey(custom)) {
                     icon = MgLocalFolders.ICONS.get(custom);
                 }
-                String sub = e.type == MgLocalFolders.TYPE_CUSTOM ? "Toifa · " + e.always.size() + " ta chat · " + (e.enabled ? "yoqilgan" : "yashirilgan") : (e.enabled ? "Yoqilgan" : "Yashirilgan");
+                String sub = e.type == MgLocalFolders.TYPE_CUSTOM ? org.telegram.messenger.MgLang.t("Toifa · ") + e.always.size() + org.telegram.messenger.MgLang.t(" ta chat · ") + (e.enabled ? "yoqilgan" : "yashirilgan") : (e.enabled ? org.telegram.messenger.MgLang.t("Yoqilgan") : org.telegram.messenger.MgLang.t("Yashirilgan"));
                 items.add(UItem.asButtonCheck(ID_LOCAL_BASE + i, e.name, sub).setChecked(e.enabled));
             }
-            items.add(UItem.asButton(ID_NEW_CATEGORY, R.drawable.msg_add, "Yangi toifa yaratish"));
-            items.add(UItem.asShadow("Yoqish/yashirish uchun bosing. Nomini yoki ikonkasini o'zgartirish uchun uzoq bosing.\n\n• Admin — siz egasi yoki admini bo'lgan barcha guruh va kanallar\n• Mening kanallarim / guruhlarim — o'zingiz egasi bo'lganlar\n• Admin kanallar / guruhlar — siz admin, lekin egasi boshqa odam\n• Notanishlar — kontaktda yo'q odamlar (himoya yoqilganda)"));
+            items.add(UItem.asButton(ID_NEW_CATEGORY, R.drawable.msg_add, org.telegram.messenger.MgLang.t("Yangi toifa yaratish")));
+            items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Yoqish/yashirish uchun bosing. Nomini yoki ikonkasini o'zgartirish uchun uzoq bosing.\n\n• Admin — siz egasi yoki admini bo'lgan barcha guruh va kanallar\n• Mening kanallarim / guruhlarim — o'zingiz egasi bo'lganlar\n• Admin kanallar / guruhlar — siz admin, lekin egasi boshqa odam\n• Notanishlar — kontaktda yo'q odamlar (himoya yoqilganda)")));
         }
 
         hiddenTabs.clear();
@@ -84,9 +84,9 @@ public class MgFoldersActivity extends UniversalFragment {
             }
         }
         if (!hiddenTabs.isEmpty()) {
-            items.add(UItem.asHeader("Yashirilgan tablar"));
+            items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Yashirilgan tablar")));
             for (int i = 0; i < hiddenTabs.size(); i++) {
-                items.add(UItem.asButton(ID_HIDDEN_BASE + i, R.drawable.msg_folders, hiddenTabs.get(i).name, "Ko'rsatish"));
+                items.add(UItem.asButton(ID_HIDDEN_BASE + i, R.drawable.msg_folders, hiddenTabs.get(i).name, org.telegram.messenger.MgLang.t("Ko'rsatish")));
             }
             items.add(UItem.asShadow(null));
         }
@@ -117,10 +117,10 @@ public class MgFoldersActivity extends UniversalFragment {
             return;
         }
         if (item.id == ID_NEW_CATEGORY) {
-            MgDialogActions.askName(this, "Yangi toifa", "", name -> {
+            MgDialogActions.askName(this, org.telegram.messenger.MgLang.t("Yangi toifa"), "", name -> {
                 MgLocalFolders.createCategory(currentAccount, name, new ArrayList<>());
                 listView.adapter.update(true);
-                org.telegram.ui.Components.BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, "Toifa yaratildi. Chatlarni belgilab ⋮ → \"Toifaga qo'shish\"").show();
+                org.telegram.ui.Components.BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Toifa yaratildi. Chatlarni belgilab ⋮ → \"Toifaga qo'shish\"")).show();
             });
             return;
         }
@@ -146,10 +146,10 @@ public class MgFoldersActivity extends UniversalFragment {
         }
         MgLocalFolders.Entry e = entries.get(local);
         ItemOptions o = ItemOptions.makeOptions(this, view)
-                .add(R.drawable.msg_edit, "Nomini o'zgartirish", () -> showRename(e))
-                .add(R.drawable.msg_palette, "Ikonka tanlash", () -> showIconPicker(e.id));
+                .add(R.drawable.msg_edit, org.telegram.messenger.MgLang.t("Nomini o'zgartirish"), () -> showRename(e))
+                .add(R.drawable.msg_palette, org.telegram.messenger.MgLang.t("Ikonka tanlash"), () -> showIconPicker(e.id));
         if (e.type == MgLocalFolders.TYPE_CUSTOM) {
-            o.add(R.drawable.msg_delete, "Toifani o'chirish", true, () -> {
+            o.add(R.drawable.msg_delete, org.telegram.messenger.MgLang.t("Toifani o'chirish"), true, () -> {
                 MgLocalFolders.deleteCategory(currentAccount, e.id);
                 listView.adapter.update(true);
             });
@@ -170,7 +170,7 @@ public class MgFoldersActivity extends UniversalFragment {
                 }
             }
         }
-        MgIconPicker.show(this, "Jild ikonkasi", cur, key -> {
+        MgIconPicker.show(this, org.telegram.messenger.MgLang.t("Jild ikonkasi"), cur, key -> {
             MgLocalFolders.setIconKey(currentAccount, filterId, key);
             listView.adapter.update(true);
         });
@@ -193,16 +193,16 @@ public class MgFoldersActivity extends UniversalFragment {
         FrameLayout frameLayout = new FrameLayout(context);
         frameLayout.addView(editText, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP, 24, 6, 24, 0));
         AlertDialog.Builder builder = new AlertDialog.Builder(context, getResourceProvider());
-        builder.setTitle("Jild nomi");
+        builder.setTitle(org.telegram.messenger.MgLang.t("Jild nomi"));
         builder.setView(frameLayout);
-        builder.setPositiveButton("Saqlash", (dialog, which) -> {
+        builder.setPositiveButton(org.telegram.messenger.MgLang.t("Saqlash"), (dialog, which) -> {
             String name = editText.getText().toString().trim();
             if (!name.isEmpty()) {
                 MgLocalFolders.renameLocal(currentAccount, e.id, name);
                 listView.adapter.update(true);
             }
         });
-        builder.setNegativeButton("Bekor qilish", null);
+        builder.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), null);
         showDialog(builder.create());
         AndroidUtilities.runOnUIThread(() -> {
             editText.requestFocus();

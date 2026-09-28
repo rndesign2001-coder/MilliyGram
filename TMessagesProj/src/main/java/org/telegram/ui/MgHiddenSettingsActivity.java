@@ -59,7 +59,7 @@ public class MgHiddenSettingsActivity extends UniversalFragment {
             MgChatLock.createLock(fragment, S, MgConfig.LOCK_PIN, () -> fragment.presentFragment(new MgHiddenSettingsActivity()));
             return;
         }
-        MgChatLock.askLock(fragment, S, "Yashirin bo'lim sozlamalari", ok -> {
+        MgChatLock.askLock(fragment, S, org.telegram.messenger.MgLang.t("Yashirin bo'lim sozlamalari"), ok -> {
             if (ok) {
                 fragment.presentFragment(new MgHiddenSettingsActivity());
             }
@@ -68,57 +68,57 @@ public class MgHiddenSettingsActivity extends UniversalFragment {
 
     @Override
     protected CharSequence getTitle() {
-        return "Yashirin bo'lim sozlamalari";
+        return org.telegram.messenger.MgLang.t("Yashirin bo'lim sozlamalari");
     }
 
     private String accountName(int account) {
         TLRPC.User user = UserConfig.getInstance(account).getCurrentUser();
         if (user == null) {
-            return "Akkaunt " + (account + 1);
+            return org.telegram.messenger.MgLang.t("Akkaunt ") + (account + 1);
         }
         String alias = MgConfig.getAccountAlias(account);
         String name = !alias.isEmpty() ? alias : ContactsController.formatName(user.first_name, user.last_name);
-        return (user.bot ? "🤖 " : "") + name + (account == currentAccount ? " (joriy)" : "");
+        return (user.bot ? "🤖 " : "") + name + (account == currentAccount ? org.telegram.messenger.MgLang.t(" (joriy)") : "");
     }
 
     @Override
     protected void fillItems(ArrayList<UItem> items, UniversalAdapter adapter) {
-        items.add(UItem.asTopViewStatic("Yashirin chatlar va akkauntlar faqat shu yerda boshqariladi. Yashirin bo'limga kirish: bosh ekranda qidiruv 🔍 tugmasini uzoq bosing.", R.drawable.msg_archive));
-        items.add(UItem.asButton(ID_OPEN, R.drawable.msg_archive, "Yashirin chatlarni ochish",
+        items.add(UItem.asTopViewStatic(org.telegram.messenger.MgLang.t("Yashirin chatlar va akkauntlar faqat shu yerda boshqariladi. Yashirin bo'limga kirish: bosh ekranda qidiruv 🔍 tugmasini uzoq bosing."), R.drawable.msg_archive));
+        items.add(UItem.asButton(ID_OPEN, R.drawable.msg_archive, org.telegram.messenger.MgLang.t("Yashirin chatlarni ochish"),
                 MgConfig.getHiddenDialogs(currentAccount).isEmpty() ? "" : String.valueOf(MgConfig.getHiddenDialogs(currentAccount).size())));
         items.add(UItem.asShadow(null));
 
-        items.add(UItem.asHeader("Yashirilgan akkauntlar"));
+        items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Yashirilgan akkauntlar")));
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
             if (UserConfig.getInstance(a).isClientActivated()) {
                 items.add(UItem.asCheck(ID_ACC_BASE + a, accountName(a)).setChecked(MgConfig.isAccountHidden(a)));
             }
         }
-        items.add(UItem.asShadow("Belgilangan akkauntlar ro'yxatlarda ko'rinmaydi. Ularga o'tish: Profil → akkauntlar ro'yxatida \"Hisob qo'shish\" ni uzoq bosing."));
+        items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Belgilangan akkauntlar ro'yxatlarda ko'rinmaydi. Ularga o'tish: Profil → akkauntlar ro'yxatida \"Hisob qo'shish\" ni uzoq bosing.")));
 
         boolean pattern = MgConfig.LOCK_PATTERN.equals(MgConfig.getLockType(S));
-        items.add(UItem.asHeader("Kirish kodi"));
-        items.add(UItem.asButton(ID_LOCK_TYPE, R.drawable.msg_secret, "Kod turi", pattern ? "Grafik kalit" : "PIN kod"));
-        items.add(UItem.asButton(ID_CHANGE_CODE, R.drawable.msg_edit, pattern ? "Grafik kalitni o'zgartirish" : "PIN kodni o'zgartirish"));
-        items.add(UItem.asCheck(ID_FINGERPRINT, "Barmoq izi bilan ochish").setChecked(MgConfig.isFingerprintEnabled(S)));
+        items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Kirish kodi")));
+        items.add(UItem.asButton(ID_LOCK_TYPE, R.drawable.msg_secret, org.telegram.messenger.MgLang.t("Kod turi"), pattern ? org.telegram.messenger.MgLang.t("Grafik kalit") : org.telegram.messenger.MgLang.t("PIN kod")));
+        items.add(UItem.asButton(ID_CHANGE_CODE, R.drawable.msg_edit, pattern ? org.telegram.messenger.MgLang.t("Grafik kalitni o'zgartirish") : org.telegram.messenger.MgLang.t("PIN kodni o'zgartirish")));
+        items.add(UItem.asCheck(ID_FINGERPRINT, org.telegram.messenger.MgLang.t("Barmoq izi bilan ochish")).setChecked(MgConfig.isFingerprintEnabled(S)));
         if (pattern) {
-            items.add(UItem.asCheck(ID_INVISIBLE, "Ko'rinmas grafik kalit").setChecked(MgConfig.isPatternInvisible(S)));
+            items.add(UItem.asCheck(ID_INVISIBLE, org.telegram.messenger.MgLang.t("Ko'rinmas grafik kalit")).setChecked(MgConfig.isPatternInvisible(S)));
         }
-        items.add(UItem.asCheck(ID_NO_PIN, "Parolsiz kirish").setChecked(MgConfig.isHiddenNoPin()));
-        items.add(UItem.asShadow("Bu kod chat qulfi kodidan alohida. Parolsiz kirish yoqilsa, qidiruvni uzoq bosganda kod so'ralmaydi."));
+        items.add(UItem.asCheck(ID_NO_PIN, org.telegram.messenger.MgLang.t("Parolsiz kirish")).setChecked(MgConfig.isHiddenNoPin()));
+        items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Bu kod chat qulfi kodidan alohida. Parolsiz kirish yoqilsa, qidiruvni uzoq bosganda kod so'ralmaydi.")));
 
-        items.add(UItem.asHeader("Xavfsizlik"));
-        items.add(UItem.asCheck(ID_SHAKE, "Silkitib yashirish").setChecked(MgConfig.isShakeToHide()));
-        items.add(UItem.asShadow("Telefonni keskin silkitsangiz, ochiq yashirin bo'lim va qulflangan chatlar darhol yopiladi, yashirilgan akkauntdan asosiy akkauntga o'tiladi."));
+        items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Xavfsizlik")));
+        items.add(UItem.asCheck(ID_SHAKE, org.telegram.messenger.MgLang.t("Silkitib yashirish")).setChecked(MgConfig.isShakeToHide()));
+        items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Telefonni keskin silkitsangiz, ochiq yashirin bo'lim va qulflangan chatlar darhol yopiladi, yashirilgan akkauntdan asosiy akkauntga o'tiladi.")));
 
-        items.add(UItem.asHeader("Yolg'on ism"));
+        items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Yolg'on ism")));
         String fake = MgConfig.getFakeName();
-        items.add(UItem.asButton(ID_FAKE_NAME, R.drawable.msg_openprofile, "Yolg'on ism", fake.isEmpty() ? "O'chirilgan" : fake));
-        items.add(UItem.asShadow("Ilovada o'z ismingiz o'rniga shu ism ko'rinadi (masalan, skrinshot uchun). Boshqalar haqiqiy ismingizni ko'raveradi."));
+        items.add(UItem.asButton(ID_FAKE_NAME, R.drawable.msg_openprofile, org.telegram.messenger.MgLang.t("Yolg'on ism"), fake.isEmpty() ? org.telegram.messenger.MgLang.t("O'chirilgan") : fake));
+        items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Ilovada o'z ismingiz o'rniga shu ism ko'rinadi (masalan, skrinshot uchun). Boshqalar haqiqiy ismingizni ko'raveradi.")));
 
-        items.add(UItem.asHeader("Bildirishnomalar"));
-        items.add(UItem.asCheck(ID_NOTIFY, "Yashirin chatlardan").setChecked(MgConfig.isHiddenNotifyEnabled()));
-        items.add(UItem.asCheck(ID_ACC_NOTIFY, "Yashirilgan akkauntlardan").setChecked(MgConfig.isHiddenAccountNotify()));
+        items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Bildirishnomalar")));
+        items.add(UItem.asCheck(ID_NOTIFY, org.telegram.messenger.MgLang.t("Yashirin chatlardan")).setChecked(MgConfig.isHiddenNotifyEnabled()));
+        items.add(UItem.asCheck(ID_ACC_NOTIFY, org.telegram.messenger.MgLang.t("Yashirilgan akkauntlardan")).setChecked(MgConfig.isHiddenAccountNotify()));
         items.add(UItem.asShadow(null));
     }
 
@@ -140,8 +140,8 @@ public class MgHiddenSettingsActivity extends UniversalFragment {
                     return;
                 }
                 AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
-                builder.setTitle("Kod turi");
-                builder.setItems(new CharSequence[]{"PIN kod (4 raqam)", "Grafik kalit (tasvirli kod)"}, (dialog, which) ->
+                builder.setTitle(org.telegram.messenger.MgLang.t("Kod turi"));
+                builder.setItems(new CharSequence[]{org.telegram.messenger.MgLang.t("PIN kod (4 raqam)"), org.telegram.messenger.MgLang.t("Grafik kalit (tasvirli kod)")}, (dialog, which) ->
                         MgChatLock.createLock(this, S, which == 1 ? MgConfig.LOCK_PATTERN : MgConfig.LOCK_PIN, () -> listView.adapter.update(true)));
                 showDialog(builder.create());
                 return;
@@ -207,25 +207,25 @@ public class MgHiddenSettingsActivity extends UniversalFragment {
         editText.setLineColors(Theme.getColor(Theme.key_windowBackgroundWhiteInputField), Theme.getColor(Theme.key_windowBackgroundWhiteInputFieldActivated), Theme.getColor(Theme.key_text_RedRegular));
         editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         editText.setSingleLine(true);
-        editText.setHint("Masalan: Foydalanuvchi");
+        editText.setHint(org.telegram.messenger.MgLang.t("Masalan: Foydalanuvchi"));
         editText.setText(MgConfig.getFakeName());
         FrameLayout frameLayout = new FrameLayout(context);
         frameLayout.addView(editText, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP, 24, 6, 24, 0));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context, getResourceProvider());
-        builder.setTitle("Yolg'on ism");
+        builder.setTitle(org.telegram.messenger.MgLang.t("Yolg'on ism"));
         builder.setView(frameLayout);
-        builder.setPositiveButton("Saqlash", (dialog, which) -> {
+        builder.setPositiveButton(org.telegram.messenger.MgLang.t("Saqlash"), (dialog, which) -> {
             MgConfig.setFakeName(editText.getText().toString());
             NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.mainUserInfoChanged);
             listView.adapter.update(true);
         });
-        builder.setNeutralButton("O'chirish", (dialog, which) -> {
+        builder.setNeutralButton(org.telegram.messenger.MgLang.t("O'chirish"), (dialog, which) -> {
             MgConfig.setFakeName("");
             NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.mainUserInfoChanged);
             listView.adapter.update(true);
         });
-        builder.setNegativeButton("Bekor qilish", null);
+        builder.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), null);
         showDialog(builder.create());
         AndroidUtilities.runOnUIThread(() -> {
             editText.requestFocus();

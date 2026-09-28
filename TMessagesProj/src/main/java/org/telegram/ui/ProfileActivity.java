@@ -4479,7 +4479,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 openAddMember();
             } else if (position == mgIdRow) {
                 if (AndroidUtilities.addToClipboard(String.valueOf(mgGetPeerId()))) {
-                    BulletinFactory.of(ProfileActivity.this).createCopyBulletin("ID nusxalandi: " + mgGetPeerId()).show();
+                    BulletinFactory.of(ProfileActivity.this).createCopyBulletin(org.telegram.messenger.MgLang.t("ID nusxalandi: ") + mgGetPeerId()).show();
                 }
             } else if (position == usernameRow) {
                 processOnClickOrPress(position, view, x, y);
@@ -13511,7 +13511,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                             containsGift = !myProfile && today && !getMessagesController().premiumPurchaseBlocked();
                         }
                     } else if (position == mgIdRow) {
-                        detailCell.setTextAndValue(String.valueOf(mgGetPeerId()), "ID · nusxalash uchun bosing", false);
+                        detailCell.setTextAndValue(String.valueOf(mgGetPeerId()), org.telegram.messenger.MgLang.t("ID · nusxalash uchun bosing"), false);
                     } else if (position == phoneRow) {
                         String text;
                         TLRPC.User user = getMessagesController().getUser(userId);

@@ -23,7 +23,7 @@ import java.util.ArrayList;
 public class MgTranslate {
 
     public static final String[] CODES = {"uz", "ru", "en", "tr", "kk", "ky", "tg", "ar", "de", "ko", "zh", "fr", "es", "fa"};
-    public static final String[] NAMES = {"🇺🇿 O'zbekcha", "🇷🇺 Ruscha", "🇬🇧 Inglizcha", "🇹🇷 Turkcha", "🇰🇿 Qozoqcha", "🇰🇬 Qirg'izcha", "🇹🇯 Tojikcha", "🇸🇦 Arabcha", "🇩🇪 Nemischa", "🇰🇷 Koreyscha", "🇨🇳 Xitoycha", "🇫🇷 Fransuzcha", "🇪🇸 Ispancha", "🇮🇷 Forscha"};
+    public static final String[] NAMES = {org.telegram.messenger.MgLang.t("🇺🇿 O'zbekcha"), org.telegram.messenger.MgLang.t("🇷🇺 Ruscha"), org.telegram.messenger.MgLang.t("🇬🇧 Inglizcha"), org.telegram.messenger.MgLang.t("🇹🇷 Turkcha"), org.telegram.messenger.MgLang.t("🇰🇿 Qozoqcha"), org.telegram.messenger.MgLang.t("🇰🇬 Qirg'izcha"), org.telegram.messenger.MgLang.t("🇹🇯 Tojikcha"), org.telegram.messenger.MgLang.t("🇸🇦 Arabcha"), org.telegram.messenger.MgLang.t("🇩🇪 Nemischa"), org.telegram.messenger.MgLang.t("🇰🇷 Koreyscha"), org.telegram.messenger.MgLang.t("🇨🇳 Xitoycha"), org.telegram.messenger.MgLang.t("🇫🇷 Fransuzcha"), org.telegram.messenger.MgLang.t("🇪🇸 Ispancha"), org.telegram.messenger.MgLang.t("🇮🇷 Forscha")};
 
     public static String nameOf(String code) {
         for (int i = 0; i < CODES.length; i++) {
@@ -97,7 +97,7 @@ public class MgTranslate {
     public static final int ENGINE_AUTO = 0;
     public static final int ENGINE_GOOGLE = 1;
     public static final int ENGINE_TELEGRAM = 2;
-    public static final String[] ENGINE_NAMES = {"Avtomatik (Telegram + Google)", "Google Tarjimon", "Telegram"};
+    public static final String[] ENGINE_NAMES = {org.telegram.messenger.MgLang.t("Avtomatik (Telegram + Google)"), org.telegram.messenger.MgLang.t("Google Tarjimon"), "Telegram"};
 
     public static int getEngine() {
         return MgConfig.getInt("mg_translate_engine", ENGINE_AUTO);
@@ -136,7 +136,7 @@ public class MgTranslate {
             } else if (engine == ENGINE_AUTO) {
                 google(src, lang, done);
             } else {
-                done.run(null, err != null ? "Telegram: " + err.text : "Telegram tarjima qila olmadi");
+                done.run(null, err != null ? "Telegram: " + err.text : org.telegram.messenger.MgLang.t("Telegram tarjima qila olmadi"));
             }
         }));
     }
@@ -186,7 +186,7 @@ public class MgTranslate {
                     out = res.toString();
                 }
             } catch (Throwable e) {
-                error = "Internet orqali tarjima qilib bo'lmadi";
+                error = org.telegram.messenger.MgLang.t("Internet orqali tarjima qilib bo'lmadi");
             } finally {
                 if (c != null) {
                     try {
@@ -203,7 +203,7 @@ public class MgTranslate {
                     t.text = outF;
                     done.run(t, null);
                 } else {
-                    done.run(null, errF != null ? errF : "Tarjima qilib bo'lmadi");
+                    done.run(null, errF != null ? errF : org.telegram.messenger.MgLang.t("Tarjima qilib bo'lmadi"));
                 }
             });
         });

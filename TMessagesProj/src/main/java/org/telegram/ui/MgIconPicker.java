@@ -109,8 +109,8 @@ public class MgIconPicker {
         AlertDialog.Builder b = new AlertDialog.Builder(ctx, fragment.getResourceProvider());
         b.setTitle(title);
         b.setView(scroll);
-        b.setNeutralButton("Standart", (d, w) -> cb.onPicked(null));
-        b.setNegativeButton("Bekor qilish", null);
+        b.setNeutralButton(org.telegram.messenger.MgLang.t("Standart"), (d, w) -> cb.onPicked(null));
+        b.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), null);
         dialogRef[0] = b.create();
         fragment.showDialog(dialogRef[0]);
     }

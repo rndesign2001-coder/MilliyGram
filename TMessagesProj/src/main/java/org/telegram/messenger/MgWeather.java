@@ -149,18 +149,18 @@ public final class MgWeather {
 
     /** WMO ob-havo kodi → o'zbekcha tavsif */
     public static String describe(int code) {
-        if (code == 0) return "Ochiq osmon";
-        if (code == 1) return "Asosan ochiq";
-        if (code == 2) return "Qisman bulutli";
-        if (code == 3) return "Bulutli";
-        if (code == 45 || code == 48) return "Tuman";
-        if (code >= 51 && code <= 57) return "Mayda yomg'ir";
-        if (code >= 61 && code <= 65) return "Yomg'ir";
-        if (code == 66 || code == 67) return "Muzlovchi yomg'ir";
-        if (code >= 71 && code <= 77) return "Qor";
-        if (code >= 80 && code <= 82) return "Jala";
-        if (code == 85 || code == 86) return "Qor yog'ishi";
-        if (code >= 95) return "Momaqaldiroq";
+        if (code == 0) return org.telegram.messenger.MgLang.t("Ochiq osmon");
+        if (code == 1) return org.telegram.messenger.MgLang.t("Asosan ochiq");
+        if (code == 2) return org.telegram.messenger.MgLang.t("Qisman bulutli");
+        if (code == 3) return org.telegram.messenger.MgLang.t("Bulutli");
+        if (code == 45 || code == 48) return org.telegram.messenger.MgLang.t("Tuman");
+        if (code >= 51 && code <= 57) return org.telegram.messenger.MgLang.t("Mayda yomg'ir");
+        if (code >= 61 && code <= 65) return org.telegram.messenger.MgLang.t("Yomg'ir");
+        if (code == 66 || code == 67) return org.telegram.messenger.MgLang.t("Muzlovchi yomg'ir");
+        if (code >= 71 && code <= 77) return org.telegram.messenger.MgLang.t("Qor");
+        if (code >= 80 && code <= 82) return org.telegram.messenger.MgLang.t("Jala");
+        if (code == 85 || code == 86) return org.telegram.messenger.MgLang.t("Qor yog'ishi");
+        if (code >= 95) return org.telegram.messenger.MgLang.t("Momaqaldiroq");
         return "—";
     }
 }

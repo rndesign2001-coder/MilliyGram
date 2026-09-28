@@ -689,8 +689,8 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
         }
 
         // MilliyGram sozlamalari
-        items.add(SettingCell.Factory.of(100, 0xFF5AB2FF, 0xFF2F80ED, R.drawable.settings_mg_gear, "MilliyGram sozlamalari", "Jildlar, arxiv, tarjima, maxfiylik"));
-        items.add(SettingCell.Factory.of(101, 0xFFFFB547, 0xFFF08A1C, R.drawable.settings_mg_palette, "Dizayn", "Mavzular, ranglar, chat foni"));
+        items.add(SettingCell.Factory.of(100, 0xFF5AB2FF, 0xFF2F80ED, R.drawable.settings_mg_gear, org.telegram.messenger.MgLang.t("MilliyGram sozlamalari"), org.telegram.messenger.MgLang.t("Jildlar, arxiv, tarjima, maxfiylik")));
+        items.add(SettingCell.Factory.of(101, 0xFFFFB547, 0xFFF08A1C, R.drawable.settings_mg_palette, org.telegram.messenger.MgLang.t("Dizayn"), org.telegram.messenger.MgLang.t("Mavzular, ranglar, chat foni")));
         items.add(UItem.asShadow(null));
 
         items.add(SettingCell.Factory.of(1, IconBackgroundColors.BLUE.top, IconBackgroundColors.BLUE.bottom, R.drawable.settings_account, getString(R.string.SettingsAccount), getString(R.string.SettingsAccountInfo)));

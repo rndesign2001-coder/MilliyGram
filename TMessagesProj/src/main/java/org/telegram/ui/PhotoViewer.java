@@ -6760,7 +6760,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         // gate in onPhotoShow). Mirrors the mute/editCover sibling lifecycle so it fades/hides with them.
         roundVideoButton = new ImageView(parentActivity);
         roundVideoButton.setScaleType(ImageView.ScaleType.CENTER);
-        roundVideoButton.setContentDescription("Doira video qilib yuborish");
+        roundVideoButton.setContentDescription(org.telegram.messenger.MgLang.t("Doira video qilib yuborish"));
         roundVideoButton.setImageResource(R.drawable.input_video);
         roundVideoButton.setColorFilter(new PorterDuffColorFilter(0xFFFFFFFF, PorterDuff.Mode.SRC_IN));
         roundVideoButton.setBackground(iBlur3FactoryFrostedLiquidGlass.create(roundVideoButton)
@@ -6778,7 +6778,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             updateVideoInfo();
             try {
                 BulletinFactory.of(containerView, resourcesProvider).createSimpleBulletin(R.raw.chats_infotip,
-                        sendAsRoundVideo ? "Video doira (dumaloq) ko'rinishida yuboriladi — maks. 60 soniya" : "Video oddiy ko'rinishda yuboriladi").show();
+                        sendAsRoundVideo ? org.telegram.messenger.MgLang.t("Video doira (dumaloq) ko'rinishida yuboriladi — maks. 60 soniya") : org.telegram.messenger.MgLang.t("Video oddiy ko'rinishda yuboriladi")).show();
             } catch (Throwable ignore) {
             }
             Object object = imagesArrLocals.get(currentIndex);

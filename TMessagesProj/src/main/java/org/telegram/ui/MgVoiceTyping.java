@@ -48,7 +48,7 @@ import java.util.ArrayList;
 public class MgVoiceTyping {
 
     public static final int REQUEST_CODE = 7719;
-    private static final int MAX_SILENT_ROUNDS = 5;       // ketma-ket "hech narsa eshitilmadi" soni
+    private static final int MAX_SILENT_ROUNDS = 5;       // ketma-ket org.telegram.messenger.MgLang.t("hech narsa eshitilmadi") soni
     private static final long MAX_SESSION_MS = 5 * 60_000L;
 
     private static Intent buildIntent(Activity activity, boolean continuous) {
@@ -69,7 +69,7 @@ public class MgVoiceTyping {
             intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
             intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, activity.getPackageName());
         } else {
-            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Gapiring…");
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, org.telegram.messenger.MgLang.t("Gapiring…"));
         }
         return intent;
     }
@@ -93,12 +93,12 @@ public class MgVoiceTyping {
             return;
         }
         if (!isAvailable(activity)) {
-            BulletinFactory.of(chat).createErrorBulletin("Bu telefonda ovozni tanish xizmati yo'q (Google ilovasini o'rnating)").show();
+            BulletinFactory.of(chat).createErrorBulletin(org.telegram.messenger.MgLang.t("Bu telefonda ovozni tanish xizmati yo'q (Google ilovasini o'rnating)")).show();
             return;
         }
         if (Build.VERSION.SDK_INT >= 23 && activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             activity.requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, 3);
-            BulletinFactory.of(chat).createSimpleBulletin(R.raw.chats_infotip, "Mikrofonga ruxsat bering va qayta bosing").show();
+            BulletinFactory.of(chat).createSimpleBulletin(R.raw.chats_infotip, org.telegram.messenger.MgLang.t("Mikrofonga ruxsat bering va qayta bosing")).show();
             return;
         }
         Runnable go = () -> AndroidUtilities.runOnUIThread(() -> {
@@ -123,7 +123,7 @@ public class MgVoiceTyping {
         try {
             chat.startActivityForResult(buildIntent(activity, false), REQUEST_CODE);
         } catch (Throwable e) {
-            BulletinFactory.of(chat).createErrorBulletin("Ovoz oynasini ochib bo'lmadi").show();
+            BulletinFactory.of(chat).createErrorBulletin(org.telegram.messenger.MgLang.t("Ovoz oynasini ochib bo'lmadi")).show();
         }
     }
 
@@ -151,11 +151,11 @@ public class MgVoiceTyping {
             put(chat, text);
             return;
         }
-        BulletinFactory.of(chat).createSimpleBulletin(R.raw.chats_infotip, "Tarjima qilinmoqda…").show();
+        BulletinFactory.of(chat).createSimpleBulletin(R.raw.chats_infotip, org.telegram.messenger.MgLang.t("Tarjima qilinmoqda…")).show();
         VoiceTranslate.INSTANCE.translate(text, target, chat.getCurrentAccount(), (result, translated) -> {
             put(chat, result);
             if (!translated) {
-                BulletinFactory.of(chat).createErrorBulletin("Tarjima qilinmadi — asl matn qo'yildi").show();
+                BulletinFactory.of(chat).createErrorBulletin(org.telegram.messenger.MgLang.t("Tarjima qilinmadi — asl matn qo'yildi")).show();
             }
         });
     }
@@ -258,14 +258,14 @@ public class MgVoiceTyping {
             textView.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
             textView.setGravity(Gravity.CENTER);
             textView.setMinHeight(AndroidUtilities.dp(56));
-            textView.setText("Gapiring… Pauza qilsangiz ham kutaman.\nTugatgach «Tayyor»ni bosing.");
+            textView.setText(org.telegram.messenger.MgLang.t("Gapiring… Pauza qilsangiz ham kutaman.\nTugatgach «Tayyor»ni bosing."));
             box.addView(textView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 22, 0, 22, 8));
 
             AlertDialog.Builder b = new AlertDialog.Builder(activity, chat.getResourceProvider());
-            b.setTitle("Ovoz bilan yozish");
+            b.setTitle(org.telegram.messenger.MgLang.t("Ovoz bilan yozish"));
             b.setView(box);
-            b.setPositiveButton("Tayyor", (d, w) -> finish());
-            b.setNegativeButton("Bekor qilish", (d, w) -> stop());
+            b.setPositiveButton(org.telegram.messenger.MgLang.t("Tayyor"), (d, w) -> finish());
+            b.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), (d, w) -> stop());
             b.setOnDismissListener(d -> {
                 if (active) {
                     finish();
@@ -330,7 +330,7 @@ public class MgVoiceTyping {
                 if (!text.isEmpty()) {
                     deliver(chat, text);
                 } else {
-                    BulletinFactory.of(chat).createSimpleBulletin(R.raw.chats_infotip, "Hech narsa eshitilmadi").show();
+                    BulletinFactory.of(chat).createSimpleBulletin(R.raw.chats_infotip, org.telegram.messenger.MgLang.t("Hech narsa eshitilmadi")).show();
                 }
             }
         }
@@ -494,13 +494,13 @@ public class MgVoiceTyping {
                     }
                     break;
                 case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
-                    BulletinFactory.of(chat).createErrorBulletin("Mikrofonga ruxsat yo'q").show();
+                    BulletinFactory.of(chat).createErrorBulletin(org.telegram.messenger.MgLang.t("Mikrofonga ruxsat yo'q")).show();
                     finish();
                     break;
                 case SpeechRecognizer.ERROR_NETWORK:
                 case SpeechRecognizer.ERROR_NETWORK_TIMEOUT:
                     if (++errorRounds > 2) {
-                        BulletinFactory.of(chat).createErrorBulletin("Internet bilan muammo — ovoz tanilmadi").show();
+                        BulletinFactory.of(chat).createErrorBulletin(org.telegram.messenger.MgLang.t("Internet bilan muammo — ovoz tanilmadi")).show();
                         finish();
                     } else {
                         restartSoon(800);

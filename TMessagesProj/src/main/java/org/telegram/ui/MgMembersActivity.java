@@ -83,7 +83,7 @@ public class MgMembersActivity extends UniversalFragment {
 
     @Override
     protected CharSequence getTitle() {
-        return "A'zolarni tozalash";
+        return org.telegram.messenger.MgLang.t("A'zolarni tozalash");
     }
 
     // ================= Yuklash =================
@@ -116,7 +116,7 @@ public class MgMembersActivity extends UniversalFragment {
                     return;
                 }
                 finishLoad();
-                BulletinFactory.of(this).createErrorBulletin("Ro'yxatni olib bo'lmadi: " + err.text).show();
+                BulletinFactory.of(this).createErrorBulletin(org.telegram.messenger.MgLang.t("Ro'yxatni olib bo'lmadi: ") + err.text).show();
                 return;
             }
             if (res instanceof TLRPC.TL_channels_channelParticipants) {
@@ -205,7 +205,7 @@ public class MgMembersActivity extends UniversalFragment {
         TLRPC.User u = m.user;
         StringBuilder sb = new StringBuilder();
         if (u.deleted) {
-            sb.append("👻 O'chirilgan hisob");
+            sb.append(org.telegram.messenger.MgLang.t("👻 O'chirilgan hisob"));
         } else {
             sb.append(UserObject.getUserName(u));
             if (u.bot) {
@@ -235,22 +235,22 @@ public class MgMembersActivity extends UniversalFragment {
     @Override
     protected void fillItems(ArrayList<UItem> items, UniversalAdapter adapter) {
         if (loading) {
-            items.add(UItem.asShadow("Ro'yxat yuklanmoqda… " + members.size() + (serverCount > 0 ? " / " + serverCount : "")));
+            items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Ro'yxat yuklanmoqda… ") + members.size() + (serverCount > 0 ? " / " + serverCount : "")));
         } else {
             String note = chat != null && ChatObject.isChannelAndNotMegaGroup(chat)
-                    ? "Yuklandi: " + members.size() + " ta obunachi. Telegram kanallarda adminlarga faqat oxirgi ~200 obunachini ko'rsatadi — tozalagach \"Qayta yuklash\"ni bosing, keyingilari chiqadi."
-                    : "Yuklandi: " + members.size() + " ta a'zo" + (serverCount > members.size() ? " (jami " + serverCount + ", Telegram ko'pi bilan 10 000 tasini beradi)" : "") + ". Adminlar ro'yxatga kirmaydi.";
+                    ? org.telegram.messenger.MgLang.t("Yuklandi: ") + members.size() + org.telegram.messenger.MgLang.t(" ta obunachi. Telegram kanallarda adminlarga faqat oxirgi ~200 obunachini ko'rsatadi — tozalagach \"Qayta yuklash\"ni bosing, keyingilari chiqadi.")
+                    : org.telegram.messenger.MgLang.t("Yuklandi: ") + members.size() + org.telegram.messenger.MgLang.t(" ta a'zo") + (serverCount > members.size() ? org.telegram.messenger.MgLang.t(" (jami ") + serverCount + org.telegram.messenger.MgLang.t(", Telegram ko'pi bilan 10 000 tasini beradi)") : "") + org.telegram.messenger.MgLang.t(". Adminlar ro'yxatga kirmaydi.");
             items.add(UItem.asShadow(note));
         }
         int n = selected.size();
         int del = countDeleted();
-        items.add(UItem.asButton(ID_DELETED, R.drawable.msg_delete, "O'chirilgan hisoblarni tozalash", String.valueOf(del)));
-        items.add(UItem.asButton(ID_QUICK, R.drawable.mg_select_all, "Tez belgilash…"));
-        items.add(UItem.asButton(ID_KICK, R.drawable.msg_leave, n > 0 ? "Belgilanganlarni chiqarish (" + n + ")" : "Belgilanganlarni chiqarish").red());
-        items.add(UItem.asButton(ID_RELOAD, R.drawable.msg_retry, "Qayta yuklash"));
-        items.add(UItem.asShadow("Chiqarilganlar \"Chetlatilganlar\" ro'yxatiga tushadi va havola orqali qayta kira olmaydi (nakrutka qaytib kelmasligi uchun). Istasangiz, u yerdan blokdan chiqarishingiz mumkin."));
+        items.add(UItem.asButton(ID_DELETED, R.drawable.msg_delete, org.telegram.messenger.MgLang.t("O'chirilgan hisoblarni tozalash"), String.valueOf(del)));
+        items.add(UItem.asButton(ID_QUICK, R.drawable.mg_select_all, org.telegram.messenger.MgLang.t("Tez belgilash…")));
+        items.add(UItem.asButton(ID_KICK, R.drawable.msg_leave, n > 0 ? org.telegram.messenger.MgLang.t("Belgilanganlarni chiqarish (") + n + ")" : org.telegram.messenger.MgLang.t("Belgilanganlarni chiqarish")).red());
+        items.add(UItem.asButton(ID_RELOAD, R.drawable.msg_retry, org.telegram.messenger.MgLang.t("Qayta yuklash")));
+        items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Chiqarilganlar \"Chetlatilganlar\" ro'yxatiga tushadi va havola orqali qayta kira olmaydi (nakrutka qaytib kelmasligi uchun). Istasangiz, u yerdan blokdan chiqarishingiz mumkin.")));
         if (!members.isEmpty()) {
-            items.add(UItem.asHeader("A'zolar (yangi qo'shilganlar tepada)"));
+            items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("A'zolar (yangi qo'shilganlar tepada)")));
             for (int i = 0; i < members.size(); i++) {
                 Member m = members.get(i);
                 items.add(UItem.asCheck(ID_BASE + i, label(m)).setChecked(selected.contains(m.user.id)));
@@ -288,18 +288,18 @@ public class MgMembersActivity extends UniversalFragment {
                     }
                 }
                 if (ids.isEmpty()) {
-                    BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, "Yuklangan ro'yxatda o'chirilgan hisob yo'q").show();
+                    BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Yuklangan ro'yxatda o'chirilgan hisob yo'q")).show();
                     return;
                 }
-                confirmKick(ids, ids.size() + " ta o'chirilgan hisob chiqarib yuborilsinmi?");
+                confirmKick(ids, ids.size() + org.telegram.messenger.MgLang.t(" ta o'chirilgan hisob chiqarib yuborilsinmi?"));
                 break;
             }
             case ID_KICK:
                 if (selected.isEmpty()) {
-                    BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, "Avval a'zolarni belgilang yoki \"Tez belgilash\"dan foydalaning").show();
+                    BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, org.telegram.messenger.MgLang.t("Avval a'zolarni belgilang yoki \"Tez belgilash\"dan foydalaning")).show();
                     return;
                 }
-                confirmKick(new ArrayList<>(selected), selected.size() + " ta a'zo chiqarib yuborilsinmi?");
+                confirmKick(new ArrayList<>(selected), selected.size() + org.telegram.messenger.MgLang.t(" ta a'zo chiqarib yuborilsinmi?"));
                 break;
         }
     }
@@ -309,17 +309,17 @@ public class MgMembersActivity extends UniversalFragment {
             return;
         }
         CharSequence[] opts = {
-                "👻 O'chirilgan hisoblar",
-                "🤖 Botlar",
-                "🕐 Oxirgi 1 soatda qo'shilganlar",
-                "📅 Oxirgi 24 soatda qo'shilganlar",
-                "📆 Oxirgi 7 kunda qo'shilganlar",
-                "🎭 Rasmsiz va username'siz",
-                "☑️ Hammasi",
-                "✖️ Belgilashni bekor qilish"
+                org.telegram.messenger.MgLang.t("👻 O'chirilgan hisoblar"),
+                org.telegram.messenger.MgLang.t("🤖 Botlar"),
+                org.telegram.messenger.MgLang.t("🕐 Oxirgi 1 soatda qo'shilganlar"),
+                org.telegram.messenger.MgLang.t("📅 Oxirgi 24 soatda qo'shilganlar"),
+                org.telegram.messenger.MgLang.t("📆 Oxirgi 7 kunda qo'shilganlar"),
+                org.telegram.messenger.MgLang.t("🎭 Rasmsiz va username'siz"),
+                org.telegram.messenger.MgLang.t("☑️ Hammasi"),
+                org.telegram.messenger.MgLang.t("✖️ Belgilashni bekor qilish")
         };
         AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
-        b.setTitle("Tez belgilash");
+        b.setTitle(org.telegram.messenger.MgLang.t("Tez belgilash"));
         b.setItems(opts, (d, w) -> {
             int now = ConnectionsManager.getInstance(currentAccount).getCurrentTime();
             int before = selected.size();
@@ -345,7 +345,7 @@ public class MgMembersActivity extends UniversalFragment {
             }
             listView.adapter.update(true);
             if (w != 7) {
-                BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, "Qo'shildi: " + (selected.size() - before) + ". Jami belgilangan: " + selected.size()).show();
+                BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Qo'shildi: ") + (selected.size() - before) + org.telegram.messenger.MgLang.t(". Jami belgilangan: ") + selected.size()).show();
             }
         });
         showDialog(b.create());
@@ -358,10 +358,10 @@ public class MgMembersActivity extends UniversalFragment {
             return;
         }
         AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
-        b.setTitle("Chiqarish");
-        b.setMessage(text + "\n\nTelegram cheklovlari tufayli ular birma-bir chiqariladi (taxminan " + Math.max(1, ids.size() * 4 / 10 / 60) + " daqiqa). Jarayonni istalgan payt to'xtatish mumkin.");
-        b.setPositiveButton("Chiqarish", (d, w) -> startKick(ids));
-        b.setNegativeButton("Bekor qilish", null);
+        b.setTitle(org.telegram.messenger.MgLang.t("Chiqarish"));
+        b.setMessage(text + org.telegram.messenger.MgLang.t("\n\nTelegram cheklovlari tufayli ular birma-bir chiqariladi (taxminan ") + Math.max(1, ids.size() * 4 / 10 / 60) + org.telegram.messenger.MgLang.t(" daqiqa). Jarayonni istalgan payt to'xtatish mumkin."));
+        b.setPositiveButton(org.telegram.messenger.MgLang.t("Chiqarish"), (d, w) -> startKick(ids));
+        b.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), null);
         AlertDialog dialog = b.create();
         showDialog(dialog);
         TextView btn = (TextView) dialog.getButton(AlertDialog.BUTTON_POSITIVE);
@@ -385,9 +385,9 @@ public class MgMembersActivity extends UniversalFragment {
         status.setText("0 / " + ids.size());
         box.addView(status, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 8, 24, 8));
         AlertDialog.Builder b = new AlertDialog.Builder(ctx, getResourceProvider());
-        b.setTitle("Chiqarilmoqda…");
+        b.setTitle(org.telegram.messenger.MgLang.t("Chiqarilmoqda…"));
         b.setView(box);
-        b.setNegativeButton("To'xtatish", (d, w) -> cancelKick = true);
+        b.setNegativeButton(org.telegram.messenger.MgLang.t("To'xtatish"), (d, w) -> cancelKick = true);
         AlertDialog progress = b.create();
         progress.setCanceledOnTouchOutside(false);
         showDialog(progress);
@@ -433,7 +433,7 @@ public class MgMembersActivity extends UniversalFragment {
         getConnectionsManager().sendRequest(request, (res, err) -> AndroidUtilities.runOnUIThread(() -> {
             if (err != null && err.text != null && err.text.startsWith("FLOOD_WAIT_")) {
                 int sec = parseWait(err.text);
-                status.setText(done + " / " + ids.size() + "\nTelegram cheklovi: " + sec + " soniya kutilmoqda…");
+                status.setText(done + " / " + ids.size() + org.telegram.messenger.MgLang.t("\nTelegram cheklovi: ") + sec + org.telegram.messenger.MgLang.t(" soniya kutilmoqda…"));
                 AndroidUtilities.runOnUIThread(() -> kickNext(ids, index, done, status, progress), (sec + 1) * 1000L);
                 return;
             }
@@ -462,7 +462,7 @@ public class MgMembersActivity extends UniversalFragment {
             listView.adapter.update(true);
         }
         getMessagesController().loadFullChat(chatId, 0, true);
-        BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, "Chiqarildi: " + done + " / " + total).show();
+        BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Chiqarildi: ") + done + " / " + total).show();
     }
 
     @Override

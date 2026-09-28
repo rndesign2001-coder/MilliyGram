@@ -3466,7 +3466,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (initialDialogsType == DIALOGS_TYPE_DEFAULT && folderId == 1 && communityId == 0) {
             // MilliyGram: arxivni turlar bo'yicha saralash
             ActionBarMenuItem mgKindItem = menu.addItem(9051, R.drawable.msg_media);
-            mgKindItem.setContentDescription("Arxivni saralash");
+            mgKindItem.setContentDescription(org.telegram.messenger.MgLang.t("Arxivni saralash"));
             mgKindItem.setOnClickListener(v -> mgShowArchiveKindPicker());
         }
         if (initialDialogsType == DIALOGS_TYPE_DEFAULT && folderId == 0 && communityId == 0) {
@@ -3738,7 +3738,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         return 0;
                     }
                     MessagesController.DialogFilter mgTabFilter = getMessagesController().getDialogFilters().get(tabId);
-                    if (org.telegram.messenger.MgLocalFolders.isLocal(mgTabFilter) || org.telegram.messenger.MgConfig.isFolderIconTabs()) {
+                    if (org.telegram.messenger.MgLocalFolders.isLocal(mgTabFilter) || org.telegram.messenger.MgConfig.isFolderIconTabs()
+                            || org.telegram.messenger.MgConfig.getBool("tab_count_muted", true)) {
                         return org.telegram.messenger.MgLocalFolders.getUnreadCount(currentAccount, mgTabFilter);
                     }
                     return mgTabFilter.unreadCount;
@@ -3863,18 +3864,18 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                             .add(R.drawable.msg_edit, defaultTab ? LocaleController.getString(R.string.FilterEditAll) : LocaleController.getString(R.string.FilterEdit), () -> {
                                 presentFragment(defaultTab ? new FiltersSetupActivity() : new FilterCreateActivity(dialogFilter));
                             })
-                            .addIf(!defaultTab, R.drawable.msg_folders, "Jildlarni tahrirlash", () -> {
+                            .addIf(!defaultTab, R.drawable.msg_folders, org.telegram.messenger.MgLang.t("Jildlarni tahrirlash"), () -> {
                                 presentFragment(new FiltersSetupActivity());
                             })
-                            .add(R.drawable.msg_palette, "Ikonka tanlash", () -> {
+                            .add(R.drawable.msg_palette, org.telegram.messenger.MgLang.t("Ikonka tanlash"), () -> {
                                 mgShowIconPicker(dialogFilter != null ? dialogFilter : (getMessagesController().getDialogFilters().isEmpty() ? null : getMessagesController().getDialogFilters().get(0)));
                             })
-                            .addIf(!defaultTab, R.drawable.msg_archive, "Tabni yashirish", () -> {
+                            .addIf(!defaultTab, R.drawable.msg_archive, org.telegram.messenger.MgLang.t("Tabni yashirish"), () -> {
                                 filterTabsView.selectFirstTab();
                                 org.telegram.messenger.MgLocalFolders.setTabHidden(currentAccount, dialogFilter.id, true);
-                                BulletinFactory.of(DialogsActivity.this).createSimpleBulletin(R.raw.contact_check, "Jild yashirildi. Qaytarish: Sozlamalar → MilliyGram → Jildlar").show();
+                                BulletinFactory.of(DialogsActivity.this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Jild yashirildi. Qaytarish: Sozlamalar → MilliyGram → Jildlar")).show();
                             })
-                            .add(R.drawable.msg_folders_private, "Lokal jildlar", () -> {
+                            .add(R.drawable.msg_folders_private, org.telegram.messenger.MgLang.t("Lokal jildlar"), () -> {
                                 presentFragment(new MgFoldersActivity());
                             })
                             .addIf(dialogFilter != null && !dialogs.isEmpty(), muteAll ? R.drawable.msg_mute : R.drawable.msg_unmute, muteAll ? LocaleController.getString(R.string.FilterMuteAll) : LocaleController.getString(R.string.FilterUnmuteAll), () -> {
@@ -4103,7 +4104,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     }
                     hideActionMode(true);
                     org.telegram.messenger.MgStrangers.refresh(currentAccount);
-                    BulletinFactory.of(DialogsActivity.this).createSimpleBulletin(R.raw.contact_check, "Asosiy ro'yxatga qaytarildi").show();
+                    BulletinFactory.of(DialogsActivity.this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Asosiy ro'yxatga qaytarildi")).show();
                 } else if (id == mg_shortcut) {
                     MgDialogActions.addShortcuts(DialogsActivity.this, currentAccount, new ArrayList<>(selectedDialogs));
                     hideActionMode(true);
@@ -6858,8 +6859,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         actionMode.addView(selectedDialogsCountTextView, LayoutHelper.createLinear(0, LayoutHelper.MATCH_PARENT, 1.0f, hasMainTabs ? 8 : 72, 0, 0, 0));
         selectedDialogsCountTextView.setOnTouchListener((v, event) -> true);
 
-        ActionBarMenuItem mgRangeItem = actionMode.addItemWithWidth(mg_select_range, R.drawable.mg_select_range, dp(42), "Oraliqni belgilash");
-        ActionBarMenuItem mgAllItem = actionMode.addItemWithWidth(mg_select_all, R.drawable.mg_select_all, dp(42), "Hammasini belgilash");
+        ActionBarMenuItem mgRangeItem = actionMode.addItemWithWidth(mg_select_range, R.drawable.mg_select_range, dp(42), org.telegram.messenger.MgLang.t("Oraliqni belgilash"));
+        ActionBarMenuItem mgAllItem = actionMode.addItemWithWidth(mg_select_all, R.drawable.mg_select_all, dp(42), org.telegram.messenger.MgLang.t("Hammasini belgilash"));
         pinItem = actionMode.addItemWithWidth(pin, R.drawable.msg_pin, dp(42));
         muteItem = actionMode.addItemWithWidth(mute, R.drawable.msg_mute, dp(42));
         archive2Item = actionMode.addItemWithWidth(archive2, R.drawable.msg_archive, dp(42));
@@ -6867,7 +6868,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         ActionBarMenuItem otherItem = actionMode.addItemWithWidth(0, R.drawable.ic_ab_other, dp(42), LocaleController.getString(R.string.AccDescrMoreOptions));
         actionMode.addView(new View(getContext()), LayoutHelper.createLinear(5, LayoutHelper.MATCH_PARENT));
-        otherItem.addSubItem(mg_favorite, R.drawable.msg_fave, "Tanlanganlarga qo'shish");
+        otherItem.addSubItem(mg_favorite, R.drawable.msg_fave, org.telegram.messenger.MgLang.t("Tanlanganlarga qo'shish"));
         archiveItem = otherItem.addSubItem(archive, R.drawable.msg_archive, LocaleController.getString(R.string.Archive));
         pin2Item = otherItem.addSubItem(pin2, R.drawable.msg_pin, LocaleController.getString(R.string.DialogPin));
         addToFolderItem = otherItem.addSubItem(add_to_folder, R.drawable.msg_addfolder, LocaleController.getString(R.string.FilterAddTo));
@@ -6875,15 +6876,15 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         readItem = otherItem.addSubItem(read, R.drawable.msg_markread, LocaleController.getString(R.string.MarkAsRead));
         clearItem = otherItem.addSubItem(clear, R.drawable.msg_clear, LocaleController.getString(R.string.ClearHistory));
         blockItem = otherItem.addSubItem(block, R.drawable.msg_block, LocaleController.getString(R.string.BlockUser));
-        otherItem.addSubItem(mg_shortcut, R.drawable.msg_home, "Bosh ekranga chiqarish");
-        otherItem.addSubItem(mg_category, R.drawable.msg_folders, "Toifaga qo'shish");
-        mgAddToGroupItem = otherItem.addSubItem(mg_add_to_group, R.drawable.msg_contact_add, "Guruh yoki kanalga qo'shish");
-        otherItem.addSubItem(mg_hide, R.drawable.msg_stories_myhide, "Yashirish");
-        otherItem.addSubItem(mg_clear_cache, R.drawable.msg_clearcache, "Keshni tozalash");
-        otherItem.addSubItem(mg_chat_settings, R.drawable.msg_settings, "Chatlar sozlamalari");
-        mgPreviewItem = otherItem.addSubItem(mg_preview, R.drawable.msg_views, "Chat ko'rinishi");
-        mgTrustItem = otherItem.addSubItem(mg_trust, R.drawable.msg_usersearch, "Notanish emas");
-        otherItem.addSubItem(mg_leave_chats, R.drawable.msg_leave, "Kanal va guruhlardan chiqish");
+        otherItem.addSubItem(mg_shortcut, R.drawable.msg_home, org.telegram.messenger.MgLang.t("Bosh ekranga chiqarish"));
+        otherItem.addSubItem(mg_category, R.drawable.msg_folders, org.telegram.messenger.MgLang.t("Toifaga qo'shish"));
+        mgAddToGroupItem = otherItem.addSubItem(mg_add_to_group, R.drawable.msg_contact_add, org.telegram.messenger.MgLang.t("Guruh yoki kanalga qo'shish"));
+        otherItem.addSubItem(mg_hide, R.drawable.msg_stories_myhide, org.telegram.messenger.MgLang.t("Yashirish"));
+        otherItem.addSubItem(mg_clear_cache, R.drawable.msg_clearcache, org.telegram.messenger.MgLang.t("Keshni tozalash"));
+        otherItem.addSubItem(mg_chat_settings, R.drawable.msg_settings, org.telegram.messenger.MgLang.t("Chatlar sozlamalari"));
+        mgPreviewItem = otherItem.addSubItem(mg_preview, R.drawable.msg_views, org.telegram.messenger.MgLang.t("Chat ko'rinishi"));
+        mgTrustItem = otherItem.addSubItem(mg_trust, R.drawable.msg_usersearch, org.telegram.messenger.MgLang.t("Notanish emas"));
+        otherItem.addSubItem(mg_leave_chats, R.drawable.msg_leave, org.telegram.messenger.MgLang.t("Kanal va guruhlardan chiqish"));
         otherItem.addSubItem(mg_stop_bots, R.drawable.msg_block, "Botlarni to'xtatish va tozalash");
 
         muteItem.setOnLongClickListener(e -> {
@@ -7093,7 +7094,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             names[i] = MgDialogActions.KIND_NAMES[i] + (i == mgArchiveKind ? "  ✓" : "");
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
-        builder.setTitle("Arxivni saralash");
+        builder.setTitle(org.telegram.messenger.MgLang.t("Arxivni saralash"));
         builder.setItems(names, MgDialogActions.KIND_ICONS, (dialog, which) -> {
             mgArchiveKind = which;
             mgUpdateArchiveTitle();
@@ -7124,7 +7125,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             return;
         }
         String cur = org.telegram.messenger.MgLocalFolders.getIconKey(currentAccount, filter);
-        MgIconPicker.show(this, filter.isDefault() ? "Jild ikonkasi" : "\"" + filter.name + "\" ikonkasi", cur,
+        MgIconPicker.show(this, filter.isDefault() ? org.telegram.messenger.MgLang.t("Jild ikonkasi") : "\"" + filter.name + "\" ikonkasi", cur,
                 key -> org.telegram.messenger.MgLocalFolders.setIconKey(currentAccount, filter.id, key));
     }
 
@@ -7133,7 +7134,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (dialogIds == null || dialogIds.isEmpty()) {
             return;
         }
-        final String favName = "Tanlanganlar";
+        final String favName = org.telegram.messenger.MgLang.t("Tanlanganlar");
         MessagesController.DialogFilter fav = null;
         ArrayList<MessagesController.DialogFilter> filters = getMessagesController().getDialogFilters();
         for (int i = 0; i < filters.size(); i++) {
@@ -7169,7 +7170,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
         final int finalAdded = added;
         FilterCreateActivity.saveFilterToServer(fav, fav.flags, fav.name, fav.entities, fav.title_noanimate, fav.color, alwaysShow, neverShow, fav.pinnedDialogs, creatingNew, false, true, true, true, DialogsActivity.this, () -> {
-            BulletinFactory.of(DialogsActivity.this).createSimpleBulletin(R.raw.contact_check, finalAdded > 0 ? "\"Tanlanganlar\" jildiga qo'shildi" : "Allaqachon \"Tanlanganlar\" jildida").show();
+            BulletinFactory.of(DialogsActivity.this).createSimpleBulletin(R.raw.contact_check, finalAdded > 0 ? org.telegram.messenger.MgLang.t("\"Tanlanganlar\" jildiga qo'shildi") : org.telegram.messenger.MgLang.t("Allaqachon \"Tanlanganlar\" jildida")).show();
         });
     }
 
@@ -7797,7 +7798,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
         }
         if (!all && (lo < 0 || lo == hi)) {
-            BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, "Oraliqni belgilash uchun avval ikkita chatni belgilang: birinchisini va oxirgisini").show();
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, org.telegram.messenger.MgLang.t("Oraliqni belgilash uchun avval ikkita chatni belgilang: birinchisini va oxirgisini")).show();
             return;
         }
         int from = all ? 0 : lo;
@@ -7831,9 +7832,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             selectedDialogsCountTextView.setNumber(selectedDialogs.size(), true);
         }
         if (added == 0) {
-            BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, all ? "Ro'yxatdagi hamma chatlar allaqachon belgilangan" : "Oraliqdagi hamma chatlar allaqachon belgilangan").show();
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, all ? org.telegram.messenger.MgLang.t("Ro'yxatdagi hamma chatlar allaqachon belgilangan") : org.telegram.messenger.MgLang.t("Oraliqdagi hamma chatlar allaqachon belgilangan")).show();
         } else if (all) {
-            BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, "Belgilandi: " + selectedDialogs.size() + " ta chat").show();
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Belgilandi: ") + selectedDialogs.size() + org.telegram.messenger.MgLang.t(" ta chat")).show();
         }
     }
 

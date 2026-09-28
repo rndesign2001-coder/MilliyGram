@@ -59,7 +59,7 @@ import java.util.HashMap;
 public class MgProfileCard {
 
     private static final int W = 1080, H = 1440;
-    public static final String[] STYLES = {"Moviy", "Tungi", "Zumrad", "Oltin"};
+    public static final String[] STYLES = {org.telegram.messenger.MgLang.t("Moviy"), org.telegram.messenger.MgLang.t("Tungi"), org.telegram.messenger.MgLang.t("Zumrad"), org.telegram.messenger.MgLang.t("Oltin")};
     private static final int[][] GRAD = {
             {0xFF1E3C8C, 0xFF1AA3D9},
             {0xFF0F1026, 0xFF3A2C6E},
@@ -75,7 +75,7 @@ public class MgProfileCard {
         final int[] style = {org.telegram.messenger.MgConfig.getInt("card_style", 0)};
         final Bitmap[] current = {render(f.getCurrentAccount(), dialogId, style[0])};
         if (current[0] == null) {
-            BulletinFactory.of(f).createErrorBulletin("Kartani yaratib bo'lmadi").show();
+            BulletinFactory.of(f).createErrorBulletin(org.telegram.messenger.MgLang.t("Kartani yaratib bo'lmadi")).show();
             return;
         }
         LinearLayout box = new LinearLayout(act);
@@ -85,11 +85,11 @@ public class MgProfileCard {
         iv.setImageBitmap(current[0]);
         box.addView(iv, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 20, 4, 20, 4));
         AlertDialog.Builder b = new AlertDialog.Builder(act, f.getResourceProvider());
-        b.setTitle("Profil kartasi");
+        b.setTitle(org.telegram.messenger.MgLang.t("Profil kartasi"));
         b.setView(box);
-        b.setPositiveButton("Ulashish", (d, w) -> share(act, current[0]));
-        b.setNegativeButton("Saqlash", (d, w) -> save(f, current[0]));
-        b.setNeutralButton("Rang", null);
+        b.setPositiveButton(org.telegram.messenger.MgLang.t("Ulashish"), (d, w) -> share(act, current[0]));
+        b.setNegativeButton(org.telegram.messenger.MgLang.t("Saqlash"), (d, w) -> save(f, current[0]));
+        b.setNeutralButton(org.telegram.messenger.MgLang.t("Rang"), null);
         AlertDialog dialog = b.create();
         f.showDialog(dialog);
         android.view.View neutral = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
@@ -142,7 +142,7 @@ public class MgProfileCard {
                     }
                 }
                 avatarDrawable.setInfo(account, u);
-                sub = u.bot ? "Bot" : null;
+                sub = u.bot ? org.telegram.messenger.MgLang.t("Bot") : null;
                 link = username != null ? "https://t.me/" + username : "tg://user?id=" + u.id;
             } else {
                 TLRPC.Chat c = mc.getChat(-dialogId);
@@ -155,7 +155,7 @@ public class MgProfileCard {
                 about = full != null ? full.about : null;
                 int count = full != null && full.participants_count > 0 ? full.participants_count : c.participants_count;
                 if (count > 0) {
-                    sub = String.format(java.util.Locale.US, "%,d", count).replace(',', ' ') + (ChatObject.isChannelAndNotMegaGroup(c) ? " obunachi" : " a'zo");
+                    sub = String.format(java.util.Locale.US, "%,d", count).replace(',', ' ') + (ChatObject.isChannelAndNotMegaGroup(c) ? org.telegram.messenger.MgLang.t(" obunachi") : org.telegram.messenger.MgLang.t(" a'zo"));
                 }
                 if (c.photo != null) {
                     avatar = loadAvatar(account, c.photo.photo_big);
@@ -232,39 +232,52 @@ public class MgProfileCard {
                 TextPaint bp = new TextPaint(Paint.ANTI_ALIAS_FLAG);
                 bp.setColor(0xE6FFFFFF);
                 bp.setTextSize(36);
-                y = drawCentered(cv, about.replace('\n', ' '), bp, y + 18, 3);
+                y = drawCentered(cv, about.replace('\n', ' '), bp, y + 18, 2);
             }
 
-            // QR
+            // QR — pastga mahkamlangan, matn bilan ustma-ust tushmaydi
             if (link != null) {
-                int qs = 400;
-                float qx = (W - qs) / 2f, qy = Math.max(y + 40, H - 110 - qs - 120);
+                int qs = 380;
+                float qBottom = H - 190;
+                float qy = qBottom - qs;
+                if (y + 60 > qy) {
+                    qs = (int) Math.max(240, qBottom - (y + 60));
+                    qy = qBottom - qs;
+                }
+                float qx = (W - qs) / 2f;
                 Paint white = new Paint(Paint.ANTI_ALIAS_FLAG);
                 white.setColor(Color.WHITE);
-                cv.drawRoundRect(new RectF(qx - 30, qy - 30, qx + qs + 30, qy + qs + 30), 40, 40, white);
+                cv.drawRoundRect(new RectF(qx - 28, qy - 28, qx + qs + 28, qy + qs + 28), 40, 40, white);
                 HashMap<EncodeHintType, Object> hints = new HashMap<>();
-                hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
+                hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
                 hints.put(EncodeHintType.MARGIN, 0);
                 TelegramQRCodeWriter writer = new TelegramQRCodeWriter();
-                Bitmap qr = writer.encode(link, qs, qs, hints, null, 0.75f, Color.WHITE, g[0]);
+                Bitmap qr = writer.encode(link, 768, 768, hints, null, 0.75f, Color.WHITE, g[0]);
                 if (qr != null) {
-                    cv.drawBitmap(qr, qx, qy, null);
-                    int hole = writer.getImageSize();
+                    float scale = qs / (float) qr.getWidth();
+                    Paint qp = new Paint(Paint.FILTER_BITMAP_FLAG | Paint.ANTI_ALIAS_FLAG);
+                    cv.drawBitmap(qr, null, new RectF(qx, qy, qx + qs, qy + qs), qp);
+                    // markazdagi belgini ilova ikonkasi bilan aniq almashtirish
+                    float hole = writer.getImageSize() * scale;
+                    float cx = qx + qs / 2f, cy = qy + qs / 2f;
+                    float half = hole / 2f + 4;
+                    cv.drawRoundRect(new RectF(cx - half, cy - half, cx + half, cy + half), half * 0.45f, half * 0.45f, white);
                     Drawable logo = ApplicationLoader.applicationContext.getResources().getDrawable(R.mipmap.ic_launcher_round);
-                    int ls = (int) (Math.max(hole, 60) * 0.9f);
-                    logo.setBounds((int) (qx + qs / 2f - ls / 2f), (int) (qy + qs / 2f - ls / 2f), (int) (qx + qs / 2f + ls / 2f), (int) (qy + qs / 2f + ls / 2f));
+                    int ls = (int) (hole * 0.92f);
+                    logo.setBounds((int) (cx - ls / 2f), (int) (cy - ls / 2f), (int) (cx + ls / 2f), (int) (cy + ls / 2f));
                     logo.draw(cv);
                 }
                 TextPaint lp = new TextPaint(Paint.ANTI_ALIAS_FLAG);
                 lp.setColor(0xDDFFFFFF);
                 lp.setTextSize(34);
-                drawCentered(cv, link.replace("https://", ""), lp, qy + qs + 50, 1);
+                lp.setTypeface(AndroidUtilities.bold());
+                drawCentered(cv, TextUtils.ellipsize(link.replace("https://", ""), lp, W - 220, TextUtils.TruncateAt.MIDDLE), lp, qy + qs + 40, 1);
             }
             TextPaint foot = new TextPaint(Paint.ANTI_ALIAS_FLAG);
             foot.setColor(0x99FFFFFF);
             foot.setTextSize(32);
             foot.setTypeface(AndroidUtilities.bold());
-            drawCentered(cv, "MilliyGram", foot, H - 80, 1);
+            drawCentered(cv, "MilliyGram", foot, H - 88, 1);
             return bmp;
         } catch (Throwable e) {
             FileLog.e(e);
@@ -309,7 +322,7 @@ public class MgProfileCard {
             intent.setType("image/png");
             intent.putExtra(Intent.EXTRA_STREAM, uri);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            act.startActivity(Intent.createChooser(intent, "Profil kartasini ulashish"));
+            act.startActivity(Intent.createChooser(intent, org.telegram.messenger.MgLang.t("Profil kartasini ulashish")));
         } catch (Throwable e) {
             FileLog.e(e);
         }
@@ -319,10 +332,10 @@ public class MgProfileCard {
         try {
             File file = writeTemp(b);
             MediaController.saveFile(file.getAbsolutePath(), f.getParentActivity(), 0, null, "image/png");
-            BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, "Karta galereyaga saqlandi").show();
+            BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Karta galereyaga saqlandi")).show();
         } catch (Throwable e) {
             FileLog.e(e);
-            BulletinFactory.of(f).createErrorBulletin("Saqlab bo'lmadi").show();
+            BulletinFactory.of(f).createErrorBulletin(org.telegram.messenger.MgLang.t("Saqlab bo'lmadi")).show();
         }
     }
 }

@@ -53,7 +53,7 @@ public class MgAccountMenu {
         }
         TLRPC.User user = UserConfig.getInstance(account).getCurrentUser();
         if (user == null) {
-            return "Akkaunt " + (account + 1);
+            return org.telegram.messenger.MgLang.t("Akkaunt ") + (account + 1);
         }
         return ContactsController.formatName(user.first_name, user.last_name);
     }
@@ -84,36 +84,36 @@ public class MgAccountMenu {
 
     private static void openAccountOptions(BaseFragment fragment, ItemOptions o, int account) {
         ItemOptions sub = o.makeSwipeback();
-        sub.add(R.drawable.ic_ab_back, "Orqaga", o::closeSwipeback);
+        sub.add(R.drawable.ic_ab_back, org.telegram.messenger.MgLang.t("Orqaga"), o::closeSwipeback);
         sub.addGap();
         sub.addText(displayName(account), 15);
         sub.addGap();
         boolean isMain = MgConfig.getMainAccount() == account;
-        sub.add(R.drawable.msg_home, isMain ? "✓ Asosiy akkaunt" : "Asosiy akkaunt sifatida tanlash", () -> {
+        sub.add(R.drawable.msg_home, isMain ? org.telegram.messenger.MgLang.t("✓ Asosiy akkaunt") : org.telegram.messenger.MgLang.t("Asosiy akkaunt sifatida tanlash"), () -> {
             o.dismiss();
             MgConfig.setMainAccount(isMain ? -1 : account);
             BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check,
-                    isMain ? "Asosiy akkaunt bekor qilindi" : "Ilova endi shu akkaunt bilan ochiladi").show();
+                    isMain ? org.telegram.messenger.MgLang.t("Asosiy akkaunt bekor qilindi") : org.telegram.messenger.MgLang.t("Ilova endi shu akkaunt bilan ochiladi")).show();
         });
-        sub.add(R.drawable.msg_addbot, "Bosh ekranga chiqarish", () -> {
+        sub.add(R.drawable.msg_addbot, org.telegram.messenger.MgLang.t("Bosh ekranga chiqarish"), () -> {
             o.dismiss();
             pinShortcut(fragment, account);
         });
-        sub.add(R.drawable.msg_edit, "Akkaunt nomini o'zgartirish", () -> {
+        sub.add(R.drawable.msg_edit, org.telegram.messenger.MgLang.t("Akkaunt nomini o'zgartirish"), () -> {
             o.dismiss();
             showAliasDialog(fragment, account);
         });
         boolean notifyOn = org.telegram.messenger.MgConfig.isAccountNotifyEnabled(account);
-        sub.add(notifyOn ? R.drawable.msg_mute : R.drawable.msg_unmute, notifyOn ? "Bildirishnomalarni o'chirish" : "Bildirishnomalarni yoqish", () -> {
+        sub.add(notifyOn ? R.drawable.msg_mute : R.drawable.msg_unmute, notifyOn ? org.telegram.messenger.MgLang.t("Bildirishnomalarni o'chirish") : org.telegram.messenger.MgLang.t("Bildirishnomalarni yoqish"), () -> {
             org.telegram.messenger.MgConfig.setAccountNotifyEnabled(account, !notifyOn);
             o.dismiss();
-            BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, !notifyOn ? "Bu akkaunt bildirishnomalari yoqildi" : "Bu akkauntdan bildirishnoma kelmaydi").show();
+            BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, !notifyOn ? org.telegram.messenger.MgLang.t("Bu akkaunt bildirishnomalari yoqildi") : org.telegram.messenger.MgLang.t("Bu akkauntdan bildirishnoma kelmaydi")).show();
         });
-        sub.add(R.drawable.msg_archive, "Yashirish", () -> {
+        sub.add(R.drawable.msg_archive, org.telegram.messenger.MgLang.t("Yashirish"), () -> {
             o.dismiss();
             hideAccount(fragment, account);
         });
-        sub.add(R.drawable.msg_leave, "Chiqish", true, () -> {
+        sub.add(R.drawable.msg_leave, org.telegram.messenger.MgLang.t("Chiqish"), true, () -> {
             o.dismiss();
             confirmLogout(fragment, account);
         });
@@ -127,7 +127,7 @@ public class MgAccountMenu {
             if (account == UserConfig.selectedAccount) {
                 switchToVisibleAccount(account);
             }
-            BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, "Akkaunt yashirildi. Ko'rish: \"Hisob qo'shish\" ni uzoq bosing").show();
+            BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Akkaunt yashirildi. Ko'rish: \"Hisob qo'shish\" ni uzoq bosing")).show();
         };
         if (!MgConfig.hasLock(MgConfig.SCOPE_HIDDEN)) {
             MgChatLock.createLock(fragment, MgConfig.SCOPE_HIDDEN, MgConfig.LOCK_PIN, doHide);
@@ -171,7 +171,7 @@ public class MgAccountMenu {
             } else if (MgConfig.isHiddenNoPin()) {
                 show.run();
             } else {
-                MgChatLock.askLock(fragment, MgConfig.SCOPE_HIDDEN, "Yashirilgan akkauntlar", ok -> {
+                MgChatLock.askLock(fragment, MgConfig.SCOPE_HIDDEN, org.telegram.messenger.MgLang.t("Yashirilgan akkauntlar"), ok -> {
                     if (ok) {
                         show.run();
                     }
@@ -192,16 +192,16 @@ public class MgAccountMenu {
             }
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getParentActivity(), fragment.getResourceProvider());
-        builder.setTitle("Yashirilgan akkauntlar");
+        builder.setTitle(org.telegram.messenger.MgLang.t("Yashirilgan akkauntlar"));
         if (hidden.isEmpty()) {
-            builder.setMessage("Yashirilgan akkaunt yo'q. Akkauntni yashirish: akkauntlar ro'yxatida ⚙ → \"Yashirish\".");
+            builder.setMessage(org.telegram.messenger.MgLang.t("Yashirilgan akkaunt yo'q. Akkauntni yashirish: akkauntlar ro'yxatida ⚙ → \"Yashirish\"."));
             builder.setPositiveButton("OK", null);
         } else {
             CharSequence[] names = new CharSequence[hidden.size()];
             int[] icons = new int[hidden.size()];
             for (int i = 0; i < hidden.size(); i++) {
                 TLRPC.User user = UserConfig.getInstance(hidden.get(i)).getCurrentUser();
-                names[i] = (user != null && user.bot ? "🤖 " : "") + displayName(hidden.get(i)) + (hidden.get(i) == UserConfig.selectedAccount ? " (joriy)" : "");
+                names[i] = (user != null && user.bot ? "🤖 " : "") + displayName(hidden.get(i)) + (hidden.get(i) == UserConfig.selectedAccount ? org.telegram.messenger.MgLang.t(" (joriy)") : "");
                 icons[i] = R.drawable.msg_openprofile;
             }
             builder.setItems(names, icons, (dialog, which) -> {
@@ -210,7 +210,7 @@ public class MgAccountMenu {
                     LaunchActivity.instance.switchToAccount(account, true);
                 }
             });
-            builder.setNegativeButton("Hammasini ko'rsatish", (dialog, which) -> {
+            builder.setNegativeButton(org.telegram.messenger.MgLang.t("Hammasini ko'rsatish"), (dialog, which) -> {
                 for (int a : hidden) {
                     MgConfig.setAccountHidden(a, false);
                 }
@@ -240,7 +240,7 @@ public class MgAccountMenu {
             if (ShortcutManagerCompat.isRequestPinShortcutSupported(context)) {
                 ShortcutManagerCompat.requestPinShortcut(context, info, null);
             } else {
-                BulletinFactory.of(fragment).createErrorBulletin("Bu telefon yorliq qo'shishni qo'llab-quvvatlamaydi").show();
+                BulletinFactory.of(fragment).createErrorBulletin(org.telegram.messenger.MgLang.t("Bu telefon yorliq qo'shishni qo'llab-quvvatlamaydi")).show();
             }
         } catch (Throwable e) {
             FileLog.e(e);
@@ -261,20 +261,20 @@ public class MgAccountMenu {
         editText.setLineColors(Theme.getColor(Theme.key_windowBackgroundWhiteInputField), Theme.getColor(Theme.key_windowBackgroundWhiteInputFieldActivated), Theme.getColor(Theme.key_text_RedRegular));
         editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         editText.setSingleLine(true);
-        editText.setHint("Masalan: Ish akkaunti");
+        editText.setHint(org.telegram.messenger.MgLang.t("Masalan: Ish akkaunti"));
         editText.setText(MgConfig.getAccountAlias(account));
         FrameLayout frameLayout = new FrameLayout(context);
         frameLayout.addView(editText, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP, 24, 6, 24, 0));
         AlertDialog.Builder builder = new AlertDialog.Builder(context, fragment.getResourceProvider());
-        builder.setTitle("Akkaunt nomi");
-        builder.setMessage("Bu nom faqat shu telefondagi akkauntlar ro'yxatida ko'rinadi.");
+        builder.setTitle(org.telegram.messenger.MgLang.t("Akkaunt nomi"));
+        builder.setMessage(org.telegram.messenger.MgLang.t("Bu nom faqat shu telefondagi akkauntlar ro'yxatida ko'rinadi."));
         builder.setView(frameLayout);
-        builder.setPositiveButton("Saqlash", (dialog, which) -> {
+        builder.setPositiveButton(org.telegram.messenger.MgLang.t("Saqlash"), (dialog, which) -> {
             MgConfig.setAccountAlias(account, editText.getText().toString());
             NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.mainUserInfoChanged);
         });
-        builder.setNeutralButton("Asl nom", (dialog, which) -> MgConfig.setAccountAlias(account, ""));
-        builder.setNegativeButton("Bekor qilish", null);
+        builder.setNeutralButton(org.telegram.messenger.MgLang.t("Asl nom"), (dialog, which) -> MgConfig.setAccountAlias(account, ""));
+        builder.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), null);
         fragment.showDialog(builder.create());
     }
 
@@ -283,9 +283,9 @@ public class MgAccountMenu {
             return;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getParentActivity(), fragment.getResourceProvider());
-        builder.setTitle("Akkauntdan chiqish");
-        builder.setMessage("\"" + displayName(account) + "\" akkauntidan chiqasizmi?");
-        builder.setPositiveButton("Chiqish", (dialog, which) -> {
+        builder.setTitle(org.telegram.messenger.MgLang.t("Akkauntdan chiqish"));
+        builder.setMessage("\"" + displayName(account) + org.telegram.messenger.MgLang.t("\" akkauntidan chiqasizmi?"));
+        builder.setPositiveButton(org.telegram.messenger.MgLang.t("Chiqish"), (dialog, which) -> {
             if (MgConfig.getMainAccount() == account) {
                 MgConfig.setMainAccount(-1);
             }
@@ -293,7 +293,7 @@ public class MgAccountMenu {
             MgConfig.setAccountAlias(account, "");
             MessagesController.getInstance(account).performLogout(1);
         });
-        builder.setNegativeButton("Bekor qilish", null);
+        builder.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), null);
         builder.makeRed(AlertDialog.BUTTON_POSITIVE);
         fragment.showDialog(builder.create());
     }

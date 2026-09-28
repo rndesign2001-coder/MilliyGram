@@ -1265,6 +1265,7 @@ public class ChatActivity extends BaseFragment implements
     public final static int OPTION_MG_REMIND = 9103;
     public final static int OPTION_MG_SELECT_TEXT = 9104;
     public final static int OPTION_MG_DETAILS = 9105;
+    public final static int OPTION_MG_REACTORS = 9106;
 
     private final static int[] allowedNotificationsDuringChatListAnimations = new int[]{
             NotificationCenter.messagesRead,
@@ -3818,7 +3819,7 @@ public class ChatActivity extends BaseFragment implements
                         mgId = currentUser.id;
                     }
                     if (AndroidUtilities.addToClipboard(String.valueOf(mgId))) {
-                        BulletinFactory.of(ChatActivity.this).createCopyBulletin("ID nusxalandi: " + mgId).show();
+                        BulletinFactory.of(ChatActivity.this).createCopyBulletin(org.telegram.messenger.MgLang.t("ID nusxalandi: ") + mgId).show();
                     }
                     return;
                 }
@@ -3885,7 +3886,7 @@ public class ChatActivity extends BaseFragment implements
                     }
                     createDeleteMessagesAlert(null, null);
                 } else if (id == forward) {
-                    openForward(true);
+                    mgShowForwardOptions();
                 } else if (id == share) {
                     share();
                 } else if (id == open_direct) {
@@ -4576,34 +4577,34 @@ public class ChatActivity extends BaseFragment implements
             if (chatMode == 0 && !isTopic) {
                 // MilliyGram: chatni PIN bilan qulflash
                 headerItem.lazilyAddSubItem(MgChatLock.MENU_ID, R.drawable.msg_secret,
-                    org.telegram.messenger.MgConfig.isDialogLocked(currentAccount, dialog_id) ? "Qulfni olish" : "Chatni qulflash");
+                    org.telegram.messenger.MgConfig.isDialogLocked(currentAccount, dialog_id) ? org.telegram.messenger.MgLang.t("Qulfni olish") : org.telegram.messenger.MgLang.t("Chatni qulflash"));
                 headerItem.lazilyAddSubItem(MgChatLock.MENU_ID_HIDE, R.drawable.msg_archive,
-                    org.telegram.messenger.MgConfig.isDialogHidden(currentAccount, dialog_id) ? "Yashirishdan chiqarish" : "Chatni yashirish");
+                    org.telegram.messenger.MgConfig.isDialogHidden(currentAccount, dialog_id) ? org.telegram.messenger.MgLang.t("Yashirishdan chiqarish") : org.telegram.messenger.MgLang.t("Chatni yashirish"));
                 headerItem.lazilyAddSubItem(MgChatTools.MENU_STATS, R.drawable.msg_stats, "Chat statistikasi");
-                headerItem.lazilyAddSubItem(MgChatTools.MENU_EXPORT, R.drawable.msg_download, "Chatni eksport qilish");
+                headerItem.lazilyAddSubItem(MgChatTools.MENU_EXPORT, R.drawable.msg_download, org.telegram.messenger.MgLang.t("Chatni eksport qilish"));
                 // MilliyGram: avtomatlashtirish
                 if (currentEncryptedChat == null && (currentChat == null || ChatObject.canSendMessages(currentChat))) {
                     headerItem.lazilyAddSubItem(MgChatFeatures.MENU_AUTO_TEXT, R.drawable.msg_text_outlined, MgChatFeatures.autoTextMenuTitle(currentAccount, dialog_id));
                     headerItem.lazilyAddSubItem(MgChatFeatures.MENU_AUTO_TRANSLATE, R.drawable.msg_translate, MgChatFeatures.autoTranslateMenuTitle(currentAccount, dialog_id));
-                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_TEMPLATES, R.drawable.msg_saved, "Tezkor shablonlar");
+                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_TEMPLATES, R.drawable.msg_saved, org.telegram.messenger.MgLang.t("Tezkor shablonlar"));
                     if (MgVoiceTyping.isAvailable(getParentActivity())) {
-                        headerItem.lazilyAddSubItem(MgChatFeatures.MENU_VOICE_TYPING, R.drawable.input_mic, "Ovoz bilan yozish");
+                        headerItem.lazilyAddSubItem(MgChatFeatures.MENU_VOICE_TYPING, R.drawable.input_mic, org.telegram.messenger.MgLang.t("Ovoz bilan yozish"));
                     }
                 }
                 if (currentChat != null && ChatObject.canUserDoAdminAction(currentChat, ChatObject.ACTION_INVITE)) {
-                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_JOIN_REQUESTS, R.drawable.msg_requests, "Qo'shilish so'rovlari");
+                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_JOIN_REQUESTS, R.drawable.msg_requests, org.telegram.messenger.MgLang.t("Qo'shilish so'rovlari"));
                 }
                 if (currentChat != null && ChatObject.isChannel(currentChat)) {
-                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_GROWTH, R.drawable.msg_stats, "Obunachilar kundaligi");
+                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_GROWTH, R.drawable.msg_stats, org.telegram.messenger.MgLang.t("Obunachilar kundaligi"));
                 }
                 if (currentEncryptedChat == null && (currentUser != null || currentChat != null)) {
                     headerItem.lazilyAddSubItem(MgChatFeatures.MENU_CARD, R.drawable.msg_qrcode, "Profil kartasi (QR)");
                 }
                 if (MgMembersActivity.canUse(currentChat)) {
-                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_MEMBERS_CLEAN, R.drawable.msg_leave, "A'zolarni tozalash");
+                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_MEMBERS_CLEAN, R.drawable.msg_leave, org.telegram.messenger.MgLang.t("A'zolarni tozalash"));
                 }
                 if (MgChatFeatures.canJoinAll(currentChat)) {
-                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_JOIN_ALL, R.drawable.msg_contact_add, "Barcha akkauntlardan qo'shilish");
+                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_JOIN_ALL, R.drawable.msg_contact_add, org.telegram.messenger.MgLang.t("Barcha akkauntlardan qo'shilish"));
                 }
                 if (currentEncryptedChat == null && MgChatFeatures.canOneTimeVoice(currentUser)) {
                     mgOneTimeItem = headerItem.lazilyAddSubItem(MgChatFeatures.MENU_ONE_TIME_VOICE, R.drawable.msg_voicechat, MgChatFeatures.oneTimeVoiceMenuTitle(currentAccount, dialog_id));
@@ -10487,19 +10488,19 @@ public class ChatActivity extends BaseFragment implements
                 actionModeViews.add(actionMode.addItemWithWidth(tag_message, R.drawable.menu_tag_edit, dp(48), LocaleController.getString(R.string.AccDescrTagMessage)));
             }
             if (!isReport()) {
-                actionModeViews.add(actionMode.addItemWithWidth(mg_select_range, R.drawable.mg_select_range, dp(44), "Oraliqni belgilash"));
-                actionModeViews.add(actionMode.addItemWithWidth(mg_select_all, R.drawable.mg_select_all, dp(44), "Hammasini belgilash"));
+                actionModeViews.add(actionMode.addItemWithWidth(mg_select_range, R.drawable.mg_select_range, dp(44), org.telegram.messenger.MgLang.t("Oraliqni belgilash")));
+                actionModeViews.add(actionMode.addItemWithWidth(mg_select_all, R.drawable.mg_select_all, dp(44), org.telegram.messenger.MgLang.t("Hammasini belgilash")));
             }
             actionModeViews.add(actionMode.addItemWithWidth(star, R.drawable.msg_fave, dp(48), LocaleController.getString(R.string.AddToFavorites)));
             actionModeViews.add(actionMode.addItemWithWidth(copy, R.drawable.msg_copy, dp(48), LocaleController.getString(R.string.Copy)));
             if (!isSavedMessages && getDialogId() != UserObject.VERIFY) {
-                actionModeViews.add(actionMode.addItemWithWidth(forward, R.drawable.msg_forward, dp(48), LocaleController.getString(R.string.Forward)));
+                actionModeViews.add(actionMode.addItemWithWidth(forward, R.drawable.mg_forward_menu, dp(48), LocaleController.getString(R.string.Forward)));
             }
             actionModeViews.add(actionMode.addItemWithWidth(share, R.drawable.msg_shareout, dp(48), LocaleController.getString(R.string.ShareFile)));
             actionModeViews.add(actionMode.addItemWithWidth(delete, R.drawable.msg_delete, dp(48), LocaleController.getString(R.string.Delete)));
         } else {
-            actionModeViews.add(actionMode.addItemWithWidth(mg_select_range, R.drawable.mg_select_range, dp(44), "Oraliqni belgilash"));
-            actionModeViews.add(actionMode.addItemWithWidth(mg_select_all, R.drawable.mg_select_all, dp(44), "Hammasini belgilash"));
+            actionModeViews.add(actionMode.addItemWithWidth(mg_select_range, R.drawable.mg_select_range, dp(44), org.telegram.messenger.MgLang.t("Oraliqni belgilash")));
+            actionModeViews.add(actionMode.addItemWithWidth(mg_select_all, R.drawable.mg_select_all, dp(44), org.telegram.messenger.MgLang.t("Hammasini belgilash")));
             actionModeViews.add(actionMode.addItemWithWidth(edit, R.drawable.msg_edit, dp(48), LocaleController.getString(R.string.Edit)));
             actionModeViews.add(actionMode.addItemWithWidth(star, R.drawable.msg_fave, dp(48), LocaleController.getString(R.string.AddToFavorites)));
             actionModeViews.add(actionMode.addItemWithWidth(copy, R.drawable.msg_copy, dp(48), LocaleController.getString(R.string.Copy)));
@@ -19622,7 +19623,7 @@ public class ChatActivity extends BaseFragment implements
             }
         }
         if (!all && (lo < 0 || lo == hi)) {
-            BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, "Oraliqni belgilash uchun avval ikkita xabarni belgilang: birinchisini va oxirgisini").show();
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, org.telegram.messenger.MgLang.t("Oraliqni belgilash uchun avval ikkita xabarni belgilang: birinchisini va oxirgisini")).show();
             return;
         }
         int from, to, step;
@@ -19670,12 +19671,95 @@ public class ChatActivity extends BaseFragment implements
         updateVisibleRows();
         int total = selectedMessagesIds[0].size() + selectedMessagesIds[1].size();
         if (capped) {
-            BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, "Belgilandi: " + total + " ta. Telegram bir vaqtda ko'pi bilan 100 ta xabarni belgilashga ruxsat beradi").show();
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, org.telegram.messenger.MgLang.t("Belgilandi: ") + total + org.telegram.messenger.MgLang.t(" ta. Telegram bir vaqtda ko'pi bilan 100 ta xabarni belgilashga ruxsat beradi")).show();
         } else if (added == 0) {
-            BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, all ? "Yuklangan hamma xabarlar allaqachon belgilangan" : "Oraliqdagi hamma xabarlar allaqachon belgilangan").show();
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, all ? org.telegram.messenger.MgLang.t("Yuklangan hamma xabarlar allaqachon belgilangan") : org.telegram.messenger.MgLang.t("Oraliqdagi hamma xabarlar allaqachon belgilangan")).show();
         } else if (all) {
-            BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, "Yuklangan " + total + " ta xabar belgilandi. Ko'proq kerak bo'lsa, yuqoriga suring va yana bosing").show();
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Yuklangan ") + total + org.telegram.messenger.MgLang.t(" ta xabar belgilandi. Ko'proq kerak bo'lsa, yuqoriga suring va yana bosing")).show();
         }
+    }
+
+    // ================= MilliyGram: uzatish turini tanlash =================
+    private boolean mgForwardWithLink;
+
+    private void mgShowForwardOptions() {
+        View anchor = null;
+        try {
+            anchor = actionBar.createActionMode().getItem(forward);
+        } catch (Throwable ignore) {
+        }
+        if (anchor == null || getParentActivity() == null) {
+            openForward(true);
+            return;
+        }
+        ItemOptions.makeOptions(this, anchor)
+                .add(R.drawable.msg_forward, LocaleController.getString(R.string.Forward), () -> {
+                    mgForwardWithLink = false;
+                    openForward(true);
+                })
+                .add(R.drawable.mg_forward_link, org.telegram.messenger.MgLang.t("Havola bilan birga uzatish"), () -> {
+                    ArrayList<MessageObject> sel = mgSelectedMessages();
+                    if (MgMessageTools.linksFor(this, sel) == null) {
+                        BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, org.telegram.messenger.MgLang.t("Bu chat xabarlari uchun ochiq havola yo'q — oddiy uzatiladi")).show();
+                        mgForwardWithLink = false;
+                    } else {
+                        mgForwardWithLink = true;
+                    }
+                    openForward(true);
+                })
+                .add(R.drawable.msg_forward_replace, org.telegram.messenger.MgLang.t("Maxsus uzatish"), () -> {
+                    ArrayList<MessageObject> sel = mgSelectedMessages();
+                    long group = 0;
+                    boolean oneGroup = !sel.isEmpty();
+                    for (MessageObject m : sel) {
+                        if (group == 0) {
+                            group = m.getGroupId();
+                        }
+                        if (m.getGroupId() == 0 || m.getGroupId() != group) {
+                            oneGroup = false;
+                        }
+                    }
+                    if (sel.size() == 1 || oneGroup) {
+                        MessageObject first = sel.get(0);
+                        MessageObject.GroupedMessages g = first.getGroupId() != 0 ? groupedMessagesMap.get(first.getGroupId()) : null;
+                        clearSelectionMode();
+                        MgCustomForward.open(this, first, g);
+                    } else {
+                        BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, org.telegram.messenger.MgLang.t("Maxsus uzatish bitta xabar yoki bitta albom uchun ishlaydi")).show();
+                    }
+                })
+                .setDimAlpha(0)
+                .show();
+    }
+
+    private static MessageObject mgReactionsTarget(MessageObject m, MessageObject.GroupedMessages g) {
+        if (MgReactions.hasReactions(m) || g == null) {
+            return m;
+        }
+        for (MessageObject x : g.messages) {
+            if (MgReactions.hasReactions(x)) {
+                return x;
+            }
+        }
+        return m;
+    }
+
+    private ArrayList<MessageObject> mgSelectedMessages() {
+        ArrayList<MessageObject> out = new ArrayList<>();
+        for (int a = 1; a >= 0; a--) {
+            ArrayList<Integer> ids = new ArrayList<>();
+            for (int b = 0; b < selectedMessagesIds[a].size(); b++) {
+                ids.add(selectedMessagesIds[a].keyAt(b));
+            }
+            Collections.sort(ids);
+            for (Integer id : ids) {
+                MessageObject m = selectedMessagesIds[a].get(id);
+                if (m != null) {
+                    out.add(m);
+                }
+            }
+        }
+        return out;
     }
 
     private void updateActionModeTitle() {
@@ -34638,6 +34722,11 @@ public class ChatActivity extends BaseFragment implements
                 AndroidUtilities.runOnUIThread(() -> MgMessageTools.showSelectText(ChatActivity.this, mgT), 200);
                 break;
             }
+            case OPTION_MG_REACTORS: {
+                final MessageObject mgMsg = mgReactionsTarget(selectedObject, selectedObjectGroup);
+                AndroidUtilities.runOnUIThread(() -> MgReactions.show(ChatActivity.this, mgMsg), 200);
+                break;
+            }
             case OPTION_MG_DETAILS: {
                 final MessageObject mgMsg = selectedObject;
                 final MessageObject.GroupedMessages mgGroup = selectedObjectGroup;
@@ -34787,6 +34876,31 @@ public class ChatActivity extends BaseFragment implements
             }
         }
 
+        if (mgForwardWithLink && !fragment.isQuote && forwardingMessage == null) {
+            mgForwardWithLink = false;
+            final String mgLinks = MgMessageTools.linksFor(this, fmessages);
+            for (int a = 1; a >= 0; a--) {
+                selectedMessagesCanCopyIds[a].clear();
+                selectedMessagesCanStarIds[a].clear();
+                selectedMessagesIds[a].clear();
+            }
+            hideActionMode();
+            updatePinnedMessageView(true);
+            updateVisibleRows();
+            for (int a = 0; a < dids.size(); a++) {
+                long did = dids.get(a).dialogId;
+                if (message != null) {
+                    getSendMessagesHelper().sendMessage(SendMessagesHelper.SendMessageParams.of(message.toString(), did, null, null, null, true, null, null, null, notify, scheduleDate, 0, null, false));
+                }
+                getSendMessagesHelper().sendMessage(fmessages, did, false, false, notify, scheduleDate, 0);
+                if (mgLinks != null) {
+                    getSendMessagesHelper().sendMessage(SendMessagesHelper.SendMessageParams.of(mgLinks, did, null, null, null, true, null, null, null, notify, scheduleDate, 0, null, false));
+                }
+            }
+            fragment.finishFragment();
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.forward, org.telegram.messenger.MgLang.t("Havola bilan birga uzatildi")).show();
+            return true;
+        }
         if (!fragment.isQuote && (dids.size() > 1 || dids.get(0).dialogId == getUserConfig().getClientUserId() || message != null || scheduleDate != 0 || !notify)) {
             return !AlertsCreator.ensurePaidMessagesMultiConfirmationTopicKeys(currentAccount, dids, fmessages.size() + (TextUtils.isEmpty(message) ? 0 : 1), prices -> {
                 if (fragment.resetDelegate) {
@@ -46554,18 +46668,18 @@ public class ChatActivity extends BaseFragment implements
                     items.add(LocaleController.getString(R.string.Forward));
                     options.add(OPTION_FORWARD);
                     icons.add(R.drawable.msg_forward);
-                    items.add("Maxsus uzatish");
+                    items.add(org.telegram.messenger.MgLang.t("Maxsus uzatish"));
                     options.add(OPTION_MG_CUSTOM_FORWARD);
                     icons.add(R.drawable.msg_forward_replace);
                 }
                 if (selectedObject != null && selectedObject.getId() > 0 && !selectedObject.isSponsored() && chatMode != MODE_SCHEDULED) {
                     String mgTxt = MgMessageTools.messageText(selectedObject, selectedObjectGroup);
                     if (!TextUtils.isEmpty(mgTxt) && org.telegram.messenger.MgTranslit.hasLetters(mgTxt)) {
-                        items.add(org.telegram.messenger.MgTranslit.isCyrillic(mgTxt) ? "Lotinga o'girish" : "Kirillga o'girish");
+                        items.add(org.telegram.messenger.MgTranslit.isCyrillic(mgTxt) ? org.telegram.messenger.MgLang.t("Lotinga o'girish") : org.telegram.messenger.MgLang.t("Kirillga o'girish"));
                         options.add(OPTION_MG_TRANSLIT);
                         icons.add(R.drawable.msg_language);
                     }
-                    items.add("Keyin eslatish");
+                    items.add(org.telegram.messenger.MgLang.t("Keyin eslatish"));
                     options.add(OPTION_MG_REMIND);
                     icons.add(R.drawable.msg_calendar);
                 }
@@ -46636,7 +46750,7 @@ public class ChatActivity extends BaseFragment implements
                     options.add(OPTION_COPY);
                     icons.add(R.drawable.msg_copy);
                     if (!TextUtils.isEmpty(MgMessageTools.messageText(selectedObject, selectedObjectGroup))) {
-                        items.add("Matnning bir qismidan nusxa olish");
+                        items.add(org.telegram.messenger.MgLang.t("Matnning bir qismidan nusxa olish"));
                         options.add(OPTION_MG_SELECT_TEXT);
                         icons.add(R.drawable.msg_text_outlined);
                     }
@@ -46722,9 +46836,14 @@ public class ChatActivity extends BaseFragment implements
             }
         }
         if (selectedObject != null && selectedObject.getId() != 0 && !selectedObject.isSponsored()) {
-            items.add("Xabar tafsilotlari");
+            items.add(org.telegram.messenger.MgLang.t("Xabar tafsilotlari"));
             options.add(OPTION_MG_DETAILS);
             icons.add(R.drawable.msg_info);
+            if (MgReactions.hasReactions(mgReactionsTarget(selectedObject, selectedObjectGroup))) {
+                items.add(org.telegram.messenger.MgLang.t("Reaksiya bildirganlar"));
+                options.add(OPTION_MG_REACTORS);
+                icons.add(R.drawable.msg_reactions);
+            }
         }
 
         if (showWelcomeMessageRevertOption(primaryMessage)) {

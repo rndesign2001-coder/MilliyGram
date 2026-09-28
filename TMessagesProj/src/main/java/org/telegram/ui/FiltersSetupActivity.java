@@ -736,7 +736,7 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
         return fragmentView;
     }
 
-    private static final String MG_LOCAL_BUTTON = "Lokal jildlar, ikonkalar va yashirin jildlar";
+    private static final String MG_LOCAL_BUTTON = org.telegram.messenger.MgLang.t("Lokal jildlar, ikonkalar va yashirin jildlar");
 
     public void createFolder(INavigationLayout navigationLayout) {
         int mgCount = 0;

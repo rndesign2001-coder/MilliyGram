@@ -186,25 +186,25 @@ public class MgConfig {
         int month = c.get(Calendar.MONTH) + 1;
         int day = c.get(Calendar.DAY_OF_MONTH);
         if (month == 1 && day == 1) {
-            return "Yangi yil muborak! 🎄";
+            return org.telegram.messenger.MgLang.t("Yangi yil muborak! 🎄");
         } else if (month == 1 && day == 14) {
-            return "Vatan himoyachilari kuni 🎖";
+            return org.telegram.messenger.MgLang.t("Vatan himoyachilari kuni 🎖");
         } else if (month == 3 && day == 8) {
-            return "8-mart muborak! 🌷";
+            return org.telegram.messenger.MgLang.t("8-mart muborak! 🌷");
         } else if (month == 3 && (day >= 20 && day <= 22)) {
-            return "Navro'z muborak! 🌱";
+            return org.telegram.messenger.MgLang.t("Navro'z muborak! 🌱");
         } else if (month == 5 && day == 9) {
-            return "Xotira va qadrlash kuni 🕊";
+            return org.telegram.messenger.MgLang.t("Xotira va qadrlash kuni 🕊");
         } else if (month == 9 && day == 1) {
-            return "Mustaqillik kuni muborak! 🇺🇿";
+            return org.telegram.messenger.MgLang.t("Mustaqillik kuni muborak! 🇺🇿");
         } else if (month == 10 && day == 1) {
-            return "Ustoz va murabbiylar kuni 📚";
+            return org.telegram.messenger.MgLang.t("Ustoz va murabbiylar kuni 📚");
         } else if (month == 10 && day == 21) {
-            return "O'zbek tili bayrami 📖";
+            return org.telegram.messenger.MgLang.t("O'zbek tili bayrami 📖");
         } else if (month == 12 && day == 8) {
-            return "Konstitutsiya kuni 📜";
+            return org.telegram.messenger.MgLang.t("Konstitutsiya kuni 📜");
         } else if (month == 12 && day == 31) {
-            return "Yangi yil arafasi 🎆";
+            return org.telegram.messenger.MgLang.t("Yangi yil arafasi 🎆");
         }
         return null;
     }

@@ -93,7 +93,7 @@ public class MgChatLock {
         }
         MgLockScreen.create(context, scope, type, ok -> {
             if (ok) {
-                BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, MgConfig.LOCK_PATTERN.equals(type) ? "Grafik kalit saqlandi" : "PIN kod saqlandi").show();
+                BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, MgConfig.LOCK_PATTERN.equals(type) ? org.telegram.messenger.MgLang.t("Grafik kalit saqlandi") : org.telegram.messenger.MgLang.t("PIN kod saqlandi")).show();
                 if (onDone != null) {
                     onDone.run();
                 }
@@ -105,13 +105,13 @@ public class MgChatLock {
     public static void toggleLock(BaseFragment fragment, int account, long dialogId) {
         if (MgConfig.isDialogLocked(account, dialogId)) {
             String scope = MgConfig.lockScopeFor(account, dialogId);
-            askLock(fragment, scope, "Qulfni olish", ok -> {
+            askLock(fragment, scope, org.telegram.messenger.MgLang.t("Qulfni olish"), ok -> {
                 if (ok) {
                     MgConfig.setDialogLocked(account, dialogId, false);
                     if (!MgConfig.SCOPE_CHAT.equals(scope)) {
                         MgConfig.removeLock(scope);
                     }
-                    BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, "Chat qulfdan chiqarildi").show();
+                    BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Chat qulfdan chiqarildi")).show();
                 }
             });
             return;
@@ -121,13 +121,13 @@ public class MgChatLock {
             return;
         }
         CharSequence[] items = {
-                MgConfig.hasPin() ? "Umumiy parol bilan" : "Umumiy parol yaratish",
-                "Shu chat uchun alohida PIN kod",
-                "Shu chat uchun alohida grafik kalit"
+                MgConfig.hasPin() ? org.telegram.messenger.MgLang.t("Umumiy parol bilan") : org.telegram.messenger.MgLang.t("Umumiy parol yaratish"),
+                org.telegram.messenger.MgLang.t("Shu chat uchun alohida PIN kod"),
+                org.telegram.messenger.MgLang.t("Shu chat uchun alohida grafik kalit")
         };
         int[] icons = {R.drawable.msg_secret, R.drawable.msg_permissions, R.drawable.msg_customize};
         AlertDialog.Builder b = new AlertDialog.Builder(context, fragment.getResourceProvider());
-        b.setTitle("Chatni qulflash");
+        b.setTitle(org.telegram.messenger.MgLang.t("Chatni qulflash"));
         b.setItems(items, icons, (d, which) -> {
             if (which == 0) {
                 if (!MgConfig.hasPin()) {
@@ -151,7 +151,7 @@ public class MgChatLock {
     private static void lockDone(BaseFragment fragment, int account, long dialogId) {
         MgConfig.setDialogLocked(account, dialogId, true);
         BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check,
-                MgConfig.hasOwnLock(account, dialogId) ? "Chat alohida parol bilan qulflandi" : "Chat qulflandi. Keyingi safar parol so'raladi").show();
+                MgConfig.hasOwnLock(account, dialogId) ? org.telegram.messenger.MgLang.t("Chat alohida parol bilan qulflandi") : org.telegram.messenger.MgLang.t("Chat qulflandi. Keyingi safar parol so'raladi")).show();
     }
 
     /**
@@ -173,7 +173,7 @@ public class MgChatLock {
         lockIcon.setScaleType(ImageView.ScaleType.CENTER);
         overlay.addView(lockIcon, LayoutHelper.createLinear(64, 64, Gravity.CENTER_HORIZONTAL));
         TextView text = new TextView(context);
-        text.setText("Bu chat qulflangan");
+        text.setText(org.telegram.messenger.MgLang.t("Bu chat qulflangan"));
         text.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
         text.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));
         text.setGravity(Gravity.CENTER);
@@ -192,7 +192,7 @@ public class MgChatLock {
         }
         long did = overlay.getTag() instanceof Long ? (Long) overlay.getTag() : 0;
         int acc = fragment.getCurrentAccount();
-        askLock(fragment, did != 0 ? MgConfig.lockScopeFor(acc, did) : MgConfig.SCOPE_CHAT, "Chat qulflangan", ok -> {
+        askLock(fragment, did != 0 ? MgConfig.lockScopeFor(acc, did) : MgConfig.SCOPE_CHAT, org.telegram.messenger.MgLang.t("Chat qulflangan"), ok -> {
             if (ok) {
                 if (overlay.getParent() instanceof ViewGroup) {
                     ((ViewGroup) overlay.getParent()).removeView(overlay);
