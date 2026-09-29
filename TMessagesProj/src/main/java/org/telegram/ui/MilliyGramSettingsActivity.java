@@ -74,7 +74,7 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
         items.add(UItem.asShadow(null));
         items.add(UItem.asButton(ID_SIMPLE, R.drawable.msg_zoomin, org.telegram.messenger.MgLang.t("Oddiy rejim (keksalar uchun)"),
                 org.telegram.messenger.MgSimple.isEnabled() ? org.telegram.messenger.MgLang.t("yoqilgan") : org.telegram.messenger.MgLang.t("o'chiq")));
-        items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Katta yozuvlar, katta tugmalar, sodda menyu va xabarlarni ovoz chiqarib o'qish.")));
+        items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Katta yozuvlar, katta tugmalar va sodda menyu.")));
         for (int i = 0; i < PAGES.length; i++) {
             items.add(UItem.asButton(PAGES[i], ICONS[i], MgSettingsPage.pageTitle(PAGES[i])));
         }

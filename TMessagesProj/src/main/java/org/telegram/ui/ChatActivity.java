@@ -1265,7 +1265,6 @@ public class ChatActivity extends BaseFragment implements
     public final static int OPTION_MG_REMIND = 9103;
     public final static int OPTION_MG_SELECT_TEXT = 9104;
     public final static int OPTION_MG_DETAILS = 9105;
-    public final static int OPTION_MG_SPEAK = 9106;
 
     private final static int[] allowedNotificationsDuringChatListAnimations = new int[]{
             NotificationCenter.messagesRead,
@@ -22403,7 +22402,6 @@ public class ChatActivity extends BaseFragment implements
                 }
                 processNewMessages(arr);
                 MgMessageTools.scamCheck(this, arr);
-                org.telegram.messenger.MgSimple.autoRead(currentAccount, arr, isPaused); // MilliyGram: oddiy rejimda o'qib berish
             } else if (ChatObject.isChannel(currentChat) && !currentChat.megagroup && chatInfo != null && did == -chatInfo.linked_chat_id) {
                 for (int a = 0, N = arr.size(); a < N; a++) {
                     MessageObject messageObject = arr.get(a);
@@ -34766,14 +34764,6 @@ public class ChatActivity extends BaseFragment implements
                 AndroidUtilities.runOnUIThread(() -> MgMessageTools.showSelectText(ChatActivity.this, mgT), 200);
                 break;
             }
-            case OPTION_MG_SPEAK: {
-                if (org.telegram.messenger.MgSimple.isSpeaking()) {
-                    org.telegram.messenger.MgSimple.stop();
-                } else {
-                    org.telegram.messenger.MgSimple.speak(MgMessageTools.messageText(selectedObject, selectedObjectGroup));
-                }
-                break;
-            }
             case OPTION_MG_DETAILS: {
                 final MessageObject mgMsg = selectedObject;
                 final MessageObject.GroupedMessages mgGroup = selectedObjectGroup;
@@ -46883,13 +46873,6 @@ public class ChatActivity extends BaseFragment implements
                 options.add(OPTION_DELETE);
                 icons.add(deleteIconRes);
             }
-        }
-        if (selectedObject != null && !selectedObject.isSponsored() && org.telegram.messenger.MgSimple.isSpeakButton()
-                && !TextUtils.isEmpty(MgMessageTools.messageText(selectedObject, selectedObjectGroup))) {
-            // MilliyGram: xabarni ovoz chiqarib o'qish
-            items.add(org.telegram.messenger.MgSimple.isSpeaking() ? org.telegram.messenger.MgLang.t("O'qishni to'xtatish") : org.telegram.messenger.MgLang.t("Ovoz chiqarib o'qish"));
-            options.add(OPTION_MG_SPEAK);
-            icons.add(R.drawable.msg_voice_speaker);
         }
         if (selectedObject != null && selectedObject.getId() != 0 && !selectedObject.isSponsored() && !org.telegram.messenger.MgSimple.isSimpleMenu()) {
             items.add(org.telegram.messenger.MgLang.t("Xabar tafsilotlari"));

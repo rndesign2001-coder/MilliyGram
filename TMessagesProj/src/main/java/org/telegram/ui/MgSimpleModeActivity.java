@@ -29,7 +29,7 @@ import java.util.ArrayList;
 
 /**
  * Oddiy rejim — keksalar va ko'zi zaif foydalanuvchilar uchun: katta shrift, katta interfeys,
- * keng chatlar ro'yxati, soddalashtirilgan menyu va xabarlarni ovoz chiqarib o'qish.
+ * keng chatlar ro'yxati va soddalashtirilgan menyu.
  */
 public class MgSimpleModeActivity extends UniversalFragment {
 
@@ -39,14 +39,6 @@ public class MgSimpleModeActivity extends UniversalFragment {
     private static final int ID_THREE_LINES = 4;
     private static final int ID_MENU = 5;
     private static final int ID_STORIES = 6;
-    private static final int ID_SPEAK_BTN = 7;
-    private static final int ID_AUTO_READ = 8;
-    private static final int ID_RATE = 9;
-    private static final int ID_TEST = 10;
-
-    private static String[] rateNames() {
-        return new String[]{MgLang.t("Sekin"), MgLang.t("O'rtacha"), MgLang.t("Odatiy"), MgLang.t("Tez")};
-    }
 
     @Override
     protected CharSequence getTitle() {
@@ -62,7 +54,7 @@ public class MgSimpleModeActivity extends UniversalFragment {
             preview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, on ? MgSimple.getFontSize() : MgConfig.NORMAL_FONT_SIZE);
             preview.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
             preview.setPadding(AndroidUtilities.dp(21), AndroidUtilities.dp(16), AndroidUtilities.dp(21), AndroidUtilities.dp(16));
-            preview.setText(MgLang.t("👴👵 Assalomu alaykum! Oddiy rejimda yozuvlar kattaroq, tugmalar kengroq va menyular soddaroq bo'ladi. Xabarni uzoq bosib, uni ovoz chiqarib o'qitish ham mumkin."));
+            preview.setText(MgLang.t("👴👵 Assalomu alaykum! Oddiy rejimda yozuvlar kattaroq, tugmalar kengroq va menyular soddaroq bo'ladi."));
             items.add(UItem.asCustom(preview));
         }
         items.add(UItem.asShadow(null));
@@ -78,14 +70,7 @@ public class MgSimpleModeActivity extends UniversalFragment {
         items.add(UItem.asHeader(MgLang.t("Soddalashtirish")));
         items.add(UItem.asCheck(ID_MENU, MgLang.t("Soddalashtirilgan xabar menyusi")).setChecked(MgConfig.getBool("simple_menu", true)));
         items.add(UItem.asCheck(ID_STORIES, MgLang.t("Hikoyalar panelini yashirish")).setChecked(MgConfig.getBool("hide_stories", false)));
-        items.add(UItem.asShadow(MgLang.t("Soddalashtirilgan menyuda xabarni uzoq bosganda faqat asosiy amallar qoladi: javob berish, nusxalash, uzatish, o'chirish va ovoz chiqarib o'qish.")));
-
-        items.add(UItem.asHeader(MgLang.t("Ovozli o'qish")));
-        items.add(UItem.asCheck(ID_SPEAK_BTN, MgLang.t("\"Ovoz chiqarib o'qish\" tugmasi")).setChecked(MgSimple.isSpeakButton()));
-        items.add(UItem.asCheck(ID_AUTO_READ, MgLang.t("Kelgan xabarlarni o'qib berish")).setChecked(MgConfig.getBool("simple_auto_read", false)));
-        items.add(UItem.asButton(ID_RATE, R.drawable.msg_speed, MgLang.t("O'qish tezligi"), rateNames()[MgSimple.getSpeechRateIndex()]));
-        items.add(UItem.asButton(ID_TEST, R.drawable.msg_voice_speaker, MgLang.t("Sinab ko'rish")));
-        items.add(UItem.asShadow(MgLang.t("Xabarni uzoq bosing → \"Ovoz chiqarib o'qish\". Avtomatik o'qish oddiy rejimda, chat ochiq turganda kelgan xabarlarni jo'natuvchi ismi bilan o'qib beradi. Telefonda o'zbek ovozi bo'lmasa, matn rus ovozida o'qiladi (Sozlamalar → Til → Matnni ovozga aylantirish).")));
+        items.add(UItem.asShadow(MgLang.t("Soddalashtirilgan menyuda xabarni uzoq bosganda faqat asosiy amallar qoladi: javob berish, nusxalash, uzatish va o'chirish.")));
     }
 
     private void setCheck(View view, boolean v) {
@@ -183,41 +168,6 @@ public class MgSimpleModeActivity extends UniversalFragment {
                 getNotificationCenter().postNotificationName(NotificationCenter.dialogsNeedReload);
                 break;
             }
-            case ID_SPEAK_BTN: {
-                boolean v = !MgSimple.isSpeakButton();
-                MgConfig.setBool("simple_speak_btn", v);
-                setCheck(view, v);
-                break;
-            }
-            case ID_AUTO_READ: {
-                boolean v = !MgConfig.getBool("simple_auto_read", false);
-                MgConfig.setBool("simple_auto_read", v);
-                setCheck(view, v);
-                if (v && !MgSimple.isEnabled()) {
-                    BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, MgLang.t("Avtomatik o'qish oddiy rejim yoqilganda ishlaydi")).show();
-                }
-                break;
-            }
-            case ID_RATE: {
-                String[] names = rateNames();
-                for (int i = 0; i < names.length; i++) {
-                    if (i == MgSimple.getSpeechRateIndex()) {
-                        names[i] += "  ✓";
-                    }
-                }
-                AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
-                b.setTitle(MgLang.t("O'qish tezligi"));
-                b.setItems(names, (d, w) -> {
-                    MgConfig.setInt("simple_rate", w);
-                    refresh();
-                    MgSimple.speak(MgLang.t("Assalomu alaykum. Bu MilliyGram ovozli o'qish namunasi."));
-                });
-                showDialog(b.create());
-                break;
-            }
-            case ID_TEST:
-                MgSimple.speak(MgLang.t("Assalomu alaykum. Bu MilliyGram ovozli o'qish namunasi."));
-                break;
         }
     }
 

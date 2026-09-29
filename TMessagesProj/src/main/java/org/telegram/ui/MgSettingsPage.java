@@ -179,7 +179,7 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asButton(ID_SIMPLE_MODE, R.drawable.msg_zoomin, org.telegram.messenger.MgLang.t("Oddiy rejim (keksalar uchun)"), MgConfig.isSimpleMode() ? org.telegram.messenger.MgLang.t("yoqilgan") : org.telegram.messenger.MgLang.t("o'chiq")));
                 items.add(UItem.asCheck(ID_HOLIDAY, org.telegram.messenger.MgLang.t("Bayram tabriklari")).setChecked(MgConfig.isHolidayDecorEnabled()));
                 items.add(UItem.asCheck(ID_SHAKE, org.telegram.messenger.MgLang.t("Silkitib yashirish")).setChecked(MgConfig.isShakeToHide()));
-                items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Oddiy rejimda yozuvlar va tugmalar kattaroq, menyu soddaroq bo'ladi, xabarlarni ovoz chiqarib o'qitish mumkin. Bayram kunlari sarlavhada tabrik chiqadi. Telefonni silkitsangiz, yashirin bo'lim va qulflangan chatlar darhol yopiladi.")));
+                items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Oddiy rejimda yozuvlar va tugmalar kattaroq, menyu soddaroq bo'ladi. Bayram kunlari sarlavhada tabrik chiqadi. Telefonni silkitsangiz, yashirin bo'lim va qulflangan chatlar darhol yopiladi.")));
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Qidiruv")));
                 items.add(UItem.asButton(ID_CHAT_FINDER, R.drawable.msg_search, org.telegram.messenger.MgLang.t("Foydalanuvchi nomini tekshirish")));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("@username yozing — band yoki bo'shligini darhol ko'rsatadi va mavjud bo'lsa, chatni ochadi.")));

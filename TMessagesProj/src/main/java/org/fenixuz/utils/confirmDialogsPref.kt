@@ -5,18 +5,18 @@ import org.telegram.messenger.ApplicationLoader
 import org.telegram.messenger.R
 
 object ConfirmDialogsPref {
-    var confirmSticker = false
-    var confirmVoice = false
-    var confirmGif = false
+    var confirmSticker = true
+    var confirmVoice = true
+    var confirmGif = true
 
     private var sharedPreferences =
         ApplicationLoader.applicationContext.getSharedPreferences("db", Context.MODE_PRIVATE)
     private var editor = sharedPreferences.edit()
 
     init {
-        confirmSticker = sharedPreferences.getBoolean("confirm_sticker", false)
-        confirmVoice = sharedPreferences.getBoolean("confirm_voice", false)
-        confirmGif = sharedPreferences.getBoolean("confirm_gif", false)
+        confirmSticker = sharedPreferences.getBoolean("confirm_sticker", true)
+        confirmVoice = sharedPreferences.getBoolean("confirm_voice", true)
+        confirmGif = sharedPreferences.getBoolean("confirm_gif", true)
     }
 
     fun changeConfirmStickerMode() {
