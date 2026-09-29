@@ -74,6 +74,7 @@ public class MgCustomForward {
         boolean withMedia = true;
         boolean spoiler;
         boolean silent;
+        int autoDelete;
         boolean hasMedia;
         boolean albumOk;
     }
@@ -221,6 +222,16 @@ public class MgCustomForward {
         TextCheckCell silentCell = new TextCheckCell(ctx, 23, true, fragment.getResourceProvider());
         silentCell.setTextAndCheck(org.telegram.messenger.MgLang.t("Ovozsiz yuborish"), st.silent, false);
         optionsBox.addView(silentCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50));
+
+        // MilliyGram: har bir tanlangan kanal/guruhda post vaqt o'tgach o'chiriladi
+        org.telegram.ui.Cells.TextSettingsCell autoDelCell = new org.telegram.ui.Cells.TextSettingsCell(ctx, 23, fragment.getResourceProvider());
+        autoDelCell.setTextAndValue(org.telegram.messenger.MgLang.t("Avto-o'chirish"), st.autoDelete > 0 ? org.telegram.messenger.MgAutoDelete.durationName(st.autoDelete) : org.telegram.messenger.MgLang.t("Yo'q"), false);
+        autoDelCell.setBackground(Theme.getSelectorDrawable(false));
+        autoDelCell.setOnClickListener(v -> MgAutoDeleteUI.pickDuration(ctx, fragment.getResourceProvider(), true, sec -> {
+            st.autoDelete = sec == null ? 0 : sec;
+            autoDelCell.setTextAndValue(org.telegram.messenger.MgLang.t("Avto-o'chirish"), st.autoDelete > 0 ? org.telegram.messenger.MgAutoDelete.durationName(st.autoDelete) : org.telegram.messenger.MgLang.t("Yo'q"), false);
+        }));
+        optionsBox.addView(autoDelCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50));
 
         EditTextCaption edit = new EditTextCaption(ctx, fragment.getResourceProvider());
         edit.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
@@ -683,6 +694,9 @@ public class MgCustomForward {
             int ok = 0;
             for (int i = 0; i < dids.size(); i++) {
                 try {
+                    if (st.autoDelete > 0) {
+                        org.telegram.messenger.MgAutoDelete.arm(fragment.getCurrentAccount(), dids.get(i).dialogId, st.autoDelete);
+                    }
                     if (send(fragment, st, dids.get(i), message, n, scheduleDate)) {
                         ok++;
                     }

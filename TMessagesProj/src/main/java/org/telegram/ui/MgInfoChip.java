@@ -214,6 +214,32 @@ public class MgInfoChip extends TextView {
         loc.setText("📍 " + org.telegram.messenger.MgLang.t(place.name) + " · " + org.telegram.messenger.MgLang.t(MgPlaces.findRegion(MgPrayer.getRegionKey()).name));
         box.addView(loc, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 8));
 
+        // MilliyGram: Qibla — jonli kichik kompas, bosilsa katta kompas ochiladi
+        LinearLayout qRow = new LinearLayout(ctx);
+        qRow.setOrientation(LinearLayout.HORIZONTAL);
+        qRow.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        qRow.setPadding(AndroidUtilities.dp(10), AndroidUtilities.dp(8), AndroidUtilities.dp(12), AndroidUtilities.dp(8));
+        GradientDrawable qBg = new GradientDrawable();
+        qBg.setCornerRadius(AndroidUtilities.dp(12));
+        qBg.setColor(Theme.multAlpha(accent, 0.10f));
+        qBg.setStroke(AndroidUtilities.dp(1), Theme.multAlpha(accent, 0.35f));
+        qRow.setBackground(qBg);
+        qRow.addView(new MgQibla.MiniView(ctx), LayoutHelper.createLinear(44, 44));
+        TextView qText = new TextView(ctx);
+        qText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+        qText.setTextColor(black);
+        SpannableStringBuilder qsb = new SpannableStringBuilder();
+        int qs0 = qsb.length();
+        qsb.append("🕋 ").append(MgQibla.shortText());
+        qsb.setSpan(new StyleSpan(Typeface.BOLD), qs0, qsb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        int qs1 = qsb.length();
+        qsb.append("\n").append(org.telegram.messenger.MgLang.t("Jonli kompasni ochish ›"));
+        qsb.setSpan(new ForegroundColorSpan(accent), qs1, qsb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        qText.setText(qsb);
+        qRow.addView(qText, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f, 12, 0, 0, 0));
+        qRow.setOnClickListener(v -> MgQibla.open(f));
+        box.addView(qRow, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 10));
+
         TextView nx = new TextView(ctx);
         nx.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
         nx.setTextColor(accent);

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    MilliyGram: faqat Google Play (AAB, bundleAfat) versiyasi uchun.
+    Play siyosatida cheklangan ruxsatlar olib tashlanadi:
+     - REQUEST_INSTALL_PACKAGES — Play ilovasi boshqa APK o'rnatmasligi kerak;
+     - USE_EXACT_ALARM — faqat budilnik/kalendar ilovalariga ruxsat (SCHEDULE_EXACT_ALARM qoladi);
+     - ACCESS_BACKGROUND_LOCATION — alohida deklaratsiya va video talab qiladi.
+    APK (afat) versiyasiga ta'sir qilmaydi.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" tools:node="remove" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" tools:node="remove" />
+</manifest>

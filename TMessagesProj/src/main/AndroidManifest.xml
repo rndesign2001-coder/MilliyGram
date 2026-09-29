@@ -414,6 +414,15 @@
             </intent-filter>
         </receiver>
 
+        <!-- MilliyGram: postni vaqt o'tgach o'chirish -->
+        <receiver
+            android:name="org.telegram.messenger.MgAutoDelete"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="uz.milliygram.AUTO_DELETE"/>
+            </intent-filter>
+        </receiver>
+
         <!-- MilliyGram: javobsiz xabar eslatmasi -->
         <receiver
             android:name="org.fenixuz.utils.ReminderReceiver"

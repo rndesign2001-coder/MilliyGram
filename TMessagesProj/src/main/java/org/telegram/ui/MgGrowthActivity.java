@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.MgGrowth;
 import org.telegram.messenger.R;
 import org.telegram.tgnet.TLRPC;
@@ -42,6 +43,8 @@ public class MgGrowthActivity extends UniversalFragment {
     private static final int ID_CLEAR = 3;
 
     private final long chatId;
+    private org.telegram.messenger.MgBestTime.Result bestTime;
+    private boolean bestTimeLoading;
 
     public MgGrowthActivity(long chatId) {
         super();
@@ -54,7 +57,21 @@ public class MgGrowthActivity extends UniversalFragment {
             MgGrowth.setTracked(currentAccount, chatId, true);
         }
         MgGrowth.fetch(currentAccount, chatId, true, this::refresh);
+        bestTime = org.telegram.messenger.MgBestTime.cached(currentAccount, chatId);
+        loadBestTime(false);
         return super.onFragmentCreate();
+    }
+
+    private void loadBestTime(boolean force) {
+        if (bestTimeLoading) {
+            return;
+        }
+        bestTimeLoading = true;
+        org.telegram.messenger.MgBestTime.load(currentAccount, chatId, force, r -> {
+            bestTimeLoading = false;
+            bestTime = r;
+            refresh();
+        });
     }
 
     private void refresh() {
@@ -191,6 +208,7 @@ public class MgGrowthActivity extends UniversalFragment {
             items.add(UItem.asCustom(new ChartView(ctx, pts), 220));
         }
         items.add(UItem.asShadow(null));
+        fillBestTime(ctx, items);
         items.add(UItem.asButton(ID_REFRESH, R.drawable.msg_retry, org.telegram.messenger.MgLang.t("Hozir yangilash")));
         items.add(UItem.asCheck(ID_TRACK, org.telegram.messenger.MgLang.t("Avtomatik kuzatish")).setChecked(MgGrowth.isTracked(currentAccount, chatId)));
         items.add(UItem.asButton(ID_CLEAR, R.drawable.msg_delete, org.telegram.messenger.MgLang.t("Tarixni tozalash")).red());
@@ -299,9 +317,99 @@ public class MgGrowthActivity extends UniversalFragment {
         }
     }
 
+    /** "Eng yaxshi vaqt" bo'limi: 24 soatlik faollik ustunlari va tavsiya */
+    private void fillBestTime(Context ctx, ArrayList<UItem> items) {
+        TLRPC.Chat c = getMessagesController().getChat(chatId);
+        if (c == null || !ChatObject.isChannel(c)) {
+            return;
+        }
+        items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("⏰ Eng yaxshi post vaqti")));
+        org.telegram.messenger.MgBestTime.Result r = bestTime;
+        TextView tv = new TextView(ctx);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+        tv.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+        tv.setLineSpacing(AndroidUtilities.dp(3), 1f);
+        tv.setPadding(AndroidUtilities.dp(21), AndroidUtilities.dp(4), AndroidUtilities.dp(21), AndroidUtilities.dp(10));
+        if (r == null || r.isEmpty()) {
+            tv.setText(bestTimeLoading ? org.telegram.messenger.MgLang.t("Obunachilar faolligi tahlil qilinmoqda…")
+                    : org.telegram.messenger.MgLang.t("Hozircha aniqlab bo'lmadi: kanalda kamida 5 ta post (1 kundan eski) bo'lishi kerak."));
+            items.add(UItem.asCustom(tv));
+            items.add(UItem.asShadow(null));
+            return;
+        }
+        int[] top = r.top(3);
+        SpannableStringBuilder sb = new SpannableStringBuilder();
+        sb.append(org.telegram.messenger.MgLang.t("Obunachilar eng faol soatlari:")).append("\n");
+        for (int i = 0; i < top.length; i++) {
+            if (r.hours[top[i]] <= 0) {
+                break;
+            }
+            int s0 = sb.length();
+            sb.append(i == 0 ? "🥇 " : i == 1 ? "🥈 " : "🥉 ").append(org.telegram.messenger.MgBestTime.hourRange(top[i]));
+            if (i == 0) {
+                sb.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD), s0, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            sb.append("\n");
+        }
+        int best = top[0];
+        int s1 = sb.length();
+        sb.append(org.telegram.messenger.MgLang.t("Tavsiya: postni ")).append(String.format(Locale.US, "%02d:45", (best + 23) % 24))
+                .append(" – ").append(String.format(Locale.US, "%02d:00", best)).append(org.telegram.messenger.MgLang.t(" oralig'ida joylang — obunachilar kirganda post tepada turadi."));
+        sb.setSpan(new ForegroundColorSpan(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4)), s1, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        tv.setText(sb);
+        items.add(UItem.asCustom(new HoursView(ctx, r), 150));
+        items.add(UItem.asCustom(tv));
+        String note = org.telegram.messenger.MgBestTime.SRC_STATS.equals(r.source)
+                ? org.telegram.messenger.MgLang.t("Manba: Telegram kanal statistikasi (soatlar bo'yicha ko'rishlar, oxirgi hafta).")
+                : org.telegram.messenger.MgLang.t("Manba: oxirgi postlaringizning ko'rishlari (") + r.samples + org.telegram.messenger.MgLang.t(" ta post). Kanal statistikasi ochilganda aniqroq bo'ladi.");
+        items.add(UItem.asShadow(note));
+    }
+
+    /** 24 soatlik faollik ustunlari; eng faol 3 soat ajratib ko'rsatiladi */
+    private static class HoursView extends View {
+        private final org.telegram.messenger.MgBestTime.Result r;
+        private final Paint bar = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Paint text = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.RectF rect = new android.graphics.RectF();
+        private final boolean[] hot = new boolean[24];
+
+        HoursView(Context ctx, org.telegram.messenger.MgBestTime.Result r) {
+            super(ctx);
+            this.r = r;
+            for (int h : r.top(3)) {
+                hot[h] = r.hours[h] > 0;
+            }
+            text.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));
+            text.setTextSize(AndroidUtilities.dp(10));
+            text.setTextAlign(Paint.Align.CENTER);
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+            float l = AndroidUtilities.dp(21), rr = getWidth() - AndroidUtilities.dp(21);
+            float t = AndroidUtilities.dp(10), b = getHeight() - AndroidUtilities.dp(22);
+            float max = Math.max(1f, r.max());
+            float step = (rr - l) / 24f;
+            int accent = Theme.getColor(Theme.key_featuredStickers_addButton);
+            int hotColor = 0xFFFF9F0A;
+            for (int h = 0; h < 24; h++) {
+                float v = r.hours[h] / max;
+                float x0 = l + step * h + step * 0.18f, x1 = l + step * (h + 1) - step * 0.18f;
+                float y0 = b - Math.max(AndroidUtilities.dp(2), (b - t) * v);
+                rect.set(x0, y0, x1, b);
+                bar.setColor(hot[h] ? hotColor : Theme.multAlpha(accent, 0.35f + 0.5f * v));
+                canvas.drawRoundRect(rect, AndroidUtilities.dp(2), AndroidUtilities.dp(2), bar);
+                if (h % 3 == 0) {
+                    canvas.drawText(String.format(Locale.US, "%02d", h), l + step * (h + 0.5f), b + AndroidUtilities.dp(15), text);
+                }
+            }
+        }
+    }
+
     @Override
     protected void onClick(UItem item, View view, int position, float x, float y) {
         if (item.id == ID_REFRESH) {
+            loadBestTime(true);
             MgGrowth.fetch(currentAccount, chatId, true, () -> {
                 refresh();
                 BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Yangilandi")).show();

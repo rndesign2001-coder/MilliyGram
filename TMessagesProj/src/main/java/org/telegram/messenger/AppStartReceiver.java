@@ -24,6 +24,7 @@ public class AppStartReceiver extends BroadcastReceiver {
                 }
                 ApplicationLoader.startPushService();
                 MgPrayerAlarm.schedule(context); // MilliyGram: qayta yoqilgandan keyin namoz eslatmasi
+                MgAutoDelete.scheduleAlarm(context); // MilliyGram: postlarni avto-o'chirish
             });
         }
     }

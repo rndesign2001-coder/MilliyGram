@@ -91,6 +91,18 @@ public class MgConfig {
         prefs().edit().putInt(key, value).apply();
     }
 
+    public static long getLong(String key, long def) {
+        try {
+            return prefs().getLong(key, def);
+        } catch (Throwable e) {
+            return def;
+        }
+    }
+
+    public static void setLong(String key, long value) {
+        prefs().edit().putLong(key, value).apply();
+    }
+
     // ---------- Oddiy rejim (katta shrift) ----------
 
     public static boolean isSimpleMode() {
@@ -99,16 +111,7 @@ public class MgConfig {
 
     public static void setSimpleMode(boolean enabled) {
         setBool("simple_mode", enabled);
-        int size = enabled ? SIMPLE_MODE_FONT_SIZE : NORMAL_FONT_SIZE;
-        SharedConfig.fontSize = size;
-        SharedConfig.fontSizeIsDefault = false;
-        SharedPreferences main = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE);
-        main.edit().putInt("fons_size", size).commit();
-        try {
-            org.telegram.ui.ActionBar.Theme.createCommonMessageResources();
-        } catch (Throwable e) {
-            FileLog.e(e);
-        }
+        MgSimple.applyFont();
     }
 
     // ---------- Trafik tejash ----------
@@ -634,7 +637,7 @@ public class MgConfig {
             JSONObject values = new JSONObject();
             for (Map.Entry<String, ?> e : prefs().getAll().entrySet()) {
                 String key = e.getKey();
-                if (key.startsWith("chat_pin") || key.startsWith("lock_fail_") || key.startsWith("lock_until_") || key.startsWith("dlg_") || key.startsWith("hidden_pin") || key.startsWith("hidden_lock") || key.startsWith("locked_dialogs_") || key.startsWith("hidden_dialogs_") || key.startsWith("hidden_account_") || key.startsWith("ghost_") || key.startsWith("account_alias_") || key.startsWith("mg_local_folders_") || key.equals("main_account") || key.equals("lock_type") || key.equals("fake_name")) {
+                if (key.startsWith("chat_pin") || key.equals("mg_ad_recs") || key.equals("qibla_gps") || key.startsWith("upd_") || key.startsWith("gbt_") || key.startsWith("lock_fail_") || key.startsWith("lock_until_") || key.startsWith("dlg_") || key.startsWith("hidden_pin") || key.startsWith("hidden_lock") || key.startsWith("locked_dialogs_") || key.startsWith("hidden_dialogs_") || key.startsWith("hidden_account_") || key.startsWith("ghost_") || key.startsWith("account_alias_") || key.startsWith("mg_local_folders_") || key.equals("main_account") || key.equals("lock_type") || key.equals("fake_name")) {
                     continue;
                 }
                 Object v = e.getValue();
@@ -666,7 +669,7 @@ public class MgConfig {
             Iterator<String> keys = values.keys();
             while (keys.hasNext()) {
                 String key = keys.next();
-                if (key.startsWith("chat_pin") || key.startsWith("lock_fail_") || key.startsWith("lock_until_") || key.startsWith("dlg_") || key.startsWith("hidden_pin") || key.startsWith("hidden_lock") || key.startsWith("locked_dialogs_") || key.startsWith("hidden_dialogs_") || key.startsWith("hidden_account_") || key.startsWith("ghost_") || key.startsWith("account_alias_") || key.startsWith("mg_local_folders_") || key.equals("main_account") || key.equals("lock_type") || key.equals("fake_name")) {
+                if (key.startsWith("chat_pin") || key.equals("mg_ad_recs") || key.equals("qibla_gps") || key.startsWith("upd_") || key.startsWith("gbt_") || key.startsWith("lock_fail_") || key.startsWith("lock_until_") || key.startsWith("dlg_") || key.startsWith("hidden_pin") || key.startsWith("hidden_lock") || key.startsWith("locked_dialogs_") || key.startsWith("hidden_dialogs_") || key.startsWith("hidden_account_") || key.startsWith("ghost_") || key.startsWith("account_alias_") || key.startsWith("mg_local_folders_") || key.equals("main_account") || key.equals("lock_type") || key.equals("fake_name")) {
                     continue;
                 }
                 JSONObject item = values.getJSONObject(key);

@@ -126,6 +126,10 @@ public class MgSettingsPage extends UniversalFragment {
     private static final int ID_GR_INTERVAL = 157;
     private static final int ID_GR_AUTO = 158;
     private static final int ID_GR_LIST = 159;
+    private static final int ID_AD_LIST = 180;
+    private static final int ID_QIBLA_OPEN = 181;
+    private static final int ID_QIBLA_STYLE = 182;
+    private static final int ID_QIBLA_GPS = 183;
     private static final int ID_ACC_NOTIFY_BASE = 2000;
     private static final int ID_EXPORT = 90;
     private static final int ID_IMPORT = 91;
@@ -171,10 +175,10 @@ public class MgSettingsPage extends UniversalFragment {
         switch (page) {
             case PAGE_GENERAL:
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Qulaylik")));
-                items.add(UItem.asCheck(ID_SIMPLE_MODE, org.telegram.messenger.MgLang.t("Oddiy rejim (katta shrift)")).setChecked(MgConfig.isSimpleMode()));
+                items.add(UItem.asButton(ID_SIMPLE_MODE, R.drawable.msg_zoomin, org.telegram.messenger.MgLang.t("Oddiy rejim (keksalar uchun)"), MgConfig.isSimpleMode() ? org.telegram.messenger.MgLang.t("yoqilgan") : org.telegram.messenger.MgLang.t("o'chiq")));
                 items.add(UItem.asCheck(ID_HOLIDAY, org.telegram.messenger.MgLang.t("Bayram tabriklari")).setChecked(MgConfig.isHolidayDecorEnabled()));
                 items.add(UItem.asCheck(ID_SHAKE, org.telegram.messenger.MgLang.t("Silkitib yashirish")).setChecked(MgConfig.isShakeToHide()));
-                items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Oddiy rejimda xabarlar kattaroq shriftda ko'rinadi. Bayram kunlari sarlavhada tabrik chiqadi. Telefonni silkitsangiz, yashirin bo'lim va qulflangan chatlar darhol yopiladi.")));
+                items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Oddiy rejimda yozuvlar va tugmalar kattaroq, menyu soddaroq bo'ladi, xabarlarni ovoz chiqarib o'qitish mumkin. Bayram kunlari sarlavhada tabrik chiqadi. Telefonni silkitsangiz, yashirin bo'lim va qulflangan chatlar darhol yopiladi.")));
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Qidiruv")));
                 items.add(UItem.asButton(ID_CHAT_FINDER, R.drawable.msg_search, org.telegram.messenger.MgLang.t("Foydalanuvchi nomini tekshirish")));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("@username yozing — band yoki bo'shligini darhol ko'rsatadi va mavjud bo'lsa, chatni ochadi.")));
@@ -211,7 +215,7 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Xabarni uzoq bosing → \"Maxsus uzatish\": matnni tahrirlab, havola va @larni tozalab, tarjima qilib, o'z nomingizdan uzating.")));
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Xabarlar yonida")));
                 items.add(UItem.asCheck(ID_SAVE_BTN, org.telegram.messenger.MgLang.t("Bulutcha — tez saqlash tugmasi")).setChecked(MgConfig.getBool("mg_save_btn", true)));
-                items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Har bir xabar yonidagi ☁ tugmasi xabarni bir bosishda \"Saqlangan xabarlar\"ga saqlaydi. Uzatish taqiqlangan chatlarda chiqmaydi.")));
+                items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("☁ tugmasi xabarni bir bosishda \"Saqlangan xabarlar\"ga saqlaydi. Kanal va botlarda — barcha xabarlarda; shaxsiy chat va guruhlarda — faqat boshqalarning xabarlari va medialarida (o'zingiznikida chiqmaydi). Uzatish taqiqlangan chatlarda chiqmaydi.")));
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Tezkor shablonlar")));
                 items.add(UItem.asButton(ID_TEMPLATES, R.drawable.msg_saved, org.telegram.messenger.MgLang.t("Shablonlarni boshqarish"), String.valueOf(MgMessageTools.templates().size())));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Ko'p yoziladigan gaplarni saqlang: chat → ⋮ → \"Tezkor shablonlar\" orqali bir bosishda qo'yiladi. Xabarni uzoq bosib \"Lotinga/Kirillga o'girish\" va \"Keyin eslatish\" ham mavjud.")));
@@ -312,6 +316,10 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asButton(ID_GR_INTERVAL, R.drawable.msg_recent, org.telegram.messenger.MgLang.t("Qanchalik tez-tez yozilsin"), org.telegram.messenger.MgLang.t("har ") + org.telegram.messenger.MgGrowth.getIntervalHours() + org.telegram.messenger.MgLang.t(" soatda")));
                 items.add(UItem.asCheck(ID_GR_AUTO, org.telegram.messenger.MgLang.t("Admin bo'lgan kanal/guruhlarni avtomatik kuzatish")).setChecked(org.telegram.messenger.MgGrowth.isAutoAdmin()));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Obunachi soni muntazam yozib boriladi va grafik chiziladi: reklama bergan yoki nakrutka kirgan kunlar ko'rinib turadi. Istalgan kanalni qo'shish: kanal → ⋮ → \"Obunachilar kundaligi\". Har tekshiruv bitta kichik so'rov, ilova tezligiga ta'sir qilmaydi.")));
+                items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Postlarni avto-o'chirish (reklama 1/24)")));
+                int adCount = org.telegram.messenger.MgAutoDelete.pendingCount();
+                items.add(UItem.asButton(ID_AD_LIST, R.drawable.msg_autodelete, org.telegram.messenger.MgLang.t("Kutilayotgan o'chirishlar"), adCount > 0 ? String.valueOf(adCount) : org.telegram.messenger.MgLang.t("yo'q")));
+                items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Kanal yoki guruhda yuborish tugmasini uzoq bosing → \"Avto-o'chirish bilan yuborish\": muddat (masalan 24 soat) va vaqtni tanlang. Post kanalga tushgan paytdan boshlab hisoblanadi va vaqti kelganda o'zi o'chadi. Bitta postni ko'p kanalga yuborishda: xabarni uzoq bosing → \"Maxsus uzatish\" → \"Avto-o'chirish\". Telefon internetga ulangan bo'lishi kerak.")));
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Avto-javob")));
                 items.add(UItem.asCheck(ID_AA_ON, org.telegram.messenger.MgLang.t("Avto-javobni yoqish")).setChecked(org.telegram.messenger.MgAutoAnswer.isEnabled()));
                 String t = org.telegram.messenger.MgAutoAnswer.getText();
@@ -334,6 +342,11 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asButton(ID_CHIP_MODE, R.drawable.msg_views, org.telegram.messenger.MgLang.t("Nimani ko'rsatish"), MgInfoChip.MODE_NAMES()[Math.max(0, Math.min(3, MgInfoChip.getMode()))]));
                 items.add(UItem.asButton(ID_CHIP_STYLE, R.drawable.msg_palette, org.telegram.messenger.MgLang.t("Ko'rinish uslubi"), MgInfoChip.STYLE_NAMES()[Math.max(0, Math.min(MgInfoChip.STYLE_NAMES().length - 1, MgInfoChip.getStyleIndex()))]));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Chatlar ro'yxati tepasida, ⋮ tugmasining chap tomonida kichik belgi chiqadi: keyingi namozgacha qolgan vaqt yoki ob-havo. Uni bossangiz, bugungi barcha vaqtlar va 3 kunlik ob-havo ochiladi.")));
+                items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Qibla")));
+                items.add(UItem.asButton(ID_QIBLA_OPEN, R.drawable.msg_location, org.telegram.messenger.MgLang.t("Qibla kompasi"), MgQibla.shortText()));
+                items.add(UItem.asButton(ID_QIBLA_STYLE, R.drawable.msg_palette, org.telegram.messenger.MgLang.t("Kompas dizayni"), MgQibla.styleNames()[MgQibla.getStyle()]));
+                items.add(UItem.asCheck(ID_QIBLA_GPS, org.telegram.messenger.MgLang.t("GPS bilan aniq joylashuv")).setChecked(MgQibla.isGpsEnabled()));
+                items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Qibla yo'nalishi tanlangan tuman bo'yicha hisoblanadi; GPS yoqilsa — turgan joyingiz bo'yicha aniqroq. Kompas aniq ishlashi uchun telefonni tekis ushlang va temir buyumlardan uzoqlashing.")));
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Joylashuv")));
                 items.add(UItem.asButton(ID_PR_REGION, R.drawable.msg_map, org.telegram.messenger.MgLang.t("Viloyat"), org.telegram.messenger.MgLang.t(org.telegram.messenger.MgPlaces.findRegion(org.telegram.messenger.MgPrayer.getRegionKey()).name)));
                 items.add(UItem.asButton(ID_PR_PLACE, R.drawable.msg_location, org.telegram.messenger.MgLang.t("Shahar / tuman"), org.telegram.messenger.MgLang.t(pl.name)));
@@ -382,11 +395,62 @@ public class MgSettingsPage extends UniversalFragment {
             return;
         }
         switch (item.id) {
-            case ID_SIMPLE_MODE: {
-                boolean value = !MgConfig.isSimpleMode();
-                MgConfig.setSimpleMode(value);
-                if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(value);
+            case ID_SIMPLE_MODE:
+                presentFragment(new MgSimpleModeActivity());
+                break;
+            case ID_AD_LIST: {
+                java.util.ArrayList<String> list = org.telegram.messenger.MgAutoDelete.describePending();
+                org.telegram.ui.ActionBar.AlertDialog.Builder b = new org.telegram.ui.ActionBar.AlertDialog.Builder(getParentActivity(), getResourceProvider());
+                b.setTitle(org.telegram.messenger.MgLang.t("Kutilayotgan o'chirishlar"));
+                b.setMessage(list.isEmpty() ? org.telegram.messenger.MgLang.t("Hozircha avto-o'chiriladigan post yo'q.") : android.text.TextUtils.join("\n", list));
+                if (!list.isEmpty()) {
+                    b.setNeutralButton(org.telegram.messenger.MgLang.t("Hammasini bekor qilish"), (d, w) -> {
+                        org.telegram.messenger.MgAutoDelete.cancelAll();
+                        if (listView != null) {
+                            listView.adapter.update(true);
+                        }
+                    });
+                }
+                b.setPositiveButton(org.telegram.messenger.MgLang.t("Yopish"), null);
+                showDialog(b.create());
+                break;
+            }
+            case ID_QIBLA_OPEN:
+                MgQibla.open(this);
+                break;
+            case ID_QIBLA_STYLE: {
+                String[] names = MgQibla.styleNames();
+                for (int i = 0; i < names.length; i++) {
+                    if (i == MgQibla.getStyle()) {
+                        names[i] += "  ✓";
+                    }
+                }
+                org.telegram.ui.ActionBar.AlertDialog.Builder b = new org.telegram.ui.ActionBar.AlertDialog.Builder(getParentActivity(), getResourceProvider());
+                b.setTitle(org.telegram.messenger.MgLang.t("Kompas dizayni"));
+                b.setItems(names, (d, w) -> {
+                    MgQibla.setStyle(w);
+                    if (listView != null) {
+                        listView.adapter.update(true);
+                    }
+                });
+                showDialog(b.create());
+                break;
+            }
+            case ID_QIBLA_GPS: {
+                if (MgQibla.isGpsEnabled()) {
+                    MgConfig.setBool("qibla_use_gps", false);
+                    setChecked(view, false);
+                } else if (getParentActivity() != null) {
+                    MgQibla.requestGps(getParentActivity(), ok -> {
+                        if (ok) {
+                            MgConfig.setBool("qibla_use_gps", true);
+                        } else {
+                            BulletinFactory.of(this).createErrorBulletin(org.telegram.messenger.MgLang.t("Joylashuvni aniqlab bo'lmadi")).show();
+                        }
+                        if (listView != null) {
+                            listView.adapter.update(true);
+                        }
+                    }, null);
                 }
                 break;
             }

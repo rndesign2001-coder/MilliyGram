@@ -2748,7 +2748,7 @@ public class AndroidUtilities {
     public static void checkDisplaySize(Context context, Configuration newConfiguration) {
         try {
             float oldDensity = density;
-            density = context.getResources().getDisplayMetrics().density;
+            density = context.getResources().getDisplayMetrics().density * MgSimple.densityFactor(); // MilliyGram: oddiy rejimda katta interfeys
             float newDensity = density;
             if (firstConfigurationWas && Math.abs(oldDensity - newDensity) > 0.001) {
                 Theme.reloadAllResources(context);

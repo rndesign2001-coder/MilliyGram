@@ -2080,6 +2080,18 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         if (messages == null || messages.isEmpty()) {
             return 0;
         }
+        try {
+            // MilliyGram: postni vaqt o'tgach o'chirish (uzatilgan postlar uchun)
+            CharSequence mgText = null;
+            for (MessageObject mgM : messages) {
+                if (mgM != null && mgM.messageOwner != null && !TextUtils.isEmpty(mgM.messageOwner.message)) {
+                    mgText = mgM.messageOwner.message;
+                    break;
+                }
+            }
+            MgAutoDelete.onSend(currentAccount, peer, scheduleDate, hideCaption ? null : mgText, messages.size());
+        } catch (Throwable ignore) {
+        }
         int sendResult = 0;
         long myId = getUserConfig().getClientUserId();
         boolean isChannel = false;
@@ -2723,6 +2735,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                                                         newMsgObj1.send_state = MessageObject.MESSAGE_SEND_STATE_SENT;
                                                         getMediaDataController().increasePeerRaiting(peer);
                                                         getNotificationCenter().postNotificationName(NotificationCenter.messageReceivedByServer, oldId, message.id, message, peer, 0L, existFlags, scheduleDate != 0);
+                                                        MgAutoDelete.onReceivedByServer(currentAccount, message.id, message, peer, 0L, scheduleDate != 0);
                                                         getNotificationCenter().postNotificationName(NotificationCenter.messageReceivedByServer2, oldId, message.id, message, peer, 0L, existFlags, scheduleDate != 0);
                                                         processSentMessage(oldId);
                                                         removeFromSendingMessages(oldId, scheduleDate != 0);
@@ -4258,6 +4271,14 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
 
     public void sendMessage(SendMessageParams sendMessageParams) {
         MgAutoText.apply(currentAccount, sendMessageParams); // MilliyGram: avto-imzo
+        if (sendMessageParams.retryMessageObject == null) {
+            try {
+                // MilliyGram: postni vaqt o'tgach o'chirish
+                MgAutoDelete.onSend(currentAccount, sendMessageParams.peer, sendMessageParams.scheduleDate,
+                        sendMessageParams.message != null ? sendMessageParams.message : sendMessageParams.caption, 1);
+            } catch (Throwable ignore) {
+            }
+        }
         final SendMessageChatArguments sendMessageChatArguments = sendMessageParams.sendMessageChatArguments != null ?
                 sendMessageParams.sendMessageChatArguments : SendMessageChatArguments.EMPTY;
         String message = sendMessageParams.message;
@@ -7775,6 +7796,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                             newMsgObj.errorAllowedPriceStars = 0;
                             newMsgObj.errorNewPriceStars = 0;
                             getNotificationCenter().postNotificationName(NotificationCenter.messageReceivedByServer, oldId, newMsgObj.id, newMsgObj, newMsgObj.dialog_id, grouped_id, existFlags, currentSchedule);
+                            MgAutoDelete.onReceivedByServer(currentAccount, newMsgObj.id, newMsgObj, newMsgObj.dialog_id, grouped_id, currentSchedule);
                             getNotificationCenter().postNotificationName(NotificationCenter.messageReceivedByServer2, oldId, newMsgObj.id, newMsgObj, newMsgObj.dialog_id, grouped_id, existFlags, currentSchedule);
                             getMessagesStorage().getStorageQueue().postRunnable(() -> {
                                 int mode = finalCurrentSchedule ? ChatActivity.MODE_SCHEDULED : 0;
@@ -7803,6 +7825,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                                     }
                                     getMediaDataController().increasePeerRaiting(newMsgObj.dialog_id);
                                     getNotificationCenter().postNotificationName(NotificationCenter.messageReceivedByServer, oldId, newMsgObj.id, newMsgObj, newMsgObj.dialog_id, grouped_id, existFlags, finalCurrentSchedule);
+                                    MgAutoDelete.onReceivedByServer(currentAccount, newMsgObj.id, newMsgObj, newMsgObj.dialog_id, grouped_id, finalCurrentSchedule);
                                     getNotificationCenter().postNotificationName(NotificationCenter.messageReceivedByServer2, oldId, newMsgObj.id, newMsgObj, newMsgObj.dialog_id, grouped_id, existFlags, finalCurrentSchedule);
                                     processSentMessage(oldId);
                                     removeFromSendingMessages(oldId, scheduled);
@@ -8324,6 +8347,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                                 });
                             } else {
                                 getNotificationCenter().postNotificationName(NotificationCenter.messageReceivedByServer, oldId, newMsgObj.id, newMsgObj, newMsgObj.dialog_id, 0L, existFlags, scheduled);
+                                MgAutoDelete.onReceivedByServer(currentAccount, newMsgObj.id, newMsgObj, newMsgObj.dialog_id, 0L, scheduled);
                                 getNotificationCenter().postNotificationName(NotificationCenter.messageReceivedByServer2, oldId, newMsgObj.id, newMsgObj, newMsgObj.dialog_id, 0L, existFlags, scheduled);
                                 getMessagesStorage().getStorageQueue().postRunnable(() -> {
                                     int mode = scheduled ? ChatActivity.MODE_SCHEDULED : 0;
@@ -8346,6 +8370,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                                     AndroidUtilities.runOnUIThread(() -> {
                                         getMediaDataController().increasePeerRaiting(newMsgObj.dialog_id);
                                         getNotificationCenter().postNotificationName(NotificationCenter.messageReceivedByServer, oldId, newMsgObj.id, newMsgObj, newMsgObj.dialog_id, 0L, existFlags, scheduled);
+                                        MgAutoDelete.onReceivedByServer(currentAccount, newMsgObj.id, newMsgObj, newMsgObj.dialog_id, 0L, scheduled);
                                         getNotificationCenter().postNotificationName(NotificationCenter.messageReceivedByServer2, oldId, newMsgObj.id, newMsgObj, newMsgObj.dialog_id, 0L, existFlags, scheduled);
                                         processSentMessage(oldId);
                                         removeFromSendingMessages(oldId, scheduled);

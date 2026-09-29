@@ -165,6 +165,9 @@ android {
         buildConfigField "String", "DEMO_CODE_URL", "\"\""
         buildConfigField "String", "ADS_BASE_URL", "\"\""
         buildConfigField "String", "ADS_API_KEY", "\"\""
+        // MilliyGram: build raqami (GitHub Actions run) va yangilanishlar e'lon qilinadigan Telegram kanal
+        buildConfigField "int", "MG_BUILD", (System.getenv("GITHUB_RUN_NUMBER") ?: "0")
+        buildConfigField "String", "MG_UPDATE_CHANNEL", "\"" + (System.getenv("MG_UPDATE_CHANNEL") ?: (project.findProperty("MG_UPDATE_CHANNEL") ?: "")).toString().replace("@", "").trim() + "\""
 
         vectorDrawables.generatedDensities = ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi']
 

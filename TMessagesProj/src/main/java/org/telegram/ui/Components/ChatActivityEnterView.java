@@ -5080,6 +5080,19 @@ public class ChatActivityEnterView extends FrameLayout implements
             }
         }
 
+        if (scheduleButtonValue && !self && parentFragment != null && !isInScheduleMode() && org.telegram.ui.MgAutoDeleteUI.isAvailable(currentAccount, dialog_id)) {
+            // MilliyGram: postni vaqt o'tgach avtomatik o'chirish (reklama 1/24, 1/48)
+            options.add(R.drawable.msg_autodelete, org.telegram.messenger.MgLang.t("Avto-o'chirish bilan yuborish…"), () -> {
+                if (messageSendPreview != null) {
+                    messageSendPreview.dismiss(false);
+                    messageSendPreview = null;
+                }
+                final long mgDid = dialog_id;
+                AndroidUtilities.runOnUIThread(() -> org.telegram.ui.MgAutoDeleteUI.sendWithAutoDelete(parentActivity, resourcesProvider, currentAccount, mgDid,
+                        (notify, scheduleDate, repeat) -> sendMessageInternal(notify, scheduleDate, repeat, 0, true)), 200);
+            });
+        }
+
         if (parentFragment != null && delegate != null && ChatObject.isMonoForum(parentFragment.getCurrentChat())) {
             options.add(R.drawable.input_suggest_paid_24, getString(R.string.PostSuggestionsSendWithOffer), () -> {
                 if (messageSendPreview != null) {

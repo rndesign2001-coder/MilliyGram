@@ -6964,6 +6964,9 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     protected void onResume() {
         MgShake.start(this);
         MgTranslate.ensureDefaultTarget(); // MilliyGram: tarjima tili
+        org.telegram.messenger.MgAutoDelete.start(); // MilliyGram: postlarni avto-o'chirish
+        org.telegram.messenger.MgUpdater.check(this); // MilliyGram: yangi versiya bildirishnomasi
+        MgOnboarding.maybeShow(this); // MilliyGram: birinchi ochilishdagi tanishtiruv
         super.onResume();
         isResumed = true;
         pipActivityHandler.onResume();

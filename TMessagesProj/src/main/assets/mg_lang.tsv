@@ -1320,3 +1320,144 @@ Anor	Гранат	Pomegranate
 Paxta	Хлопок	Cotton
 Juda ko'p noto'g'ri urinish. %d soniyadan keyin qayta urinib ko'ring	Слишком много неверных попыток. Повторите через %d сек.	Too many wrong attempts. Try again in %d seconds
 bor	есть	set
+ (rejalashtirilgan post)	 (отложенный пост)	 (scheduled post)
+24 soat (1/24)	24 часа (1/24)	24 hours (1/24)
+48 soat (1/48)	48 часов (1/48)	48 hours (1/48)
+72 soat (1/72)	72 часа (1/72)	72 hours (1/72)
+ soat	 ч	 h
+🎉 Yangi versiya chiqdi (b	🎉 Вышла новая версия (b	🎉 New version available (b
+Sizda: b	У вас: b	You have: b
+. Yangilab oling — xatolar tuzatilgan va yangi imkoniyatlar qo'shilgan.	. Обновитесь — исправлены ошибки и добавлены новые возможности.	. Please update — bugs fixed and new features added.
+Yangilash	Обновить	Update
+Keyinroq	Позже	Later
+O'tkazib yuborish	Пропустить	Skip
+Ilova yangilanishlari	Обновления приложения	App updates
+MilliyGram yangilandi: b	MilliyGram обновлён: b	MilliyGram updated: b
+Yangi versiyani yuklab oling — bosing	Скачайте новую версию — нажмите	Tap to download the new version
+O'qishni to'xtatish	Остановить чтение	Stop reading
+Ovoz chiqarib o'qish	Прочитать вслух	Read aloud
+Avto-o'chirish bilan yuborish…	Отправить с автоудалением…	Send with auto-delete…
+Boshqa muddat (soatda)…	Другой срок (в часах)…	Custom duration (hours)…
+O'chirilmasin	Не удалять	Don't delete
+Post qancha vaqtdan keyin o'chirilsin?	Через сколько удалить пост?	Delete the post after how long?
+masalan, 36	например, 36	e.g. 36
+Necha soatdan keyin o'chirilsin?	Через сколько часов удалить?	Delete after how many hours?
+Avto-o'chirish: 	Автоудаление: 	Auto-delete: 
+Hozir yuborish	Отправить сейчас	Send now
+Vaqtini rejalashtirib yuborish…	Запланировать отправку…	Schedule send…
+Avto-o'chirish	Автоудаление	Auto-delete
+⏰ Eng yaxshi post vaqti	⏰ Лучшее время для поста	⏰ Best time to post
+Obunachilar faolligi tahlil qilinmoqda…	Анализируем активность подписчиков…	Analyzing subscriber activity…
+Hozircha aniqlab bo'lmadi: kanalda kamida 5 ta post (1 kundan eski) bo'lishi kerak.	Пока не удалось определить: в канале должно быть не менее 5 постов старше 1 дня.	Not enough data yet: the channel needs at least 5 posts older than 1 day.
+Obunachilar eng faol soatlari:	Самые активные часы подписчиков:	Subscribers' most active hours:
+Tavsiya: postni 	Совет: публикуйте пост в 	Tip: post between 
+ oralig'ida joylang — obunachilar kirganda post tepada turadi.	 — когда подписчики зайдут, пост будет наверху.	 — the post will be on top when subscribers come online.
+Manba: Telegram kanal statistikasi (soatlar bo'yicha ko'rishlar, oxirgi hafta).	Источник: статистика канала Telegram (просмотры по часам, последняя неделя).	Source: Telegram channel statistics (views by hour, last week).
+Manba: oxirgi postlaringizning ko'rishlari (	Источник: просмотры ваших последних постов (	Source: views of your recent posts (
+ ta post). Kanal statistikasi ochilganda aniqroq bo'ladi.	 постов). Со статистикой канала будет точнее.	 posts). It becomes more accurate once channel statistics are available.
+Jonli kompasni ochish ›	Открыть живой компас ›	Open live compass ›
+MilliyGram'ga xush kelibsiz!	Добро пожаловать в MilliyGram!	Welcome to MilliyGram!
+Telegram'ning barcha imkoniyatlari va o'zbek foydalanuvchilari uchun qo'shimchalar	Все возможности Telegram и дополнения для пользователей из Узбекистана	All of Telegram plus extras for users in Uzbekistan
+Sozlamalar → MilliyGram bo'limida hammasi bir joyda	Всё в одном месте: Настройки → MilliyGram	Everything in one place: Settings → MilliyGram
+Ma'lumotlaringiz faqat telefoningizda qoladi	Ваши данные остаются только на телефоне	Your data stays on your phone
+Maxfiylik	Конфиденциальность	Privacy
+Chatni PIN yoki grafik kalit bilan qulflash (chat → ⋮)	Блокировка чата PIN-кодом или графическим ключом (чат → ⋮)	Lock chats with a PIN or pattern (chat → ⋮)
+Yashirin bo'lim: qidiruv tugmasini uzoq bosing	Скрытый раздел: долгое нажатие на кнопку поиска	Hidden section: long-press the search button
+Telefonni silkitsangiz, maxfiy chatlar darhol yopiladi	Встряхните телефон — скрытые чаты сразу закроются	Shake the phone to instantly close private chats
+Firibgarlik va APK fayllardan ogohlantirish	Предупреждения о мошенничестве и APK-файлах	Warnings about scams and APK files
+Namoz, qibla va ob-havo	Намаз, кибла и погода	Prayer, Qibla and weather
+Chatlar ro'yxati tepasida keyingi namozgacha qolgan vaqt	Вверху списка чатов — время до следующего намаза	Time until the next prayer at the top of the chat list
+Uni bossangiz — barcha vaqtlar, ob-havo va jonli qibla kompasi	Нажмите — все времена, погода и живой компас киблы	Tap it for all times, weather and a live Qibla compass
+Namoz vaqtini eslatish, lotin ↔ kirill o'girish, tarjima	Напоминания о намазе, латиница ↔ кириллица, перевод	Prayer reminders, Latin ↔ Cyrillic, translation
+Kanal adminlari uchun	Для админов каналов	For channel admins
+☁ Bulutcha — postni bir bosishda Saqlangan xabarlarga	☁ Облачко — пост в Избранное одним нажатием	☁ Cloud button — save a post to Saved Messages in one tap
+Yuborish tugmasini uzoq bosing → reklama postini 24/48 soatdan keyin avtomatik o'chirish	Долгое нажатие на «Отправить» → автоудаление рекламного поста через 24/48 часов	Long-press Send → auto-delete an ad post after 24/48 hours
+Bitta postni ko'p kanalga tahrirlab uzatish	Пересылка одного поста в несколько каналов с редактированием	Forward one post to many channels with editing
+Obunachilar kundaligi va eng yaxshi post vaqti	Дневник подписчиков и лучшее время для поста	Subscriber diary and best posting time
+Boshlash 🚀	Начать 🚀	Get started 🚀
+Keyingi	Далее	Next
+👓 Oddiy rejim yoqilgan (katta yozuvlar) ✓	👓 Простой режим включён (крупный текст) ✓	👓 Simple mode on (large text) ✓
+👓 Katta yozuvlar kerakmi? Oddiy rejimni yoqish	👓 Нужен крупный текст? Включить простой режим	👓 Need larger text? Turn on simple mode
+Zumrad naqsh	Изумрудный узор	Emerald pattern
+Shimol	Север	North
+Shimoli-sharq	Северо-восток	Northeast
+Sharq	Восток	East
+Janubi-sharq	Юго-восток	Southeast
+Janub	Юг	South
+Janubi-g'arb	Юго-запад	Southwest
+G'arb	Запад	West
+Shimoli-g'arb	Северо-запад	Northwest
+Qibla 	Кибла 	Qibla 
+Sh	С	N
+Shq	В	E
+J	Ю	S
+G'	З	W
+🕋 Qibla	🕋 Кибла	🕋 Qibla
+📍 GPS bo'yicha	📍 По GPS	📍 By GPS
+Qibla: 	Кибла: 	Qibla: 
+Makkagacha 	До Мекки 	To Mecca 
+ km	 км	 km
+⚠️ Kompas aniqligi past: telefonni havoda ∞ shaklida 2–3 marta aylantiring va temir buyumlardan uzoqlashing.	⚠️ Низкая точность компаса: поводите телефоном восьмёркой (∞) 2–3 раза и отойдите от металла.	⚠️ Low compass accuracy: move the phone in a figure-8 (∞) 2–3 times and keep away from metal.
+📡 GPS: yoqilgan (yangilash)	📡 GPS: включён (обновить)	📡 GPS: on (refresh)
+📡 GPS bilan aniqroq aniqlash	📡 Точнее по GPS	📡 More accurate with GPS
+Telefonni tekis ushlang…	Держите телефон горизонтально…	Hold the phone flat…
+✅ Qibla aynan oldingizda	✅ Кибла прямо перед вами	✅ Qibla is straight ahead
+O'ngga buriling 	Повернитесь вправо 	Turn right 
+Chapga buriling 	Повернитесь влево 	Turn left 
+Telefoningizda kompas sensori yo'q	В телефоне нет датчика компаса	Your phone has no compass sensor
+Qibla shimoldan soat mili bo'yicha 	Кибла от севера по часовой стрелке: 	Qibla, clockwise from north: 
+). Quyosh yoki xarita yordamida yo'nalishni toping.	). Определите направление по солнцу или карте.	). Find the direction using the sun or a map.
+📡 Joylashuv aniqlanmoqda…	📡 Определяем местоположение…	📡 Getting your location…
+Joylashuv (GPS) o'chiq — telefon sozlamalaridan yoqing	Геолокация (GPS) выключена — включите в настройках телефона	Location (GPS) is off — turn it on in phone settings
+Oddiy rejim (keksalar uchun)	Простой режим (для пожилых)	Simple mode (for seniors)
+yoqilgan	включён	on
+o'chiq	выключен	off
+Oddiy rejimda yozuvlar va tugmalar kattaroq, menyu soddaroq bo'ladi, xabarlarni ovoz chiqarib o'qitish mumkin. Bayram kunlari sarlavhada tabrik chiqadi. Telefonni silkitsangiz, yashirin bo'lim va qulflangan chatlar darhol yopiladi.	В простом режиме текст и кнопки крупнее, меню проще, сообщения можно прослушать вслух. В праздники в заголовке появляется поздравление. Встряхните телефон — скрытый раздел и заблокированные чаты сразу закроются.	In simple mode text and buttons are larger, menus are simpler and messages can be read aloud. On holidays a greeting appears in the title. Shake the phone to instantly close the hidden section and locked chats.
+☁ tugmasi xabarni bir bosishda \"Saqlangan xabarlar\"ga saqlaydi. Kanal va botlarda — barcha xabarlarda; shaxsiy chat va guruhlarda — faqat boshqalarning xabarlari va medialarida (o'zingiznikida chiqmaydi). Uzatish taqiqlangan chatlarda chiqmaydi.	Кнопка ☁ сохраняет сообщение в «Избранное» одним нажатием. В каналах и ботах — у всех сообщений; в личных чатах и группах — только у чужих сообщений и медиа (у ваших не показывается). Не показывается там, где пересылка запрещена.	The ☁ button saves a message to Saved Messages in one tap. In channels and bots — on every message; in private chats and groups — only on other people's messages and media (not on yours). Hidden where forwarding is restricted.
+Postlarni avto-o'chirish (reklama 1/24)	Автоудаление постов (реклама 1/24)	Post auto-delete (ads 1/24)
+Kutilayotgan o'chirishlar	Ожидающие удаления	Pending deletions
+Kanal yoki guruhda yuborish tugmasini uzoq bosing → \"Avto-o'chirish bilan yuborish\": muddat (masalan 24 soat) va vaqtni tanlang. Post kanalga tushgan paytdan boshlab hisoblanadi va vaqti kelganda o'zi o'chadi. Bitta postni ko'p kanalga yuborishda: xabarni uzoq bosing → \"Maxsus uzatish\" → \"Avto-o'chirish\". Telefon internetga ulangan bo'lishi kerak.	В канале или группе зажмите «Отправить» → «Отправить с автоудалением»: выберите срок (например, 24 часа) и время. Отсчёт идёт с момента выхода поста, по истечении он удалится сам. Для рассылки в несколько каналов: зажмите сообщение → «Особая пересылка» → «Автоудаление». Телефон должен быть подключён к интернету.	In a channel or group long-press Send → \"Send with auto-delete\": pick a duration (e.g. 24 hours) and time. The countdown starts when the post goes live and it deletes itself when time is up. For many channels: long-press a message → \"Custom forward\" → \"Auto-delete\". The phone must be online.
+Qibla	Кибла	Qibla
+Qibla kompasi	Компас киблы	Qibla compass
+Kompas dizayni	Дизайн компаса	Compass design
+GPS bilan aniq joylashuv	Точное местоположение по GPS	Precise location via GPS
+Qibla yo'nalishi tanlangan tuman bo'yicha hisoblanadi; GPS yoqilsa — turgan joyingiz bo'yicha aniqroq. Kompas aniq ishlashi uchun telefonni tekis ushlang va temir buyumlardan uzoqlashing.	Направление киблы считается по выбранному району; с GPS — точнее, по вашему местоположению. Для точности держите телефон горизонтально и подальше от металла.	The Qibla direction is calculated for the selected district; with GPS it uses your exact location. For accuracy hold the phone flat and away from metal.
+Hozircha avto-o'chiriladigan post yo'q.	Пока нет постов для автоудаления.	No posts scheduled for auto-delete.
+Hammasini bekor qilish	Отменить все	Cancel all
+Joylashuvni aniqlab bo'lmadi	Не удалось определить местоположение	Couldn't get your location
+Sekin	Медленно	Slow
+O'rtacha	Средне	Medium
+Odatiy	Обычно	Normal
+Tez	Быстро	Fast
+Oddiy rejim	Простой режим	Simple mode
+👴👵 Assalomu alaykum! Oddiy rejimda yozuvlar kattaroq, tugmalar kengroq va menyular soddaroq bo'ladi. Xabarni uzoq bosib, uni ovoz chiqarib o'qitish ham mumkin.	👴👵 Здравствуйте! В простом режиме текст крупнее, кнопки шире, а меню проще. Зажмите сообщение, чтобы прослушать его вслух.	👴👵 Hello! In simple mode text is larger, buttons are wider and menus are simpler. Long-press a message to hear it read aloud.
+Oddiy rejimni yoqish	Включить простой режим	Turn on simple mode
+Bir bosishda: katta shrift, katta interfeys, keng chatlar ro'yxati va soddalashtirilgan menyu yoqiladi. Quyida har birini alohida sozlash mumkin.	Одним нажатием: крупный шрифт, крупный интерфейс, широкий список чатов и простое меню. Ниже каждое можно настроить отдельно.	One tap turns on large text, a larger interface, a roomy chat list and a simple menu. Each can be adjusted below.
+Xabarlar shrifti	Шрифт сообщений	Message text size
+Tugmalar va yozuvlar kattaligi	Размер кнопок и надписей	Button and label size
+Keng chatlar ro'yxati (katta rasm)	Широкий список чатов (крупные фото)	Roomy chat list (large photos)
+Shrift va kattalik faqat oddiy rejim yoqilganda qo'llanadi. Kattalik o'zgarganda ilova bir marta qayta ochiladi.	Шрифт и размер действуют только в простом режиме. При смене размера приложение один раз перезапустится.	Text and interface size apply only in simple mode. Changing the size reopens the app once.
+Soddalashtirish	Упрощение	Simplify
+Soddalashtirilgan xabar menyusi	Упрощённое меню сообщений	Simplified message menu
+Soddalashtirilgan menyuda xabarni uzoq bosganda faqat asosiy amallar qoladi: javob berish, nusxalash, uzatish, o'chirish va ovoz chiqarib o'qish.	В упрощённом меню при долгом нажатии остаются только основные действия: ответить, копировать, переслать, удалить и прочитать вслух.	The simplified menu keeps only the main actions on long-press: reply, copy, forward, delete and read aloud.
+Ovozli o'qish	Чтение вслух	Read aloud
+\"Ovoz chiqarib o'qish\" tugmasi	Кнопка «Прочитать вслух»	\"Read aloud\" button
+Kelgan xabarlarni o'qib berish	Читать входящие сообщения	Read incoming messages
+O'qish tezligi	Скорость чтения	Reading speed
+Sinab ko'rish	Проверить	Try it
+Xabarni uzoq bosing → \"Ovoz chiqarib o'qish\". Avtomatik o'qish oddiy rejimda, chat ochiq turganda kelgan xabarlarni jo'natuvchi ismi bilan o'qib beradi. Telefonda o'zbek ovozi bo'lmasa, matn rus ovozida o'qiladi (Sozlamalar → Til → Matnni ovozga aylantirish).	Зажмите сообщение → «Прочитать вслух». Автоматическое чтение в простом режиме озвучивает новые сообщения в открытом чате с именем отправителя. Если на телефоне нет узбекского голоса, текст читается русским (Настройки → Язык → Синтез речи).	Long-press a message → \"Read aloud\". In simple mode, auto-read speaks new messages in the open chat with the sender's name. If the phone has no Uzbek voice, a Russian voice is used (Settings → Language → Text-to-speech).
+Qayta ochish	Перезапустить	Reopen
+O'zgarish to'liq qo'llanishi uchun ekran qayta ochiladi.	Чтобы изменения применились полностью, экран будет открыт заново.	The screen will reopen to fully apply the change.
+ — odatiy	 — обычный	 — default
+ — juda katta	 — очень крупный	 — very large
+Avtomatik o'qish oddiy rejim yoqilganda ishlaydi	Автоматическое чтение работает в простом режиме	Auto-read works when simple mode is on
+Assalomu alaykum. Bu MilliyGram ovozli o'qish namunasi.	Здравствуйте. Это пример чтения вслух в MilliyGram.	Hello. This is a MilliyGram read-aloud sample.
+Katta yozuvlar, katta tugmalar, sodda menyu va xabarlarni ovoz chiqarib o'qish.	Крупный текст, большие кнопки, простое меню и чтение сообщений вслух.	Large text, big buttons, a simple menu and messages read aloud.
+MilliyGram imkoniyatlari (tanishtiruv)	Возможности MilliyGram (знакомство)	MilliyGram features (intro)
+Sozlamalar bo'yicha qisqa sayohat	Краткий тур по настройкам	Quick settings tour
+Yangilanishni tekshirish	Проверить обновление	Check for updates
+Yangilanishlar kanali sozlanmagan	Канал обновлений не настроен	Update channel isn't configured
+Tekshirilmoqda…	Проверяем…	Checking…
+Tekshirib bo'lmadi (internetni tekshiring)	Не удалось проверить (проверьте интернет)	Couldn't check (check your internet)
+Sizda eng so'nggi versiya o'rnatilgan	У вас последняя версия	You have the latest version
+Versiya: 	Версия: 	Version: 

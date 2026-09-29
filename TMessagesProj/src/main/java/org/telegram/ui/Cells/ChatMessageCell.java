@@ -1683,8 +1683,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     private static final int SIDE_BUTTON_MG_SAVE = 7; // MilliyGram: Saqlangan xabarlarga tez saqlash
     private static Drawable mgCloudDrawable;
 
+    private boolean mgSavePressed;
+
     public boolean isMgSaveSideButton() {
-        return drawSideButton == SIDE_BUTTON_MG_SAVE;
+        return drawSideButton == SIDE_BUTTON_MG_SAVE || mgSavePressed;
     }
     private float sideStartX, sideStartY;
     private float summarizeButtonX, summarizeButtonY;
@@ -5175,7 +5177,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                         sideButtonVisible &&
                         drawSideButton != 0 &&
                         x >= sideStartX - dp(24) && x <= sideStartX + dp(40) &&
-                        y >= sideStartY - dp(drawSummarizeButton ? 6 : 24) && y <= sideStartY + dp(38 + (drawSideButton == 3 && commentLayout != null ? 18 : 0) + (drawSideButton2 == SIDE_BUTTON_SPONSORED_MORE ? 38 : 0))
+                        y >= sideStartY - dp(drawSummarizeButton ? 6 : 24) && y <= sideStartY + dp(38 + (drawSideButton == 3 && commentLayout != null ? 18 : 0) + (drawSideButton2 == SIDE_BUTTON_SPONSORED_MORE || drawSideButton2 == SIDE_BUTTON_MG_SAVE ? 38 : 0))
                     ) {
                         if (currentMessageObject.isSent()) {
                             if (currentMessageObject.isSponsored()) {
@@ -5184,6 +5186,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                                 } else {
                                     pressedSideButton = SIDE_BUTTON_SPONSORED_CLOSE;
                                 }
+                            } else if (drawSideButton2 == SIDE_BUTTON_MG_SAVE && y > sideStartY + dp(32)) {
+                                pressedSideButton = SIDE_BUTTON_MG_SAVE;
                             } else {
                                 pressedSideButton = drawSideButton;
                             }
@@ -5323,6 +5327,13 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                                 delegate.didPressSponsoredInfo(this, x, y);
                             } else if (pressedSideButton == 3) {
                                 delegate.didPressCommentButton(this);
+                            } else if (pressedSideButton == SIDE_BUTTON_MG_SAVE && drawSideButton != SIDE_BUTTON_MG_SAVE) {
+                                mgSavePressed = true;
+                                try {
+                                    delegate.didPressSideButton(this);
+                                } finally {
+                                    mgSavePressed = false;
+                                }
                             } else {
                                 delegate.didPressSideButton(this);
                             }
@@ -5338,7 +5349,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                         if (!(
                             sideButtonVisible &&
                             x >= sideStartX - dp(24) && x <= sideStartX + dp(40) &&
-                            y >= sideStartY - dp(drawSummarizeButton ? 6 : 24) && y <= sideStartY + dp(38 + (drawSideButton == 3 && commentLayout != null ? 18 : 0) + (drawSideButton2 == SIDE_BUTTON_SPONSORED_MORE ? 38 : 0))
+                            y >= sideStartY - dp(drawSummarizeButton ? 6 : 24) && y <= sideStartY + dp(38 + (drawSideButton == 3 && commentLayout != null ? 18 : 0) + (drawSideButton2 == SIDE_BUTTON_SPONSORED_MORE || drawSideButton2 == SIDE_BUTTON_MG_SAVE ? 38 : 0))
                         )) {
                             sideButtonPressed = false;
 
@@ -6984,6 +6995,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             }
             if (drawSideButton == 0 && mgCanQuickSave(messageObject)) {
                 drawSideButton = SIDE_BUTTON_MG_SAVE;
+            } else if ((drawSideButton == 1 || drawSideButton == 2) && drawSideButton2 == 0 && mgCanQuickSave(messageObject)) {
+                // MilliyGram: ulashish tugmasi ostida ikkinchi — bulutcha
+                drawSideButton2 = SIDE_BUTTON_MG_SAVE;
             }
             drawSummarizeButton = TranslateController.isSummarizable(messageObject);
             hasReplyQuote = false;
@@ -12356,7 +12370,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             } else if (sideButtonPressed) {
                 if (pressedSideButton != SIDE_BUTTON_SPONSORED_CLOSE &&
                     pressedSideButton != SIDE_BUTTON_SPONSORED_MORE &&
-                    pressedSideButton != 3 && pressedSideButton != 2
+                    pressedSideButton != 3 && pressedSideButton != 2 && pressedSideButton != SIDE_BUTTON_MG_SAVE
                 ) {
                     delegate.didQuickShareStart(this, lastTouchX, lastTouchY);
                     sideButtonPressed = false;
@@ -18670,6 +18684,19 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         if (MessagesController.getInstance(currentAccount).isPeerNoForwards(m.getDialogId())) {
             return false;
         }
+        // Kanallar va botlarda — barcha xabarlarda; shaxsiy chat va guruhlarda — faqat suhbatdoshning xabarlarida
+        final long mgDid = m.getDialogId();
+        boolean mgAll = false;
+        if (mgDid < 0) {
+            TLRPC.Chat mgChat = MessagesController.getInstance(currentAccount).getChat(-mgDid);
+            mgAll = mgChat != null && ChatObject.isChannelAndNotMegaGroup(mgChat);
+        } else if (mgDid > 0) {
+            TLRPC.User mgUser = MessagesController.getInstance(currentAccount).getUser(mgDid);
+            mgAll = mgUser != null && mgUser.bot;
+        }
+        if (!mgAll && m.isOut()) {
+            return false;
+        }
         if (currentMessagesGroup != null && currentPosition != null) {
             final boolean last = (currentPosition.flags & MessageObject.POSITION_FLAG_BOTTOM) != 0 && (currentPosition.flags & (m.isOutOwner() ? MessageObject.POSITION_FLAG_LEFT : MessageObject.POSITION_FLAG_RIGHT)) != 0;
             if (!currentMessagesGroup.isDocuments && !last) {
@@ -21684,6 +21711,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             } else {
                 sideStartY = 0;
             }
+        } else if (drawSideButton2 == SIDE_BUTTON_MG_SAVE) {
+            // ikki tugma (ulashish + bulutcha) pastki chegarada tugashi uchun yuqoriga suriladi
+            sideStartY = Math.max(sideStartY - dp(32), (layoutHeight + transitionParams.deltaBottom - dp(64)) / 2f);
         }
         if (!currentMessageObject.isOutOwner() && isRoundVideo && !hasLinkPreview) {
             float offsetSize = isAvatarVisible ? ((AndroidUtilities.roundPlayingMessageSize(isSideMenued) - AndroidUtilities.roundMessageSize) * 0.7f) : dp(50);
@@ -21705,7 +21735,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             if (SizeNotifierFrameLayout.drawingBlur) {
                 return;
             }
-            rect.set(sideStartX, sideStartY, sideStartX + dp(32), sideStartY + dp(drawSideButton2 == SIDE_BUTTON_SPONSORED_MORE ? 64 : 32));
+            rect.set(sideStartX, sideStartY, sideStartX + dp(32), sideStartY + dp(drawSideButton2 == SIDE_BUTTON_SPONSORED_MORE || drawSideButton2 == SIDE_BUTTON_MG_SAVE ? 64 : 32));
             if (rect.right >= getMeasuredWidth()) {
                 sideButtonVisible = false;
                 return;
@@ -21756,6 +21786,15 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 canvas.drawRoundRect(rect, dp(16), dp(16), Theme.chat_actionBackgroundGradientDarkenPaint);
             }
 
+            if (drawSideButton2 == SIDE_BUTTON_MG_SAVE) {
+                if (mgCloudDrawable == null) {
+                    mgCloudDrawable = ContextCompat.getDrawable(getContext(), R.drawable.mg_cloud_save).mutate();
+                }
+                mgCloudDrawable.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_chat_serviceIcon), PorterDuff.Mode.SRC_IN));
+                final int w2 = mgCloudDrawable.getIntrinsicWidth(), h2 = mgCloudDrawable.getIntrinsicHeight();
+                mgCloudDrawable.setBounds((int) (sideStartX + dp(16) - w2 / 2f), (int) (sideStartY + dp(48) - h2 / 2f), (int) (sideStartX + dp(16) + w2 / 2f), (int) (sideStartY + dp(48) + h2 / 2f));
+                mgCloudDrawable.draw(canvas);
+            }
             if (drawSideButton == SIDE_BUTTON_MG_SAVE) {
                 if (mgCloudDrawable == null) {
                     mgCloudDrawable = ContextCompat.getDrawable(getContext(), R.drawable.mg_cloud_save).mutate();

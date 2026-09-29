@@ -3966,6 +3966,24 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
                     }, resourcesProvider);
                 });
             }
+            if (editingMessageObject == null && !self && chatActivity != null && chatActivity.canScheduleMessage() && org.telegram.ui.MgAutoDeleteUI.isAvailable(currentAccount, dialogId)) {
+                // MilliyGram: postni vaqt o'tgach avtomatik o'chirish (reklama 1/24, 1/48)
+                final long mgDid = dialogId;
+                options.add(R.drawable.msg_autodelete, org.telegram.messenger.MgLang.t("Avto-o'chirish bilan yuborish…"), () -> {
+                    if (messageSendPreview != null) {
+                        messageSendPreview.dismiss(false);
+                        messageSendPreview = null;
+                    }
+                    AndroidUtilities.runOnUIThread(() -> org.telegram.ui.MgAutoDeleteUI.sendWithAutoDelete(getContext(), resourcesProvider, currentAccount, mgDid, (notify, scheduleDate, repeat) -> {
+                        final long effectId = 0;
+                        if (currentAttachLayout == photoLayout || currentAttachLayout == photoPreviewLayout) {
+                            sendPressed(notify, scheduleDate, repeat, effectId, isCaptionAbove());
+                        } else if (!currentAttachLayout.sendSelectedItems(notify, scheduleDate, repeat, effectId, isCaptionAbove())) {
+                            dismiss();
+                        }
+                    }), 200);
+                });
+            }
             if ((currentAttachLayout == photoLayout || currentAttachLayout == photoPreviewLayout) && currentAttachLayout.getSelectedItemsCount() == 1 && chatActivity != null && ChatObject.isMonoForum(chatActivity.getCurrentChat())) {
                 final ChatActivity finalChatActivity = chatActivity;
                 final long finalDialogId1 = dialogId;

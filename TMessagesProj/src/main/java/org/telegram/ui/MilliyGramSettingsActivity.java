@@ -23,6 +23,9 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
     private static final int ID_ABOUT = 500;
     private static final int ID_DESIGN = 501;
     private static final int ID_TOUR = 502;
+    private static final int ID_SIMPLE = 503;
+    private static final int ID_INTRO = 504;
+    private static final int ID_UPDATE = 505;
     private static final int ID_RESULT_BASE = 10000;
 
     private String mgQuery;
@@ -69,6 +72,9 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
             return;
         }
         items.add(UItem.asShadow(null));
+        items.add(UItem.asButton(ID_SIMPLE, R.drawable.msg_zoomin, org.telegram.messenger.MgLang.t("Oddiy rejim (keksalar uchun)"),
+                org.telegram.messenger.MgSimple.isEnabled() ? org.telegram.messenger.MgLang.t("yoqilgan") : org.telegram.messenger.MgLang.t("o'chiq")));
+        items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Katta yozuvlar, katta tugmalar, sodda menyu va xabarlarni ovoz chiqarib o'qish.")));
         for (int i = 0; i < PAGES.length; i++) {
             items.add(UItem.asButton(PAGES[i], ICONS[i], MgSettingsPage.pageTitle(PAGES[i])));
         }
@@ -76,14 +82,23 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
         items.add(UItem.asShadow(null));
         items.add(UItem.asButton(MgSettingsPage.PAGE_BACKUP, R.drawable.msg_copy, org.telegram.messenger.MgLang.t("Sozlamalarni saqlash")));
         items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Sozlamalarni (sevimlilar va jildlar bilan) nusxalab, boshqa telefonda tiklash mumkin.")));
-        items.add(UItem.asButton(ID_TOUR, R.drawable.msg_help, org.telegram.messenger.MgLang.t("Qisqacha tanishtiruv")));
+        items.add(UItem.asButton(ID_INTRO, R.drawable.msg_emoji_activities, org.telegram.messenger.MgLang.t("MilliyGram imkoniyatlari (tanishtiruv)")));
+        items.add(UItem.asButton(ID_TOUR, R.drawable.msg_help, org.telegram.messenger.MgLang.t("Sozlamalar bo'yicha qisqa sayohat")));
+        items.add(UItem.asButton(ID_UPDATE, R.drawable.msg_retry, org.telegram.messenger.MgLang.t("Yangilanishni tekshirish"),
+                org.telegram.messenger.MgUpdater.currentBuild() > 0 ? "b" + org.telegram.messenger.MgUpdater.currentBuild() : ""));
         items.add(UItem.asButton(ID_ABOUT, R.drawable.msg_info, org.telegram.messenger.MgLang.t("MilliyGram haqida")));
         items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("MilliyGram — Telegram'ning ochiq manba kodi asosida qurilgan norasmiy klient.")));
     }
 
     @Override
     protected void onClick(UItem item, View view, int position, float x, float y) {
-        if (item.id == ID_ABOUT) {
+        if (item.id == ID_SIMPLE) {
+            presentFragment(new MgSimpleModeActivity());
+        } else if (item.id == ID_INTRO) {
+            MgOnboarding.show(getParentActivity());
+        } else if (item.id == ID_UPDATE) {
+            checkUpdate();
+        } else if (item.id == ID_ABOUT) {
             showAboutDialog();
         } else if (item.id == ID_DESIGN) {
             presentFragment(new MgDesignActivity());
@@ -138,6 +153,29 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
             }, 700);
         }
         return v;
+    }
+
+    private void checkUpdate() {
+        if (android.text.TextUtils.isEmpty(org.telegram.messenger.MgUpdater.channel())) {
+            org.telegram.ui.Components.BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, org.telegram.messenger.MgLang.t("Yangilanishlar kanali sozlanmagan")).show();
+            return;
+        }
+        org.telegram.ui.Components.BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, org.telegram.messenger.MgLang.t("Tekshirilmoqda…")).show();
+        org.telegram.messenger.MgUpdater.check(getParentActivity(), true, build -> {
+            if (build == null) {
+                org.telegram.ui.Components.BulletinFactory.of(this).createErrorBulletin(org.telegram.messenger.MgLang.t("Tekshirib bo'lmadi (internetni tekshiring)")).show();
+            } else if (build == 0) {
+                org.telegram.ui.Components.BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Sizda eng so'nggi versiya o'rnatilgan")).show();
+            }
+        });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (listView != null && listView.adapter != null) {
+            listView.adapter.update(false);
+        }
     }
 
     /** Yangi foydalanuvchi uchun bo'limlarni bittalab, strelka bilan ko'rsatib chiqish */
@@ -251,7 +289,9 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
         builder.setTitle("MilliyGram");
         builder.setMessage(org.telegram.messenger.MgLang.t("MilliyGram — milliy dizayndagi norasmiy Telegram klienti.\n\n") +
                 org.telegram.messenger.MgLang.t("Ilova Telegram FZ-LLC tomonidan ishlab chiqilmagan. U Telegram'ning ochiq manba kodi (GPL v2) asosida qurilgan va Telegram API'dan foydalanadi.\n\n") +
-                org.telegram.messenger.MgLang.t("Xabarlaringiz to'g'ridan-to'g'ri Telegram serverlari orqali yuboriladi. MilliyGram hech qanday ma'lumot yig'maydi."));
+                org.telegram.messenger.MgLang.t("Xabarlaringiz to'g'ridan-to'g'ri Telegram serverlari orqali yuboriladi. MilliyGram hech qanday ma'lumot yig'maydi.")
+                + "\n\n" + org.telegram.messenger.MgLang.t("Versiya: ") + org.telegram.messenger.BuildVars.BUILD_VERSION_STRING
+                + (org.telegram.messenger.MgUpdater.currentBuild() > 0 ? " (b" + org.telegram.messenger.MgUpdater.currentBuild() + ")" : ""));
         builder.setPositiveButton("OK", null);
         showDialog(builder.create());
     }
