@@ -5,6 +5,10 @@ name: MilliyGram Google Play (AAB)
 # Natija: Actions sahifasidagi artefakt (MilliyGram-play-<versiya>-<build>.aab) — uni Play Console'ga yuklaysiz.
 on:
   workflow_dispatch:
+  # vaqtincha: shu fayl o'zgarganda bir marta ishga tushadi
+  push:
+    branches: [ claude/zen-hypatia-ngf4ae ]
+    paths: [ '.github/workflows/play.yml' ]
 
 permissions:
   contents: read
