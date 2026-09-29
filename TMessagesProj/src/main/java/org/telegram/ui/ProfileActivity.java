@@ -2552,6 +2552,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     finishFragment();
                 } else if (id == block_contact) {
                     onBlockContactClicked(false);
+                } else if (id == MgProfileTools.MENU_ID) {
+                    MgProfileTools.show(ProfileActivity.this, currentAccount, userId != 0 ? userId : -chatId);
                 } else if (id == add_contact) {
                     TLRPC.User user = getMessagesController().getUser(userId);
                     Bundle args = new Bundle();
@@ -12344,6 +12346,10 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 otherItem.addSubItem(leave_group, R.drawable.msg_leave, LocaleController.getString(R.string.DeleteAndExit));
                 leaveAction = true;
             }
+        }
+        // MilliyGram: profil ⋮ → "Maxsus sozlamalar"
+        if (imageUpdater == null && (userId != 0 && userId != getUserConfig().getClientUserId() || chatId != 0) && topicId == 0) {
+            otherItem.addSubItem(MgProfileTools.MENU_ID, R.drawable.msg_customize, org.telegram.messenger.MgLang.t("Maxsus sozlamalar"));
         }
 
         if (imageUpdater != null) {

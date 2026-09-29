@@ -167,7 +167,7 @@ android {
         buildConfigField "String", "ADS_BASE_URL", "\"\""
         buildConfigField "String", "ADS_API_KEY", "\"\""
         // MilliyGram: build raqami (GitHub Actions run)
-        buildConfigField "int", "MG_BUILD", (System.getenv("GITHUB_RUN_NUMBER") ?: "0")
+        buildConfigField "int", "MG_BUILD", String.valueOf(Integer.parseInt(System.getenv("GITHUB_RUN_NUMBER") ?: "0") + Integer.parseInt(System.getenv("MG_BUILD_OFFSET") ?: "0"))
 
         vectorDrawables.generatedDensities = ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi']
 

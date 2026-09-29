@@ -127,6 +127,7 @@ public class MgSettingsPage extends UniversalFragment {
     private static final int ID_GR_AUTO = 158;
     private static final int ID_GR_LIST = 159;
     private static final int ID_AD_LIST = 180;
+    private static final int ID_FWD_SELECT = 184;
     private static final int ID_QIBLA_OPEN = 181;
     private static final int ID_QIBLA_STYLE = 182;
     private static final int ID_QIBLA_GPS = 183;
@@ -213,6 +214,8 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Maxsus uzatish")));
                 items.add(UItem.asButton(ID_SIGNATURE, R.drawable.msg_edit, org.telegram.messenger.MgLang.t("Imzo"), MgConfig.getString("mg_cf_signature", "").isEmpty() ? org.telegram.messenger.MgLang.t("yo'q") : org.telegram.messenger.MgLang.t("bor")));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Xabarni uzoq bosing → \"Maxsus uzatish\": matnni tahrirlab, havola va @larni tozalab, tarjima qilib, o'z nomingizdan uzating.")));
+                items.add(UItem.asCheck(ID_FWD_SELECT, org.telegram.messenger.MgLang.t("Uzatishda avval belgilash")).setChecked(MgConfig.getBool("fwd_select_mode", true)));
+                items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Yoqilganda uzatish oynasida chat bosilsa darhol yuborilmaydi — bir nechta chatni belgilab, pastdagi tugma bilan yuborasiz. Tugmani uzoq bossangiz: rejalashtirish, ovozsiz va avto-o'chirish bilan yuborish. 📁 tugmasi — saqlangan chat to'plamlari.")));
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Xabarlar yonida")));
                 items.add(UItem.asCheck(ID_SAVE_BTN, org.telegram.messenger.MgLang.t("Bulutcha — tez saqlash tugmasi")).setChecked(MgConfig.getBool("mg_save_btn", true)));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("☁ tugmasi xabarni bir bosishda \"Saqlangan xabarlar\"ga saqlaydi. Kanal va botlarda — barcha xabarlarda; shaxsiy chat va guruhlarda — faqat boshqalarning xabarlari va medialarida (o'zingiznikida chiqmaydi). Uzatish taqiqlangan chatlarda chiqmaydi.")));
@@ -402,7 +405,23 @@ public class MgSettingsPage extends UniversalFragment {
                 java.util.ArrayList<String> list = org.telegram.messenger.MgAutoDelete.describePending();
                 org.telegram.ui.ActionBar.AlertDialog.Builder b = new org.telegram.ui.ActionBar.AlertDialog.Builder(getParentActivity(), getResourceProvider());
                 b.setTitle(org.telegram.messenger.MgLang.t("Kutilayotgan o'chirishlar"));
-                b.setMessage(list.isEmpty() ? org.telegram.messenger.MgLang.t("Hozircha avto-o'chiriladigan post yo'q.") : android.text.TextUtils.join("\n", list));
+                if (list.isEmpty()) {
+                    b.setMessage(org.telegram.messenger.MgLang.t("Hozircha avto-o'chiriladigan post yo'q."));
+                } else {
+                    b.setItems(list.toArray(new CharSequence[0]), (d, w) -> {
+                        org.telegram.ui.ActionBar.AlertDialog.Builder c = new org.telegram.ui.ActionBar.AlertDialog.Builder(getParentActivity(), getResourceProvider());
+                        c.setTitle(org.telegram.messenger.MgLang.t("Bekor qilinsinmi?"));
+                        c.setMessage(list.get(w) + "\n\n" + org.telegram.messenger.MgLang.t("Bu post avtomatik o'chirilmaydi."));
+                        c.setPositiveButton(org.telegram.messenger.MgLang.t("Bekor qilish"), (d2, w2) -> {
+                            org.telegram.messenger.MgAutoDelete.cancel(w);
+                            if (listView != null) {
+                                listView.adapter.update(true);
+                            }
+                        });
+                        c.setNegativeButton(org.telegram.messenger.MgLang.t("Yopish"), null);
+                        showDialog(c.create());
+                    });
+                }
                 if (!list.isEmpty()) {
                     b.setNeutralButton(org.telegram.messenger.MgLang.t("Hammasini bekor qilish"), (d, w) -> {
                         org.telegram.messenger.MgAutoDelete.cancelAll();
@@ -415,6 +434,9 @@ public class MgSettingsPage extends UniversalFragment {
                 showDialog(b.create());
                 break;
             }
+            case ID_FWD_SELECT:
+                toggle(view, "fwd_select_mode", true);
+                break;
             case ID_QIBLA_OPEN:
                 MgQibla.open(this);
                 break;

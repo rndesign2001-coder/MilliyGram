@@ -163,7 +163,8 @@ android {
     }
 
     // MilliyGram: har bir CI yig'ilishida versionCode oshadi (Play Market va ustidan o'rnatish uchun shart)
-    defaultConfig.versionCode = Integer.parseInt(APP_VERSION_CODE) + Integer.parseInt(System.getenv("GITHUB_RUN_NUMBER") ?: "0")
+    // Play (AAB) yig'ilishlariga MG_BUILD_OFFSET=1000 qo'shiladi — Play versiyasi doim APK'dan yangiroq hisoblanadi
+    defaultConfig.versionCode = Integer.parseInt(APP_VERSION_CODE) + Integer.parseInt(System.getenv("GITHUB_RUN_NUMBER") ?: "0") + Integer.parseInt(System.getenv("MG_BUILD_OFFSET") ?: "0")
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->

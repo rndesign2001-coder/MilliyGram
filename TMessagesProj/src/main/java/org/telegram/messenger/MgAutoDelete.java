@@ -50,6 +50,7 @@ public class MgAutoDelete extends BroadcastReceiver {
     public static final int[] PRESET_HOURS = {1, 3, 6, 12, 24, 48, 72, 168};
 
     private static final class Arm {
+        boolean mode; // doimiy rejimdan yaratilgan
         int seconds;
         long armedAt;
         long firstUse;
@@ -216,6 +217,17 @@ public class MgAutoDelete extends BroadcastReceiver {
         }
     }
 
+    // ------------------------------------------------------------------ doimiy rejim
+
+    /** Kanal/guruh uchun doimiy avto-o'chirish muddati (soniya), 0 — o'chiq */
+    public static int getChatMode(int account, long did) {
+        return MgConfig.getInt("ad_mode_" + account + "_" + did, 0);
+    }
+
+    public static void setChatMode(int account, long did, int seconds) {
+        MgConfig.setInt("ad_mode_" + account + "_" + did, Math.max(0, seconds));
+    }
+
     /** SendMessagesHelper'dan: chatga post ketmoqda (count — xabarlar soni) */
     public static void onSend(int account, long did, int scheduleDate, CharSequence text, int count) {
         if (did == 0 || count <= 0) {
@@ -224,13 +236,22 @@ public class MgAutoDelete extends BroadcastReceiver {
         synchronized (sync) {
             String key = armKey(account, did);
             Arm a = arms.get(key);
-            if (a == null) {
-                return;
-            }
             long nowMs = System.currentTimeMillis();
-            if (a.firstUse == 0 && nowMs - a.armedAt > ARM_TTL_MS || a.firstUse != 0 && nowMs - a.firstUse > ARM_GRACE_MS) {
+            if (a != null && (a.firstUse == 0 && nowMs - a.armedAt > ARM_TTL_MS || a.firstUse != 0 && nowMs - a.firstUse > ARM_GRACE_MS)) {
                 arms.remove(key);
-                return;
+                a = null;
+            }
+            if (a == null) {
+                // bir martalik belgi yo'q — chatning doimiy rejimi bormi?
+                int mode = did < 0 ? getChatMode(account, did) : 0;
+                if (mode <= 0) {
+                    return;
+                }
+                a = new Arm();
+                a.mode = true;
+                a.seconds = mode;
+                a.armedAt = nowMs;
+                arms.put(key, a);
             }
             boolean scheduled = scheduleDate > 0 && scheduleDate != 0x7FFFFFFE;
             String tk = textKey(text);
@@ -339,6 +360,17 @@ public class MgAutoDelete extends BroadcastReceiver {
             }
         }
         return out;
+    }
+
+    /** Bitta yozuvni bekor qiladi (describePending tartibidagi indeks) */
+    public static void cancel(int index) {
+        synchronized (sync) {
+            if (index >= 0 && index < recs().size()) {
+                recs().remove(index);
+                save();
+            }
+        }
+        scheduleAlarm(ApplicationLoader.applicationContext);
     }
 
     public static void cancelAll() {

@@ -6852,6 +6852,22 @@ public class ChatActivityEnterView extends FrameLayout implements
     }
 
     public final ColoredImageSpan[] spans = new ColoredImageSpan[1];
+    /** MilliyGram: avto-o'chirish rejimi yoqilgan kanal/guruhda maydonda ⏱ belgisi */
+    private CharSequence mgAutoDeleteHint(CharSequence base) {
+        try {
+            int mode = dialog_id < 0 ? org.telegram.messenger.MgAutoDelete.getChatMode(currentAccount, dialog_id) : 0;
+            if (mode > 0) {
+                return "⏱ " + org.telegram.messenger.MgAutoDelete.durationName(mode) + " · " + base;
+            }
+        } catch (Throwable ignore) {
+        }
+        return base;
+    }
+
+    public void mgUpdateAutoDeleteBadge() {
+        updateFieldHint(true);
+    }
+
     public void updateFieldHint(boolean animated) {
         if (messageEditText == null) {
             return;
@@ -6949,12 +6965,12 @@ public class ChatActivityEnterView extends FrameLayout implements
                     }
                 } else if (isChannel) {
                     if (silent) {
-                        messageEditText.setHintText(getString("ChannelSilentBroadcast", R.string.ChannelSilentBroadcast), animated);
+                        messageEditText.setHintText(mgAutoDeleteHint(getString("ChannelSilentBroadcast", R.string.ChannelSilentBroadcast)), animated);
                     } else {
-                        messageEditText.setHintText(getString("ChannelBroadcast", R.string.ChannelBroadcast), animated);
+                        messageEditText.setHintText(mgAutoDeleteHint(getString("ChannelBroadcast", R.string.ChannelBroadcast)), animated);
                     }
                 } else {
-                    messageEditText.setHintText(getString(R.string.TypeMessage));
+                    messageEditText.setHintText(mgAutoDeleteHint(getString(R.string.TypeMessage)));
                 }
             }
         }

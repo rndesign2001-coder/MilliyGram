@@ -620,7 +620,8 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             return 0;
         });
 
-        ItemOptions o = ItemOptions.makeOptions(this, button);
+        // MilliyGram: ⚙ menyu ichki sahifa (swipeback) ochadi — busiz ilova yopilib qolardi
+        ItemOptions o = ItemOptions.makeOptions(this, button, true);
         if (UserConfig.getActivatedAccountsCount() < UserConfig.MAX_ACCOUNT_COUNT) {
             o.add(R.drawable.msg_addbot, getString(R.string.AddAccount), () -> {
                 int freeAccounts = 0;

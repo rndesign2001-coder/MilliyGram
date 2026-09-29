@@ -105,6 +105,24 @@ public class MgAutoDeleteUI {
         }, 200);
     }
 
+    /** Kanal/guruh uchun doimiy "Avto-o'chirish rejimi" */
+    public static void pickChatMode(org.telegram.ui.ActionBar.BaseFragment f, int account, long dialogId, Runnable after) {
+        Context ctx = f.getParentActivity();
+        if (ctx == null) {
+            return;
+        }
+        pickDuration(ctx, f.getResourceProvider(), true, sec -> {
+            int v = sec == null ? 0 : sec;
+            MgAutoDelete.setChatMode(account, dialogId, v);
+            org.telegram.ui.Components.BulletinFactory.of(f).createSimpleBulletin(R.raw.contact_check, v > 0
+                    ? MgLang.t("Avto-o'chirish rejimi yoqildi: bu chatga yuboriladigan har qanday xabar ") + MgAutoDelete.durationName(v) + MgLang.t("dan keyin o'chadi")
+                    : MgLang.t("Avto-o'chirish rejimi o'chirildi")).show();
+            if (after != null) {
+                after.run();
+            }
+        });
+    }
+
     public interface Sender {
         /** scheduleDate = 0 — darhol */
         void send(boolean notify, int scheduleDate, int scheduleRepeatPeriod);
@@ -114,6 +132,42 @@ public class MgAutoDeleteUI {
      * Yuborish tugmasi menyusidan: muddat → "Hozir" yoki "Rejalashtirish" → yuborish.
      * Muddat post kanalda paydo bo'lgan vaqtdan hisoblanadi.
      */
+    /** Bir nechta chatga (uzatish oynasi): har biri uchun muddat belgilanadi */
+    public static void sendWithAutoDelete(Context ctx, Theme.ResourcesProvider rp, int account, java.util.ArrayList<Long> dialogIds, boolean canSchedule, Sender sender) {
+        pickDuration(ctx, rp, false, seconds -> {
+            if (seconds == null || seconds <= 0) {
+                return;
+            }
+            Runnable armAll = () -> {
+                for (Long did : dialogIds) {
+                    MgAutoDelete.arm(account, did, seconds);
+                }
+            };
+            if (!canSchedule) {
+                armAll.run();
+                sender.send(true, 0, 0);
+                return;
+            }
+            AlertDialog.Builder b = new AlertDialog.Builder(ctx, rp);
+            b.setTitle(MgLang.t("Avto-o'chirish: ") + MgAutoDelete.durationName(seconds));
+            b.setItems(new CharSequence[]{
+                    MgLang.t("Hozir yuborish"),
+                    MgLang.t("Vaqtini rejalashtirib yuborish…")
+            }, new int[]{R.drawable.msg_send, R.drawable.msg_calendar2}, (d, which) -> {
+                if (which == 0) {
+                    armAll.run();
+                    sender.send(true, 0, 0);
+                } else {
+                    AndroidUtilities.runOnUIThread(() -> AlertsCreator.createScheduleDatePickerDialog(ctx, -1, (notify, scheduleDate, repeat) -> {
+                        armAll.run();
+                        sender.send(notify, scheduleDate, repeat);
+                    }, rp), 150);
+                }
+            });
+            b.show();
+        });
+    }
+
     public static void sendWithAutoDelete(Context ctx, Theme.ResourcesProvider rp, int account, long dialogId, Sender sender) {
         pickDuration(ctx, rp, false, seconds -> {
             if (seconds == null || seconds <= 0) {

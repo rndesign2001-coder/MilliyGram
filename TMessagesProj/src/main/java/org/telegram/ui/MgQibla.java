@@ -834,6 +834,21 @@ public class MgQibla {
             fillInfo.run();
         }, status));
 
+        // tizim panellari (status va navigatsiya) ostida tugmalar qolib ketmasligi uchun
+        root.setOnApplyWindowInsetsListener((v, insets) -> {
+            int insT = insets.getSystemWindowInsetTop();
+            int insB = insets.getSystemWindowInsetBottom();
+            bottom.setTranslationY(-insB);
+            close.setTranslationY(insT);
+            title.setTranslationY(insT);
+            return insets;
+        });
+        {
+            int insB = AndroidUtilities.navigationBarHeight, insT = AndroidUtilities.statusBarHeight;
+            bottom.setTranslationY(-insB);
+            close.setTranslationY(insT);
+            title.setTranslationY(insT);
+        }
         dialog.setContentView(root);
         Window win = dialog.getWindow();
         if (win != null) {

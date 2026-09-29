@@ -3759,7 +3759,13 @@ public class ChatActivity extends BaseFragment implements
                     mgSelectMessages(id == mg_select_all);
                     return;
                 }
-                if (id == MgChatLock.MENU_ID) {
+                if (id == MgChatMenu.MENU_JUMP) {
+                    mgShowQuickJump();
+                    return;
+                } else if (id == MgChatMenu.MENU_TOOLS) {
+                    mgShowTools();
+                    return;
+                } else if (id == MgChatLock.MENU_ID) {
                     MgChatLock.toggleLock(ChatActivity.this, currentAccount, dialog_id);
                     return;
                 } else if (id == MgChatLock.MENU_ID_HIDE) {
@@ -4575,43 +4581,9 @@ public class ChatActivity extends BaseFragment implements
                     LocaleController.getString(UserObject.isBotForum(currentUser) ? R.string.ClearAllHistory : R.string.ClearHistory));
             }
             if (chatMode == 0 && !isTopic) {
-                // MilliyGram: chatni PIN bilan qulflash
-                headerItem.lazilyAddSubItem(MgChatLock.MENU_ID, R.drawable.msg_secret,
-                    org.telegram.messenger.MgConfig.isDialogLocked(currentAccount, dialog_id) ? org.telegram.messenger.MgLang.t("Qulfni olish") : org.telegram.messenger.MgLang.t("Chatni qulflash"));
-                headerItem.lazilyAddSubItem(MgChatLock.MENU_ID_HIDE, R.drawable.msg_archive,
-                    org.telegram.messenger.MgConfig.isDialogHidden(currentAccount, dialog_id) ? org.telegram.messenger.MgLang.t("Yashirishdan chiqarish") : org.telegram.messenger.MgLang.t("Chatni yashirish"));
-                headerItem.lazilyAddSubItem(MgChatTools.MENU_STATS, R.drawable.msg_stats, "Chat statistikasi");
-                headerItem.lazilyAddSubItem(MgChatTools.MENU_EXPORT, R.drawable.msg_download, org.telegram.messenger.MgLang.t("Chatni eksport qilish"));
-                // MilliyGram: avtomatlashtirish
-                if (currentEncryptedChat == null && (currentChat == null || ChatObject.canSendMessages(currentChat))) {
-                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_AUTO_TEXT, R.drawable.msg_text_outlined, MgChatFeatures.autoTextMenuTitle(currentAccount, dialog_id));
-                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_AUTO_TRANSLATE, R.drawable.msg_translate, MgChatFeatures.autoTranslateMenuTitle(currentAccount, dialog_id));
-                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_TEMPLATES, R.drawable.msg_saved, org.telegram.messenger.MgLang.t("Tezkor shablonlar"));
-                    if (MgVoiceTyping.isAvailable(getParentActivity())) {
-                        headerItem.lazilyAddSubItem(MgChatFeatures.MENU_VOICE_TYPING, R.drawable.input_mic, org.telegram.messenger.MgLang.t("Ovoz bilan yozish"));
-                    }
-                }
-                if (currentChat != null && ChatObject.canUserDoAdminAction(currentChat, ChatObject.ACTION_INVITE)) {
-                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_JOIN_REQUESTS, R.drawable.msg_requests, org.telegram.messenger.MgLang.t("Qo'shilish so'rovlari"));
-                }
-                if (currentChat != null && ChatObject.isChannel(currentChat)) {
-                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_GROWTH, R.drawable.msg_stats, org.telegram.messenger.MgLang.t("Obunachilar kundaligi"));
-                }
-                if (currentEncryptedChat == null && (currentUser != null || currentChat != null)) {
-                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_CARD, R.drawable.msg_qrcode, "Profil kartasi (QR)");
-                }
-                if (MgMembersActivity.canUse(currentChat)) {
-                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_MEMBERS_CLEAN, R.drawable.msg_leave, org.telegram.messenger.MgLang.t("A'zolarni tozalash"));
-                }
-                if (MgChatFeatures.canJoinAll(currentChat)) {
-                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_JOIN_ALL, R.drawable.msg_contact_add, org.telegram.messenger.MgLang.t("Barcha akkauntlardan qo'shilish"));
-                }
-                if (currentEncryptedChat == null && MgChatFeatures.canOneTimeVoice(currentUser)) {
-                    mgOneTimeItem = headerItem.lazilyAddSubItem(MgChatFeatures.MENU_ONE_TIME_VOICE, R.drawable.msg_voicechat, MgChatFeatures.oneTimeVoiceMenuTitle(currentAccount, dialog_id));
-                }
-                if (MgChatFeatures.canToggleStranger(currentAccount, currentUser)) {
-                    headerItem.lazilyAddSubItem(MgChatFeatures.MENU_STRANGER, R.drawable.msg_usersearch, MgChatFeatures.strangerMenuTitle(currentAccount, dialog_id));
-                }
+                // MilliyGram: barcha qo'shimcha vositalar bitta guruhlangan oynada
+                headerItem.lazilyAddSubItem(MgChatMenu.MENU_JUMP, R.drawable.menu_browser_arrowup, org.telegram.messenger.MgLang.t("Xabarga tez o'tish"));
+                headerItem.lazilyAddSubItem(MgChatMenu.MENU_TOOLS, R.drawable.msg_customize, org.telegram.messenger.MgLang.t("MilliyGram vositalari"));
             }
             boolean addedSettings = false;
             if (!isTopic) {
@@ -19730,6 +19702,89 @@ public class ChatActivity extends BaseFragment implements
                 })
                 .setDimAlpha(0)
                 .show();
+    }
+
+    /** MilliyGram: "Xabarga tez o'tish" — eng birinchi, 100 ta yuqoriga, eng oxirgi, sana bo'yicha */
+    private void mgShowQuickJump() {
+        MgChatMenu.showQuickJump(this,
+                () -> jumpToDate(1),
+                () -> {
+                    if (messages.isEmpty() || chatLayoutManager == null) {
+                        return;
+                    }
+                    int lastVisible = chatLayoutManager.findLastVisibleItemPosition();
+                    int idx = lastVisible - chatAdapter.messagesStartRow;
+                    idx = Math.max(0, Math.min(messages.size() - 1, idx));
+                    int target = Math.min(messages.size() - 1, idx + 100);
+                    for (int a = target; a >= idx; a--) {
+                        MessageObject m = messages.get(a);
+                        if (m != null && m.getId() > 0) {
+                            scrollToMessageId(m.getId(), 0, false, m.getDialogId() == mergeDialogId ? 1 : 0, true, 0);
+                            return;
+                        }
+                    }
+                },
+                () -> scrollToLastMessage(false, true),
+                () -> {
+                    if (getParentActivity() != null) {
+                        showDialog(AlertsCreator.createCalendarPickerDialog(getParentActivity(), 1375315200000L, param -> jumpToDate(param), themeDelegate).create());
+                    }
+                });
+    }
+
+    /** MilliyGram: guruhlangan vositalar oynasi */
+    private void mgShowTools() {
+        final ActionBar.ActionBarMenuOnItemClick click = actionBar.getActionBarMenuOnItemClick();
+        final Utilities.Callback<Integer> run = mid -> {
+            if (click != null) {
+                click.onItemClick(mid);
+            }
+        };
+        ArrayList<MgChatMenu.Section> sections = new ArrayList<>();
+        MgChatMenu.Section privacy = new MgChatMenu.Section(org.telegram.messenger.MgLang.t("Maxfiylik"));
+        privacy.add(R.drawable.msg_secret, org.telegram.messenger.MgConfig.isDialogLocked(currentAccount, dialog_id) ? org.telegram.messenger.MgLang.t("Qulfni olish") : org.telegram.messenger.MgLang.t("Chatni qulflash"), () -> run.run(MgChatLock.MENU_ID));
+        privacy.add(R.drawable.msg_archive, org.telegram.messenger.MgConfig.isDialogHidden(currentAccount, dialog_id) ? org.telegram.messenger.MgLang.t("Yashirishdan chiqarish") : org.telegram.messenger.MgLang.t("Chatni yashirish"), () -> run.run(MgChatLock.MENU_ID_HIDE));
+        sections.add(privacy);
+        if (currentEncryptedChat == null && (currentChat == null || ChatObject.canSendMessages(currentChat))) {
+            MgChatMenu.Section write = new MgChatMenu.Section(org.telegram.messenger.MgLang.t("Yozish yordamchisi"));
+            write.add(R.drawable.msg_text_outlined, MgChatFeatures.autoTextMenuTitle(currentAccount, dialog_id), () -> run.run(MgChatFeatures.MENU_AUTO_TEXT));
+            write.add(R.drawable.msg_translate, MgChatFeatures.autoTranslateMenuTitle(currentAccount, dialog_id), () -> run.run(MgChatFeatures.MENU_AUTO_TRANSLATE));
+            write.add(R.drawable.msg_saved, org.telegram.messenger.MgLang.t("Tezkor shablonlar"), () -> run.run(MgChatFeatures.MENU_TEMPLATES));
+            if (MgVoiceTyping.isAvailable(getParentActivity())) {
+                write.add(R.drawable.input_mic, org.telegram.messenger.MgLang.t("Ovoz bilan yozish"), () -> run.run(MgChatFeatures.MENU_VOICE_TYPING));
+            }
+            if (MgChatFeatures.canOneTimeVoice(currentUser)) {
+                write.add(R.drawable.msg_voicechat, MgChatFeatures.oneTimeVoiceMenuTitle(currentAccount, dialog_id), () -> run.run(MgChatFeatures.MENU_ONE_TIME_VOICE));
+            }
+            sections.add(write);
+        }
+        if (currentChat != null) {
+            MgChatMenu.Section admin = new MgChatMenu.Section(ChatObject.isChannelAndNotMegaGroup(currentChat) ? org.telegram.messenger.MgLang.t("Kanal boshqaruvi") : org.telegram.messenger.MgLang.t("Guruh boshqaruvi"));
+            if (MgAutoDeleteUI.isAvailable(currentAccount, dialog_id)) {
+                int mode = org.telegram.messenger.MgAutoDelete.getChatMode(currentAccount, dialog_id);
+                admin.add(R.drawable.msg_autodelete, org.telegram.messenger.MgLang.t("Avto-o'chirish rejimi") + (mode > 0 ? " · " + org.telegram.messenger.MgAutoDelete.durationName(mode) : ""),
+                        () -> MgAutoDeleteUI.pickChatMode(ChatActivity.this, currentAccount, dialog_id, () -> {
+                            if (chatActivityEnterView != null) {
+                                chatActivityEnterView.mgUpdateAutoDeleteBadge();
+                            }
+                        }));
+            }
+            if (ChatObject.isChannel(currentChat)) {
+                admin.add(R.drawable.msg_stats, org.telegram.messenger.MgLang.t("Obunachilar kundaligi"), () -> run.run(MgChatFeatures.MENU_GROWTH));
+            }
+            if (ChatObject.canUserDoAdminAction(currentChat, ChatObject.ACTION_INVITE)) {
+                admin.add(R.drawable.msg_requests, org.telegram.messenger.MgLang.t("Qo'shilish so'rovlari"), () -> run.run(MgChatFeatures.MENU_JOIN_REQUESTS));
+            }
+            if (MgMembersActivity.canUse(currentChat)) {
+                admin.add(R.drawable.msg_leave, org.telegram.messenger.MgLang.t("A'zolarni tozalash"), () -> run.run(MgChatFeatures.MENU_MEMBERS_CLEAN));
+            }
+            sections.add(admin);
+        }
+        MgChatMenu.Section info = new MgChatMenu.Section(org.telegram.messenger.MgLang.t("Chat haqida"));
+        info.add(R.drawable.msg_stats, org.telegram.messenger.MgLang.t("Chat statistikasi"), () -> run.run(MgChatTools.MENU_STATS));
+        info.add(R.drawable.msg_download, org.telegram.messenger.MgLang.t("Chatni eksport qilish"), () -> run.run(MgChatTools.MENU_EXPORT));
+        sections.add(info);
+        MgChatMenu.show(this, org.telegram.messenger.MgLang.t("MilliyGram vositalari"), sections);
     }
 
     private ArrayList<MessageObject> mgSelectedMessages() {
@@ -47368,6 +47423,10 @@ public class ChatActivity extends BaseFragment implements
     }
 
     private boolean onSideControlButtonOnLongClick(int buttonId, View view) {
+        if (buttonId == ChatActivitySideControlsButtonsLayout.BUTTON_PAGE_DOWN) {
+            mgShowQuickJump(); // MilliyGram: ↓ tugmasini uzoq bosish — xabarga tez o'tish
+            return true;
+        }
         final Runnable onRead;
         final int type;
         if (buttonId == ChatActivitySideControlsButtonsLayout.BUTTON_MENTION) {

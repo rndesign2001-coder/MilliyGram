@@ -1467,3 +1467,57 @@ XAVFSIZ	БЕЗОПАСНО	SECURE
 🎉 Yangi versiya tayyor	🎉 Новая версия готова	🎉 New version ready
 MilliyGram'ning yangi versiyasi Google Play'dan yuklab olindi. O'rnatish uchun ilova bir necha soniyaga qayta ishga tushadi.	Новая версия MilliyGram загружена из Google Play. Для установки приложение перезапустится на несколько секунд.	A new version of MilliyGram has been downloaded from Google Play. The app will restart for a few seconds to install it.
 O'rnatish	Установить	Install
+Xabarga tez o'tish	Быстрый переход к сообщению	Quick jump to message
+MilliyGram vositalari	Инструменты MilliyGram	MilliyGram tools
+Yozish yordamchisi	Помощник при письме	Writing assistant
+Kanal boshqaruvi	Управление каналом	Channel management
+Guruh boshqaruvi	Управление группой	Group management
+Avto-o'chirish rejimi	Режим автоудаления	Auto-delete mode
+Chat haqida	О чате	About chat
+Chat statistikasi	Статистика чата	Chat statistics
+Maxsus sozlamalar	Особые настройки	Special settings
+Avto-o'chirish rejimi yoqildi: bu chatga yuboriladigan har qanday xabar 	Режим автоудаления включён: любое сообщение в этом чате удалится через 	Auto-delete mode is on: any message sent to this chat will be deleted after 
+dan keyin o'chadi		
+Avto-o'chirish rejimi o'chirildi	Режим автоудаления выключен	Auto-delete mode is off
+⏮  Eng birinchi xabarga o'tish	⏮  К самому первому сообщению	⏮  Go to the first message
+⏫  Tepaga tez chiqish (100 ta xabar)	⏫  Быстро вверх (100 сообщений)	⏫  Jump up (100 messages)
+⏬  Pastga tez tushish (eng oxirgisi)	⏬  Быстро вниз (к последнему)	⏬  Jump down (latest)
+📅  Sana bo'yicha o'tish	📅  Перейти к дате	📅  Jump to date
+Uzatishda avval belgilash	При пересылке сначала выбирать	Select before sending when forwarding
+Yoqilganda uzatish oynasida chat bosilsa darhol yuborilmaydi — bir nechta chatni belgilab, pastdagi tugma bilan yuborasiz. Tugmani uzoq bossangiz: rejalashtirish, ovozsiz va avto-o'chirish bilan yuborish. 📁 tugmasi — saqlangan chat to'plamlari.	Если включено, нажатие на чат в окне пересылки не отправляет сразу — отметьте несколько чатов и отправьте кнопкой внизу. Долгое нажатие на кнопку: отложить, без звука или с автоудалением. Кнопка 📁 — сохранённые наборы чатов.	When on, tapping a chat in the forward screen doesn't send right away — select several chats and send with the button below. Long-press it to schedule, send silently or with auto-delete. The 📁 button opens saved chat sets.
+Bekor qilinsinmi?	Отменить?	Cancel it?
+Bu post avtomatik o'chirilmaydi.	Этот пост не будет удалён автоматически.	This post won't be deleted automatically.
+Botlarni to'xtatish va tozalash	Остановить и очистить ботов	Stop and clear bots
+⭐ \"Tanlanganlar\" jildiga qo'shildi	⭐ Добавлено в папку «Избранные»	⭐ Added to \"Favorites\"
+\"Tanlanganlar\" jildidan olib tashlandi	Удалено из папки «Избранные»	Removed from \"Favorites\"
+🕘 Oxirgi tanlov (	🕘 Последний выбор (	🕘 Last selection (
+ ta)	)	)
+➕ Belgilanganlarni to'plam qilib saqlash (	➕ Сохранить отмеченные как набор (	➕ Save selected as a set (
+🗑 To'plamni o'chirish…	🗑 Удалить набор…	🗑 Delete a set…
+Qaysi to'plam o'chirilsin?	Какой набор удалить?	Which set to delete?
+Chatlarni belgilab, shu tugma orqali to'plam qilib saqlang (masalan, \"Reklama kanallarim\")	Отметьте чаты и сохраните их набором этой кнопкой (например, «Мои рекламные каналы»)	Select chats and save them as a set with this button (e.g. \"My ad channels\")
+Chat to'plamlari	Наборы чатов	Chat sets
+ ta chat belgilandi	 чатов отмечено	 chats selected
+Masalan: Reklama kanallarim	Например: Мои рекламные каналы	e.g. My ad channels
+To'plam nomi	Название набора	Set name
+To'plam	Набор	Set
+\" saqlandi (	» сохранён (	\" saved (
+ ta chat)	 чатов)	 chats)
+Kontakt	Контакт	Contact
+Havola va ID	Ссылка и ID	Link and ID
+Kontakt nomini o'zgartirish	Изменить имя контакта	Edit contact name
+Maxsus kontakt qo'shish	Добавить контакт со своим именем	Add contact with custom name
+Foydalanuvchi eslatmasini ulashish	Поделиться упоминанием пользователя	Share user mention
+Havolani ulashish	Поделиться ссылкой	Share link
+ID ni nusxalash	Копировать ID	Copy ID
+Profil kartasi (QR)	Карточка профиля (QR)	Profile card (QR)
+Kanal tahrirchilari safiga qo'shish	Добавить в редакторы канала	Add as channel editor
+Jildga qo'shish	Добавить в папку	Add to folder
+Tanlanganlardan olib tashlash	Убрать из избранных	Remove from favorites
+Tanlab olinganlarga qo'shish	Добавить в избранные	Add to favorites
+Boshqa	Другое	Other
+Siz admin tayinlay oladigan kanal yoki guruh yo'q	Нет каналов или групп, где вы можете назначать админов	No channels or groups where you can add admins
+Qaysi kanalga tahrirchi qilinsin?	В каком канале назначить редактором?	Make editor in which channel?
+Jildlar yo'q. Sozlamalar → Jildlar orqali yarating yoki \"Toifaga qo'shish\"dan foydalaning.	Папок нет. Создайте их в Настройки → Папки или используйте «Добавить в категорию».	No folders. Create one in Settings → Folders or use \"Add to category\".
+Allaqachon shu jildda	Уже в этой папке	Already in this folder
+\" jildiga qo'shildi	» — добавлено в папку	\" — added to folder

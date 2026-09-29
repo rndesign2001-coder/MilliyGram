@@ -5,6 +5,9 @@ name: MilliyGram Google Play (AAB)
 # Natija: Actions sahifasidagi artefakt (MilliyGram-play-<versiya>-<build>.aab) — uni Play Console'ga yuklaysiz.
 on:
   workflow_dispatch:
+  push:
+    branches: [ claude/zen-hypatia-ngf4ae ]
+    paths: [ '.github/workflows/play.yml' ]
 
 permissions:
   contents: read
@@ -68,6 +71,7 @@ jobs:
         env:
           API_ID: ${{ secrets.API_ID }}
           API_HASH: ${{ secrets.API_HASH }}
+          MG_BUILD_OFFSET: "1000"
           STORE_PASS: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD || secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS || secrets.KEY_ALIAS }}
           KEY_PASS: ${{ secrets.UPLOAD_KEY_PASSWORD || secrets.KEY_PASSWORD }}
@@ -83,7 +87,7 @@ jobs:
         run: |
           VER=$(grep APP_VERSION_NAME gradle.properties | cut -d= -f2)
           AAB=$(find TMessagesProj_App/build/outputs/bundle -name "*.aab" | head -1)
-          NAME="MilliyGram-play-${VER}-${GITHUB_RUN_NUMBER}.aab"
+          NAME="MilliyGram-play-${VER}-b$((GITHUB_RUN_NUMBER + 1000)).aab"
           cp "$AAB" "$NAME"
           echo "name=$NAME" >> "$GITHUB_OUTPUT"
 

@@ -17,6 +17,7 @@ import org.telegram.tgnet.TLRPC;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 
 /**
@@ -235,6 +236,9 @@ public class MgLocalFolders {
     }
 
     public static void save(int account, ArrayList<Entry> entries) {
+        synchronized (favCache) {
+            favCache.remove(account);
+        }
         try {
             JSONArray arr = new JSONArray();
             for (Entry e : entries) {
@@ -477,6 +481,80 @@ public class MgLocalFolders {
         save(account, entries);
         applyAndNotify(account);
         return id;
+    }
+
+    // ---------- Tanlanganlar (⭐) ----------
+
+    public static final String FAV_KEY = "favorites";
+    private static final java.util.HashMap<Integer, HashSet<Long>> favCache = new java.util.HashMap<>();
+
+    /** "Tanlanganlar" lokal jildining id si (yo'q bo'lsa 0) */
+    public static int favoritesId(int account) {
+        for (Entry e : load(account)) {
+            if (e.type == TYPE_CUSTOM && FAV_KEY.equals(e.key)) {
+                return e.id;
+            }
+        }
+        return 0;
+    }
+
+    private static HashSet<Long> favSet(int account) {
+        synchronized (favCache) {
+            HashSet<Long> set = favCache.get(account);
+            if (set == null) {
+                set = new HashSet<>();
+                for (Entry e : load(account)) {
+                    if (e.type == TYPE_CUSTOM && FAV_KEY.equals(e.key)) {
+                        set.addAll(e.always);
+                    }
+                }
+                favCache.put(account, set);
+            }
+            return set;
+        }
+    }
+
+    public static boolean isFavorite(int account, long did) {
+        return did != 0 && favSet(account).contains(did);
+    }
+
+    /**
+     * Chatlarni "Tanlanganlar" jildiga qo'shadi yoki olib tashlaydi. Jild bo'lmasa — ⭐ ikonkali lokal jild
+     * darhol yaratiladi va "Barchasi"dan keyingi tabga qo'yiladi.
+     * @return qo'shilgan (true) yoki olib tashlangan (false)
+     */
+    public static boolean setFavorite(int account, ArrayList<Long> dids, boolean add) {
+        synchronized (favCache) {
+            favCache.remove(account);
+        }
+        int id = favoritesId(account);
+        if (add) {
+            if (id == 0) {
+                id = createCategory(account, org.telegram.messenger.MgLang.t("Tanlanganlar"), dids);
+                if (id == 0) {
+                    return false;
+                }
+                ArrayList<Entry> entries = load(account);
+                for (Entry e : entries) {
+                    if (e.id == id) {
+                        e.key = FAV_KEY;
+                        e.icon = "fave";
+                        e.pos = 1;
+                    }
+                }
+                save(account, entries);
+                MgConfig.setString("folder_icon_" + account + "_" + id, "fave");
+                applyAndNotify(account);
+            } else {
+                addToCategory(account, id, dids);
+            }
+        } else if (id != 0) {
+            removeFromCategory(account, id, dids);
+        }
+        synchronized (favCache) {
+            favCache.remove(account);
+        }
+        return add;
     }
 
     /** Chatlarni toifaga qo'shadi; qo'shilganlar sonini qaytaradi */

@@ -258,6 +258,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     private Path thumbPath;
     private SpoilerEffect thumbSpoiler;
     private boolean drawForwardIcon, drawGiftIcon;
+    private static android.text.TextPaint mgStarPaint;
     private boolean visibleOnScreen = true;
     private boolean updateLayout;
     private boolean wasDrawnOnline;
@@ -4729,6 +4730,15 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 storyParams.forceState = s;
             }
 
+            // MilliyGram: "Tanlanganlar" jildidagi chat — avatar burchagida ⭐
+            if (isDialogCell && !isDialogFolder() && currentDialogId != 0 && org.telegram.messenger.MgLocalFolders.isFavorite(currentAccount, currentDialogId)) {
+                if (mgStarPaint == null) {
+                    mgStarPaint = new android.text.TextPaint(Paint.ANTI_ALIAS_FLAG);
+                    mgStarPaint.setTextAlign(Paint.Align.CENTER);
+                }
+                mgStarPaint.setTextSize(dp(12));
+                canvas.drawText("⭐", storyParams.originalAvatarRect.left + dp(5), storyParams.originalAvatarRect.top + dp(10), mgStarPaint);
+            }
             if (!insideCommunityList && (chat != null && chat.linked_community_id != 0 || user != null && user.linked_community_id != 0) && !drawCommunityAvatar && isDialogCell && !isDialogFolder()) {
                 final float ccx = storyParams.originalAvatarRect.centerX() + dp(20.33f);
                 final float ccy = storyParams.originalAvatarRect.centerY() + dp(19);
