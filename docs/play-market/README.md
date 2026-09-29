@@ -22,7 +22,13 @@ Parol almashsa ham imzo o'zgarmaydi — foydalanuvchilar odatdagidek yangilaydi.
 
 ## 2. AAB yig'ish
 Actions → **"MilliyGram Google Play (AAB)"** → Run workflow → tugagach Artifacts'dan `MilliyGram-play-….aab`ni yuklab oling.
-Play versiyasida Play qoidalariga zid ruxsatlar (APK o'rnatish, USE_EXACT_ALARM, fon joylashuvi) avtomatik olib tashlanadi. Ilova ichidagi "yangi versiya" oynasi ham Play'dan o'rnatilganda o'chadi — yangilanishni Play o'zi beradi.
+Play versiyasida Play qoidalariga zid ruxsatlar (APK o'rnatish, USE_EXACT_ALARM, fon joylashuvi) avtomatik olib tashlanadi.
+
+### Yangilanishlar
+Ilova Google Play'ning rasmiy **In-App Updates** mexanizmidan foydalanadi: Play'ga yangi versiya yuklaganingizda, foydalanuvchi ilovani ochganda buni ko'radi, yangilanish fonda yuklanadi va "O'rnatish" so'raladi.
+- Oddiy yangilanish — fonda yuklanadi (foydalanuvchi ishlashda davom etadi).
+- Muhim yangilanish — Play Console'da relizga **prioritet 4 yoki 5** bering (Play Developer API orqali `inAppUpdatePriority`) — shunda to'liq ekranli majburiy oyna chiqadi. 7 kundan beri yangilanmagan foydalanuvchilarga ham shu oyna chiqadi.
+- Bu faqat Play'dan o'rnatilgan ilovada ishlaydi va faqat Play orqali sinab ko'rish mumkin (Internal testing yoki Internal app sharing).
 
 ## 3. Play Console
 1. play.google.com/console → Create app → nom: **MilliyGram**, til: o'zbek, turi: App, bepul.

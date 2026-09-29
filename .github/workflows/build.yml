@@ -62,8 +62,6 @@ jobs:
         env:
           API_ID: ${{ secrets.API_ID }}
           API_HASH: ${{ secrets.API_HASH }}
-          # yangi versiya e'lon qilinadigan kanal (Settings → Secrets and variables → Actions → Variables)
-          MG_UPDATE_CHANNEL: ${{ vars.MG_UPDATE_CHANNEL }}
         run: |
           set -o pipefail
           touch build.log
@@ -113,32 +111,3 @@ jobs:
           name: MilliyGram ${{ steps.out.outputs.tag }}
           body: "Avtomatik yig'ilgan APK. Norasmiy Telegram klienti."
           files: ${{ steps.out.outputs.name }}
-
-      # Yangi APK'ni Telegram kanalga "#mgupdate <build>" belgisi bilan joylash.
-      # Eski versiyalar shu belgini ko'rib, foydalanuvchiga "Yangilab oling" deb xabar beradi.
-      # Kerak: TG_BOT_TOKEN (secret) va MG_UPDATE_CHANNEL (variable); bot kanalda admin bo'lishi kerak.
-      - name: Telegram kanalga e'lon qilish
-        if: success()
-        env:
-          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
-          MG_UPDATE_CHANNEL: ${{ vars.MG_UPDATE_CHANNEL }}
-          RELEASE_URL: https://github.com/${{ github.repository }}/releases/tag/${{ steps.out.outputs.tag }}
-        run: |
-          if [ -z "$TG_BOT_TOKEN" ] || [ -z "$MG_UPDATE_CHANNEL" ]; then
-            echo "TG_BOT_TOKEN yoki MG_UPDATE_CHANNEL sozlanmagan — kanalga e'lon qilinmaydi"
-            exit 0
-          fi
-          CH="@${MG_UPDATE_CHANNEL#@}"
-          VER=$(grep APP_VERSION_NAME gradle.properties | cut -d= -f2)
-          MSG=$(git log -1 --pretty=%s | cut -c1-600)
-          CAPTION=$(printf '🆕 MilliyGram %s (b%s)\n\n%s\n\n#mgupdate %s' "$VER" "$GITHUB_RUN_NUMBER" "$MSG" "$GITHUB_RUN_NUMBER")
-          # Bot API 50 MB gacha fayl yuboradi; oshsa — havola bilan xabar
-          if curl -sf --form-string chat_id="$CH" --form-string caption="$CAPTION" -F document=@"${{ steps.out.outputs.name }}" \
-               "https://api.telegram.org/bot${TG_BOT_TOKEN}/sendDocument" > /dev/null; then
-            echo "APK kanalga yuborildi"
-          else
-            curl -sf -d chat_id="$CH" --data-urlencode text="$CAPTION
-
-          ⬇️ Yuklab olish: $RELEASE_URL" "https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage" > /dev/null \
-              && echo "Havola kanalga yuborildi" || echo "::warning::Kanalga yuborib bo'lmadi (bot kanalda adminmi?)"
-          fi

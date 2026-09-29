@@ -156,15 +156,19 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
     }
 
     private void checkUpdate() {
-        if (android.text.TextUtils.isEmpty(org.telegram.messenger.MgUpdater.channel())) {
-            org.telegram.ui.Components.BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, org.telegram.messenger.MgLang.t("Yangilanishlar kanali sozlanmagan")).show();
+        if (getParentActivity() == null) {
+            return;
+        }
+        if (!org.telegram.messenger.MgUpdater.isFromPlayStore()) {
+            // APK orqali o'rnatilgan — Play sahifasini ochamiz
+            org.telegram.messenger.MgUpdater.openPlayPage(getParentActivity());
             return;
         }
         org.telegram.ui.Components.BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, org.telegram.messenger.MgLang.t("Tekshirilmoqda…")).show();
-        org.telegram.messenger.MgUpdater.check(getParentActivity(), true, build -> {
-            if (build == null) {
+        org.telegram.messenger.MgUpdater.check(getParentActivity(), true, started -> {
+            if (started == null) {
                 org.telegram.ui.Components.BulletinFactory.of(this).createErrorBulletin(org.telegram.messenger.MgLang.t("Tekshirib bo'lmadi (internetni tekshiring)")).show();
-            } else if (build == 0) {
+            } else if (!started) {
                 org.telegram.ui.Components.BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Sizda eng so'nggi versiya o'rnatilgan")).show();
             }
         });
