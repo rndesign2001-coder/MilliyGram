@@ -115,6 +115,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
     private boolean justCreated = false;
     private boolean startPressed = false;
     private Drawable logoDrawable;
+    private Drawable mgWordA, mgWordB;
     private CharSequence[] titles;
     private String[] messages;
     private int currentViewPagerPage;
@@ -156,9 +157,12 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
     @Override
     public View createView(Context context) {
         // MilliyGram: so'z belgisi (Telegram logotipi o'rniga)
-        logoDrawable = context.getResources().getDrawable(R.drawable.telegram_logo_2).mutate();
-        logoDrawable.setColorFilter(new android.graphics.PorterDuffColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText), android.graphics.PorterDuff.Mode.SRC_IN));
-        logoDrawable.setBounds(0, dp(4), dp(140), dp(31));
+        // "Milliy" — matn rangida, "Gram" — ko'k (logodagidek)
+        mgWordA = context.getResources().getDrawable(R.drawable.mg_word_milliy).mutate();
+        mgWordB = context.getResources().getDrawable(R.drawable.mg_word_gram).mutate();
+        logoDrawable = new android.graphics.drawable.LayerDrawable(new Drawable[]{mgWordA, mgWordB});
+        mgTintWordmark();
+        logoDrawable.setBounds(0, dp(4), dp(150), dp(33));
         SpannableStringBuilder ssb = new SpannableStringBuilder(LocaleController.getString(R.string.Page1Title));
         ssb.setSpan(new ImageSpan(logoDrawable), 0, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         titles[0] = ssb;
@@ -631,7 +635,15 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
             container.addView(frameLayout, 0);
 
             headerTextView.setText(titles[position]);
-            messageTextView.setText(AndroidUtilities.replaceTags(messages[position]));
+            if (position == 0) {
+                // MilliyGram: logodagi shior
+                messageTextView.setText(mgTagline());
+                messageTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+                messageTextView.setLetterSpacing(0.16f);
+                messageTextView.setTextColor(Theme.multAlpha(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText), 0.75f));
+            } else {
+                messageTextView.setText(AndroidUtilities.replaceTags(messages[position]));
+            }
 
             return frameLayout;
         }
@@ -989,9 +1001,35 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
                 Theme.key_featuredStickers_buttonText, Theme.key_windowBackgroundWhiteBlackText);
     }
 
+    private void mgTintWordmark() {
+        if (mgWordA == null || mgWordB == null) {
+            return;
+        }
+        boolean dark = Theme.isCurrentThemeDark();
+        mgWordA.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText), PorterDuff.Mode.SRC_IN));
+        mgWordB.setColorFilter(new PorterDuffColorFilter(dark ? 0xFF3AA0FF : 0xFF1E7BF0, PorterDuff.Mode.SRC_IN));
+    }
+
+    /** Logodagi shior: O‘ZBEKCHA • TEZ • XAVFSIZ (nuqtalar ko'k) */
+    private static CharSequence mgTagline() {
+        String a = org.telegram.messenger.MgLang.t("O‘ZBEKCHA"), b = org.telegram.messenger.MgLang.t("TEZ"), c = org.telegram.messenger.MgLang.t("XAVFSIZ");
+        SpannableStringBuilder sb = new SpannableStringBuilder();
+        int blue = Theme.isCurrentThemeDark() ? 0xFF3AA0FF : 0xFF1E7BF0;
+        String[] parts = {a, b, c};
+        for (int i = 0; i < parts.length; i++) {
+            if (i > 0) {
+                int st = sb.length();
+                sb.append("  •  ");
+                sb.setSpan(new android.text.style.ForegroundColorSpan(blue), st, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            sb.append(parts[i]);
+        }
+        return sb;
+    }
+
     private void updateColors(boolean fromTheme) {
         startMessagingButtonBackground.setColors(new int[]{getThemedColor(Theme.key_featuredStickers_addButton), getThemedColor(Theme.key_featuredStickers_addButton2)});
-        logoDrawable.setColorFilter(Theme.multAlpha(getThemedColor(Theme.key_actionBarDefaultTitle), 0.9f), PorterDuff.Mode.MULTIPLY);
+        mgTintWordmark();
         fragmentView.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
         switchLanguageTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
         startMessagingButton.setTextColor(Theme.getColor(Theme.key_featuredStickers_buttonText));
