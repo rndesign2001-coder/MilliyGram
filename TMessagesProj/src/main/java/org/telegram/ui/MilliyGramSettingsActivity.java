@@ -26,6 +26,10 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
     private static final int ID_SIMPLE = 503;
     private static final int ID_INTRO = 504;
     private static final int ID_UPDATE = 505;
+    private static final int ID_NEWS = 506;
+    private static final int ID_CHAT = 507;
+    public static final String NEWS_CHANNEL = "MilliyGramm";
+    public static final String CHAT_GROUP = "MilliyGramChat";
     private static final int ID_RESULT_BASE = 10000;
 
     private String mgQuery;
@@ -71,7 +75,10 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
             fillSearch(items);
             return;
         }
-        items.add(UItem.asShadow(null));
+        items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("MilliyGram hamjamiyati")));
+        items.add(UItem.asButton(ID_NEWS, R.drawable.msg_channel, org.telegram.messenger.MgLang.t("📢 Yangiliklar kanali"), "@" + NEWS_CHANNEL));
+        items.add(UItem.asButton(ID_CHAT, R.drawable.msg_groups, org.telegram.messenger.MgLang.t("💬 Loyiha chati (savol va takliflar)"), "@" + CHAT_GROUP));
+        items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Yangi versiyalar, imkoniyatlar va maslahatlar — kanalda. Savol, taklif yoki xato haqida xabar berish uchun chatga yozing.")));
         items.add(UItem.asButton(ID_SIMPLE, R.drawable.msg_zoomin, org.telegram.messenger.MgLang.t("Oddiy rejim (keksalar uchun)"),
                 org.telegram.messenger.MgSimple.isEnabled() ? org.telegram.messenger.MgLang.t("yoqilgan") : org.telegram.messenger.MgLang.t("o'chiq")));
         items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Katta yozuvlar, katta tugmalar va sodda menyu.")));
@@ -92,7 +99,9 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
 
     @Override
     protected void onClick(UItem item, View view, int position, float x, float y) {
-        if (item.id == ID_SIMPLE) {
+        if (item.id == ID_NEWS || item.id == ID_CHAT) {
+            org.telegram.messenger.browser.Browser.openUrl(getParentActivity(), "https://t.me/" + (item.id == ID_NEWS ? NEWS_CHANNEL : CHAT_GROUP));
+        } else if (item.id == ID_SIMPLE) {
             presentFragment(new MgSimpleModeActivity());
         } else if (item.id == ID_INTRO) {
             MgOnboarding.show(getParentActivity());

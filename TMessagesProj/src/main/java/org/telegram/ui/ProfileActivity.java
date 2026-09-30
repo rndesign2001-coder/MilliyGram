@@ -653,6 +653,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     private int infoEndRowEmpty;
     private int phoneRow;
     private int mgIdRow = -1; // MilliyGram: ID qatori
+    private ActionBarPopupWindow.ActionBarPopupWindowLayout mgToolsSwipeLayout;
+    private int mgQuickRow = -1, mgQuickSectionRow = -1; // MilliyGram: kanal/guruh tezkor tugmalari
     private int noteRow;
     private int locationRow;
     private int userInfoRow;
@@ -10539,6 +10541,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         infoEndRowEmpty = -1;
         phoneRow = -1;
         mgIdRow = -1;
+        mgQuickRow = -1;
+        mgQuickSectionRow = -1;
         noteRow = -1;
         userInfoRow = -1;
         locationRow = -1;
@@ -10874,6 +10878,17 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 sharedMediaRow = rowCount++;
             }
         } else if (chatId != 0) {
+            if (mgQuickAvailable()) {
+                if (emptyRow < 0 && emptyRow2 < 0) {
+                    if (hasMusic || peerColor != null || actionsView == null) {
+                        emptyRow2 = rowCount++;
+                    } else {
+                        emptyRow = rowCount++;
+                    }
+                }
+                mgQuickRow = rowCount++;
+                mgQuickSectionRow = rowCount++;
+            }
             if (currentChat != null || chatInfo != null && (!TextUtils.isEmpty(chatInfo.about) || chatInfo.location instanceof TLRPC.TL_channelLocation) || ChatObject.isPublic(currentChat)) {
                 if (emptyRow < 0 && emptyRow2 < 0) {
                     if (hasMusic || peerColor != null || actionsView == null) {
@@ -12103,6 +12118,11 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         }
         Context context = actionBar.getContext();
         otherItem.removeAllSubItems();
+        if (mgToolsSwipeLayout != null && mgToolsSwipeLayout.getParent() instanceof ViewGroup) {
+            // MilliyGram: eski "Maxsus sozlamalar" sahifasi qayta qo'shilishidan oldin olib tashlanadi
+            ((ViewGroup) mgToolsSwipeLayout.getParent()).removeView(mgToolsSwipeLayout);
+        }
+        mgToolsSwipeLayout = null;
         animatingItem = null;
 
         editItemVisible = false;
@@ -12349,7 +12369,19 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         }
         // MilliyGram: profil ⋮ → "Maxsus sozlamalar"
         if (imageUpdater == null && (userId != 0 && userId != getUserConfig().getClientUserId() || chatId != 0) && topicId == 0) {
-            otherItem.addSubItem(MgProfileTools.MENU_ID, R.drawable.msg_customize, org.telegram.messenger.MgLang.t("Maxsus sozlamalar"));
+            if (getContext() != null && otherItem.getPopupLayout() != null && otherItem.getPopupLayout().getSwipeBack() != null) {
+                final ActionBarPopupWindow.ActionBarPopupWindowLayout mgLayout = MgChatMenu.createSwipeLayout(getContext(), resourcesProvider);
+                mgToolsSwipeLayout = mgLayout;
+                final long mgDid = userId != 0 ? userId : -chatId;
+                final Runnable[] mgFill = new Runnable[1];
+                mgFill[0] = () -> MgChatMenu.fillSwipe(mgLayout, otherItem.getPopupLayout().getSwipeBack(), resourcesProvider,
+                        MgProfileTools.buildSections(ProfileActivity.this, currentAccount, mgDid),
+                        () -> otherItem.closeSubMenu(), mgFill[0]);
+                mgFill[0].run();
+                otherItem.addSwipeBackItem(R.drawable.msg_customize, null, org.telegram.messenger.MgLang.t("Maxsus sozlamalar"), mgLayout);
+            } else {
+                otherItem.addSubItem(MgProfileTools.MENU_ID, R.drawable.msg_customize, org.telegram.messenger.MgLang.t("Maxsus sozlamalar"));
+            }
         }
 
         if (imageUpdater != null) {
@@ -13116,6 +13148,66 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         });
     }
 
+    /** MilliyGram: kanal/guruh adminlari uchun tezkor tugmalar qatori */
+    private boolean mgQuickAvailable() {
+        if (currentChat == null || topicId != 0 || ChatObject.isNotInChat(currentChat) || !org.telegram.messenger.MgConfig.getBool("profile_quick_row", true)) {
+            return false;
+        }
+        return currentChat.creator || ChatObject.hasAdminRights(currentChat);
+    }
+
+    private View mgCreateQuickView(Context context) {
+        LinearLayout row = new LinearLayout(context);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER);
+        row.setPadding(dp(12), dp(6), dp(12), dp(6));
+        if (currentChat == null) {
+            return row;
+        }
+        final boolean channel = ChatObject.isChannelAndNotMegaGroup(currentChat);
+        final ArrayList<Object[]> buttons = new ArrayList<>();
+        buttons.add(new Object[]{R.drawable.msg_groups, org.telegram.messenger.MgLang.t(channel ? "Obunachilar" : "A'zolar"), (Runnable) () -> mgOpenUsers(ChatUsersActivity.TYPE_USERS)});
+        buttons.add(new Object[]{R.drawable.msg_admins, org.telegram.messenger.MgLang.t("Adminlar"), (Runnable) () -> mgOpenUsers(ChatUsersActivity.TYPE_ADMIN)});
+        if (ChatObject.isChannel(currentChat) || currentChat.creator || ChatObject.canBlockUsers(currentChat)) {
+            final boolean kicked = !channel && !currentChat.gigagroup || ChatObject.isCommunity(currentChat);
+            buttons.add(new Object[]{kicked ? R.drawable.msg_permissions : R.drawable.msg_user_remove,
+                    org.telegram.messenger.MgLang.t(kicked ? "Ruxsatlar" : "Chiqarib yuborilganlar"),
+                    (Runnable) () -> mgOpenUsers(kicked ? ChatUsersActivity.TYPE_KICKED : ChatUsersActivity.TYPE_BANNED)});
+        }
+        if (ChatObject.isChannel(currentChat) || currentChat.gigagroup) {
+            buttons.add(new Object[]{R.drawable.msg_log, org.telegram.messenger.MgLang.t("So'nggi amallar"), (Runnable) () -> presentFragment(new ChannelAdminLogActivity(currentChat))});
+        }
+        for (Object[] b : buttons) {
+            ImageView iv = new ImageView(context);
+            iv.setScaleType(ImageView.ScaleType.CENTER);
+            iv.setImageResource((Integer) b[0]);
+            iv.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_windowBackgroundWhiteGrayIcon), PorterDuff.Mode.SRC_IN));
+            iv.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector), Theme.RIPPLE_MASK_CIRCLE_20DP));
+            final String label = (String) b[1];
+            iv.setContentDescription(label);
+            final Runnable action = (Runnable) b[2];
+            iv.setOnClickListener(v -> action.run());
+            iv.setOnLongClickListener(v -> {
+                BulletinFactory.of(ProfileActivity.this).createSimpleBulletin(R.raw.info, label).show();
+                return true;
+            });
+            row.addView(iv, LayoutHelper.createLinear(52, 44, 0, 4, 0, 4, 0));
+        }
+        return row;
+    }
+
+    private void mgOpenUsers(int type) {
+        if (currentChat == null) {
+            return;
+        }
+        Bundle args = new Bundle();
+        args.putLong("chat_id", chatId);
+        args.putInt("type", type);
+        ChatUsersActivity fragment = new ChatUsersActivity(args);
+        fragment.setInfo(chatInfo);
+        presentFragment(fragment);
+    }
+
     private class ListAdapter extends RecyclerListView.SelectionAdapter {
         private final static int VIEW_TYPE_HEADER = 1,
                 VIEW_TYPE_TEXT_DETAIL = 2,
@@ -13146,7 +13238,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 VIEW_TYPE_TEXT_DETAIL_MULTILINE_2 = 30,
                 VIEW_TYPE_EMPTY2 = 31,
                 VIEW_TYPE_TEXT2 = 32,
-                VIEW_TYPE_LINKED_COMMUNITY = 33
+                VIEW_TYPE_LINKED_COMMUNITY = 33,
+                VIEW_TYPE_MG_QUICK = 90
                         ;
 
         private Context mContext;
@@ -13235,6 +13328,11 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 }
                 case VIEW_TYPE_SHADOW: {
                     view = new ShadowSectionCell(mContext, resourcesProvider);
+                    break;
+                }
+                case VIEW_TYPE_MG_QUICK: {
+                    view = mgCreateQuickView(mContext);
+                    view.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhite));
                     break;
                 }
                 case VIEW_TYPE_SHADOW_TEXT: {
@@ -14336,7 +14434,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             int type = holder.getItemViewType();
             return type != VIEW_TYPE_HEADER && type != VIEW_TYPE_DIVIDER && type != VIEW_TYPE_SHADOW &&
                     type != VIEW_TYPE_EMPTY && type != VIEW_TYPE_EMPTY2 && type != VIEW_TYPE_HEADER_EMPTY && type != VIEW_TYPE_BOTTOM_PADDING && type != VIEW_TYPE_SHARED_MEDIA &&
-                    type != 9 && type != 10 && type != VIEW_TYPE_BOT_APP && type != VIEW_TYPE_TEXT2; // These are legacy ones, left for compatibility
+                    type != 9 && type != 10 && type != VIEW_TYPE_BOT_APP && type != VIEW_TYPE_TEXT2 && type != VIEW_TYPE_MG_QUICK; // These are legacy ones, left for compatibility
         }
 
         @Override
@@ -14412,6 +14510,10 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 return VIEW_TYPE_CHANNEL;
             } else if (position == botAppRow) {
                 return VIEW_TYPE_BOT_APP;
+            } else if (position == mgQuickRow) {
+                return VIEW_TYPE_MG_QUICK;
+            } else if (position == mgQuickSectionRow) {
+                return VIEW_TYPE_SHADOW;
             } else if (position == infoSectionRow || position == infoAffiliateRow) {
                 return VIEW_TYPE_SHADOW_TEXT;
             } else if (position == unofficialSecurityRiskRow) {
@@ -15750,6 +15852,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             put(++pointer, infoEndRowEmpty, sparseIntArray);
             put(++pointer, phoneRow, sparseIntArray);
             put(++pointer, mgIdRow, sparseIntArray);
+            put(++pointer, mgQuickRow, sparseIntArray);
+            put(++pointer, mgQuickSectionRow, sparseIntArray);
             put(++pointer, noteRow, sparseIntArray);
             put(++pointer, locationRow, sparseIntArray);
             put(++pointer, userInfoRow, sparseIntArray);

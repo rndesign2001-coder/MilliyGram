@@ -429,30 +429,10 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
         switchLanguageTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
         frameContainerView.addView(switchLanguageTextView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, 30, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0, 0, 20));
         switchLanguageTextView.setOnClickListener(v -> {
-            if (startPressed || localeInfo == null) {
+            if (startPressed) {
                 return;
             }
-            startPressed = true;
-
-            AlertDialog loaderDialog = new AlertDialog(v.getContext(), AlertDialog.ALERT_TYPE_SPINNER);
-            loaderDialog.setCanCancel(false);
-            loaderDialog.showDelayed(1000);
-
-            NotificationCenter.getGlobalInstance().addObserver(new NotificationCenter.NotificationCenterDelegate() {
-                @Override
-                public void didReceivedNotification(int id, int account, Object... args) {
-                    if (id == NotificationCenter.reloadInterface) {
-                        loaderDialog.dismiss();
-
-                        NotificationCenter.getGlobalInstance().removeObserver(this, id);
-                        AndroidUtilities.runOnUIThread(()->{
-                            presentFragment(new LoginActivity().setIntroView(frameContainerView, startMessagingButton), true);
-                            destroyed = true;
-                        }, 100);
-                    }
-                }
-            }, NotificationCenter.reloadInterface);
-            LocaleController.getInstance().applyLanguage(localeInfo, true, false, currentAccount);
+            mgShowLanguagePicker();
         });
 
         frameContainerView.addView(themeFrameLayout, LayoutHelper.createFrame(64, 64, Gravity.TOP | Gravity.RIGHT, 0, themeMargin, themeMargin, 0));
@@ -508,63 +488,135 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
         MessagesController.getGlobalMainSettings().edit().putLong("intro_crashed_time", 0).apply();
     }
 
-    private void checkContinueText() {
-        LocaleController.LocaleInfo englishInfo = null;
-        LocaleController.LocaleInfo systemInfo = null;
-        LocaleController.LocaleInfo currentLocaleInfo = LocaleController.getInstance().getCurrentLocaleInfo();
-        String systemLang = MessagesController.getInstance(currentAccount).suggestedLangCode;
-        if (systemLang == null || systemLang.equals("en") && LocaleController.getInstance().getSystemDefaultLocale().getLanguage() != null && !LocaleController.getInstance().getSystemDefaultLocale().getLanguage().equals("en")) {
-            systemLang = LocaleController.getInstance().getSystemDefaultLocale().getLanguage();
-            if (systemLang == null) {
-                systemLang = "en";
-            }
-        }
+    private boolean mgUzScheduled;
 
-        String arg = systemLang.contains("-") ? systemLang.split("-")[0] : systemLang;
-        String alias = LocaleController.getLocaleAlias(arg);
-        for (int a = 0; a < LocaleController.getInstance().languages.size(); a++) {
-            LocaleController.LocaleInfo info = LocaleController.getInstance().languages.get(a);
-            if (info.shortName.equals("en")) {
-                englishInfo = info;
-            }
-            if (info.shortName.replace("_", "-").equals(systemLang) || info.shortName.equals(arg) || info.shortName.equals(alias)) {
-                systemInfo = info;
-            }
-            if (englishInfo != null && systemInfo != null) {
-                break;
-            }
+    /**
+     * MilliyGram: ilova birinchi marta ochilganda o'zbek tili avtomatik qo'llanadi,
+     * pastdagi tugma esa barcha mavjud tillardan birini tanlash imkonini beradi.
+     */
+    private void checkContinueText() {
+        if (switchLanguageTextView != null) {
+            String t = org.telegram.messenger.MgLang.t("Tilni tanlash");
+            switchLanguageTextView.setText("🌐  " + ("Tilni tanlash".equals(t) ? t : t + " / Tilni tanlash"));
         }
-        if (englishInfo == null || systemInfo == null || englishInfo == systemInfo) {
+        if (mgUzScheduled || org.telegram.messenger.MgConfig.getBool("lang_chosen", false)) {
             return;
         }
-        TLRPC.TL_langpack_getStrings req = new TLRPC.TL_langpack_getStrings();
-        if (systemInfo != currentLocaleInfo) {
-            req.lang_code = systemInfo.getLangCode();
-            localeInfo = systemInfo;
-        } else {
-            req.lang_code = englishInfo.getLangCode();
-            localeInfo = englishInfo;
+        LocaleController.LocaleInfo current = LocaleController.getInstance().getCurrentLocaleInfo();
+        if (current != null && current.shortName != null && current.shortName.startsWith("uz")) {
+            mgMarkLangChosen();
+            return;
         }
-        req.keys.add("ContinueOnThisLanguage");
-        String finalSystemLang = systemLang;
-        ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> {
-            if (response instanceof Vector) {
-                Vector vector = (Vector) response;
-                if (vector.objects.isEmpty()) {
-                    return;
-                }
-                final TLRPC.LangPackString string = (TLRPC.LangPackString) vector.objects.get(0);
-                if (string instanceof TLRPC.TL_langPackString) {
-                    AndroidUtilities.runOnUIThread(() -> {
-                        if (!destroyed) {
-                            switchLanguageTextView.setText(string.value);
-                            SharedPreferences preferences = MessagesController.getGlobalMainSettings();
-                            preferences.edit().putString("language_showed2", finalSystemLang.toLowerCase()).apply();
-                        }
-                    });
-                }
+        LocaleController.LocaleInfo uz = mgFindUzbek();
+        if (uz == null) {
+            return;
+        }
+        mgUzScheduled = true;
+        // loadRemoteLanguages joriy tilni qayta qo'llab bo'lgach ishga tushsin
+        AndroidUtilities.runOnUIThread(() -> {
+            if (destroyed || startPressed) {
+                mgUzScheduled = false;
+                return;
             }
-        }, ConnectionsManager.RequestFlagWithoutLogin);
+            mgMarkLangChosen();
+            LocaleController.getInstance().applyLanguage(uz, true, false, currentAccount);
+        }, 400);
+    }
+
+    private static LocaleController.LocaleInfo mgFindUzbek() {
+        LocaleController.LocaleInfo found = null;
+        ArrayList<LocaleController.LocaleInfo> list = LocaleController.getInstance().languages;
+        for (int a = 0; a < list.size(); a++) {
+            LocaleController.LocaleInfo info = list.get(a);
+            if (info == null || info.shortName == null) {
+                continue;
+            }
+            if (info.shortName.equals("uz")) {
+                return info;
+            }
+            if (found == null && (info.shortName.startsWith("uz") || "uz".equals(info.pluralLangCode))) {
+                found = info;
+            }
+        }
+        return found;
+    }
+
+    private void mgMarkLangChosen() {
+        org.telegram.messenger.MgConfig.setBool("lang_chosen", true);
+        String sys = MessagesController.getInstance(currentAccount).suggestedLangCode;
+        if (sys != null) {
+            MessagesController.getGlobalMainSettings().edit().putString("language_showed2", sys).apply();
+        }
+    }
+
+    /** "Tilni tanlash" — ilovadagi barcha tillar ro'yxati; o'zbek tili birinchi */
+    private void mgShowLanguagePicker() {
+        if (getParentActivity() == null) {
+            return;
+        }
+        ArrayList<LocaleController.LocaleInfo> all = new ArrayList<>();
+        ArrayList<LocaleController.LocaleInfo> src = LocaleController.getInstance().languages;
+        for (int a = 0; a < src.size(); a++) {
+            LocaleController.LocaleInfo info = src.get(a);
+            if (info != null && info.name != null && !info.isUnofficial()) {
+                all.add(info);
+            }
+        }
+        java.util.Collections.sort(all, (x, y) -> {
+            boolean ux = x.shortName != null && x.shortName.startsWith("uz");
+            boolean uy = y.shortName != null && y.shortName.startsWith("uz");
+            if (ux != uy) {
+                return ux ? -1 : 1;
+            }
+            return (x.name == null ? "" : x.name).compareToIgnoreCase(y.name == null ? "" : y.name);
+        });
+        if (all.isEmpty()) {
+            return;
+        }
+        LocaleController.LocaleInfo current = LocaleController.getInstance().getCurrentLocaleInfo();
+        CharSequence[] names = new CharSequence[all.size()];
+        for (int i = 0; i < all.size(); i++) {
+            LocaleController.LocaleInfo info = all.get(i);
+            String n = info.name;
+            if (info.nameEnglish != null && !info.nameEnglish.equals(info.name)) {
+                n += "  ·  " + info.nameEnglish;
+            }
+            names[i] = info == current ? "✓  " + n : n;
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+        String t = org.telegram.messenger.MgLang.t("Tilni tanlash");
+        builder.setTitle("Tilni tanlash".equals(t) ? t : t + " / Tilni tanlash");
+        builder.setItems(names, (d, which) -> {
+            LocaleController.LocaleInfo info = all.get(which);
+            mgMarkLangChosen();
+            mgUzScheduled = true;
+            if (info == LocaleController.getInstance().getCurrentLocaleInfo()) {
+                return;
+            }
+            AlertDialog loaderDialog = new AlertDialog(getParentActivity(), AlertDialog.ALERT_TYPE_SPINNER);
+            loaderDialog.setCanCancel(false);
+            loaderDialog.showDelayed(500);
+            NotificationCenter.getGlobalInstance().addObserver(new NotificationCenter.NotificationCenterDelegate() {
+                @Override
+                public void didReceivedNotification(int id, int account, Object... args) {
+                    if (id == NotificationCenter.reloadInterface) {
+                        NotificationCenter.getGlobalInstance().removeObserver(this, id);
+                        try {
+                            loaderDialog.dismiss();
+                        } catch (Throwable ignore) {
+                        }
+                    }
+                }
+            }, NotificationCenter.reloadInterface);
+            LocaleController.getInstance().applyLanguage(info, true, false, currentAccount);
+            AndroidUtilities.runOnUIThread(() -> {
+                try {
+                    loaderDialog.dismiss();
+                } catch (Throwable ignore) {
+                }
+            }, 8000);
+        });
+        showDialog(builder.create());
     }
 
     @Override

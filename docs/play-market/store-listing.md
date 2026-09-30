@@ -28,16 +28,20 @@ MilliyGram — o'zbek foydalanuvchilari uchun qo'shimcha imkoniyatlarga ega, Tel
 • Obunachilar kundaligi: kirgan/chiqqanlar grafigi, nakrutka kunlari
 • Eng yaxshi post vaqti tavsiyasi
 • ☁ Postni bir bosishda "Saqlangan xabarlar"ga saqlash
+• Kanal/guruh profilida tezkor tugmalar: obunachilar, adminlar, ruxsatlar, so'nggi amallar
+• Uzatishda bir nechta chatni belgilab, keyin yuborish; chat to'plamlarini eslab qolish
+• Kanal va guruh uchun doimiy avto-o'chirish rejimi
 
 👓 ODDIY REJIM (KEKSALAR UCHUN)
 • Katta yozuvlar va katta tugmalar
 • Soddalashtirilgan menyu
-• Xabarlarni ovoz chiqarib o'qish
 
 ✨ BOSHQA QULAYLIKLAR
 • Lotin ↔ kirill o'girish, yozganingizni tarjima qilib yuborish
 • Milliy naqshli mavzular, kun vaqtiga qarab almashadigan fon
-• Lokal jildlar, avto-javob, shablonlar
+• Lokal jildlar, ⭐ "Tanlanganlar" jildi, avto-javob, shablonlar
+• Chatda eng birinchi xabarga yoki sana bo'yicha tez o'tish
+• Stiker, GIF va ovozli xabarni yuborishdan oldin tasdiqlash
 • O'zbek, rus va ingliz tillarida
 
 MilliyGram Telegram FZ-LLC tomonidan ishlab chiqilmagan. U Telegram'ning ochiq manba kodi (GPL v2) asosida qurilgan. Xabarlaringiz to'g'ridan-to'g'ri Telegram serverlari orqali yuboriladi; MilliyGram hech qanday shaxsiy ma'lumot yig'maydi.
@@ -47,6 +51,8 @@ Muloqot (Communication)
 
 ## Kontakt ma'lumotlari
 Email: (Play Console'dagi ishlab chiquvchi emaili)
+Yangiliklar kanali: https://t.me/MilliyGramm
+Loyiha chati: https://t.me/MilliyGramChat
 Maxfiylik siyosati URL: https://github.com/rndesign2001-coder/MilliyGram/blob/main/docs/play-market/privacy-policy.md
 
 ## Kontent reytingi (anketa javoblari)

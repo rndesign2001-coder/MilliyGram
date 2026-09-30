@@ -207,7 +207,8 @@ public class SessionCell extends FrameLayout {
             }
         } else if (object instanceof TLRPC.TL_authorization) {
             final TLRPC.TL_authorization session = (TLRPC.TL_authorization) object;
-            imageView.setImageDrawable(createDrawable(42, session));
+            android.graphics.drawable.Drawable mgLogo = org.telegram.messenger.MgSessions.isOurs(session) ? org.telegram.messenger.MgSessions.logo() : null;
+            imageView.setImageDrawable(mgLogo != null ? mgLogo : createDrawable(42, session));
 
             StringBuilder stringBuilder = new StringBuilder();
             if (session.device_model.length() != 0) {
@@ -248,7 +249,7 @@ public class SessionCell extends FrameLayout {
             detailExTextView.setText(spannableStringBuilder);
 
             stringBuilder = new StringBuilder();
-            stringBuilder.append(session.app_name);
+            stringBuilder.append(org.telegram.messenger.MgSessions.appName(session));
             stringBuilder.append(" ").append(session.app_version);
 
             detailTextView.setText(stringBuilder);

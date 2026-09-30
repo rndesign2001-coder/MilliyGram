@@ -110,7 +110,7 @@ public class SessionBottomSheet extends BottomSheet {
 
         ItemView applicationItemView = new ItemView(context, false);
         stringBuilder = new StringBuilder();
-        stringBuilder.append(session.app_name);
+        stringBuilder.append(org.telegram.messenger.MgSessions.appName(session));
         stringBuilder.append(" ").append(session.app_version);
         applicationItemView.valueText.setText(stringBuilder);
         Drawable drawable = ContextCompat.getDrawable(context, R.drawable.menu_devices).mutate();
@@ -308,6 +308,15 @@ public class SessionBottomSheet extends BottomSheet {
     }
 
     private void setAnimation(TLRPC.TL_authorization session, RLottieImageView imageView) {
+        if (org.telegram.messenger.MgSessions.isOurs(session)) {
+            Drawable mgLogo = org.telegram.messenger.MgSessions.logo();
+            if (mgLogo != null) {
+                imageView.setBackground(null);
+                imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                imageView.setImageDrawable(mgLogo);
+                return;
+            }
+        }
         String platform = session.platform.toLowerCase();
         if (platform.isEmpty()) {
             platform = session.system_version.toLowerCase();

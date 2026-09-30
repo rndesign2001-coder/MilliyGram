@@ -8025,6 +8025,14 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         if (!UserConfig.getInstance(currentAccount).isClientActivated()) {
             return;
         }
+        // MilliyGram: til tanlangan (yoki o'zbek tili avtomatik qo'llangan) bo'lsa, taklif oynasi chiqmaydi
+        if (!force) {
+            boolean chosen = org.telegram.messenger.MgConfig.getBool("lang_chosen", false);
+            org.telegram.messenger.MgConfig.setBool("lang_chosen", true);
+            if (chosen) {
+                return;
+            }
+        }
         try {
             if (loadingLocaleDialog || ApplicationLoader.mainInterfacePaused) {
                 return;

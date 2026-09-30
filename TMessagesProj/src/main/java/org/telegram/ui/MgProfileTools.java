@@ -43,8 +43,16 @@ public class MgProfileTools {
     }
 
     public static void show(BaseFragment f, int account, long dialogId) {
+        ArrayList<MgChatMenu.Section> sections = buildSections(f, account, dialogId);
+        if (sections != null) {
+            MgChatMenu.show(f, MgLang.t("Maxsus sozlamalar"), sections);
+        }
+    }
+
+    /** Profil ⋮ → "Maxsus sozlamalar" bandlari (yon tomondan ochiladigan menyu uchun ham) */
+    public static ArrayList<MgChatMenu.Section> buildSections(BaseFragment f, int account, long dialogId) {
         if (f.getParentActivity() == null || dialogId == 0) {
-            return;
+            return null;
         }
         MessagesController mc = MessagesController.getInstance(account);
         TLRPC.User user = dialogId > 0 ? mc.getUser(dialogId) : null;
@@ -114,7 +122,7 @@ public class MgProfileTools {
             }
         }
         sections.add(other);
-        MgChatMenu.show(f, MgLang.t("Maxsus sozlamalar"), sections);
+        return sections;
     }
 
     private static void shareMention(BaseFragment f, int account, long dialogId, TLRPC.User user, TLRPC.Chat chat) {

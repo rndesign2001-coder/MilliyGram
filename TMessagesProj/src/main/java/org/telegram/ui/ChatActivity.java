@@ -4439,6 +4439,9 @@ public class ChatActivity extends BaseFragment implements
                 @Override
                 public void onShowSubMenu() {
                     updateScrimSourceBitmap();
+                    if (mgToolsLayout != null) {
+                        mgFillToolsMenu(); // MilliyGram: holatlarni yangilash (qulf, yashirish va h.k.)
+                    }
                 }
 
                 @Override
@@ -4582,7 +4585,9 @@ public class ChatActivity extends BaseFragment implements
             if (chatMode == 0 && !isTopic) {
                 // MilliyGram: barcha qo'shimcha vositalar bitta guruhlangan oynada
                 headerItem.lazilyAddSubItem(MgChatMenu.MENU_JUMP, R.drawable.menu_browser_arrowup, org.telegram.messenger.MgLang.t("Xabarga tez o'tish"));
-                headerItem.lazilyAddSubItem(MgChatMenu.MENU_TOOLS, R.drawable.msg_customize, org.telegram.messenger.MgLang.t("MilliyGram vositalari"));
+                mgToolsLayout = MgChatMenu.createSwipeLayout(context, themeDelegate);
+                mgFillToolsMenu();
+                headerItem.lazilyAddSwipeBackItem(R.drawable.msg_customize, null, org.telegram.messenger.MgLang.t("MilliyGram vositalari"), mgToolsLayout);
             }
             boolean addedSettings = false;
             if (!isTopic) {
@@ -19732,9 +19737,31 @@ public class ChatActivity extends BaseFragment implements
     }
 
     /** MilliyGram: guruhlangan vositalar oynasi */
+    private ActionBarPopupWindow.ActionBarPopupWindowLayout mgToolsLayout;
+
+    private void mgFillToolsMenu() {
+        if (mgToolsLayout == null || headerItem == null) {
+            return;
+        }
+        try {
+            MgChatMenu.fillSwipe(mgToolsLayout, headerItem.getPopupLayout().getSwipeBack(), themeDelegate, mgBuildToolsSections(),
+                    () -> {
+                        if (headerItem != null) {
+                            headerItem.closeSubMenu();
+                        }
+                    }, this::mgFillToolsMenu);
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
+    }
+
     private void mgShowTools() {
-        final ActionBar.ActionBarMenuOnItemClick click = actionBar.getActionBarMenuOnItemClick();
+        MgChatMenu.show(this, org.telegram.messenger.MgLang.t("MilliyGram vositalari"), mgBuildToolsSections());
+    }
+
+    private ArrayList<MgChatMenu.Section> mgBuildToolsSections() {
         final Utilities.Callback<Integer> run = mid -> {
+            final ActionBar.ActionBarMenuOnItemClick click = actionBar.getActionBarMenuOnItemClick();
             if (click != null) {
                 click.onItemClick(mid);
             }
@@ -19783,7 +19810,7 @@ public class ChatActivity extends BaseFragment implements
         info.add(R.drawable.msg_stats, org.telegram.messenger.MgLang.t("Chat statistikasi"), () -> run.run(MgChatTools.MENU_STATS));
         info.add(R.drawable.msg_download, org.telegram.messenger.MgLang.t("Chatni eksport qilish"), () -> run.run(MgChatTools.MENU_EXPORT));
         sections.add(info);
-        MgChatMenu.show(this, org.telegram.messenger.MgLang.t("MilliyGram vositalari"), sections);
+        return sections;
     }
 
     private ArrayList<MessageObject> mgSelectedMessages() {

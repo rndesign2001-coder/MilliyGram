@@ -16,11 +16,17 @@ import android.widget.TextView;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.MgLang;
+import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.R;
+import org.telegram.ui.ActionBar.ActionBarMenuItem;
+import org.telegram.ui.ActionBar.ActionBarMenuSubItem;
+import org.telegram.ui.ActionBar.ActionBarPopupWindow;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.BottomSheet;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.TextCell;
 import org.telegram.ui.Components.LayoutHelper;
+import org.telegram.ui.Components.PopupSwipeBackLayout;
 
 import java.util.ArrayList;
 
@@ -124,6 +130,69 @@ public class MgChatMenu {
         builder.setCustomView(scroll);
         sheet[0] = builder.create();
         f.showDialog(sheet[0]);
+    }
+
+    /** ⋮ menyusi ichida yon tomondan ochiladigan sahifa (Orqaga tugmasi bilan) */
+    public static ActionBarPopupWindow.ActionBarPopupWindowLayout createSwipeLayout(Context ctx, Theme.ResourcesProvider rp) {
+        ActionBarPopupWindow.ActionBarPopupWindowLayout layout = new ActionBarPopupWindow.ActionBarPopupWindowLayout(ctx, 0, rp);
+        layout.setFitItems(true);
+        return layout;
+    }
+
+    /**
+     * Sahifani bo'limlar bilan to'ldiradi. dismiss — menyuni yopish; refill — amal bajarilgach
+     * sahifani yangilash (masalan "Chatni qulflash" → "Qulfni olish").
+     */
+    public static void fillSwipe(ActionBarPopupWindow.ActionBarPopupWindowLayout layout, PopupSwipeBackLayout swipeBack, Theme.ResourcesProvider rp,
+                                 ArrayList<Section> sections, Runnable dismiss, Runnable refill) {
+        layout.removeInnerViews();
+        Context ctx = layout.getContext();
+        ActionBarMenuSubItem back = ActionBarMenuItem.addItem(layout, R.drawable.msg_arrow_back, LocaleController.getString(R.string.Back), false, rp);
+        back.setOnClickListener(v -> {
+            if (swipeBack != null) {
+                swipeBack.closeForeground();
+            }
+        });
+        if (sections == null) {
+            return;
+        }
+        for (Section s : sections) {
+            if (s.items.isEmpty()) {
+                continue;
+            }
+            ActionBarPopupWindow.GapView gap = new ActionBarPopupWindow.GapView(ctx, rp, Theme.key_actionBarDefaultSubmenuSeparator);
+            gap.setTag(R.id.fit_width_tag, 1);
+            layout.addView(gap, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 8));
+            if (s.title != null) {
+                TextView head = new TextView(ctx);
+                head.setText(s.title);
+                head.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+                head.setTypeface(AndroidUtilities.bold());
+                head.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueHeader, rp));
+                head.setPadding(AndroidUtilities.dp(18), AndroidUtilities.dp(8), AndroidUtilities.dp(18), AndroidUtilities.dp(2));
+                head.setTag(R.id.fit_width_tag, 1);
+                layout.addView(head, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+            }
+            for (Item it : s.items) {
+                ActionBarMenuSubItem cell = ActionBarMenuItem.addItem(layout, it.icon, it.text, false, rp);
+                if (it.red) {
+                    int red = Theme.getColor(Theme.key_text_RedRegular, rp);
+                    cell.setTextColor(red);
+                    cell.setIconColor(red);
+                }
+                cell.setOnClickListener(v -> {
+                    if (dismiss != null) {
+                        dismiss.run();
+                    }
+                    AndroidUtilities.runOnUIThread(() -> {
+                        it.action.run();
+                        if (refill != null) {
+                            AndroidUtilities.runOnUIThread(refill, 700);
+                        }
+                    }, 150);
+                });
+            }
+        }
     }
 
     /** "Xabarga tez o'tish" oynasi */
