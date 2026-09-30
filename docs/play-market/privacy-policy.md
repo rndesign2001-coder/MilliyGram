@@ -19,7 +19,7 @@ _Oxirgi yangilanish / Last updated: 2026-09-29_
 
 **Bolalar**: ilova 13 yoshdan kichiklar uchun mo'ljallanmagan.
 
-**Aloqa**: GitHub orqali — https://github.com/rndesign2001-coder/MilliyGram/issues
+**Aloqa**: Telegram — https://t.me/MilliyGramChat · GitHub — https://github.com/rndesign2001-coder/MilliyGram/issues
 
 ## English
 
@@ -37,4 +37,4 @@ _Oxirgi yangilanish / Last updated: 2026-09-29_
 
 **Children**: the app is not intended for children under 13.
 
-**Contact**: https://github.com/rndesign2001-coder/MilliyGram/issues
+**Contact**: Telegram — https://t.me/MilliyGramChat · GitHub — https://github.com/rndesign2001-coder/MilliyGram/issues

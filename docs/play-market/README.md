@@ -5,7 +5,7 @@ Bu papkadagi fayllar:
 | Fayl | Nima uchun |
 |---|---|
 | `store-listing.md` | Do'kon sahifasi matnlari: nom, qisqa va to'liq tavsif, toifa, kontent reytingi va Data safety javoblari |
-| `privacy-policy.md` | Maxfiylik siyosati (o'zbekcha + inglizcha). Play talab qiladigan URL: `https://github.com/rndesign2001-coder/MilliyGram/blob/main/docs/play-market/privacy-policy.md` |
+| `privacy-policy.md` | Maxfiylik siyosati (o'zbekcha + inglizcha). Play talab qiladigan URL: `https://github.com/rndesign2001-coder/MilliyGram/blob/claude/zen-hypatia-ngf4ae/docs/play-market/privacy-policy.md` |
 | `icon-512.png` | Do'kon ikonkasi (512×512, 32-bit PNG) |
 | `feature-graphic-1024x500.png` | Feature graphic (1024×500) |
 

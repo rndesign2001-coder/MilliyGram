@@ -53,7 +53,7 @@ Muloqot (Communication)
 Email: (Play Console'dagi ishlab chiquvchi emaili)
 Yangiliklar kanali: https://t.me/MilliyGramm
 Loyiha chati: https://t.me/MilliyGramChat
-Maxfiylik siyosati URL: https://github.com/rndesign2001-coder/MilliyGram/blob/main/docs/play-market/privacy-policy.md
+Maxfiylik siyosati URL: https://github.com/rndesign2001-coder/MilliyGram/blob/claude/zen-hypatia-ngf4ae/docs/play-market/privacy-policy.md
 
 ## Kontent reytingi (anketa javoblari)
 • Foydalanuvchilar o'zaro muloqot qiladi: Ha
