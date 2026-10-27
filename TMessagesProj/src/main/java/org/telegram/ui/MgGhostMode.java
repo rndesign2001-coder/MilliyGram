@@ -95,7 +95,7 @@ public class MgGhostMode {
     private static void applyFlag(int account, boolean enable) {
         MgConfig.setBool("ghost_mode_" + account, enable);
         // onlayn holatni darhol yangilash (taymer keyingi aylanishda to'g'ri holatni yuboradi)
-        MessagesController.getInstance(account).getNotificationCenter().postNotificationName(org.telegram.messenger.NotificationCenter.updateInterfaces, MessagesController.UPDATE_MASK_STATUS);
+        org.telegram.messenger.NotificationCenter.getInstance(account).postNotificationName(org.telegram.messenger.NotificationCenter.updateInterfaces, MessagesController.UPDATE_MASK_STATUS);
     }
 
     /** Sharpa yoqiq turganda "Oxirgi marta onlayn" bandi o'zgartirilsa — maxfiylikni moslash */
