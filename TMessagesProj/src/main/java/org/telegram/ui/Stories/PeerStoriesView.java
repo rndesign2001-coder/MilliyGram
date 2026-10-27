@@ -7056,7 +7056,7 @@ public class PeerStoriesView extends SizeNotifierFrameLayout implements Notifica
                     }
                 }
             }
-            if (org.fenixuz.utils.GhostStory.INSTANCE.getGhostMode() || org.fenixuz.utils.GhostVariable.INSTANCE.getGhostMode()) {
+            if (org.fenixuz.utils.GhostStory.INSTANCE.getGhostMode() || org.fenixuz.utils.GhostVariable.INSTANCE.getGhostMode() || org.telegram.ui.MgGhostMode.hideStories(currentAccount)) {
                 return;
             }
             if (isActive && this.storyItem != null && userStories != null && ((!StoriesUtilities.hasExpiredViews(storyItem) && (this.storyItem.id > userStories.max_read_id || this.storyItem.id > storiesController.dialogIdToMaxReadId.get(dialogId, 0))) || isSelf)) {

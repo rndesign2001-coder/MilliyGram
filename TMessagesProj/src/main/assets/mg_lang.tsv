@@ -1592,3 +1592,10 @@ Yoqish/yashirish uchun bosing. Nomini yoki ikonkasini o'zgartirish uchun uzoq bo
 Yordam	Помощь	Help
 kompas	компас	compass
 yashirilgan	скрыто	hidden
+Hikoyalarni sezdirmay ko'rish	Смотреть истории незаметно	View stories without being seen
+O'qiganimni bildirmaslik (✓✓)	Не отправлять отметку о прочтении (✓✓)	Don't send read receipts (✓✓)
+Onlayn ko'rinmaslik	Не показываться в сети	Don't appear online
+Sharpa rejimi yoqildi: o'qiganingiz, yozayotganingiz va onlayn ekaningiz ko'rinmaydi	Режим призрака включён: прочтение, набор текста и статус «в сети» скрыты	Ghost mode is on: reading, typing and online status are hidden
+Yoqilganda xabarlarni o'qiganingiz, yozayotganingiz va onlayn ekaningiz boshqalarga ko'rinmaydi. Diqqat: chatga xabar yozsangiz, Telegram o'sha chatdagi xabarlarni baribir o'qilgan deb belgilaydi. Oxirgi band Telegram maxfiylik sozlamasini o'zgartiradi — o'chirganda avvalgisi tiklanadi.	Когда включено, другие не видят, что вы прочитали сообщение, печатаете или в сети. Внимание: если вы напишете в чат, Telegram всё равно отметит сообщения в нём прочитанными. Последний пункт меняет настройку приватности Telegram — при выключении прежняя восстанавливается.	When on, others can't see that you read messages, are typing or are online. Note: if you send a message in a chat, Telegram still marks that chat as read. The last option changes your Telegram privacy setting — the previous one is restored when you turn it off.
+\"Oxirgi marta\" va raqamni \"Hech kim\" qilish	Скрыть «был(а) в сети» и номер от всех	Set \"Last seen\" and phone number to \"Nobody\"
+\"Yozmoqda…\" ni yubormaslik	Не показывать «печатает…»	Don't send \"typing…\"

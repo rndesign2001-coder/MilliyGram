@@ -133,6 +133,11 @@ public class MgSettingsPage extends UniversalFragment {
     private static final int ID_KB_SCROLL = 187;
     private static final int ID_CONFIRM_CALL = 188;
     private static final int ID_HIDE_PHONE = 189;
+    private static final int ID_GHOST_READ = 190;
+    private static final int ID_GHOST_TYPING = 191;
+    private static final int ID_GHOST_ONLINE = 192;
+    private static final int ID_GHOST_STORIES = 193;
+    private static final int ID_GHOST_PRIVACY = 194;
     private static final int ID_QIBLA_OPEN = 181;
     private static final int ID_QIBLA_STYLE = 182;
     private static final int ID_QIBLA_GPS = 183;
@@ -299,7 +304,14 @@ public class MgSettingsPage extends UniversalFragment {
                 }
                 break;
             case PAGE_PRIVACY: {
+                items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Sharpa rejimi")));
                 items.add(UItem.asCheck(ID_GHOST, org.telegram.messenger.MgLang.t("Sharpa rejimi")).setChecked(MgGhostMode.isEnabled(currentAccount)));
+                items.add(UItem.asCheck(ID_GHOST_READ, org.telegram.messenger.MgLang.t("O'qiganimni bildirmaslik (✓✓)")).setChecked(MgGhostMode.option(MgGhostMode.OPT_READ)));
+                items.add(UItem.asCheck(ID_GHOST_TYPING, org.telegram.messenger.MgLang.t("\"Yozmoqda…\" ni yubormaslik")).setChecked(MgGhostMode.option(MgGhostMode.OPT_TYPING)));
+                items.add(UItem.asCheck(ID_GHOST_ONLINE, org.telegram.messenger.MgLang.t("Onlayn ko'rinmaslik")).setChecked(MgGhostMode.option(MgGhostMode.OPT_ONLINE)));
+                items.add(UItem.asCheck(ID_GHOST_STORIES, org.telegram.messenger.MgLang.t("Hikoyalarni sezdirmay ko'rish")).setChecked(MgGhostMode.option(MgGhostMode.OPT_STORIES)));
+                items.add(UItem.asCheck(ID_GHOST_PRIVACY, org.telegram.messenger.MgLang.t("\"Oxirgi marta\" va raqamni \"Hech kim\" qilish")).setChecked(MgGhostMode.option(MgGhostMode.OPT_PRIVACY)));
+                items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Yoqilganda xabarlarni o'qiganingiz, yozayotganingiz va onlayn ekaningiz boshqalarga ko'rinmaydi. Diqqat: chatga xabar yozsangiz, Telegram o'sha chatdagi xabarlarni baribir o'qilgan deb belgilaydi. Oxirgi band Telegram maxfiylik sozlamasini o'zgartiradi — o'chirganda avvalgisi tiklanadi.")));
                 items.add(UItem.asButton(ID_HIDDEN, R.drawable.msg_stories_myhide, org.telegram.messenger.MgLang.t("Yashirin bo'lim")));
                 int locked = MgConfig.getLockedCount();
                 items.add(UItem.asButton(ID_LOCK, R.drawable.msg_secret, org.telegram.messenger.MgLang.t("Chat qulfi"), locked > 0 ? String.valueOf(locked) : ""));
@@ -611,6 +623,26 @@ public class MgSettingsPage extends UniversalFragment {
                 break;
             case ID_GHOST:
                 toggleGhost(view);
+                break;
+            case ID_GHOST_READ:
+                toggle(view, MgGhostMode.OPT_READ, true);
+                break;
+            case ID_GHOST_TYPING:
+                toggle(view, MgGhostMode.OPT_TYPING, true);
+                break;
+            case ID_GHOST_ONLINE:
+                toggle(view, MgGhostMode.OPT_ONLINE, true);
+                break;
+            case ID_GHOST_STORIES:
+                toggle(view, MgGhostMode.OPT_STORIES, true);
+                break;
+            case ID_GHOST_PRIVACY:
+                toggle(view, MgGhostMode.OPT_PRIVACY, false);
+                MgGhostMode.onPrivacyOptionChanged(currentAccount, err -> {
+                    if (err != null) {
+                        BulletinFactory.of(this).createErrorBulletin(err).show();
+                    }
+                });
                 break;
             case ID_HIDDEN:
                 MgHiddenSettingsActivity.open(this);
@@ -1298,31 +1330,18 @@ public class MgSettingsPage extends UniversalFragment {
 
     private void toggleGhost(View view) {
         boolean enable = !MgGhostMode.isEnabled(currentAccount);
-        Runnable apply = () -> MgGhostMode.setEnabled(currentAccount, enable, error -> {
-            if (error == null) {
-                if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(enable);
-                }
-                BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, enable ? org.telegram.messenger.MgLang.t("Sharpa rejimi yoqildi") : org.telegram.messenger.MgLang.t("Avvalgi maxfiylik sozlamalari tiklandi")).show();
-            } else {
+        if (view instanceof TextCheckCell) {
+            ((TextCheckCell) view).setChecked(enable);
+        }
+        MgGhostMode.setEnabled(currentAccount, enable, error -> {
+            if (error != null) {
                 BulletinFactory.of(this).createErrorBulletin(error).show();
+            } else {
+                BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, enable
+                        ? org.telegram.messenger.MgLang.t("Sharpa rejimi yoqildi: o'qiganingiz, yozayotganingiz va onlayn ekaningiz ko'rinmaydi")
+                        : org.telegram.messenger.MgLang.t("Sharpa rejimi o'chirildi")).show();
             }
         });
-        if (!enable || getParentActivity() == null) {
-            apply.run();
-            return;
-        }
-        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
-        builder.setTitle(org.telegram.messenger.MgLang.t("Sharpa rejimi"));
-        builder.setMessage(org.telegram.messenger.MgLang.t("Telegram maxfiylik sozlamalarida quyidagilar \"Hech kim\" ga o'zgaradi:\n\n") +
-                org.telegram.messenger.MgLang.t("• oxirgi marta onlayn bo'lgan vaqtingiz va onlayn holatingiz;\n") +
-                org.telegram.messenger.MgLang.t("• telefon raqamingiz;\n") +
-                org.telegram.messenger.MgLang.t("• uzatilgan xabarlaringizdagi profilingizga havola.\n\n") +
-                org.telegram.messenger.MgLang.t("Eslatma: Telegram qoidasiga ko'ra, o'z vaqtingizni yashirsangiz, boshqalarning ham \"oxirgi marta onlayn\" vaqtini ko'ra olmaysiz.\n\n") +
-                org.telegram.messenger.MgLang.t("O'chirganingizda avvalgi sozlamalaringiz aynan tiklanadi."));
-        builder.setPositiveButton(org.telegram.messenger.MgLang.t("Yoqish"), (dialog, which) -> apply.run());
-        builder.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), null);
-        showDialog(builder.create());
     }
 
     private void showFocusTimeDialog() {

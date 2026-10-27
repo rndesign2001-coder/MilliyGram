@@ -10556,7 +10556,7 @@ public class MessagesController extends BaseController implements NotificationCe
         checkReadTasks();
 
         if (getUserConfig().isClientActivated()) {
-            if (!ignoreSetOnline && getConnectionsManager().getPauseTime() == 0 && ApplicationLoader.isScreenOn && !ApplicationLoader.mainInterfacePausedStageQueue) {
+            if (!ignoreSetOnline && !org.telegram.ui.MgGhostMode.hideOnline(currentAccount) && getConnectionsManager().getPauseTime() == 0 && ApplicationLoader.isScreenOn && !ApplicationLoader.mainInterfacePausedStageQueue) {
                 if (ApplicationLoader.mainInterfacePausedStageQueueTime != 0 && Math.abs(ApplicationLoader.mainInterfacePausedStageQueueTime - System.currentTimeMillis()) > 1000) {
                     if (statusSettingState != 1 && (lastStatusUpdateTime == 0 || Math.abs(System.currentTimeMillis() - lastStatusUpdateTime) >= 55000 || offlineSent)) {
                         statusSettingState = 1;
@@ -11417,6 +11417,9 @@ public class MessagesController extends BaseController implements NotificationCe
     public boolean sendTyping(long dialogId, long threadMsgId, int action, String emojicon, int classGuid) {
         if (action < 0 || action >= sendingTypings.length || dialogId == 0) {
             return false;
+        }
+        if (org.telegram.ui.MgGhostMode.hideTyping(currentAccount)) {
+            return false; // MilliyGram: sharpa rejimi — "yozmoqda…" yuborilmaydi
         }
         final long selfId = UserConfig.getInstance(UserConfig.selectedAccount).getClientUserId();
         if (dialogId == selfId) {
@@ -14442,6 +14445,8 @@ public class MessagesController extends BaseController implements NotificationCe
         getNotificationCenter().postNotificationName(NotificationCenter.messagesReadContent, dialogId, arrayList);
         if (messageObject.getId() < 0) {
             markMessageAsRead(messageObject.getDialogId(), messageObject.messageOwner.random_id, Integer.MIN_VALUE);
+        } else if (org.telegram.ui.MgGhostMode.hideRead(currentAccount)) {
+            // MilliyGram: sharpa rejimi — ovozli xabar tinglangani bilinmaydi
         } else {
             if (messageObject.messageOwner.peer_id.channel_id != 0) {
                 TLRPC.TL_channels_readMessageContents req = new TLRPC.TL_channels_readMessageContents();
@@ -14468,6 +14473,9 @@ public class MessagesController extends BaseController implements NotificationCe
 
     public void markMentionMessageAsRead(int mid, long channelId, long did) {
         getMessagesStorage().markMentionMessageAsRead(-channelId, mid, did);
+        if (org.telegram.ui.MgGhostMode.hideRead(currentAccount)) {
+            return;
+        }
         if (channelId != 0) {
             TLRPC.TL_channels_readMessageContents req = new TLRPC.TL_channels_readMessageContents();
             req.channel = getInputChannel(channelId);
@@ -14592,6 +14600,9 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     private void completeReadTask(ReadTask task) {
+        if (org.telegram.ui.MgGhostMode.hideRead(currentAccount)) {
+            return; // MilliyGram: sharpa rejimi — o'qilganlik belgisi yuborilmaydi
+        }
         if (task.replyId != 0 && task.monoForumPeerId == 0) {
             TLRPC.TL_messages_readDiscussion req = new TLRPC.TL_messages_readDiscussion();
             req.msg_id = (int) task.replyId;

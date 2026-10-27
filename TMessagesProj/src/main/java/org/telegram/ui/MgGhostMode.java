@@ -21,10 +21,13 @@ import org.telegram.tgnet.tl.TL_account;
 import java.util.ArrayList;
 
 /**
- * Sharpa rejimi — Telegram'ning RASMIY maxfiylik sozlamalarini bir tugma bilan o'zgartiradi.
- * Ilova ichida hech qanday holat soxtalashtirilmaydi (Telegram API qoidalariga mos).
- * Yoqilganda: "oxirgi marta onlayn", telefon raqami va uzatilgan xabarlardagi havola — "Hech kim".
- * O'chirilganda: avvalgi sozlamalar aynan tiklanadi.
+ * Sharpa rejimi — boshqalarga sezdirmasdan Telegram'dan foydalanish:
+ *  • o'qilganlik belgisi yuborilmaydi (✓✓ ko'k bo'lmaydi);
+ *  • "yozmoqda…" holati yuborilmaydi;
+ *  • ilova ochiq bo'lsa ham "onlayn" bo'lib ko'rinmaysiz;
+ *  • hikoyalarni ko'rganingiz bilinmaydi;
+ *  • ixtiyoriy: Telegram maxfiylik sozlamasida "Oxirgi marta onlayn" va telefon raqami — "Hech kim".
+ * Har bir qismni sozlamalarda alohida o'chirish mumkin. O'chirilganda maxfiylik sozlamalari aynan tiklanadi.
  */
 public class MgGhostMode {
 
@@ -34,8 +37,79 @@ public class MgGhostMode {
             ContactsController.PRIVACY_RULES_TYPE_FORWARDS
     };
 
+    public static final String OPT_READ = "ghost_opt_read";
+    public static final String OPT_TYPING = "ghost_opt_typing";
+    public static final String OPT_ONLINE = "ghost_opt_online";
+    public static final String OPT_STORIES = "ghost_opt_stories";
+    public static final String OPT_PRIVACY = "ghost_opt_privacy";
+
+    /** Sharpa rejimi yoqilganmi (hisob bo'yicha) */
     public static boolean isEnabled(int account) {
+        return MgConfig.getBool("ghost_mode_" + account, privacyApplied(account));
+    }
+
+    public static boolean option(String key) {
+        return MgConfig.getBool(key, !OPT_PRIVACY.equals(key));
+    }
+
+    public static boolean hideRead(int account) {
+        return isEnabled(account) && option(OPT_READ);
+    }
+
+    public static boolean hideTyping(int account) {
+        return isEnabled(account) && option(OPT_TYPING);
+    }
+
+    public static boolean hideOnline(int account) {
+        return isEnabled(account) && option(OPT_ONLINE);
+    }
+
+    public static boolean hideStories(int account) {
+        return isEnabled(account) && option(OPT_STORIES);
+    }
+
+    /** Telegram maxfiylik sozlamalari sharpa uchun o'zgartirilganmi */
+    private static boolean privacyApplied(int account) {
         return MgConfig.getBool("ghost_" + account, false);
+    }
+
+    /**
+     * Sharpa rejimini yoqadi yoki o'chiradi.
+     * @param done natija: null — muvaffaqiyatli, aks holda xato matni
+     */
+    public static void setEnabled(int account, boolean enable, Utilities.Callback<String> done) {
+        boolean wantPrivacy = enable && option(OPT_PRIVACY);
+        boolean needPrivacyChange = wantPrivacy != privacyApplied(account);
+        if (!needPrivacyChange) {
+            applyFlag(account, enable);
+            done.run(null);
+            return;
+        }
+        setPrivacy(account, wantPrivacy, err -> {
+            // maxfiylik o'zgarmasa ham asosiy sharpa rejimi baribir ishlaydi
+            applyFlag(account, enable);
+            done.run(err);
+        });
+    }
+
+    private static void applyFlag(int account, boolean enable) {
+        MgConfig.setBool("ghost_mode_" + account, enable);
+        // onlayn holatni darhol yangilash (taymer keyingi aylanishda to'g'ri holatni yuboradi)
+        MessagesController.getInstance(account).getNotificationCenter().postNotificationName(org.telegram.messenger.NotificationCenter.updateInterfaces, MessagesController.UPDATE_MASK_STATUS);
+    }
+
+    /** Sharpa yoqiq turganda "Oxirgi marta onlayn" bandi o'zgartirilsa — maxfiylikni moslash */
+    public static void onPrivacyOptionChanged(int account, Utilities.Callback<String> done) {
+        if (!isEnabled(account)) {
+            done.run(null);
+            return;
+        }
+        boolean want = option(OPT_PRIVACY);
+        if (want == privacyApplied(account)) {
+            done.run(null);
+            return;
+        }
+        setPrivacy(account, want, done);
     }
 
     private static TLRPC.InputPrivacyKey keyFor(int type) {
@@ -62,11 +136,8 @@ public class MgGhostMode {
         return true;
     }
 
-    /**
-     * Sharpa rejimini yoqadi yoki o'chiradi.
-     * @param done natija: null — muvaffaqiyatli, aks holda xato matni
-     */
-    public static void setEnabled(int account, boolean enable, Utilities.Callback<String> done) {
+    /** Telegram maxfiylik sozlamalarini sharpa uchun o'zgartirish yoki tiklash */
+    private static void setPrivacy(int account, boolean enable, Utilities.Callback<String> done) {
         if (!isReady(account)) {
             done.run(org.telegram.messenger.MgLang.t("Maxfiylik sozlamalari yuklanmoqda. Bir necha soniyadan keyin qayta urinib ko'ring."));
             return;

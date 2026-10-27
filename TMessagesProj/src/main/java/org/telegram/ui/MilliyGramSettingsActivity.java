@@ -87,8 +87,14 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
         return () -> presentFragment(new MgSettingsPage(page));
     }
 
+    /** Kanal yoki guruhni Telegram ichida to'g'ridan-to'g'ri ochadi (brauzersiz) */
     private void openLink(String user) {
-        if (getParentActivity() != null) {
+        if (getParentActivity() == null) {
+            return;
+        }
+        try {
+            getMessagesController().openByUserName(user, this, 1);
+        } catch (Throwable e) {
             org.telegram.messenger.browser.Browser.openUrl(getParentActivity(), "https://t.me/" + user);
         }
     }
@@ -164,7 +170,7 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
                 org.telegram.ui.Components.BulletinFactory.of(this).createErrorBulletin(err).show();
             } else {
                 org.telegram.ui.Components.BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check,
-                        enable ? t("Sharpa rejimi yoqildi: onlayn va o'qilgan belgisi ko'rinmaydi") : t("Sharpa rejimi o'chirildi")).show();
+                        enable ? t("Sharpa rejimi yoqildi: o'qiganingiz, yozayotganingiz va onlayn ekaningiz ko'rinmaydi") : t("Sharpa rejimi o'chirildi")).show();
             }
             if (listView != null && listView.adapter != null) {
                 listView.adapter.update(true);
@@ -175,7 +181,7 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
     @Override
     protected void onClick(UItem item, View view, int position, float x, float y) {
         if (item.id == ID_NEWS || item.id == ID_CHAT) {
-            org.telegram.messenger.browser.Browser.openUrl(getParentActivity(), "https://t.me/" + (item.id == ID_NEWS ? NEWS_CHANNEL : CHAT_GROUP));
+            openLink(item.id == ID_NEWS ? NEWS_CHANNEL : CHAT_GROUP);
         } else if (item.id == ID_SIMPLE) {
             presentFragment(new MgSimpleModeActivity());
         } else if (item.id == ID_INTRO) {
