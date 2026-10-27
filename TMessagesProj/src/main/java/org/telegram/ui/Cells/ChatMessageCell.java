@@ -18481,7 +18481,13 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         } else if (currentMessageObject.deletedBy != null && !currentMessageObject.deletedBy.isEmpty()) {
             timeString = currentMessageObject.deletedBy + " " + LocaleController.getInstance().getFormatterDay().format((long) (messageObject.messageOwner.date) * 1000);
         } else if (currentMessageObject.realDate != 0) {
-            timeString = LocaleController.formatSmallDateChat(currentMessageObject.realDate) + ", " + LocaleController.getInstance().getFormatterDay().format((long) (currentMessageObject.realDate) * 1000);
+            timeString = LocaleController.formatSmallDateChat(currentMessageObject.realDate) + ", " + org.telegram.messenger.MgExtras.formatTime((long) (currentMessageObject.realDate) * 1000);
+            if (currentMessageObject.currentEvent != null && currentMessageObject.currentEvent.action instanceof TLRPC.TL_channelAdminLogEventActionDeleteMessage && messageObject.messageOwner.date != 0) {
+                // MilliyGram: "So'nggi amallar"da xabar qachon o'chirilgani ham ko'rinadi
+                int deletedAt = messageObject.messageOwner.date;
+                boolean sameDay = LocaleController.formatSmallDateChat(deletedAt).equals(LocaleController.formatSmallDateChat(currentMessageObject.realDate));
+                timeString = timeString + "  ·  🗑 " + (sameDay ? "" : LocaleController.formatSmallDateChat(deletedAt) + ", ") + org.telegram.messenger.MgExtras.formatTime((long) deletedAt * 1000);
+            }
         } else if (currentMessageObject.isRepostPreview) {
             timeString = LocaleController.formatSmallDateChat(messageObject.messageOwner.date) + ", " + LocaleController.getInstance().getFormatterDay().format((long) (messageObject.messageOwner.date) * 1000);
         } else if (edited) {
