@@ -6967,6 +6967,11 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         org.telegram.messenger.MgAutoDelete.start(); // MilliyGram: postlarni avto-o'chirish
         org.telegram.messenger.MgUpdater.check(this); // MilliyGram: yangi versiya bildirishnomasi
         MgOnboarding.maybeShow(this); // MilliyGram: birinchi ochilishdagi tanishtiruv
+        AndroidUtilities.runOnUIThread(() -> {
+            if (isResumed) {
+                MgSessionGuard.check(this, UserConfig.selectedAccount); // MilliyGram: yangi qurilmadan kirish ogohlantirishi
+            }
+        }, 3000);
         super.onResume();
         isResumed = true;
         pipActivityHandler.onResume();

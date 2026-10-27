@@ -138,6 +138,7 @@ public class MgSettingsPage extends UniversalFragment {
     private static final int ID_GHOST_ONLINE = 192;
     private static final int ID_GHOST_STORIES = 193;
     private static final int ID_GHOST_PRIVACY = 194;
+    private static final int ID_SESSION_GUARD = 195;
     private static final int ID_QIBLA_OPEN = 181;
     private static final int ID_QIBLA_STYLE = 182;
     private static final int ID_QIBLA_GPS = 183;
@@ -318,6 +319,8 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asShadow(null));
                 items.add(UItem.asCheck(ID_LOCK_ANIM, org.telegram.messenger.MgLang.t("Qulf ekranida animatsiyali fon")).setChecked(MgConfig.getBool("lock_animated_bg", true)));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Chatni qulflashda umumiy parol yoki shu chatga alohida PIN / grafik kalit tanlash mumkin: chat → ⋮ → \"Chatni qulflash\".")));
+                items.add(UItem.asCheck(ID_SESSION_GUARD, org.telegram.messenger.MgLang.t("Yangi qurilmadan kirish ogohlantirishi")).setChecked(MgSessionGuard.isEnabled()));
+                items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Akkauntingizga notanish qurilmadan kirilsa, ilova darhol ogohlantiradi va uni bir bosishda chiqarib yuborish imkonini beradi.")));
                 items.add(UItem.asCheck(ID_HIDE_PHONE, org.telegram.messenger.MgLang.t("Telefon raqamimni yashirish")).setChecked(org.telegram.messenger.MgExtras.hidePhone()));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Sozlamalar va profilingizda raqamingiz \"+998 •• ••• •• 12\" ko'rinishida chiqadi — skrinshot ulashganda qulay. Boshqalar uchun maxfiylik Telegram sozlamalarida belgilanadi.")));
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Xavfsizlik")));
@@ -461,6 +464,9 @@ public class MgSettingsPage extends UniversalFragment {
             }
             case ID_FWD_SELECT:
                 toggle(view, "fwd_select_mode", true);
+                break;
+            case ID_SESSION_GUARD:
+                toggle(view, "session_guard", true);
                 break;
             case ID_TIME_SEC:
                 toggle(view, "time_seconds", false);

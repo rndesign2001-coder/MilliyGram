@@ -1599,3 +1599,34 @@ Sharpa rejimi yoqildi: o'qiganingiz, yozayotganingiz va onlayn ekaningiz ko'rinm
 Yoqilganda xabarlarni o'qiganingiz, yozayotganingiz va onlayn ekaningiz boshqalarga ko'rinmaydi. Diqqat: chatga xabar yozsangiz, Telegram o'sha chatdagi xabarlarni baribir o'qilgan deb belgilaydi. Oxirgi band Telegram maxfiylik sozlamasini o'zgartiradi — o'chirganda avvalgisi tiklanadi.	Когда включено, другие не видят, что вы прочитали сообщение, печатаете или в сети. Внимание: если вы напишете в чат, Telegram всё равно отметит сообщения в нём прочитанными. Последний пункт меняет настройку приватности Telegram — при выключении прежняя восстанавливается.	When on, others can't see that you read messages, are typing or are online. Note: if you send a message in a chat, Telegram still marks that chat as read. The last option changes your Telegram privacy setting — the previous one is restored when you turn it off.
 \"Oxirgi marta\" va raqamni \"Hech kim\" qilish	Скрыть «был(а) в сети» и номер от всех	Set \"Last seen\" and phone number to \"Nobody\"
 \"Yozmoqda…\" ni yubormaslik	Не показывать «печатает…»	Don't send \"typing…\"
+ ta xabar	 сообщ.	 messages
+Agar bu siz bo'lmasangiz — darhol chiqarib yuboring va ikki bosqichli parolni yoqing.	Если это не вы — сразу завершите сеанс и включите двухэтапную проверку.	If this wasn't you, terminate it right away and turn on two-step verification.
+Agar shu telefonda yaqinda (24 soat ichida) kirgan bo'lsangiz, Telegram bu seansga boshqa qurilmalarni chiqarib yuborishga ruxsat bermaydi. Eski qurilmangizdan Sozlamalar → Qurilmalar orqali tugating.	Если вы вошли на этом телефоне недавно (в течение 24 часов), Telegram не позволяет этому сеансу завершать другие. Завершите его со старого устройства: Настройки → Устройства.	If you signed in on this phone recently (within 24 hours), Telegram won't let this session terminate others. End it from your older device: Settings → Devices.
+Akkauntingizga notanish qurilmadan kirilsa, ilova darhol ogohlantiradi va uni bir bosishda chiqarib yuborish imkonini beradi.	Если в аккаунт войдут с незнакомого устройства, приложение сразу предупредит и позволит завершить сеанс одним нажатием.	If someone signs in from an unknown device, the app warns you right away and lets you terminate it in one tap.
+Akkauntingizga yangi qurilmadan kirildi:	В ваш аккаунт вошли с нового устройства:	Someone signed in to your account from a new device:
+Barcha xabarlarimni o'chirish	Удалить все мои сообщения	Delete all my messages
+Bu guruhda sizning xabaringiz topilmadi	В этой группе нет ваших сообщений	No messages of yours in this group
+Bu menman	Это я	It's me
+Chiqarib bo'lmadi	Не удалось завершить	Couldn't terminate
+Chiqarib yuborish	Завершить сеанс	Terminate
+Eksport uchun voqealar hali yuklanmagan	События для экспорта ещё не загружены	Events for export aren't loaded yet
+Eksport vaqti	Время экспорта	Exported at
+Fayl	Файл	File
+Hammasini o'qilgan qilish	Прочитать все	Mark all as read
+Jami voqealar	Всего событий	Total events
+O'chirildi: 	Удалено: 	Deleted: 
+O'chirilmoqda: 	Удаление: 	Deleting: 
+O'qilgan deb belgilandi: 	Отмечено прочитанным: 	Marked as read: 
+Ovozli xabar	Голосовое сообщение	Voice message
+Qurilma chiqarib yuborildi	Сеанс завершён	Device signed out
+Rasm	Фото	Photo
+Shu guruhdagi BARCHA xabarlaringiz hamma uchun o'chiriladi. Bu amalni qaytarib bo'lmaydi.\n\nDavom etilsinmi?	ВСЕ ваши сообщения в этой группе будут удалены для всех. Это действие нельзя отменить.\n\nПродолжить?	ALL your messages in this group will be deleted for everyone. This can't be undone.\n\nContinue?
+So'nggi amallar eksporti	Экспорт недавних действий	Recent actions export
+So'nggi amallarni eksport qilish	Экспортировать недавние действия	Export recent actions
+Stiker	Стикер	Sticker
+Video	Видео	Video
+Xatolik: 	Ошибка: 	Error: 
+Xavfsizlik uchun Sozlamalar → Maxfiylik va xavfsizlik → Ikki bosqichli tekshiruv bo'limida parol o'rnating.	Для безопасности установите пароль: Настройки → Конфиденциальность → Двухэтапная проверка.	For safety, set a password: Settings → Privacy and Security → Two-Step Verification.
+Yangi qurilma	Новое устройство	New device
+Yangi qurilmadan kirish ogohlantirishi	Предупреждение о входе с нового устройства	New device sign-in alert
+yozilgan	написано	written

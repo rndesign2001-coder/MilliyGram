@@ -19820,6 +19820,9 @@ public class ChatActivity extends BaseFragment implements
         MgChatMenu.Section info = new MgChatMenu.Section(org.telegram.messenger.MgLang.t("Chat haqida"));
         info.add(R.drawable.msg_stats, org.telegram.messenger.MgLang.t("Chat statistikasi"), () -> run.run(MgChatTools.MENU_STATS));
         info.add(R.drawable.msg_download, org.telegram.messenger.MgLang.t("Chatni eksport qilish"), () -> run.run(MgChatTools.MENU_EXPORT));
+        if (currentChat != null && MgDeleteMine.canUse(currentChat)) {
+            info.add(R.drawable.msg_delete, org.telegram.messenger.MgLang.t("Barcha xabarlarimni o'chirish"), () -> MgDeleteMine.start(ChatActivity.this, currentAccount, dialog_id));
+        }
         sections.add(info);
         return sections;
     }

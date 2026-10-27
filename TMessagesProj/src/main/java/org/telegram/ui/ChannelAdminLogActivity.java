@@ -932,6 +932,8 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
             public void onItemClick(final int id) {
                 if (id == -1) {
                     finishFragment();
+                } else if (id == MgAdminLogExport.MENU_ID) {
+                    MgAdminLogExport.export(ChannelAdminLogActivity.this, currentChat, messages); // MilliyGram
                 }
             }
         });
@@ -939,7 +941,7 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
         avatarContainer = new ChatAvatarContainer(context, null, false);
         avatarContainer.setGlassMode();
         avatarContainer.setOccupyStatusBar(!AndroidUtilities.isTablet());
-        actionBar.addView(avatarContainer, 0, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT, 54, 0, 52, 0));
+        actionBar.addView(avatarContainer, 0, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT, 54, 0, 100, 0));
 
         ActionBarMenu menu = actionBar.createMenu();
         searchItem = menu.addItem(0, R.drawable.outline_header_search).setIsSearchField(true).setActionBarMenuItemSearchListener(new ActionBarMenuItem.ActionBarMenuItemSearchListener() {
@@ -975,6 +977,8 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
         });
         searchItem.setSearchFieldHint(getString(R.string.Search));
         searchItem.setSearchPaddingStart(7);
+        ActionBarMenuItem mgExportItem = menu.addItem(MgAdminLogExport.MENU_ID, R.drawable.msg_download); // MilliyGram: jurnalni eksport qilish
+        mgExportItem.setContentDescription(org.telegram.messenger.MgLang.t("So'nggi amallarni eksport qilish"));
         avatarContainer.setEnabled(false);
 
         avatarContainer.setTitle(currentChat.title);

@@ -3823,11 +3823,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     final boolean finalMuteAll = muteAll;
 
                     final MessagesController.DialogFilter finalFilter = filter;
+                    int mgUnreadChats = 0;
                     for (int i = 0; i < dialogs.size(); i++) {
                         if (dialogs.get(i).unread_mark || dialogs.get(i).unread_count > 0) {
                             hasUnread = true;
+                            mgUnreadChats++;
                         }
                     }
+                    final int mgUnreadFinal = mgUnreadChats;
 
                     filterOptions = ItemOptions.makeOptions(DialogsActivity.this, tabView)
                             .setScrimViewBackground(new Drawable() {
@@ -3861,6 +3864,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                                     return PixelFormat.TRANSPARENT;
                                 }
                             })
+                            .addIf(hasUnread, R.drawable.msg_markread, org.telegram.messenger.MgLang.t("Hammasini o'qilgan qilish") + " (" + mgUnreadFinal + ")", () -> {
+                                markDialogsAsRead(dialogs);
+                                BulletinFactory.of(DialogsActivity.this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("O'qilgan deb belgilandi: ") + mgUnreadFinal + org.telegram.messenger.MgLang.t(" ta chat")).show();
+                            })
                             .addIf(getMessagesController().getDialogFilters().size() > 1, R.drawable.tabs_reorder, LocaleController.getString(R.string.FilterReorder), () -> {
                                 filterTabsView.setIsEditing(true);
                                 showDoneItem(true);
@@ -3892,9 +3899,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                                     }
                                 }
                                 BulletinFactory.createMuteBulletin(DialogsActivity.this, finalMuteAll, count, null).show();
-                            })
-                            .addIf(hasUnread, R.drawable.msg_markread, LocaleController.getString(R.string.MarkAllAsRead), () -> {
-                                markDialogsAsRead(dialogs);
                             })
                             .addIf(hasShare, R.drawable.msg_share, FilterCreateActivity.withNew(filter != null && filter.isMyChatlist() ? -1 : 0, LocaleController.getString(R.string.LinkActionShare), true), () -> {
                                 if (shareEmpty[0]) {
