@@ -73,7 +73,26 @@ public class VoIPHelper {
 
 	private static final int VOIP_SUPPORT_ID = 4244000;
 
+	private static boolean mgCallConfirmed;
+
 	public static void startCall(TLRPC.User user, boolean videoCall, boolean canVideoCall, final Activity activity, TLRPC.UserFull userFull, AccountInstance accountInstance) {
+		// MilliyGram: tasodifiy qo'ng'iroqning oldini olish uchun avval so'rash
+		if (org.telegram.messenger.MgExtras.confirmCalls() && !mgCallConfirmed && activity != null && user != null) {
+			new AlertDialog.Builder(activity)
+					.setTitle(videoCall ? org.telegram.messenger.MgLang.t("Video qo'ng'iroq") : org.telegram.messenger.MgLang.t("Qo'ng'iroq"))
+					.setMessage(org.telegram.messenger.MgLang.t("Qo'ng'iroq qilinsinmi: ") + org.telegram.messenger.UserObject.getUserName(user) + "?")
+					.setPositiveButton(org.telegram.messenger.MgLang.t("Qo'ng'iroq qilish"), (d, w) -> {
+						mgCallConfirmed = true;
+						try {
+							startCall(user, videoCall, canVideoCall, activity, userFull, accountInstance);
+						} finally {
+							mgCallConfirmed = false;
+						}
+					})
+					.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), null)
+					.show();
+			return;
+		}
 		if (accountInstance == null ? MessagesController.getInstance(UserConfig.selectedAccount).isFrozen() : accountInstance.getMessagesController().isFrozen()) {
 			AccountFrozenAlert.show(accountInstance == null ? UserConfig.selectedAccount : accountInstance.getCurrentAccount());
 			return;

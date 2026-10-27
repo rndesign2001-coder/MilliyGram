@@ -1909,6 +1909,9 @@ public class ChatActivity extends BaseFragment implements
         @Override
         public boolean hasDoubleTap(View view, int position) {
             if (isQuickRepliesOrWelcomeMessagesMode()) return false;
+            if (org.telegram.messenger.MgExtras.doubleTapMode() != org.telegram.messenger.MgExtras.TAP_OFF) {
+                return mgDoubleTapTarget(view) != null; // MilliyGram: sozlanadigan ikki marta bosish amali
+            }
             String reactionStringSetting = getMediaDataController().getDoubleTapReaction();
             TLRPC.TL_availableReaction reaction = getMediaDataController().getReactionsMap().get(reactionStringSetting);
             if (reaction == null && (reactionStringSetting == null || !reactionStringSetting.startsWith("animated_"))) {
@@ -1935,6 +1938,10 @@ public class ChatActivity extends BaseFragment implements
         @Override
         public void onDoubleTap(View view, int position, float x, float y) {
             if (getParentActivity() == null || isSecretChat() || isInScheduleMode() || isInPreviewMode() || isQuickRepliesOrWelcomeMessagesMode()) {
+                return;
+            }
+            if (org.telegram.messenger.MgExtras.doubleTapMode() != org.telegram.messenger.MgExtras.TAP_OFF) {
+                mgDoubleTap(view);
                 return;
             }
             MessageObject messageObject;
@@ -6920,6 +6927,10 @@ public class ChatActivity extends BaseFragment implements
 
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING && org.telegram.messenger.MgExtras.hideKeyboardOnScroll()
+                        && chatActivityEnterView != null && chatActivityEnterView.isKeyboardVisible()) {
+                    chatActivityEnterView.closeKeyboard(); // MilliyGram: aylantirganda klaviaturani yashirish
+                }
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     if (pollHintCell != null) {
                         pollHintView.showForMessageCell(pollHintCell, -1, pollHintX, pollHintY, true);
@@ -33805,6 +33816,68 @@ public class ChatActivity extends BaseFragment implements
             }
         }
         MediaController.saveFile(path, getParentActivity(), messageObject.isVideo() ? 1 : 0, null, null);
+    }
+
+    /** MilliyGram: ikki marta bosilgan xabar (amal bajarib bo'lmaydiganlari uchun null) */
+    private MessageObject mgDoubleTapTarget(View view) {
+        if (!(view instanceof ChatMessageCell) || actionBar.isActionModeShowed() || isInScheduleMode() || isInPreviewMode()) {
+            return null;
+        }
+        MessageObject m = ((ChatMessageCell) view).getPrimaryMessageObject();
+        if (m == null || m.isDateObject || m.isSponsored() || m.isSending() || m.isEditing() || m.getId() <= 0) {
+            return null;
+        }
+        switch (org.telegram.messenger.MgExtras.doubleTapMode()) {
+            case org.telegram.messenger.MgExtras.TAP_REPLY:
+                return chatActivityEnterView != null && chatActivityEnterView.getVisibility() == View.VISIBLE && (currentChat == null || ChatObject.canSendMessages(currentChat)) ? m : null;
+            case org.telegram.messenger.MgExtras.TAP_COPY:
+                return !TextUtils.isEmpty(m.messageText) && !m.isSecret() && !getMessagesController().isChatNoForwards(currentChat) ? m : null;
+            case org.telegram.messenger.MgExtras.TAP_EDIT:
+                return m.canEditMessage(currentChat) ? m : null;
+            case org.telegram.messenger.MgExtras.TAP_SAVE:
+            case org.telegram.messenger.MgExtras.TAP_FORWARD:
+                return !isSecretChat() && m.canForwardMessage() && !getMessagesController().isChatNoForwards(currentChat) ? m : null;
+        }
+        return null;
+    }
+
+    private void mgDoubleTap(View view) {
+        MessageObject m = mgDoubleTapTarget(view);
+        if (m == null) {
+            return;
+        }
+        try {
+            view.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP, android.view.HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+        } catch (Throwable ignore) {
+        }
+        MessageObject.GroupedMessages group = m.getGroupId() != 0 ? groupedMessagesMap.get(m.getGroupId()) : null;
+        int mode = org.telegram.messenger.MgExtras.doubleTapMode();
+        if (mode == org.telegram.messenger.MgExtras.TAP_SAVE) {
+            ArrayList<MessageObject> list = new ArrayList<>();
+            if (group != null) {
+                list.addAll(group.messages);
+            } else {
+                list.add(m);
+            }
+            MgMessageTools.quickSave(ChatActivity.this, list);
+            return;
+        }
+        selectedObject = m;
+        selectedObjectGroup = group;
+        switch (mode) {
+            case org.telegram.messenger.MgExtras.TAP_REPLY:
+                processSelectedOption(OPTION_REPLY);
+                break;
+            case org.telegram.messenger.MgExtras.TAP_COPY:
+                processSelectedOption(OPTION_COPY);
+                break;
+            case org.telegram.messenger.MgExtras.TAP_EDIT:
+                processSelectedOption(OPTION_EDIT);
+                break;
+            case org.telegram.messenger.MgExtras.TAP_FORWARD:
+                processSelectedOption(OPTION_FORWARD);
+                break;
+        }
     }
 
     private void processSelectedOption(int option) {

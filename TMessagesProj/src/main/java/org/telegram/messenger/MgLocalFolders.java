@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 
 /**
  * Lokal (serverga sinxronlanmaydigan) jildlar: O'qilmagan, Guruhlar, Profillar, Kanallar, Botlar,
+ * "Mening kanal va guruhlarim" (faqat o'zi yaratgan kanal/guruh bo'lsa ko'rinadi),
  * hamda standart holatda yashirin Admin, Mening kanallarim, Mening guruhlarim.
  * Shuningdek har qanday jild uchun ikonka tanlash va jild tabini yashirish.
  */
@@ -38,6 +39,7 @@ public class MgLocalFolders {
     public static final int TYPE_STRANGERS = 5; // notanishlar (kontaktda yo'q shaxsiy chatlar)
     public static final int TYPE_MOD_CHANNELS = 6; // admin (lekin egasi emas) kanallar
     public static final int TYPE_MOD_GROUPS = 7;   // admin (lekin egasi emas) guruhlar
+    public static final int TYPE_OWNED = 8;        // o'zi yaratgan kanal va guruhlar (bo'lmasa jild ko'rinmaydi)
 
     public static final int CUSTOM_MIN = 920;
     public static final int CUSTOM_MAX = 989;
@@ -65,6 +67,7 @@ public class MgLocalFolders {
         icon("unread", R.drawable.msg_markunread, org.telegram.messenger.MgLang.t("O'qilmagan"));
         icon("admin_channels", R.drawable.msg_channel_create, org.telegram.messenger.MgLang.t("Mening kanallarim"));
         icon("admin_groups", R.drawable.msg_groups_create, org.telegram.messenger.MgLang.t("Mening guruhlarim"));
+        icon("my_chats", R.drawable.msg_admins, org.telegram.messenger.MgLang.t("Mening kanal va guruhlarim"));
         icon("mod_channels", R.drawable.msg_channel, org.telegram.messenger.MgLang.t("Admin kanallar"));
         icon("mod_groups", R.drawable.msg_groups, org.telegram.messenger.MgLang.t("Admin guruhlar"));
         icon("archive", R.drawable.msg_archive, org.telegram.messenger.MgLang.t("Arxiv"));
@@ -109,6 +112,7 @@ public class MgLocalFolders {
     }
 
     private static final Def[] DEFS = {
+            new Def(912, "my_chats", org.telegram.messenger.MgLang.t("Mening kanal va guruhlarim"), MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_OWNED, "my_chats", true, 1),
             new Def(903, "private", org.telegram.messenger.MgLang.t("Profillar"), MessagesController.DIALOG_FILTER_FLAG_CONTACTS | MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS | EXCL_ARCH, TYPE_NONE, "private", true, 1),
             new Def(902, "groups", org.telegram.messenger.MgLang.t("Guruhlar"), MessagesController.DIALOG_FILTER_FLAG_GROUPS | EXCL_ARCH, TYPE_NONE, "groups", true, 2),
             new Def(904, "channels", org.telegram.messenger.MgLang.t("Kanallar"), MessagesController.DIALOG_FILTER_FLAG_CHANNELS | EXCL_ARCH, TYPE_NONE, "channels", true, 3),
@@ -311,9 +315,16 @@ public class MgLocalFolders {
             list.add(0, def);
             mc.dialogFiltersById.put(0, def);
         }
+        boolean owned = hasOwnedChats(mc);
+        synchronized (ownedState) {
+            ownedState.put(mc.currentAccount, owned);
+        }
         for (Entry e : entries) {
             if (!e.enabled) {
                 continue;
+            }
+            if (e.type == TYPE_OWNED && !owned) {
+                continue; // kanal yoki guruh yaratmagan bo'lsa, jild ko'rinmaydi
             }
             MessagesController.DialogFilter f = toFilter(e);
             int index = Math.max(0, Math.min(e.pos, list.size()));
@@ -327,8 +338,12 @@ public class MgLocalFolders {
         MessagesController mc = MessagesController.getInstance(account);
         ArrayList<Entry> entries = load(account);
         HashMap<Integer, Entry> byId = new HashMap<>();
+        HashMap<Integer, Boolean> ownedWasEnabled = new HashMap<>();
         for (Entry e : entries) {
             byId.put(e.id, e);
+            if (e.type == TYPE_OWNED) {
+                ownedWasEnabled.put(e.id, e.enabled);
+            }
             e.enabled = false;
         }
         ArrayList<MessagesController.DialogFilter> list = mc.dialogFilters;
@@ -346,6 +361,15 @@ public class MgLocalFolders {
             e.always.addAll(f.alwaysShow);
             e.never.clear();
             e.never.addAll(f.neverShow);
+        }
+        // yashirin turgan (kanal/guruh yo'qligi uchun) "Mening kanal va guruhlarim" holatini saqlab qolish
+        if (!ownedWasEnabled.isEmpty() && !hasOwnedChats(mc)) {
+            for (Entry e : entries) {
+                Boolean was = ownedWasEnabled.get(e.id);
+                if (was != null && !e.enabled && mc.dialogFiltersById.get(e.id) == null) {
+                    e.enabled = was;
+                }
+            }
         }
         save(account, entries);
     }
@@ -644,6 +668,64 @@ public class MgLocalFolders {
 
     // ---------- Admin jildlari ----------
 
+    private static final HashMap<Integer, Boolean> ownedState = new HashMap<>();
+
+    private static boolean isOwnedChat(TLRPC.Chat chat) {
+        return chat != null && chat.creator && !ChatObject.isNotInChat(chat) && !chat.deactivated
+                && (chat.migrated_to == null || chat.migrated_to instanceof TLRPC.TL_inputChannelEmpty);
+    }
+
+    /** Hisobda o'zi yaratgan kanal yoki guruh bormi */
+    public static boolean hasOwnedChats(MessagesController mc) {
+        try {
+            ArrayList<TLRPC.Dialog> all = mc.getAllDialogs();
+            for (int i = 0, n = all.size(); i < n; i++) {
+                TLRPC.Dialog d = all.get(i);
+                if (d != null && d.id < 0 && isOwnedChat(mc.getChat(-d.id))) {
+                    return true;
+                }
+            }
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
+        return false;
+    }
+
+    /**
+     * Chatlar ro'yxati o'zgarganda (sortDialogs) chaqiriladi: birinchi kanal/guruh yaratilsa —
+     * "Mening kanal va guruhlarim" jildi paydo bo'ladi, oxirgisi o'chirilsa — yo'qoladi.
+     */
+    public static void checkOwnedFolder(MessagesController mc) {
+        if (!isEnabledFeature() || !mc.dialogFiltersLoaded) {
+            return;
+        }
+        final int account = mc.currentAccount;
+        Boolean prev;
+        synchronized (ownedState) {
+            prev = ownedState.get(account);
+        }
+        if (prev == null) {
+            return; // inject hali ishlamagan — o'zi hisoblaydi
+        }
+        boolean has = hasOwnedChats(mc);
+        if (has == prev) {
+            return;
+        }
+        synchronized (ownedState) {
+            ownedState.put(account, has);
+        }
+        boolean enabled = false;
+        for (Entry e : load(account)) {
+            if (e.type == TYPE_OWNED && e.enabled) {
+                enabled = true;
+                break;
+            }
+        }
+        if (enabled) {
+            AndroidUtilities.runOnUIThread(() -> applyAndNotify(account));
+        }
+    }
+
     public static boolean includesByType(MessagesController.DialogFilter filter, MessagesController mc, long dialogId) {
         if (filter.mgLocalType == TYPE_STRANGERS) {
             return MgStrangers.belongsInInbox(mc.currentAccount, dialogId);
@@ -659,6 +741,8 @@ public class MgLocalFolders {
         boolean owner = chat.creator;
         boolean admin = !owner && chat.admin_rights != null;
         switch (filter.mgLocalType) {
+            case TYPE_OWNED:
+                return isOwnedChat(chat);
             case TYPE_ADMIN_CHANNELS:
                 return owner && broadcast;
             case TYPE_ADMIN_GROUPS:

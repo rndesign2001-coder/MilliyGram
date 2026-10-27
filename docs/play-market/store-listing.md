@@ -29,6 +29,7 @@ MilliyGram — o'zbek foydalanuvchilari uchun qo'shimcha imkoniyatlarga ega, Tel
 • Eng yaxshi post vaqti tavsiyasi
 • ☁ Postni bir bosishda "Saqlangan xabarlar"ga saqlash
 • Kanal/guruh profilida tezkor tugmalar: obunachilar, adminlar, ruxsatlar, so'nggi amallar
+• "Mening kanal va guruhlarim" jildi — o'zingiz yaratgan kanal va guruhlar avtomatik bir joyda
 • Uzatishda bir nechta chatni belgilab, keyin yuborish; chat to'plamlarini eslab qolish
 • Kanal va guruh uchun doimiy avto-o'chirish rejimi
 
@@ -42,6 +43,8 @@ MilliyGram — o'zbek foydalanuvchilari uchun qo'shimcha imkoniyatlarga ega, Tel
 • Lokal jildlar, ⭐ "Tanlanganlar" jildi, avto-javob, shablonlar
 • Chatda eng birinchi xabarga yoki sana bo'yicha tez o'tish
 • Stiker, GIF va ovozli xabarni yuborishdan oldin tasdiqlash
+• Xabarni ikki marta bosib tez javob berish, nusxalash yoki saqlash
+• Xabar vaqtida soniyalar, qo'ng'iroqdan oldin tasdiqlash, telefon raqamini yashirish
 • O'zbek, rus va ingliz tillarida
 
 MilliyGram Telegram FZ-LLC tomonidan ishlab chiqilmagan. U Telegram'ning ochiq manba kodi (GPL v2) asosida qurilgan. Xabarlaringiz to'g'ridan-to'g'ri Telegram serverlari orqali yuboriladi; MilliyGram hech qanday shaxsiy ma'lumot yig'maydi.

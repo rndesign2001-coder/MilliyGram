@@ -4692,7 +4692,7 @@ public class NotificationsController extends BaseController implements Notificat
                     .setGroupSummary(true)
                     .setShowWhen(true)
                     .setWhen(((long) lastMessageObject.messageOwner.date) * 1000)
-                    .setColor(0xff11acfa);
+                    .setColor(0xff2F6BFF);
 
             long[] vibrationPattern = null;
             Uri sound = null;
@@ -5690,7 +5690,7 @@ public class NotificationsController extends BaseController implements Notificat
                     .setContentText(text.toString())
                     .setAutoCancel(true)
                     .setNumber(dialogKey.story ? storyPushMessages.size() : messageObjects.size())
-                    .setColor(0xff11acfa)
+                    .setColor(0xff2F6BFF)
                     .setGroupSummary(false)
                     .setWhen(date)
                     .setShowWhen(true)

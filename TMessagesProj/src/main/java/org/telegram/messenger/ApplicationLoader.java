@@ -148,6 +148,15 @@ public class ApplicationLoader extends Application {
         return false;
     }
 
+    /** MilliyGram: Google Play (AAB) versiyasi — Play to'lov siyosatiga moslash uchun */
+    protected boolean isPlayStore() {
+        return false;
+    }
+
+    public static boolean isPlayStoreBuild() {
+        return applicationLoaderInstance != null && applicationLoaderInstance.isPlayStore();
+    }
+
     protected boolean isBeta() {
         return false;
     }

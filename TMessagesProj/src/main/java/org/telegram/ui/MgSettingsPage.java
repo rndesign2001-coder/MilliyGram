@@ -128,6 +128,11 @@ public class MgSettingsPage extends UniversalFragment {
     private static final int ID_GR_LIST = 159;
     private static final int ID_AD_LIST = 180;
     private static final int ID_FWD_SELECT = 184;
+    private static final int ID_DBL_TAP = 185;
+    private static final int ID_TIME_SEC = 186;
+    private static final int ID_KB_SCROLL = 187;
+    private static final int ID_CONFIRM_CALL = 188;
+    private static final int ID_HIDE_PHONE = 189;
     private static final int ID_QIBLA_OPEN = 181;
     private static final int ID_QIBLA_STYLE = 182;
     private static final int ID_QIBLA_GPS = 183;
@@ -216,6 +221,12 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Xabarni uzoq bosing → \"Maxsus uzatish\": matnni tahrirlab, havola va @larni tozalab, tarjima qilib, o'z nomingizdan uzating.")));
                 items.add(UItem.asCheck(ID_FWD_SELECT, org.telegram.messenger.MgLang.t("Uzatishda avval belgilash")).setChecked(MgConfig.getBool("fwd_select_mode", true)));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Yoqilganda uzatish oynasida chat bosilsa darhol yuborilmaydi — bir nechta chatni belgilab, pastdagi tugma bilan yuborasiz. Tugmani uzoq bossangiz: rejalashtirish, ovozsiz va avto-o'chirish bilan yuborish. 📁 tugmasi — saqlangan chat to'plamlari.")));
+                items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Chatda qulaylik")));
+                items.add(UItem.asButton(ID_DBL_TAP, R.drawable.menu_reply, org.telegram.messenger.MgLang.t("Xabarni ikki marta bosish"), org.telegram.messenger.MgExtras.doubleTapNames()[org.telegram.messenger.MgExtras.doubleTapMode()]));
+                items.add(UItem.asCheck(ID_TIME_SEC, org.telegram.messenger.MgLang.t("Xabar vaqtida soniyalarni ko'rsatish")).setChecked(org.telegram.messenger.MgExtras.showSeconds()));
+                items.add(UItem.asCheck(ID_KB_SCROLL, org.telegram.messenger.MgLang.t("Aylantirganda klaviaturani yashirish")).setChecked(org.telegram.messenger.MgExtras.hideKeyboardOnScroll()));
+                items.add(UItem.asCheck(ID_CONFIRM_CALL, org.telegram.messenger.MgLang.t("Qo'ng'iroqdan oldin so'rash")).setChecked(org.telegram.messenger.MgExtras.confirmCalls()));
+                items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Ikki marta bosish — xabarga tez javob berish, nusxalash, tahrirlash, saqlash yoki uzatish. Qo'ng'iroqdan oldin so'rash tasodifan qo'ng'iroq qilib yuborishning oldini oladi.")));
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Xabarlar yonida")));
                 items.add(UItem.asCheck(ID_SAVE_BTN, org.telegram.messenger.MgLang.t("Bulutcha — tez saqlash tugmasi")).setChecked(MgConfig.getBool("mg_save_btn", true)));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("☁ tugmasi xabarni bir bosishda \"Saqlangan xabarlar\"ga saqlaydi. Kanal va botlarda — barcha xabarlarda; shaxsiy chat va guruhlarda — faqat boshqalarning xabarlari va medialarida (o'zingiznikida chiqmaydi). Uzatish taqiqlangan chatlarda chiqmaydi.")));
@@ -295,6 +306,8 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asShadow(null));
                 items.add(UItem.asCheck(ID_LOCK_ANIM, org.telegram.messenger.MgLang.t("Qulf ekranida animatsiyali fon")).setChecked(MgConfig.getBool("lock_animated_bg", true)));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Chatni qulflashda umumiy parol yoki shu chatga alohida PIN / grafik kalit tanlash mumkin: chat → ⋮ → \"Chatni qulflash\".")));
+                items.add(UItem.asCheck(ID_HIDE_PHONE, org.telegram.messenger.MgLang.t("Telefon raqamimni yashirish")).setChecked(org.telegram.messenger.MgExtras.hidePhone()));
+                items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Sozlamalar va profilingizda raqamingiz \"+998 •• ••• •• 12\" ko'rinishida chiqadi — skrinshot ulashganda qulay. Boshqalar uchun maxfiylik Telegram sozlamalarida belgilanadi.")));
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Xavfsizlik")));
                 items.add(UItem.asCheck(ID_APK_BLOCK, org.telegram.messenger.MgLang.t("APK fayllarni bloklash")).setChecked(org.fenixuz.utils.ApkShield.isEnabled()));
                 items.add(UItem.asCheck(ID_SCAM, org.telegram.messenger.MgLang.t("Firibgarlikdan ogohlantirish")).setChecked(MgMessageTools.isScamGuardEnabled()));
@@ -437,6 +450,38 @@ public class MgSettingsPage extends UniversalFragment {
             case ID_FWD_SELECT:
                 toggle(view, "fwd_select_mode", true);
                 break;
+            case ID_TIME_SEC:
+                toggle(view, "time_seconds", false);
+                getNotificationCenter().postNotificationName(NotificationCenter.updateInterfaces, org.telegram.messenger.MessagesController.UPDATE_MASK_ALL);
+                break;
+            case ID_KB_SCROLL:
+                toggle(view, "kb_hide_scroll", false);
+                break;
+            case ID_CONFIRM_CALL:
+                toggle(view, "confirm_call", false);
+                break;
+            case ID_HIDE_PHONE:
+                toggle(view, "hide_phone", false);
+                getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+                break;
+            case ID_DBL_TAP: {
+                String[] names = org.telegram.messenger.MgExtras.doubleTapNames();
+                int cur = org.telegram.messenger.MgExtras.doubleTapMode();
+                CharSequence[] items2 = new CharSequence[names.length];
+                for (int i = 0; i < names.length; i++) {
+                    items2[i] = (i == cur ? "✓  " : "") + names[i];
+                }
+                AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+                b.setTitle(org.telegram.messenger.MgLang.t("Xabarni ikki marta bosish"));
+                b.setItems(items2, (d, w) -> {
+                    MgConfig.setInt("dbl_tap", w);
+                    if (listView != null && listView.adapter != null) {
+                        listView.adapter.update(true);
+                    }
+                });
+                showDialog(b.create());
+                break;
+            }
             case ID_QIBLA_OPEN:
                 MgQibla.open(this);
                 break;

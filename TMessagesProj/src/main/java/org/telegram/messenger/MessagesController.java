@@ -735,13 +735,14 @@ public class MessagesController extends BaseController implements NotificationCe
     public boolean starsLocked;
 
     public boolean starsPurchaseAvailable() {
-        return !starsLocked;
+        // MilliyGram: Play versiyasida raqamli tovarlar faqat Play Billing orqali sotilishi mumkin
+        return !starsLocked && !ApplicationLoader.isPlayStoreBuild();
     }
     public boolean premiumFeaturesBlocked() {
         return premiumLocked && !getUserConfig().isPremium();
     }
     public boolean premiumPurchaseBlocked() {
-        return premiumLocked;
+        return premiumLocked || ApplicationLoader.isPlayStoreBuild();
     }
 
     public List<String> directPaymentsCurrency = new ArrayList<>();
@@ -22549,6 +22550,11 @@ public class MessagesController extends BaseController implements NotificationCe
         }
 
         hasArchivedChats = dialogsByFolder.get(1, null) != null;
+        try {
+            MgLocalFolders.checkOwnedFolder(this); // MilliyGram: "Mening kanal va guruhlarim" jildini ko'rsatish/yashirish
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
     }
 
     private boolean addDialogToItsCommunity(TLRPC.Dialog dialog) {

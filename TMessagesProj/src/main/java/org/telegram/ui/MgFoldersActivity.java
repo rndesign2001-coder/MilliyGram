@@ -70,11 +70,14 @@ public class MgFoldersActivity extends UniversalFragment {
                 if (custom != null && MgLocalFolders.ICONS.containsKey(custom)) {
                     icon = MgLocalFolders.ICONS.get(custom);
                 }
-                String sub = e.type == MgLocalFolders.TYPE_CUSTOM ? org.telegram.messenger.MgLang.t("Toifa · ") + e.always.size() + org.telegram.messenger.MgLang.t(" ta chat · ") + (e.enabled ? "yoqilgan" : "yashirilgan") : (e.enabled ? org.telegram.messenger.MgLang.t("Yoqilgan") : org.telegram.messenger.MgLang.t("Yashirilgan"));
+                String sub = e.type == MgLocalFolders.TYPE_CUSTOM ? org.telegram.messenger.MgLang.t("Toifa · ") + e.always.size() + org.telegram.messenger.MgLang.t(" ta chat · ") + (e.enabled ? org.telegram.messenger.MgLang.t("yoqilgan") : org.telegram.messenger.MgLang.t("yashirilgan")) : (e.enabled ? org.telegram.messenger.MgLang.t("Yoqilgan") : org.telegram.messenger.MgLang.t("Yashirilgan"));
+                if (e.type == MgLocalFolders.TYPE_OWNED && e.enabled && !MgLocalFolders.hasOwnedChats(getMessagesController())) {
+                    sub = org.telegram.messenger.MgLang.t("Yoqilgan · kanal yoki guruh yaratsangiz paydo bo'ladi");
+                }
                 items.add(UItem.asButtonCheck(ID_LOCAL_BASE + i, e.name, sub).setChecked(e.enabled));
             }
             items.add(UItem.asButton(ID_NEW_CATEGORY, R.drawable.msg_add, org.telegram.messenger.MgLang.t("Yangi toifa yaratish")));
-            items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Yoqish/yashirish uchun bosing. Nomini yoki ikonkasini o'zgartirish uchun uzoq bosing.\n\n• Admin — siz egasi yoki admini bo'lgan barcha guruh va kanallar\n• Mening kanallarim / guruhlarim — o'zingiz egasi bo'lganlar\n• Admin kanallar / guruhlar — siz admin, lekin egasi boshqa odam\n• Notanishlar — kontaktda yo'q odamlar (himoya yoqilganda)")));
+            items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Yoqish/yashirish uchun bosing. Nomini yoki ikonkasini o'zgartirish uchun uzoq bosing.\n\n• Mening kanal va guruhlarim — o'zingiz yaratgan kanal va guruhlar (ular bo'lmasa, jild ko'rinmaydi)\n• Admin — siz egasi yoki admini bo'lgan barcha guruh va kanallar\n• Mening kanallarim / guruhlarim — o'zingiz egasi bo'lganlar\n• Admin kanallar / guruhlar — siz admin, lekin egasi boshqa odam\n• Notanishlar — kontaktda yo'q odamlar (himoya yoqilganda)")));
         }
 
         hiddenTabs.clear();

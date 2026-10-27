@@ -263,7 +263,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
         mgIconView = new android.widget.ImageView(context);
         mgIconView.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
         try {
-            android.graphics.drawable.Drawable anim = context.getResources().getDrawable(R.drawable.mg_splash_anim);
+            android.graphics.drawable.Drawable anim = context.getResources().getDrawable(R.drawable.mg_intro_anim);
             mgIconView.setImageDrawable(anim);
             if (anim instanceof android.graphics.drawable.AnimationDrawable) {
                 AndroidUtilities.runOnUIThread(((android.graphics.drawable.AnimationDrawable) anim)::start, 300);
