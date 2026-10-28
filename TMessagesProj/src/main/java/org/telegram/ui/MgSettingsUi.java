@@ -330,6 +330,33 @@ public final class MgSettingsUi {
     }
 
     /** Sarlavhali bo'lim kartasi */
+    /** Sozlamalardan qidirish paneli (bosilganda tepadagi qidiruv maydoni ochiladi) */
+    public static View searchBar(Context ctx, Theme.ResourcesProvider rp, CharSequence hint, Runnable onClick) {
+        FrameLayout wrap = new FrameLayout(ctx);
+        LinearLayout bar = new LinearLayout(ctx);
+        bar.setOrientation(LinearLayout.HORIZONTAL);
+        bar.setGravity(Gravity.CENTER_VERTICAL);
+        bar.setPadding(dp(14), 0, dp(14), 0);
+        GradientDrawable bg = new GradientDrawable();
+        bg.setCornerRadius(dp(24));
+        bg.setColor(color(Theme.key_windowBackgroundWhite, rp));
+        bar.setBackground(new RippleDrawable(ColorStateList.valueOf(color(Theme.key_listSelector, rp)), bg, null));
+        ImageView icon = new ImageView(ctx);
+        icon.setImageResource(R.drawable.outline_header_search);
+        icon.setColorFilter(new PorterDuffColorFilter(color(Theme.key_windowBackgroundWhiteGrayIcon, rp), PorterDuff.Mode.SRC_IN));
+        bar.addView(icon, LayoutHelper.createLinear(24, 24));
+        TextView text = new TextView(ctx);
+        text.setText(hint);
+        text.setTextColor(color(Theme.key_windowBackgroundWhiteGrayText, rp));
+        text.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
+        text.setSingleLine(true);
+        text.setEllipsize(TextUtils.TruncateAt.END);
+        bar.addView(text, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f, 12, 0, 0, 0));
+        bar.setOnClickListener(v -> onClick.run());
+        wrap.addView(bar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 48, Gravity.TOP, 12, 6, 12, 6));
+        return wrap;
+    }
+
     public static View section(Context ctx, Theme.ResourcesProvider rp, CharSequence header, ArrayList<Row> rows) {
         FrameLayout wrap = new FrameLayout(ctx);
         LinearLayout card = new LinearLayout(ctx);

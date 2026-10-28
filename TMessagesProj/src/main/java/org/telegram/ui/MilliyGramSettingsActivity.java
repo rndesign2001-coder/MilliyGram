@@ -78,6 +78,10 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
     private static final int CARD_LIFE = 605;
     private static final int CARD_SYSTEM = 606;
     private static final int CARD_HELP = 607;
+    private static final int CARD_SEARCH = 608;
+
+    private org.telegram.ui.ActionBar.ActionBarMenuItem mgSearchItem;
+    private final ArrayList<CharSequence> mgResultTexts = new ArrayList<>();
 
     private static String t(String s) {
         return org.telegram.messenger.MgLang.t(s);
@@ -114,6 +118,11 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
                 + (org.telegram.messenger.MgUpdater.currentBuild() > 0 ? "  ·  b" + org.telegram.messenger.MgUpdater.currentBuild() : "");
         items.add(UItem.asCustomShadow(CARD_HERO, MgSettingsUi.hero(ctx, version,
                 () -> openLink(NEWS_CHANNEL), () -> openLink(CHAT_GROUP), this::checkUpdate)));
+        items.add(UItem.asCustomShadow(CARD_SEARCH, MgSettingsUi.searchBar(ctx, rp, t("Sozlamalardan qidirish"), () -> {
+            if (mgSearchItem != null) {
+                mgSearchItem.openSearch(true);
+            }
+        })));
 
         // Tezkor plitkalar
         ArrayList<MgSettingsUi.Tile> tiles = new ArrayList<>();
@@ -200,7 +209,7 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
                 } else if (page == ID_TOUR) {
                     startTour();
                 } else if (page > 0) {
-                    presentFragment(new MgSettingsPage(page));
+                    presentFragment(new MgSettingsPage(page).highlight(mgResultTexts.get(i)));
                 }
             }
         } else if (item.id == ID_TOUR) {
@@ -214,7 +223,7 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
     public android.view.View createView(android.content.Context context) {
         android.view.View v = super.createView(context);
         org.telegram.ui.ActionBar.ActionBarMenu menu = actionBar.createMenu();
-        org.telegram.ui.ActionBar.ActionBarMenuItem searchItem = menu.addItem(0, R.drawable.outline_header_search).setIsSearchField(true)
+        org.telegram.ui.ActionBar.ActionBarMenuItem searchItem = mgSearchItem = menu.addItem(0, R.drawable.outline_header_search).setIsSearchField(true)
                 .setActionBarMenuItemSearchListener(new org.telegram.ui.ActionBar.ActionBarMenuItem.ActionBarMenuItemSearchListener() {
                     @Override
                     public void onSearchCollapse() {
@@ -340,6 +349,7 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
             buildIndex();
         }
         mgResultPages.clear();
+        mgResultTexts.clear();
         String q = norm(mgQuery.trim());
         String[] words = q.split("\\s+");
         for (Object[] e : mgIndex) {
@@ -353,6 +363,7 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
             }
             if (ok) {
                 mgResultPages.add((Integer) e[0]);
+                mgResultTexts.add((CharSequence) e[1]);
                 items.add(UItem.asButton(ID_RESULT_BASE + mgResultPages.size() - 1, (Integer) e[2], (CharSequence) e[1], (String) e[3]));
             }
         }

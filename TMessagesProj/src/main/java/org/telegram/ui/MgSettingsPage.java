@@ -160,6 +160,40 @@ public class MgSettingsPage extends UniversalFragment {
         this.page = page;
     }
 
+    private CharSequence mgHighlight;
+
+    /** Qidiruvdan ochilganda: shu nomli bandga aylantirib, yoritib ko'rsatadi */
+    public MgSettingsPage highlight(CharSequence text) {
+        mgHighlight = text;
+        return this;
+    }
+
+    @Override
+    public void onTransitionAnimationEnd(boolean isOpen, boolean backward) {
+        super.onTransitionAnimationEnd(isOpen, backward);
+        if (!isOpen || backward || mgHighlight == null || listView == null || listView.adapter == null) {
+            return;
+        }
+        String want = mgHighlight.toString();
+        mgHighlight = null;
+        int pos = -1;
+        for (int i = 0; i < listView.adapter.getItemCount(); i++) {
+            UItem u = listView.adapter.getItem(i);
+            if (u != null && u.text != null && want.equals(u.text.toString())) {
+                pos = i;
+                break;
+            }
+        }
+        if (pos < 0) {
+            return;
+        }
+        final int target = pos;
+        if (listView.getLayoutManager() instanceof androidx.recyclerview.widget.LinearLayoutManager) {
+            ((androidx.recyclerview.widget.LinearLayoutManager) listView.getLayoutManager()).scrollToPositionWithOffset(target, org.telegram.messenger.AndroidUtilities.dp(80));
+        }
+        listView.post(() -> listView.highlightRow(() -> target, 1800));
+    }
+
     public static String pageTitle(int page) {
         switch (page) {
             case PAGE_GENERAL: return org.telegram.messenger.MgLang.t("Asosiy");

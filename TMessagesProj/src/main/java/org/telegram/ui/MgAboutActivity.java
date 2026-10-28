@@ -30,12 +30,10 @@ public class MgAboutActivity extends UniversalFragment {
 
     public static final String SUPPORT_USER = "Rustam_Nigmatov";
     private static final String PRIVACY_URL = "https://github.com/rndesign2001-coder/MilliyGram/blob/claude/zen-hypatia-ngf4ae/docs/play-market/privacy-policy.md";
-    private static final String SOURCE_URL = "https://github.com/rndesign2001-coder/MilliyGram";
 
     private static final int CARD_HEADER = 700;
     private static final int CARD_CHANNELS = 701;
     private static final int CARD_HELP = 702;
-    private static final int CARD_INFO = 703;
 
     @Override
     protected CharSequence getTitle() {
@@ -111,14 +109,12 @@ public class MgAboutActivity extends UniversalFragment {
         help.add(new MgSettingsUi.Row(R.drawable.msg_retry, 0xFF0EA5E9, MgLang.t("Yangilanishni tekshirish"), MgLang.t("Eng so'nggi versiyani o'rnating"), null, this::checkUpdate));
         items.add(UItem.asCustomShadow(CARD_HELP, MgSettingsUi.section(ctx, getResourceProvider(), MgLang.t("Yordam"), help)));
 
-        ArrayList<MgSettingsUi.Row> info = new ArrayList<>();
-        info.add(new MgSettingsUi.Row(R.drawable.msg_secret, 0xFF64748B, MgLang.t("Maxfiylik siyosati"), MgLang.t("Qanday ma'lumotlar ishlatiladi"), null,
-                () -> Browser.openUrl(getParentActivity(), PRIVACY_URL)));
-        info.add(new MgSettingsUi.Row(R.drawable.msg_link, 0xFF475569, MgLang.t("Ochiq manba kodi"), "GNU GPL v2", null,
-                () -> Browser.openUrl(getParentActivity(), SOURCE_URL)));
-        items.add(UItem.asCustomShadow(CARD_INFO, MgSettingsUi.section(ctx, getResourceProvider(), MgLang.t("Ma'lumot"), info)));
-        // Google Play qoidasi: ilova Telegram kompaniyasiniki emasligi ko'rsatilishi kerak
-        items.add(UItem.asShadow(MgLang.t("MilliyGram Telegram API asosida ishlaydi va Telegram FZ-LLC bilan bog'liq emas.")));
+        // Google Play qoidasi: ilova mustaqil ekanligi va ma'lumotlardan foydalanish aniq yozilgan
+        // (Play talabi: maxfiylik siyosati ilova ichida ham ochilishi kerak — shu yerda havola sifatida)
+        CharSequence policy = org.telegram.messenger.AndroidUtilities.replaceSingleTag("**" + MgLang.t("Maxfiylik siyosati") + "**",
+                () -> Browser.openUrl(getParentActivity(), PRIVACY_URL));
+        items.add(UItem.asShadow(new android.text.SpannableStringBuilder(MgLang.t("MilliyGram — Telegram API asosida ishlaydigan mustaqil ilova. Biz shaxsiy ma'lumotlaringizni yig'maymiz, saqlamaymiz va uchinchi shaxslarga bermaymiz. Xabarlaringiz to'g'ridan-to'g'ri Telegram serverlari orqali shifrlangan holda yuboriladi."))
+                .append("\n\n").append(policy)));
     }
 
     @Override
