@@ -190,6 +190,99 @@ public final class MgSettingsUi {
         return b;
     }
 
+    /** "Ilova haqida" sahifasining tepa kartasi: logo, nom, shior va ikkita versiya kartasi */
+    public static View aboutHeader(Context ctx, Theme.ResourcesProvider rp, CharSequence mgVersion, CharSequence tgVersion) {
+        FrameLayout wrap = new FrameLayout(ctx);
+        LinearLayout card = new LinearLayout(ctx);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setGravity(Gravity.CENTER_HORIZONTAL);
+        GradientDrawable bg = new GradientDrawable();
+        bg.setCornerRadius(dp(22));
+        bg.setColor(color(Theme.key_windowBackgroundWhite, rp));
+        card.setBackground(bg);
+        card.setPadding(dp(16), dp(24), dp(16), dp(16));
+
+        ImageView logo = new ImageView(ctx);
+        logo.setImageResource(R.mipmap.ic_launcher_round);
+        card.addView(logo, LayoutHelper.createLinear(104, 104, Gravity.CENTER_HORIZONTAL));
+        // logo yumshoq "nafas oladi"
+        android.animation.ObjectAnimator sx = android.animation.ObjectAnimator.ofFloat(logo, View.SCALE_X, 1f, 1.05f);
+        android.animation.ObjectAnimator sy = android.animation.ObjectAnimator.ofFloat(logo, View.SCALE_Y, 1f, 1.05f);
+        final android.animation.ObjectAnimator[] pulse = {sx, sy};
+        for (android.animation.ObjectAnimator a : pulse) {
+            a.setDuration(1800);
+            a.setRepeatMode(android.animation.ValueAnimator.REVERSE);
+            a.setRepeatCount(android.animation.ValueAnimator.INFINITE);
+            a.setInterpolator(new android.view.animation.AccelerateDecelerateInterpolator());
+        }
+        logo.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+                for (android.animation.ObjectAnimator a : pulse) {
+                    if (!a.isStarted()) {
+                        a.start();
+                    }
+                }
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                for (android.animation.ObjectAnimator a : pulse) {
+                    a.cancel();
+                }
+            }
+        });
+
+        TextView name = new TextView(ctx);
+        name.setText("MilliyGram");
+        name.setTextColor(color(Theme.key_windowBackgroundWhiteBlackText, rp));
+        name.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 26);
+        name.setTypeface(AndroidUtilities.bold());
+        name.setGravity(Gravity.CENTER);
+        card.addView(name, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 0, 14, 0, 0));
+
+        TextView tag = new TextView(ctx);
+        tag.setText(org.telegram.messenger.MgLang.t("O'zbekcha • Tez • Xavfsiz"));
+        tag.setTextColor(color(Theme.key_windowBackgroundWhiteGrayText, rp));
+        tag.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+        tag.setGravity(Gravity.CENTER);
+        card.addView(tag, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 0, 4, 0, 0));
+
+        LinearLayout chips = new LinearLayout(ctx);
+        chips.setOrientation(LinearLayout.HORIZONTAL);
+        chips.addView(versionChip(ctx, rp, "MilliyGram", mgVersion), LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f, 0, 0, 5, 0));
+        chips.addView(versionChip(ctx, rp, "Telegram", tgVersion), LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f, 5, 0, 0, 0));
+        card.addView(chips, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 20, 0, 0));
+
+        wrap.addView(card, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP, 12, 12, 12, 6));
+        return wrap;
+    }
+
+    private static View versionChip(Context ctx, Theme.ResourcesProvider rp, CharSequence label, CharSequence value) {
+        LinearLayout chip = new LinearLayout(ctx);
+        chip.setOrientation(LinearLayout.VERTICAL);
+        chip.setGravity(Gravity.CENTER);
+        chip.setPadding(dp(8), dp(12), dp(8), dp(12));
+        GradientDrawable g = new GradientDrawable();
+        g.setCornerRadius(dp(16));
+        g.setColor(Theme.multAlpha(color(Theme.key_windowBackgroundWhiteBlackText, rp), 0.06f));
+        chip.setBackground(g);
+        TextView l = new TextView(ctx);
+        l.setText(label);
+        l.setTextColor(color(Theme.key_windowBackgroundWhiteGrayText, rp));
+        l.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+        l.setGravity(Gravity.CENTER);
+        chip.addView(l);
+        TextView v = new TextView(ctx);
+        v.setText(value);
+        v.setTextColor(color(Theme.key_windowBackgroundWhiteBlueText4, rp));
+        v.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+        v.setTypeface(AndroidUtilities.bold());
+        v.setGravity(Gravity.CENTER);
+        chip.addView(v, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, 0, 2, 0, 0));
+        return chip;
+    }
+
     /** 4 ta tezkor plitka */
     public static View tiles(Context ctx, Theme.ResourcesProvider rp, ArrayList<Tile> tiles) {
         LinearLayout row = new LinearLayout(ctx);

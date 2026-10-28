@@ -499,6 +499,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private ValueAnimator contactsAlphaAnimator;
     private ViewPage[] viewPages;
     private ActionBarMenuItem passcodeItem;
+    private ActionBarMenuItem mgGhostItem; // MilliyGram: sharpa rejimi tugmasi
+    private static final int MG_GHOST_ID = 9061;
     private ActionBarMenuItem downloadsItem;
     private DownloadProgressIcon downloadProgressIcon;
     private boolean downloadsItemVisible;
@@ -3293,6 +3295,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             proxyMenuSubItem.setTextAndIcon(getString(R.string.MenuProxyTitle), 0, proxyDrawable);
             proxyMenuSubItem.setContentDescription(getString(R.string.ProxySettings));
 
+            mgGhostItem = menu.addItem(MG_GHOST_ID, R.drawable.ghost_off_for_action_bar);
+            mgUpdateGhostItem(false);
+
             passcodeItem = menu.addItem(1, R.drawable.outline_header_lock_24);
             passcodeItem.setContentDescription(getString(R.string.AccDescrPasscodeLock));
 
@@ -3986,6 +3991,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     } else if (onlySelect || folderId != 0 || communityId != 0) {
                         finishFragment();
                     }
+                } else if (id == MG_GHOST_ID) {
+                    mgToggleGhost();
                 } else if (id == 1) {
                     if (getParentActivity() == null) {
                         return;
@@ -7339,6 +7346,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     @Override
     public void onResume() {
+        mgUpdateGhostItem(false);
         super.onResume();
         MgInfoChip.refreshHolder(mgInfoChipHolder); // MilliyGram
         MgLiveBackground.startTicker();
@@ -9995,6 +10003,49 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     private void markAsUnread(long did) {
         getMessagesController().markDialogAsUnread(did, null, 0);
+    }
+
+    /** MilliyGram: tepadagi sharpa tugmasi holatini yangilash */
+    private void mgUpdateGhostItem(boolean animated) {
+        if (mgGhostItem == null) {
+            return;
+        }
+        boolean show = org.telegram.messenger.MgConfig.getBool("ghost_btn", true) && !onlySelect && folderId == 0;
+        mgGhostItem.setVisibility(show ? View.VISIBLE : View.GONE);
+        if (!show) {
+            return;
+        }
+        boolean on = MgGhostMode.isEnabled(currentAccount);
+        mgGhostItem.setIcon(on ? R.drawable.ghost_on_for_action_bar : R.drawable.ghost_off_for_action_bar);
+        if (mgGhostItem.getIconView() != null) {
+            mgGhostItem.getIconView().setColorFilter(on ? null : new android.graphics.PorterDuffColorFilter(getThemedColor(Theme.key_actionBarDefaultIcon), android.graphics.PorterDuff.Mode.SRC_IN));
+            if (animated) {
+                View icon = mgGhostItem.getIconView();
+                icon.animate().cancel();
+                icon.setScaleX(0.6f);
+                icon.setScaleY(0.6f);
+                icon.animate().scaleX(1f).scaleY(1f).setDuration(380).setInterpolator(new android.view.animation.OvershootInterpolator(2.6f)).start();
+            }
+        }
+        mgGhostItem.setContentDescription(on ? org.telegram.messenger.MgLang.t("Sharpa rejimi yoqilgan") : org.telegram.messenger.MgLang.t("Sharpa rejimi o'chiq"));
+    }
+
+    private void mgToggleGhost() {
+        final boolean enable = !MgGhostMode.isEnabled(currentAccount);
+        try {
+            mgGhostItem.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP, android.view.HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+        } catch (Throwable ignore) {
+        }
+        MgGhostMode.setEnabled(currentAccount, enable, err -> AndroidUtilities.runOnUIThread(() -> {
+            mgUpdateGhostItem(true);
+            if (err != null) {
+                BulletinFactory.of(this).createErrorBulletin(err).show();
+            } else {
+                BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, enable
+                        ? org.telegram.messenger.MgLang.t("Sharpa rejimi yoqildi: o'qiganingiz, yozayotganingiz va onlayn ekaningiz ko'rinmaydi")
+                        : org.telegram.messenger.MgLang.t("Sharpa rejimi o'chirildi")).show();
+            }
+        }));
     }
 
     private void markDialogsAsRead(ArrayList<TLRPC.Dialog> dialogs) {

@@ -158,9 +158,8 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
         ArrayList<MgSettingsUi.Row> help = new ArrayList<>();
         help.add(new MgSettingsUi.Row(R.drawable.msg_emoji_activities, 0xFFF59E0B, t("MilliyGram imkoniyatlari"), t("Qisqa tanishtiruv"), null, () -> MgOnboarding.show(getParentActivity())));
         help.add(new MgSettingsUi.Row(R.drawable.msg_help, 0xFF3B82F6, t("Sozlamalar bo'yicha sayohat"), t("Har bir bo'lim nima qilishini ko'rsatadi"), null, this::startTour));
-        help.add(new MgSettingsUi.Row(R.drawable.msg_info, 0xFF64748B, t("MilliyGram haqida"), t("Versiya, maxfiylik va litsenziya"), null, this::showAboutDialog));
+        help.add(new MgSettingsUi.Row(R.drawable.msg_info, 0xFF64748B, t("MilliyGram haqida"), t("Versiya, kanallar va yordam xizmati"), null, () -> presentFragment(new MgAboutActivity())));
         items.add(UItem.asCustomShadow(CARD_HELP, MgSettingsUi.section(ctx, rp, t("Yordam"), help)));
-        items.add(UItem.asShadow(t("MilliyGram — Telegram'ning ochiq manba kodi asosida qurilgan norasmiy klient.")));
     }
 
     private void toggleGhost() {
@@ -189,7 +188,7 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
         } else if (item.id == ID_UPDATE) {
             checkUpdate();
         } else if (item.id == ID_ABOUT) {
-            showAboutDialog();
+            presentFragment(new MgAboutActivity());
         } else if (item.id == ID_DESIGN) {
             presentFragment(new MgDesignActivity());
         } else if (item.id >= ID_RESULT_BASE) {

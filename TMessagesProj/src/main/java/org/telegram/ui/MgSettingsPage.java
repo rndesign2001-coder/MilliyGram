@@ -139,6 +139,7 @@ public class MgSettingsPage extends UniversalFragment {
     private static final int ID_GHOST_STORIES = 193;
     private static final int ID_GHOST_PRIVACY = 194;
     private static final int ID_SESSION_GUARD = 195;
+    private static final int ID_GHOST_BTN = 196;
     private static final int ID_QIBLA_OPEN = 181;
     private static final int ID_QIBLA_STYLE = 182;
     private static final int ID_QIBLA_GPS = 183;
@@ -307,6 +308,7 @@ public class MgSettingsPage extends UniversalFragment {
             case PAGE_PRIVACY: {
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Sharpa rejimi")));
                 items.add(UItem.asCheck(ID_GHOST, org.telegram.messenger.MgLang.t("Sharpa rejimi")).setChecked(MgGhostMode.isEnabled(currentAccount)));
+                items.add(UItem.asCheck(ID_GHOST_BTN, org.telegram.messenger.MgLang.t("Bosh ekranda sharpa tugmasi")).setChecked(MgConfig.getBool("ghost_btn", true)));
                 items.add(UItem.asCheck(ID_GHOST_READ, org.telegram.messenger.MgLang.t("O'qiganimni bildirmaslik (✓✓)")).setChecked(MgGhostMode.option(MgGhostMode.OPT_READ)));
                 items.add(UItem.asCheck(ID_GHOST_TYPING, org.telegram.messenger.MgLang.t("\"Yozmoqda…\" ni yubormaslik")).setChecked(MgGhostMode.option(MgGhostMode.OPT_TYPING)));
                 items.add(UItem.asCheck(ID_GHOST_ONLINE, org.telegram.messenger.MgLang.t("Onlayn ko'rinmaslik")).setChecked(MgGhostMode.option(MgGhostMode.OPT_ONLINE)));
@@ -629,6 +631,9 @@ public class MgSettingsPage extends UniversalFragment {
                 break;
             case ID_GHOST:
                 toggleGhost(view);
+                break;
+            case ID_GHOST_BTN:
+                toggle(view, "ghost_btn", true);
                 break;
             case ID_GHOST_READ:
                 toggle(view, MgGhostMode.OPT_READ, true);
