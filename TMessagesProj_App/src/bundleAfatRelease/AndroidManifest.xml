@@ -5,7 +5,10 @@
      - REQUEST_INSTALL_PACKAGES — Play ilovasi boshqa APK o'rnatmasligi kerak;
      - USE_EXACT_ALARM — faqat budilnik/kalendar ilovalariga ruxsat (SCHEDULE_EXACT_ALARM qoladi);
      - ACCESS_BACKGROUND_LOCATION — alohida deklaratsiya va video talab qiladi;
-     - AD_ID — reklama ishlatilmaydi (Play'dagi "Advertising ID" savoliga "Yo'q" javobi bilan mos).
+     - AD_ID — reklama ishlatilmaydi (Play'dagi "Advertising ID" savoliga "Yo'q" javobi bilan mos);
+     - READ_CALL_LOG — SMS/qo'ng'iroqlar jurnali ruxsati Play'da maxsus deklaratsiya talab qiladi
+       (login faqat SMS/ilova kodi bilan ishlaydi, qo'ng'iroq orqali avtomatik tasdiqlash o'chadi).
+    Fayl bundleAfatRelease papkasida: build type manifestidan ham ustun turadi, shuning uchun olib tashlash ishlaydi.
     APK (afat) versiyasiga ta'sir qilmaydi.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -16,4 +19,5 @@
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" tools:node="remove" />
     <!-- Reklama ishlatilmaydi: Google kutubxonalari qo'shishi mumkin bo'lgan reklama identifikatori ruxsatini olib tashlash -->
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" tools:node="remove" />
 </manifest>
