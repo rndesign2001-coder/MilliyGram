@@ -120,6 +120,8 @@ android {
                 // MilliyGram: Google Play (AAB). Play 64-bit talab qiladi; x86 telefonlar deyarli yo'q, yig'ish vaqtini qisqartirish uchun faqat ARM
                 abiFilters "armeabi-v7a", "arm64-v8a"
             }
+            // MilliyGram: Google Play avtomatik himoyasi (automatic protection) minSdk 24+ talab qiladi
+            minSdkVersion 24
             ext {
                 abiVersionCode = 1
             }

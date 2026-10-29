@@ -35,11 +35,11 @@ public class LauncherIconController {
 
     public enum LauncherIcon {
         DEFAULT("DefaultIcon", R.mipmap.mg_icon_background, R.mipmap.mg_icon_foreground, R.string.AppIconDefault),
-        VINTAGE("VintageIcon", R.mipmap.mg_icon_background, R.mipmap.mg_icon_foreground, R.string.AppIconVintage),
-        AQUA("AquaIcon", R.mipmap.mg_icon_background, R.mipmap.mg_icon_foreground, R.string.AppIconAqua),
-        PREMIUM("PremiumIcon", R.mipmap.mg_icon_background, R.mipmap.mg_icon_foreground, R.string.AppIconPremium, true),
-        TURBO("TurboIcon", R.mipmap.mg_icon_background, R.mipmap.mg_icon_foreground, R.string.AppIconTurbo, true),
-        NOX("NoxIcon", R.mipmap.mg_icon_background, R.mipmap.mg_icon_foreground, R.string.AppIconNox, true);
+        VINTAGE("VintageIcon", R.mipmap.mg_icon_black_bg, R.mipmap.mg_icon_6_fg, R.string.AppIconVintage),
+        AQUA("AquaIcon", R.mipmap.mg_icon_black_bg, R.mipmap.mg_icon_4_fg, R.string.AppIconAqua),
+        PREMIUM("PremiumIcon", R.mipmap.mg_icon_black_bg, R.mipmap.mg_icon_3_fg, R.string.AppIconPremium),
+        TURBO("TurboIcon", R.mipmap.mg_icon_black_bg, R.mipmap.mg_icon_5_fg, R.string.AppIconTurbo),
+        NOX("NoxIcon", R.mipmap.mg_icon_black_bg, R.mipmap.mg_icon_2_fg, R.string.AppIconNox);
 
         public final String key;
         public final int background;

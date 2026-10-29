@@ -10016,16 +10016,28 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             return;
         }
         boolean on = MgGhostMode.isEnabled(currentAccount);
-        mgGhostItem.setIcon(on ? R.drawable.ghost_on_for_action_bar : R.drawable.ghost_off_for_action_bar);
-        if (mgGhostItem.getIconView() != null) {
-            mgGhostItem.getIconView().setColorFilter(on ? null : new android.graphics.PorterDuffColorFilter(getThemedColor(Theme.key_actionBarDefaultIcon), android.graphics.PorterDuff.Mode.SRC_IN));
-            if (animated) {
-                View icon = mgGhostItem.getIconView();
-                icon.animate().cancel();
-                icon.setScaleX(0.6f);
-                icon.setScaleY(0.6f);
-                icon.animate().scaleX(1f).scaleY(1f).setDuration(380).setInterpolator(new android.view.animation.OvershootInterpolator(2.6f)).start();
+        if (on) {
+            // yoqilgan belgi o'z rangida qoladi: tema almashganda ham ActionBar rangi ustiga yozilmaydi
+            android.graphics.drawable.Drawable d = getParentActivity() == null ? null : androidx.core.content.ContextCompat.getDrawable(getParentActivity(), R.drawable.ghost_on_for_action_bar);
+            if (d != null) {
+                mgGhostItem.setIcon(new android.graphics.drawable.LayerDrawable(new android.graphics.drawable.Drawable[]{d.mutate()}) {
+                    @Override
+                    public void setColorFilter(android.graphics.ColorFilter colorFilter) {
+                    }
+                });
             }
+        } else {
+            mgGhostItem.setIcon(R.drawable.ghost_off_for_action_bar);
+            if (mgGhostItem.getIconView() != null) {
+                mgGhostItem.getIconView().setColorFilter(new android.graphics.PorterDuffColorFilter(getThemedColor(Theme.key_actionBarDefaultIcon), android.graphics.PorterDuff.Mode.SRC_IN));
+            }
+        }
+        if (animated && mgGhostItem.getIconView() != null) {
+            View icon = mgGhostItem.getIconView();
+            icon.animate().cancel();
+            icon.setScaleX(0.6f);
+            icon.setScaleY(0.6f);
+            icon.animate().scaleX(1f).scaleY(1f).setDuration(380).setInterpolator(new android.view.animation.OvershootInterpolator(2.6f)).start();
         }
         mgGhostItem.setContentDescription(on ? org.telegram.messenger.MgLang.t("Sharpa rejimi yoqilgan") : org.telegram.messenger.MgLang.t("Sharpa rejimi o'chiq"));
     }
@@ -14428,6 +14440,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             Theme.turnOffAutoNight(BulletinFactory.of(this), () -> {
                 presentFragment(new ThemeActivity(ThemeActivity.THEME_TYPE_NIGHT));
             });
+        });
+        // MilliyGram: hikoyalar panelini yashirish / ko'rsatish
+        final boolean mgStoriesHidden = org.telegram.messenger.MgConfig.getBool("hide_stories", false);
+        io.add(mgStoriesHidden ? R.drawable.msg_views : R.drawable.msg_stories_myhide,
+                org.telegram.messenger.MgLang.t(mgStoriesHidden ? "Hikoyalarni ko'rsatish" : "Hikoyalarni yashirish"), () -> {
+            org.telegram.messenger.MgConfig.setBool("hide_stories", !mgStoriesHidden);
+            updateStoriesVisibility(true);
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t(mgStoriesHidden ? "Hikoyalar paneli ko'rsatildi" : "Hikoyalar paneli yashirildi")).show();
         });
         io.addGap();
         io.add(R.drawable.outline_groups_24, getString(R.string.NewGroup), () -> {

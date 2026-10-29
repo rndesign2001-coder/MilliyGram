@@ -32896,7 +32896,8 @@ public class ChatActivity extends BaseFragment implements
                 fragmentView.getLocationInWindow(location);
                 popupX += location[0];
             }
-            int totalHeight = contentView.getHeight();
+            // MilliyGram: menyu pastki navigatsiya paneli ostiga kirib, kesilib qolmasligi uchun
+            int totalHeight = contentView.getHeight() - AndroidUtilities.navigationBarHeight;
             int height = scrimPopupContainerLayout.getMeasuredHeight() + AndroidUtilities.dp(48);
             int keyboardHeight = contentView.measureKeyboardHeight();
             if (keyboardHeight > AndroidUtilities.dp(20)) {

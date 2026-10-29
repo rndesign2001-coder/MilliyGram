@@ -1655,3 +1655,8 @@ Hikoyalarni sezdirmasdan ko'ring	Смотрите истории незамет�
 Yangi qurilmadan kirilsa darhol ogohlantirish	Мгновенное оповещение о входе с нового устройства	Instant alert when a new device logs in
 «So'nggi amallar»ni faylga eksport qilish	Экспорт «Последних действий» в файл	Export "Recent actions" to a file
 MilliyGram — Telegram API asosida ishlaydigan mustaqil ilova. Biz shaxsiy ma'lumotlaringizni yig'maymiz, saqlamaymiz va uchinchi shaxslarga bermaymiz. Xabarlaringiz to'g'ridan-to'g'ri Telegram serverlari orqali shifrlangan holda yuboriladi.	MilliyGram — независимое приложение на основе Telegram API. Мы не собираем, не храним и не передаём ваши личные данные третьим лицам. Сообщения отправляются напрямую через серверы Telegram в зашифрованном виде.	MilliyGram is an independent app built on the Telegram API. We do not collect, store or share your personal data with third parties. Your messages are sent encrypted directly through Telegram's servers.
+Hikoyalarni ko'rsatish	Показать истории	Show stories
+Hikoyalarni yashirish	Скрыть истории	Hide stories
+Hikoyalar paneli ko'rsatildi	Панель историй показана	Stories bar is shown
+Hikoyalar paneli yashirildi	Панель историй скрыта	Stories bar is hidden
+Android uchun MilliyGram	MilliyGram для Android	MilliyGram for Android

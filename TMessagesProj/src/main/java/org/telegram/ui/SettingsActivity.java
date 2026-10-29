@@ -929,22 +929,21 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
         try {
             PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
             int code = pInfo.versionCode / 10;
-            String abi = "";
+            // MilliyGram: "Android uchun MilliyGram v12.10.3 (6041)\nstore bundled arm64-v8a"
+            String cpu = Build.SUPPORTED_ABIS != null && Build.SUPPORTED_ABIS.length > 0 ? Build.SUPPORTED_ABIS[0] : Build.CPU_ABI;
+            String abi;
             switch (pInfo.versionCode % 10) {
                 case 1:
                 case 2:
-                    abi = "store bundled " + Build.CPU_ABI + " " + Build.CPU_ABI2;
+                    abi = "store bundled " + cpu;
                     break;
                 default:
-                case 9:
-                    if (ApplicationLoader.isStandaloneBuild()) {
-                        abi = "direct " + Build.CPU_ABI + " " + Build.CPU_ABI2;
-                    } else {
-                        abi = "universal " + Build.CPU_ABI + " " + Build.CPU_ABI2;
-                    }
+                    abi = (ApplicationLoader.isStandaloneBuild() ? "direct " : "universal ") + cpu;
                     break;
             }
-            return formatString(R.string.TelegramVersion, String.format(Locale.US, "v%s (%d)\n%s", pInfo.versionName, code, abi));
+            int build = org.telegram.messenger.MgUpdater.currentBuild();
+            String ver = "v" + pInfo.versionName + (build > 0 ? " · b" + build : "");
+            return org.telegram.messenger.MgLang.t("Android uchun MilliyGram") + " " + String.format(Locale.US, "%s (%d)\n%s", ver, code, abi);
         } catch (Exception e) {
             FileLog.e(e);
         }
