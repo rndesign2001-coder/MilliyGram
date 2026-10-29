@@ -91,8 +91,7 @@ public class MgAboutActivity extends UniversalFragment {
         if (ctx == null) {
             return;
         }
-        int build = MgUpdater.currentBuild();
-        String mgVersion = build > 0 ? "b" + build : BuildVars.BUILD_VERSION_STRING;
+        String mgVersion = MgUpdater.versionName();
         items.add(UItem.asCustomShadow(CARD_HEADER, MgSettingsUi.aboutHeader(ctx, getResourceProvider(), mgVersion, BuildVars.BUILD_VERSION_STRING)));
 
         ArrayList<MgSettingsUi.Row> channels = new ArrayList<>();

@@ -44,6 +44,11 @@ public final class MgUpdater {
         return BuildConfig.MG_BUILD;
     }
 
+    /** MilliyGram versiyasi, masalan "1.0.0" (Telegram asos versiyasi — BuildVars.BUILD_VERSION_STRING) */
+    public static String versionName() {
+        return BuildConfig.MG_VERSION_NAME;
+    }
+
     /** Google Play'dan o'rnatilganmi */
     public static boolean isFromPlayStore() {
         try {

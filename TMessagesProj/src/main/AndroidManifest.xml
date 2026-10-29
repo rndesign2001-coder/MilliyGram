@@ -141,8 +141,8 @@
             android:enabled="false"
             android:name="org.telegram.messenger.VintageIcon"
             android:targetActivity="org.telegram.ui.LaunchActivity"
-            android:icon="@mipmap/icon_6_launcher"
-            android:roundIcon="@mipmap/icon_6_launcher_round"
+            android:icon="@mipmap/mg_icon_atlas"
+            android:roundIcon="@mipmap/mg_icon_atlas_round"
             android:exported="true">
 
             <intent-filter>
@@ -157,8 +157,8 @@
             android:enabled="false"
             android:name="org.telegram.messenger.AquaIcon"
             android:targetActivity="org.telegram.ui.LaunchActivity"
-            android:icon="@mipmap/icon_4_launcher"
-            android:roundIcon="@mipmap/icon_4_launcher_round"
+            android:icon="@mipmap/mg_icon_oq"
+            android:roundIcon="@mipmap/mg_icon_oq_round"
             android:exported="true">
 
             <intent-filter>
@@ -173,8 +173,8 @@
             android:enabled="false"
             android:name="org.telegram.messenger.PremiumIcon"
             android:targetActivity="org.telegram.ui.LaunchActivity"
-            android:icon="@mipmap/icon_3_launcher"
-            android:roundIcon="@mipmap/icon_3_launcher_round"
+            android:icon="@mipmap/mg_icon_shisha"
+            android:roundIcon="@mipmap/mg_icon_shisha_round"
             android:exported="true">
 
             <intent-filter>
@@ -189,8 +189,8 @@
             android:enabled="false"
             android:name="org.telegram.messenger.TurboIcon"
             android:targetActivity="org.telegram.ui.LaunchActivity"
-            android:icon="@mipmap/icon_5_launcher"
-            android:roundIcon="@mipmap/icon_5_launcher_round"
+            android:icon="@mipmap/mg_icon_neon"
+            android:roundIcon="@mipmap/mg_icon_neon_round"
             android:exported="true">
 
             <intent-filter>
@@ -205,8 +205,24 @@
             android:enabled="false"
             android:name="org.telegram.messenger.NoxIcon"
             android:targetActivity="org.telegram.ui.LaunchActivity"
-            android:icon="@mipmap/icon_2_launcher"
-            android:roundIcon="@mipmap/icon_2_launcher_round"
+            android:icon="@mipmap/mg_icon_binafsha"
+            android:roundIcon="@mipmap/mg_icon_binafsha_round"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
+            </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
+        </activity-alias>
+
+        <activity-alias
+            android:enabled="false"
+            android:name="org.telegram.messenger.FlagIcon"
+            android:targetActivity="org.telegram.ui.LaunchActivity"
+            android:icon="@mipmap/mg_icon_bayroq"
+            android:roundIcon="@mipmap/mg_icon_bayroq_round"
             android:exported="true">
 
             <intent-filter>

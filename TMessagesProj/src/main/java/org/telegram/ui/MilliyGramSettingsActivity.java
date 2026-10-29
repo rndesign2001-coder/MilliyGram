@@ -114,8 +114,7 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
             return;
         }
         org.telegram.ui.ActionBar.Theme.ResourcesProvider rp = getResourceProvider();
-        String version = "v" + org.telegram.messenger.BuildVars.BUILD_VERSION_STRING
-                + (org.telegram.messenger.MgUpdater.currentBuild() > 0 ? "  ·  b" + org.telegram.messenger.MgUpdater.currentBuild() : "");
+        String version = "MilliyGram " + org.telegram.messenger.MgUpdater.versionName();
         items.add(UItem.asCustomShadow(CARD_HERO, MgSettingsUi.hero(ctx, version,
                 () -> openLink(NEWS_CHANNEL), () -> openLink(CHAT_GROUP), this::checkUpdate)));
         items.add(UItem.asCustomShadow(CARD_SEARCH, MgSettingsUi.searchBar(ctx, rp, t("Sozlamalardan qidirish"), () -> {
@@ -388,8 +387,7 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
         builder.setMessage(org.telegram.messenger.MgLang.t("MilliyGram — milliy dizayndagi norasmiy Telegram klienti.\n\n") +
                 org.telegram.messenger.MgLang.t("Ilova Telegram FZ-LLC tomonidan ishlab chiqilmagan. U Telegram'ning ochiq manba kodi (GPL v2) asosida qurilgan va Telegram API'dan foydalanadi.\n\n") +
                 org.telegram.messenger.MgLang.t("Xabarlaringiz to'g'ridan-to'g'ri Telegram serverlari orqali yuboriladi. MilliyGram hech qanday ma'lumot yig'maydi.")
-                + "\n\n" + org.telegram.messenger.MgLang.t("Versiya: ") + org.telegram.messenger.BuildVars.BUILD_VERSION_STRING
-                + (org.telegram.messenger.MgUpdater.currentBuild() > 0 ? " (b" + org.telegram.messenger.MgUpdater.currentBuild() + ")" : ""));
+                + "\n\n" + org.telegram.messenger.MgLang.t("Versiya: ") + org.telegram.messenger.MgUpdater.versionName());
         builder.setPositiveButton("OK", null);
         showDialog(builder.create());
     }

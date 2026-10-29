@@ -82,7 +82,7 @@ jobs:
       - name: Faylni nomlash
         id: out
         run: |
-          VER=$(grep APP_VERSION_NAME gradle.properties | cut -d= -f2)
+          VER=$(grep MG_VERSION_NAME gradle.properties | cut -d= -f2)
           AAB=$(find TMessagesProj_App/build/outputs/bundle -name "*.aab" | head -1)
           NAME="MilliyGram-play-${VER}-b$((GITHUB_RUN_NUMBER + 1000)).aab"
           cp "$AAB" "$NAME"

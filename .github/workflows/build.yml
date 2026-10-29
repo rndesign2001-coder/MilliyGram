@@ -93,7 +93,7 @@ jobs:
       - name: Faylni nomlash
         id: out
         run: |
-          VER=$(grep APP_VERSION_NAME gradle.properties | cut -d= -f2)
+          VER=$(grep MG_VERSION_NAME gradle.properties | cut -d= -f2)
           NAME="MilliyGram-${VER}-${GITHUB_RUN_NUMBER}.apk"
           cp TMessagesProj_App/build/outputs/apk/afat/release/app.apk "$NAME"
           echo "name=$NAME" >> "$GITHUB_OUTPUT"

@@ -929,7 +929,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
         try {
             PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
             int code = pInfo.versionCode / 10;
-            // MilliyGram: "Android uchun MilliyGram v12.10.3 (6041)\nstore bundled arm64-v8a"
+            // MilliyGram: "Android uchun MilliyGram 1.0.0 (7131)\nstore bundled arm64-v8a"
             String cpu = Build.SUPPORTED_ABIS != null && Build.SUPPORTED_ABIS.length > 0 ? Build.SUPPORTED_ABIS[0] : Build.CPU_ABI;
             String abi;
             switch (pInfo.versionCode % 10) {
@@ -941,8 +941,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                     abi = (ApplicationLoader.isStandaloneBuild() ? "direct " : "universal ") + cpu;
                     break;
             }
-            int build = org.telegram.messenger.MgUpdater.currentBuild();
-            String ver = "v" + pInfo.versionName + (build > 0 ? " · b" + build : "");
+            String ver = org.telegram.messenger.MgUpdater.versionName();
             return org.telegram.messenger.MgLang.t("Android uchun MilliyGram") + " " + String.format(Locale.US, "%s (%d)\n%s", ver, code, abi);
         } catch (Exception e) {
             FileLog.e(e);
