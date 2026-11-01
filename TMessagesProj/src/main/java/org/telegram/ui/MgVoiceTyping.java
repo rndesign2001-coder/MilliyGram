@@ -23,9 +23,9 @@ import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.fenixuz.ui.voice_translate.VoiceTranslateSheet;
-import org.fenixuz.utils.VoiceDictation;
-import org.fenixuz.utils.VoiceTranslate;
+import org.milliygram.ui.voice_translate.VoiceTranslateSheet;
+import org.milliygram.utils.VoiceDictation;
+import org.milliygram.utils.VoiceTranslate;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.R;

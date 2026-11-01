@@ -285,21 +285,21 @@ public class MilliyGramSettingsActivity extends UniversalFragment {
             return;
         }
         org.telegram.messenger.MgConfig.setBool("tour_done", true);
-        java.util.ArrayList<org.fenixuz.ui.onboarding.FenixTour.Step> steps = new java.util.ArrayList<>();
-        steps.add(new org.fenixuz.ui.onboarding.FenixTour.Step(CARD_HERO, t("MilliyGram"),
+        java.util.ArrayList<org.milliygram.ui.onboarding.MilliyTour.Step> steps = new java.util.ArrayList<>();
+        steps.add(new org.milliygram.ui.onboarding.MilliyTour.Step(CARD_HERO, t("MilliyGram"),
                 t("Yangiliklar kanali, loyiha chati va yangilanishni tekshirish shu yerda.")));
-        steps.add(new org.fenixuz.ui.onboarding.FenixTour.Step(CARD_TILES, t("Tezkor tugmalar"),
+        steps.add(new org.milliygram.ui.onboarding.MilliyTour.Step(CARD_TILES, t("Tezkor tugmalar"),
                 t("Oddiy rejim, sharpa rejimi, qibla kompasi va mavzuni bir bosishda o'zgartiring.")));
-        steps.add(new org.fenixuz.ui.onboarding.FenixTour.Step(CARD_CHATS, t("Chatlar va xabarlar"),
+        steps.add(new org.milliygram.ui.onboarding.MilliyTour.Step(CARD_CHATS, t("Chatlar va xabarlar"),
                 t("Jildlar, tarjima, ikki marta bosish amali, shablonlar va avto-javob.")));
-        steps.add(new org.fenixuz.ui.onboarding.FenixTour.Step(CARD_SAFE, t("Xavfsizlik"),
+        steps.add(new org.milliygram.ui.onboarding.MilliyTour.Step(CARD_SAFE, t("Xavfsizlik"),
                 t("Chat qulfi, yashirin bo'lim, notanishlardan himoya, APK blok va firibgarlikdan ogohlantirish.")));
-        steps.add(new org.fenixuz.ui.onboarding.FenixTour.Step(CARD_LIFE, t("Namoz vaqti va ob-havo"),
+        steps.add(new org.milliygram.ui.onboarding.MilliyTour.Step(CARD_LIFE, t("Namoz vaqti va ob-havo"),
                 t("Tumaningizni tanlang — chatlar ro'yxati tepasida keyingi namozgacha qolgan vaqt yoki ob-havo chiqadi.")));
-        steps.add(new org.fenixuz.ui.onboarding.FenixTour.Step(CARD_HELP, t("Yordam"),
+        steps.add(new org.milliygram.ui.onboarding.MilliyTour.Step(CARD_HELP, t("Yordam"),
                 t("Bu tanishtiruvni istalgan vaqtda shu yerdan qayta ko'rishingiz mumkin.")));
         try {
-            new org.fenixuz.ui.onboarding.FenixTour(getParentActivity(), (android.widget.FrameLayout) fragmentView, listView, steps).start();
+            new org.milliygram.ui.onboarding.MilliyTour(getParentActivity(), (android.widget.FrameLayout) fragmentView, listView, steps).start();
         } catch (Throwable e) {
             org.telegram.messenger.FileLog.e(e);
         }

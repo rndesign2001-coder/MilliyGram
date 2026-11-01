@@ -90,8 +90,8 @@ import androidx.recyclerview.widget.SimpleItemAnimator;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import org.fenixuz.utils.ConfirmDialogsPref;
-import org.fenixuz.ui.confirmToSendMessages.ConfirmDialog;
+import org.milliygram.utils.ConfirmDialogsPref;
+import org.milliygram.ui.confirmToSendMessages.ConfirmDialog;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 import org.telegram.messenger.AccountInstance;

@@ -9332,9 +9332,9 @@ public class MessagesController extends BaseController implements NotificationCe
         deleteMessages(messages, randoms, encryptedChat, dialogId, forAll, mode, false, 0, null, topicId);
     }
 
-    // Fenix delete-save: tracks who deleted the messages (By.Me = current user via delete dialog, By.You = server-pushed).
-    public org.fenixuz.utils.By whoDeleted = org.fenixuz.utils.By.You;
-    public void deleteMessages(ArrayList<Integer> messages, ArrayList<Long> randoms, TLRPC.EncryptedChat encryptedChat, long dialogId, int topicId, boolean forAll, int mode, org.fenixuz.utils.By whoDeleted) {
+    // Milliy delete-save: tracks who deleted the messages (By.Me = current user via delete dialog, By.You = server-pushed).
+    public org.milliygram.utils.By whoDeleted = org.milliygram.utils.By.You;
+    public void deleteMessages(ArrayList<Integer> messages, ArrayList<Long> randoms, TLRPC.EncryptedChat encryptedChat, long dialogId, int topicId, boolean forAll, int mode, org.milliygram.utils.By whoDeleted) {
         this.whoDeleted = whoDeleted;
         deleteMessages(messages, randoms, encryptedChat, dialogId, forAll, mode, false, 0, null, topicId);
     }
@@ -14429,7 +14429,7 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public void markMessageContentAsRead(MessageObject messageObject) {
-        if (org.fenixuz.utils.ChatPreviewState.INSTANCE.isGhost(messageObject.getDialogId())) {
+        if (org.milliygram.utils.ChatPreviewState.INSTANCE.isGhost(messageObject.getDialogId())) {
             return;
         }
         if (messageObject.scheduled) {

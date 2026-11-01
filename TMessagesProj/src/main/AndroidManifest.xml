@@ -441,10 +441,10 @@
 
         <!-- MilliyGram: javobsiz xabar eslatmasi -->
         <receiver
-            android:name="org.fenixuz.utils.ReminderReceiver"
+            android:name="org.milliygram.utils.ReminderReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="org.fenixuz.REMINDER_FIRE"/>
+                <action android:name="org.milliygram.REMINDER_FIRE"/>
             </intent-filter>
         </receiver>
 

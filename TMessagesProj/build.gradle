@@ -159,9 +159,25 @@ android {
         minSdkVersion 21
         targetSdkVersion 36
 
-        // MilliyGram: Telegram API kalitlari (my.telegram.org) muhit o'zgaruvchilaridan olinadi
-        buildConfigField "int", "MG_APP_ID", (System.getenv("API_ID") ?: "0")
-        buildConfigField "String", "MG_APP_HASH", "\"" + (System.getenv("API_HASH") ?: "") + "\""
+        // MilliyGram: Telegram API kalitlari (my.telegram.org) muhit o'zgaruvchilaridan olinadi.
+        // APK ichida ochiq matn bo'lib turmasligi uchun har build'da tasodifiy kalit bilan XOR qilinadi (MgKeys ochadi).
+        def mgRnd = new java.security.SecureRandom()
+        byte[] mgKey = new byte[32]
+        mgRnd.nextBytes(mgKey)
+        byte[] mgHash = (System.getenv("API_HASH") ?: "").getBytes("UTF-8")
+        StringBuilder mgEnc = new StringBuilder()
+        for (int i = 0; i < mgHash.length; i++) {
+            mgEnc.append(String.format("%02x", (mgHash[i] ^ mgKey[i % mgKey.length]) & 0xff))
+        }
+        StringBuilder mgKeyHex = new StringBuilder()
+        for (int i = 0; i < mgKey.length; i++) {
+            mgKeyHex.append(String.format("%02x", mgKey[i] & 0xff))
+        }
+        int mgIdMask = mgRnd.nextInt() & 0x7fffffff
+        buildConfigField "int", "MG_K1", String.valueOf(Integer.parseInt(System.getenv("API_ID") ?: "0") ^ mgIdMask)
+        buildConfigField "int", "MG_K2", String.valueOf(mgIdMask)
+        buildConfigField "String", "MG_K3", "\"" + mgEnc + "\""
+        buildConfigField "String", "MG_K4", "\"" + mgKeyHex + "\""
         buildConfigField "String", "DEMO_PHONE_NUMBER", "\"\""
         buildConfigField "String", "DEMO_CODE_URL", "\"\""
         buildConfigField "String", "ADS_BASE_URL", "\"\""

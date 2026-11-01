@@ -11175,7 +11175,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                                     attributeVideo = new TLRPC.TL_documentAttributeVideo();
                                     attributeVideo.supports_streaming = true;
                                 }
-                                // Novagram: a gallery video sent as a round video note. The flag is set only by the
+                                // MilliyGram: a gallery video sent as a round video note. The flag is set only by the
                                 // PhotoViewer round toggle (false for every normal media send), so this is inert for
                                 // regular videos and just tags the outgoing document as a round message (video note).
                                 // Never tag a round message inside a multi-item album — a video note cannot belong to

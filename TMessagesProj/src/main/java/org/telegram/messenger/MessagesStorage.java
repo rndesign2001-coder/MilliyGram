@@ -29,9 +29,9 @@ import android.util.SparseIntArray;
 import androidx.annotation.UiThread;
 import androidx.collection.LongSparseArray;
 
-import org.fenixuz.utils.By;
-import org.fenixuz.utils.DeletedMsg;
-import org.fenixuz.utils.WhoDeletedMsg;
+import org.milliygram.utils.By;
+import org.milliygram.utils.DeletedMsg;
+import org.milliygram.utils.WhoDeletedMsg;
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.SQLite.SQLiteCursor;
 import org.telegram.SQLite.SQLiteDatabase;
@@ -3662,7 +3662,7 @@ public class MessagesStorage extends BaseController {
         });
     }
 
-    public void fenixRecalcMainUnread() {
+    public void mgRecalcMainUnread() {
         storageQueue.postRunnable(() -> {
             calcUnreadCounters(false);
             AndroidUtilities.runOnUIThread(() -> {
@@ -14541,7 +14541,7 @@ public class MessagesStorage extends BaseController {
         SQLiteCursor cursor = null;
         SQLitePreparedStatement state = null;
 
-        // Fenix delete-save: capture deleted messages instead of removing them, depending on the chosen mode.
+        // Milliy delete-save: capture deleted messages instead of removing them, depending on the chosen mode.
         int deletedType = DeletedMsg.INSTANCE.getCheckType();
         if ((DeletedMsg.SECOND == deletedType || DeletedMsg.ALL == deletedType) && !clear) {
             ArrayList<Integer> savable = new ArrayList<>();
@@ -16377,8 +16377,8 @@ public class MessagesStorage extends BaseController {
                                 if (data != null) {
                                     TLRPC.Message oldMessage = TLRPC.Message.TLdeserialize(data, data.readInt32(false), false);
                                     oldMessage.readAttachPath(data, getUserConfig().clientUserId);
-                                    if (org.fenixuz.utils.EditMessage.INSTANCE.getEditMode()) {
-                                        org.fenixuz.utils.EditMessage.INSTANCE.saveEditedMsg(oldMessage, dialogId);
+                                    if (org.milliygram.utils.EditMessage.INSTANCE.getEditMode()) {
+                                        org.milliygram.utils.EditMessage.INSTANCE.saveEditedMsg(oldMessage, dialogId);
                                     }
                                     data.reuse();
                                     if (reactionUpdates != null) {

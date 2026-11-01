@@ -2105,14 +2105,14 @@ public class PeerStoriesView extends SizeNotifierFrameLayout implements Notifica
                             }
                         }
 
-                        boolean fenixNativeSaveShown = !unsupported && allowShare && !currentStory.isLive
+                        boolean mgNativeSaveShown = !unsupported && allowShare && !currentStory.isLive
                                 && UserConfig.getInstance(currentAccount).isPremium();
-                        if (org.fenixuz.utils.StoryDownload.INSTANCE.isEnabled() && !fenixNativeSaveShown
+                        if (org.milliygram.utils.StoryDownload.INSTANCE.isEnabled() && !mgNativeSaveShown
                                 && !unsupported && !currentStory.isLive
                                 && currentStory.storyItem != null
                                 && !(currentStory.storyItem instanceof TL_stories.TL_storyItemSkipped)) {
                             ActionBarMenuItem.addItem(popupLayout, R.drawable.msg_gallery,
-                                    org.fenixuz.utils.LanguageCode.INSTANCE.getMyTitles(299), false, resourcesProvider).setOnClickListener(v -> {
+                                    org.milliygram.utils.LanguageCode.INSTANCE.getMyTitles(299), false, resourcesProvider).setOnClickListener(v -> {
                                 saveToGallery();
                                 if (popupMenu != null) {
                                     popupMenu.dismiss();
@@ -7056,7 +7056,7 @@ public class PeerStoriesView extends SizeNotifierFrameLayout implements Notifica
                     }
                 }
             }
-            if (org.fenixuz.utils.GhostStory.INSTANCE.getGhostMode() || org.fenixuz.utils.GhostVariable.INSTANCE.getGhostMode() || org.telegram.ui.MgGhostMode.hideStories(currentAccount)) {
+            if (org.milliygram.utils.GhostStory.INSTANCE.getGhostMode() || org.milliygram.utils.GhostVariable.INSTANCE.getGhostMode() || org.telegram.ui.MgGhostMode.hideStories(currentAccount)) {
                 return;
             }
             if (isActive && this.storyItem != null && userStories != null && ((!StoriesUtilities.hasExpiredViews(storyItem) && (this.storyItem.id > userStories.max_read_id || this.storyItem.id > storiesController.dialogIdToMaxReadId.get(dialogId, 0))) || isSelf)) {

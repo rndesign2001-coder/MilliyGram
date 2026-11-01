@@ -365,14 +365,14 @@ public class ApplicationLoader extends Application {
 
         Thread historyWarmup = new Thread(() -> {
             try {
-                org.fenixuz.utils.DeletedMsg.INSTANCE.warmUp();
-                org.fenixuz.utils.EditMessage.INSTANCE.warmUp();
+                org.milliygram.utils.DeletedMsg.INSTANCE.warmUp();
+                org.milliygram.utils.EditMessage.INSTANCE.warmUp();
             } catch (Throwable ignore) {
             } finally {
                 AndroidUtilities.runOnUIThread(() ->
-                    NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.novagramHistoryWarmedUp));
+                    NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.mgHistoryWarmedUp));
             }
-        }, "novagram-history-warmup");
+        }, "mg-history-warmup");
         historyWarmup.setDaemon(true);
         historyWarmup.setPriority(Thread.MIN_PRIORITY);
         historyWarmup.start();

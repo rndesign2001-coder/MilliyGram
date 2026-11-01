@@ -5932,7 +5932,7 @@ public class MessageObject {
             if (!TextUtils.isEmpty(restrictionReason)) {
                 messageText = restrictionReason;
                 isRestrictedMessage = true;
-            } else if (org.fenixuz.utils.ApkShield.INSTANCE.shouldHide(messageOwner)) {
+            } else if (org.milliygram.utils.ApkShield.INSTANCE.shouldHide(messageOwner)) {
                 messageText = org.telegram.messenger.MgLang.t("🛡 APK fayl bloklandi — xavfsizlik uchun (Sozlamalar → Maxfiylik)");
                 isRestrictedMessage = true;
             } else if (messageOwner.rich_message != null) {

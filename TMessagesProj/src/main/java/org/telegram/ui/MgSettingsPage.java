@@ -140,6 +140,12 @@ public class MgSettingsPage extends UniversalFragment {
     private static final int ID_GHOST_PRIVACY = 194;
     private static final int ID_SESSION_GUARD = 195;
     private static final int ID_GHOST_BTN = 196;
+    private static final int ID_NF_ON = 197;
+    private static final int ID_NF_USERS = 198;
+    private static final int ID_NF_BOTS = 199;
+    private static final int ID_NF_GROUPS = 200;
+    private static final int ID_NF_CHANNELS = 201;
+    private static final int ID_NF_EXCEPTIONS = 202;
     private static final int ID_QIBLA_OPEN = 181;
     private static final int ID_QIBLA_STYLE = 182;
     private static final int ID_QIBLA_GPS = 183;
@@ -278,12 +284,12 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asButton(ID_TEXT_STYLE, R.drawable.msg_text_outlined, org.telegram.messenger.MgLang.t("Standart matn uslubi"), org.telegram.messenger.MgAutoText.STYLE_NAMES()[org.telegram.messenger.MgAutoText.getDefaultStyle()]));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Tanlangan uslub har bir oddiy matnli xabaringizga avtomatik qo'llanadi (buyruqlar, kod va faqat emojidan iborat xabarlar bundan mustasno).")));
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Yuborishdan oldin so'rash")));
-                items.add(UItem.asCheck(ID_CONFIRM_STICKER, org.telegram.messenger.MgLang.t("Stiker yuborishda")).setChecked(org.fenixuz.utils.ConfirmDialogsPref.INSTANCE.getConfirmSticker()));
-                items.add(UItem.asCheck(ID_CONFIRM_GIF, org.telegram.messenger.MgLang.t("GIF yuborishda")).setChecked(org.fenixuz.utils.ConfirmDialogsPref.INSTANCE.getConfirmGif()));
-                items.add(UItem.asCheck(ID_CONFIRM_VOICE, org.telegram.messenger.MgLang.t("Ovozli xabarda (avval tinglash)")).setChecked(org.fenixuz.utils.ConfirmDialogsPref.INSTANCE.getConfirmVoice()));
+                items.add(UItem.asCheck(ID_CONFIRM_STICKER, org.telegram.messenger.MgLang.t("Stiker yuborishda")).setChecked(org.milliygram.utils.ConfirmDialogsPref.INSTANCE.getConfirmSticker()));
+                items.add(UItem.asCheck(ID_CONFIRM_GIF, org.telegram.messenger.MgLang.t("GIF yuborishda")).setChecked(org.milliygram.utils.ConfirmDialogsPref.INSTANCE.getConfirmGif()));
+                items.add(UItem.asCheck(ID_CONFIRM_VOICE, org.telegram.messenger.MgLang.t("Ovozli xabarda (avval tinglash)")).setChecked(org.milliygram.utils.ConfirmDialogsPref.INSTANCE.getConfirmVoice()));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Tasodifan yuborib yuborishning oldini oladi. Ovozli xabar yozib bo'lingach darhol ketmaydi — avval tinglab, keyin yuborasiz.")));
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Doira video")));
-                items.add(UItem.asCheck(ID_ROUND_FRONT, org.telegram.messenger.MgLang.t("Old kamera bilan boshlash")).setChecked(org.fenixuz.utils.CameraSituation.INSTANCE.isFront()));
+                items.add(UItem.asCheck(ID_ROUND_FRONT, org.telegram.messenger.MgLang.t("Old kamera bilan boshlash")).setChecked(org.milliygram.utils.CameraSituation.INSTANCE.isFront()));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("O'chirilsa, doira video orqa kamera bilan boshlanadi. Galereyadagi videoni doira qilib yuborish: videoni tanlang → pastdagi ⏺ (kamera) tugmasini bosing. Bir martalik ovozli xabar: chat → ⋮ → \"Bir martalik ovoz\". Gapirib yozish (tarjima bilan): chat → ⋮ → \"Ovoz bilan yozish\".")));
                 break;
             case PAGE_THEMES:
@@ -312,7 +318,19 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Profilingizni chiroyli vizitka rasmiga aylantiring va ulashing. Kanal yoki guruh kartasi: chat → ⋮ → \"Profil kartasi (QR)\".")));
                 break;
             }
-            case PAGE_NOTIFY:
+            case PAGE_NOTIFY: {
+                boolean nfOn = org.telegram.messenger.MgNotifyFilter.isEnabled();
+                items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Bildirishnoma filtri")));
+                items.add(UItem.asCheck(ID_NF_ON, org.telegram.messenger.MgLang.t("Faqat tanlangan chatlardan")).setChecked(nfOn));
+                if (nfOn) {
+                    items.add(UItem.asCheck(ID_NF_USERS, org.telegram.messenger.MgLang.t("Shaxsiy chatlar")).setChecked(MgConfig.getBool(org.telegram.messenger.MgNotifyFilter.KEY_USERS, true)));
+                    items.add(UItem.asCheck(ID_NF_BOTS, org.telegram.messenger.MgLang.t("Botlar")).setChecked(MgConfig.getBool(org.telegram.messenger.MgNotifyFilter.KEY_BOTS, true)));
+                    items.add(UItem.asCheck(ID_NF_GROUPS, org.telegram.messenger.MgLang.t("Guruhlar")).setChecked(MgConfig.getBool(org.telegram.messenger.MgNotifyFilter.KEY_GROUPS, true)));
+                    items.add(UItem.asCheck(ID_NF_CHANNELS, org.telegram.messenger.MgLang.t("Kanallar")).setChecked(MgConfig.getBool(org.telegram.messenger.MgNotifyFilter.KEY_CHANNELS, true)));
+                    items.add(UItem.asButton(ID_NF_EXCEPTIONS, R.drawable.msg_add, org.telegram.messenger.MgLang.t("Istisno chatlar"),
+                            String.valueOf(org.telegram.messenger.MgNotifyFilter.getExceptions(currentAccount).size())));
+                }
+                items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Yoqilsa, faqat belgilangan turdagi chatlardan bildirishnoma keladi. Masalan, faqat \"Shaxsiy chatlar\"ni qoldirsangiz, guruh, kanal va botlardan bildirishnoma kelmaydi. Istisno chatlardan esa har doim keladi.")));
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Fokus rejimi")));
                 items.add(UItem.asCheck(ID_FOCUS, org.telegram.messenger.MgLang.t("Fokus rejimi")).setChecked(MgConfig.isFocusEnabled()));
                 items.add(UItem.asButton(ID_FOCUS_TIME, R.drawable.msg_recent, org.telegram.messenger.MgLang.t("Vaqt oralig'i"),
@@ -321,9 +339,9 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asButton(ID_NOTIFY_SETTINGS, R.drawable.msg_notifications, org.telegram.messenger.MgLang.t("Telegram bildirishnomalari")));
                 items.add(UItem.asShadow(null));
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Javobsiz xabar eslatmasi")));
-                items.add(UItem.asCheck(ID_REMIND_ON, org.telegram.messenger.MgLang.t("Eslatib turish")).setChecked(org.fenixuz.utils.MessageReminder.INSTANCE.isEnabled()));
-                items.add(UItem.asButton(ID_REMIND_DELAY, R.drawable.msg_recent, org.telegram.messenger.MgLang.t("Qancha vaqtdan keyin"), org.fenixuz.utils.MessageReminder.INSTANCE.getDelayMin() + org.telegram.messenger.MgLang.t(" daqiqa")));
-                items.add(UItem.asButton(ID_REMIND_SOUND, R.drawable.msg_filled_data_music, org.telegram.messenger.MgLang.t("Ovoz"), org.fenixuz.utils.MessageReminder.INSTANCE.getSound() == 1 ? org.telegram.messenger.MgLang.t("Budilnik") : org.telegram.messenger.MgLang.t("Bildirishnoma")));
+                items.add(UItem.asCheck(ID_REMIND_ON, org.telegram.messenger.MgLang.t("Eslatib turish")).setChecked(org.milliygram.utils.MessageReminder.INSTANCE.isEnabled()));
+                items.add(UItem.asButton(ID_REMIND_DELAY, R.drawable.msg_recent, org.telegram.messenger.MgLang.t("Qancha vaqtdan keyin"), org.milliygram.utils.MessageReminder.INSTANCE.getDelayMin() + org.telegram.messenger.MgLang.t(" daqiqa")));
+                items.add(UItem.asButton(ID_REMIND_SOUND, R.drawable.msg_filled_data_music, org.telegram.messenger.MgLang.t("Ovoz"), org.milliygram.utils.MessageReminder.INSTANCE.getSound() == 1 ? org.telegram.messenger.MgLang.t("Budilnik") : org.telegram.messenger.MgLang.t("Bildirishnoma")));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Shaxsiy chatga kelgan xabarni belgilangan vaqt ichida o'qimasangiz, telefon bir marta jiringlab eslatadi. Xabarni o'qishingiz bilan eslatma bekor bo'ladi. Ovozi o'chirilgan, yashirin va notanish chatlar hisobga olinmaydi.")));
                 if (org.telegram.messenger.UserConfig.getActivatedAccountsCount() > 1) {
                     items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Akkauntlar bo'yicha")));
@@ -339,6 +357,7 @@ public class MgSettingsPage extends UniversalFragment {
                     items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("O'chirilgan akkauntdan bildirishnoma kelmaydi. Akkauntlar ro'yxatida ⚙ tugmasi orqali ham o'zgartirish mumkin.")));
                 }
                 break;
+            }
             case PAGE_PRIVACY: {
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Sharpa rejimi")));
                 items.add(UItem.asCheck(ID_GHOST, org.telegram.messenger.MgLang.t("Sharpa rejimi")).setChecked(MgGhostMode.isEnabled(currentAccount)));
@@ -360,7 +379,7 @@ public class MgSettingsPage extends UniversalFragment {
                 items.add(UItem.asCheck(ID_HIDE_PHONE, org.telegram.messenger.MgLang.t("Telefon raqamimni yashirish")).setChecked(org.telegram.messenger.MgExtras.hidePhone()));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Sozlamalar va profilingizda raqamingiz \"+998 •• ••• •• 12\" ko'rinishida chiqadi — skrinshot ulashganda qulay. Boshqalar uchun maxfiylik Telegram sozlamalarida belgilanadi.")));
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Xavfsizlik")));
-                items.add(UItem.asCheck(ID_APK_BLOCK, org.telegram.messenger.MgLang.t("APK fayllarni bloklash")).setChecked(org.fenixuz.utils.ApkShield.isEnabled()));
+                items.add(UItem.asCheck(ID_APK_BLOCK, org.telegram.messenger.MgLang.t("APK fayllarni bloklash")).setChecked(org.milliygram.utils.ApkShield.isEnabled()));
                 items.add(UItem.asCheck(ID_SCAM, org.telegram.messenger.MgLang.t("Firibgarlikdan ogohlantirish")).setChecked(MgMessageTools.isScamGuardEnabled()));
                 items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("APK blok: chatlardagi .apk (Android ilova) fayllari ko'rsatilmaydi va ochilmaydi. Ogohlantirish: kontaktingizda yo'q odam karta raqami, SMS kod, pul o'tkazish yoki shubhali havola bilan yozsa, chatni ochganingizda ogohlantiriladi.")));
                 items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Notanishlardan himoya")));
@@ -669,6 +688,25 @@ public class MgSettingsPage extends UniversalFragment {
             case ID_GHOST_BTN:
                 toggle(view, "ghost_btn", true);
                 break;
+            case ID_NF_ON:
+                MgConfig.setBool(org.telegram.messenger.MgNotifyFilter.KEY_ON, !org.telegram.messenger.MgNotifyFilter.isEnabled());
+                listView.adapter.update(true);
+                break;
+            case ID_NF_USERS:
+                toggle(view, org.telegram.messenger.MgNotifyFilter.KEY_USERS, true);
+                break;
+            case ID_NF_BOTS:
+                toggle(view, org.telegram.messenger.MgNotifyFilter.KEY_BOTS, true);
+                break;
+            case ID_NF_GROUPS:
+                toggle(view, org.telegram.messenger.MgNotifyFilter.KEY_GROUPS, true);
+                break;
+            case ID_NF_CHANNELS:
+                toggle(view, org.telegram.messenger.MgNotifyFilter.KEY_CHANNELS, true);
+                break;
+            case ID_NF_EXCEPTIONS:
+                presentFragment(new MgNotifyExceptionsActivity());
+                break;
             case ID_GHOST_READ:
                 toggle(view, MgGhostMode.OPT_READ, true);
                 break;
@@ -801,26 +839,26 @@ public class MgSettingsPage extends UniversalFragment {
                 break;
             }
             case ID_CONFIRM_STICKER:
-                org.fenixuz.utils.ConfirmDialogsPref.INSTANCE.changeConfirmStickerMode();
-                setChecked(view, org.fenixuz.utils.ConfirmDialogsPref.INSTANCE.getConfirmSticker());
+                org.milliygram.utils.ConfirmDialogsPref.INSTANCE.changeConfirmStickerMode();
+                setChecked(view, org.milliygram.utils.ConfirmDialogsPref.INSTANCE.getConfirmSticker());
                 break;
             case ID_CONFIRM_GIF:
-                org.fenixuz.utils.ConfirmDialogsPref.INSTANCE.changeConfirmGifMode();
-                setChecked(view, org.fenixuz.utils.ConfirmDialogsPref.INSTANCE.getConfirmGif());
+                org.milliygram.utils.ConfirmDialogsPref.INSTANCE.changeConfirmGifMode();
+                setChecked(view, org.milliygram.utils.ConfirmDialogsPref.INSTANCE.getConfirmGif());
                 break;
             case ID_CONFIRM_VOICE:
-                org.fenixuz.utils.ConfirmDialogsPref.INSTANCE.changeConfirmVoiceMode();
-                setChecked(view, org.fenixuz.utils.ConfirmDialogsPref.INSTANCE.getConfirmVoice());
+                org.milliygram.utils.ConfirmDialogsPref.INSTANCE.changeConfirmVoiceMode();
+                setChecked(view, org.milliygram.utils.ConfirmDialogsPref.INSTANCE.getConfirmVoice());
                 break;
             case ID_ROUND_FRONT: {
-                boolean v = !org.fenixuz.utils.CameraSituation.INSTANCE.isFront();
-                org.fenixuz.utils.CameraSituation.INSTANCE.setFront(v);
+                boolean v = !org.milliygram.utils.CameraSituation.INSTANCE.isFront();
+                org.milliygram.utils.CameraSituation.INSTANCE.setFront(v);
                 setChecked(view, v);
                 break;
             }
             case ID_APK_BLOCK: {
-                boolean v = !org.fenixuz.utils.ApkShield.isEnabled();
-                org.fenixuz.utils.ApkShield.setEnabled(v);
+                boolean v = !org.milliygram.utils.ApkShield.isEnabled();
+                org.milliygram.utils.ApkShield.setEnabled(v);
                 setChecked(view, v);
                 break;
             }
@@ -1000,11 +1038,11 @@ public class MgSettingsPage extends UniversalFragment {
                 });
                 break;
             case ID_CHAT_FINDER:
-                presentFragment(new org.fenixuz.ui.chat_finder.ChatFinder());
+                presentFragment(new org.milliygram.ui.chat_finder.ChatFinder());
                 break;
             case ID_REMIND_ON: {
-                boolean v = !org.fenixuz.utils.MessageReminder.INSTANCE.isEnabled();
-                org.fenixuz.utils.MessageReminder.INSTANCE.setEnabled(v);
+                boolean v = !org.milliygram.utils.MessageReminder.INSTANCE.isEnabled();
+                org.milliygram.utils.MessageReminder.INSTANCE.setEnabled(v);
                 setChecked(view, v);
                 break;
             }
@@ -1017,7 +1055,7 @@ public class MgSettingsPage extends UniversalFragment {
                 AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
                 b.setTitle(org.telegram.messenger.MgLang.t("Eslatma vaqti"));
                 b.setItems(names, (d, w) -> {
-                    org.fenixuz.utils.MessageReminder.INSTANCE.setDelayMin(opts[w]);
+                    org.milliygram.utils.MessageReminder.INSTANCE.setDelayMin(opts[w]);
                     listView.adapter.update(true);
                 });
                 showDialog(b.create());
@@ -1027,7 +1065,7 @@ public class MgSettingsPage extends UniversalFragment {
                 AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
                 b.setTitle(org.telegram.messenger.MgLang.t("Eslatma ovozi"));
                 b.setItems(new CharSequence[]{org.telegram.messenger.MgLang.t("Bildirishnoma ovozi (yumshoq)"), org.telegram.messenger.MgLang.t("Budilnik ovozi (baland)")}, (d, w) -> {
-                    org.fenixuz.utils.MessageReminder.INSTANCE.setSound(w);
+                    org.milliygram.utils.MessageReminder.INSTANCE.setSound(w);
                     listView.adapter.update(true);
                 });
                 showDialog(b.create());

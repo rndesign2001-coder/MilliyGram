@@ -2510,7 +2510,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 bottomMargin -= 24;
                 mgQrLoginView.setOnClickListener(v -> {
                     try {
-                        new org.fenixuz.ui.qr_login.QrLoginController(LoginActivity.this, context, null).show();
+                        new org.milliygram.ui.qr_login.QrLoginController(LoginActivity.this, context, null).show();
                     } catch (Throwable e) {
                         FileLog.e(e);
                     }

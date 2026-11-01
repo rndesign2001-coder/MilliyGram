@@ -836,7 +836,7 @@ public class NotificationsController extends BaseController implements Notificat
     public void processReadMessages(LongSparseIntArray inbox, long dialogId, int maxDate, int maxId, boolean isPopup) {
         if (inbox != null && inbox.size() > 0) {
             try {
-                org.fenixuz.utils.MessageReminder.INSTANCE.onRead(true); // MilliyGram: o'qildi — eslatma bekor
+                org.milliygram.utils.MessageReminder.INSTANCE.onRead(true); // MilliyGram: o'qildi — eslatma bekor
             } catch (Throwable ignore) {
             }
         }
@@ -1028,7 +1028,7 @@ public class NotificationsController extends BaseController implements Notificat
     // MilliyGram: javobsiz xabar eslatmasi — faqat ovozi o'chirilmagan, yashirilmagan shaxsiy chatlardagi kiruvchi xabarlar
     private void mgReminderOnNew(ArrayList<MessageObject> messageObjects) {
         try {
-            if (messageObjects == null || messageObjects.isEmpty() || !org.fenixuz.utils.MessageReminder.INSTANCE.isEnabled()
+            if (messageObjects == null || messageObjects.isEmpty() || !org.milliygram.utils.MessageReminder.INSTANCE.isEnabled()
                     || !MgConfig.isAccountNotifyEnabled(currentAccount)) {
                 return;
             }
@@ -1053,7 +1053,7 @@ public class NotificationsController extends BaseController implements Notificat
                 list.add(m);
             }
             if (list != null) {
-                org.fenixuz.utils.MessageReminder.INSTANCE.onNewMessages(list);
+                org.milliygram.utils.MessageReminder.INSTANCE.onNewMessages(list);
             }
         } catch (Throwable ignore) {
         }
@@ -1555,14 +1555,14 @@ public class NotificationsController extends BaseController implements Notificat
         });
     }
 
-    public void fenixDismissStrangers() {
+    public void mgDismissStrangers() {
         notificationsQueue.postRunnable(() -> {
             try {
                 LongSparseIntArray toDismiss = null;
                 for (int i = 0; i < pushDialogs.size(); i++) {
                     long did = pushDialogs.keyAt(i);
                     if (DialogObject.isUserDialog(did)
-                            && org.fenixuz.utils.StrangerShield.belongsInInbox(currentAccount, getMessagesController().getUser(did), did)) {
+                            && org.milliygram.utils.StrangerShield.belongsInInbox(currentAccount, getMessagesController().getUser(did), did)) {
                         if (toDismiss == null) {
                             toDismiss = new LongSparseIntArray();
                         }
@@ -3336,6 +3336,9 @@ public class NotificationsController extends BaseController implements Notificat
         }
         if (!MgStrangers.isNotifyEnabled() && MgStrangers.belongsInInbox(currentAccount, dialog_id)) {
             return 2; // MilliyGram: notanishdan — ovozsiz
+        }
+        if (MgNotifyFilter.blocks(currentAccount, dialog_id)) {
+            return 2; // MilliyGram: bildirishnoma filtri bu turdagi chatni o'tkazmaydi
         }
         int notifyOverride = dialogsNotificationsFacade.getProperty(NotificationsSettingsFacade.PROPERTY_NOTIFY, dialog_id, topicId, -1);
         if (notifyOverride == 3) {

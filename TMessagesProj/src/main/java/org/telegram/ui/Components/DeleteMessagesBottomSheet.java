@@ -19,8 +19,8 @@ import android.view.View;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.fenixuz.utils.By;
-import org.fenixuz.utils.DeletedMsg;
+import org.milliygram.utils.By;
+import org.milliygram.utils.DeletedMsg;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BotWebViewVibrationEffect;
 import org.telegram.messenger.ChatObject;

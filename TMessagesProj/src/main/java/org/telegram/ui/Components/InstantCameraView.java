@@ -737,7 +737,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
             recordedTime = 0;
             progress = 0;
         }
-        isFrontface = org.fenixuz.utils.CameraSituation.INSTANCE.isFront();
+        isFrontface = org.milliygram.utils.CameraSituation.INSTANCE.isFront();
         cancelled = false;
         file = null;
         encryptedFile = null;

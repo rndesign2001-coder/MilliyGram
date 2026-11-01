@@ -27,8 +27,8 @@ public class BuildVars {
     public static String BUILD_VERSION_STRING = BuildConfig.BUILD_VERSION_STRING;
 
     // MilliyGram: kalitlar GitHub Secrets (API_ID, API_HASH) orqali build paytida beriladi
-    public static int APP_ID = BuildConfig.MG_APP_ID;
-    public static String APP_HASH = BuildConfig.MG_APP_HASH;
+    public static int APP_ID = MgKeys.appId();
+    public static String APP_HASH = MgKeys.appHash();
 
     // SafetyNet key for Google Identity SDK, set it to empty to disable
     public static String SAFETYNET_KEY = "";

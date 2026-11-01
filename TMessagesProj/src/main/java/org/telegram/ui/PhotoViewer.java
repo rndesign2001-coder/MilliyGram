@@ -366,8 +366,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     private boolean allowOrder = true;
 
     private boolean muteVideo;
-    private boolean sendAsRoundVideo; // Novagram: current video will be sent as a round video note
-    // Novagram: source size as it is actually DISPLAYED - the container rotation and the pixel aspect ratio
+    private boolean sendAsRoundVideo; // MilliyGram: current video will be sent as a round video note
+    // MilliyGram: source size as it is actually DISPLAYED - the container rotation and the pixel aspect ratio
     // (SAR) are already applied. That is the space the round-video square crop has to be computed in, because
     // the transcoder's decoder applies the same rotation before TextureRenderer ever samples the frame.
     // Both stay 0 until the player reports a size; getRoundVideoDisplaySize() then falls back to the demuxer.
@@ -950,7 +950,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     private ImageView tuneItem;
     private MuteDrawable muteDrawable;
     private ImageView muteButton;
-    private ImageView roundVideoButton; // Novagram: toggle to send a gallery video as a round video note
+    private ImageView roundVideoButton; // MilliyGram: toggle to send a gallery video as a round video note
     private LivePhotoButton livePhotoButton;
     private EditCoverButton editCoverButton;
     private ArrayList<HintView2> muteHints;
@@ -2212,7 +2212,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     private final static int ads_report = 103;
     private final static int ads_separator = 104;
     private final static int ads_remove = 105;
-    private final static int fenix_photo_to_text = 200;
+    private final static int mg_photo_to_text = 200;
 
     private static DecelerateInterpolator decelerateInterpolator;
     private static Paint progressPaint;
@@ -4924,11 +4924,11 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                         return;
                     }
                     closePhoto(true, false);
-                } else if (id == fenix_photo_to_text) {
+                } else if (id == mg_photo_to_text) {
                     if (currentMessageObject != null && parentActivity != null) {
                         File f = FileLoader.getInstance(currentAccount).getPathToMessage(currentMessageObject.messageOwner);
                         if (f != null && f.exists()) {
-                            new org.fenixuz.ui.photo_to_text.PhotoToText(parentActivity, currentAccount, f.toString());
+                            new org.milliygram.ui.photo_to_text.PhotoToText(parentActivity, currentAccount, f.toString());
                         }
                     }
                 } else if (id == gallery_menu_save) {
@@ -5935,11 +5935,11 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         menuItem.addSubItem(gallery_menu_hide_translation, R.drawable.msg_translate, getString(R.string.HideTranslation)).setColors(0xfffafafa, 0xfffafafa);
         menuItem.addSubItem(gallery_menu_delete, R.drawable.msg_delete, getString(R.string.Delete)).setColors(0xfffafafa, 0xfffafafa);
         menuItem.addSubItem(gallery_menu_cancel_loading, R.drawable.msg_cancel, getString(R.string.StopDownload)).setColors(0xfffafafa, 0xfffafafa);
-        menuItem.addSubItem(fenix_photo_to_text, R.drawable.msg_photo_text_framed3, org.fenixuz.utils.LanguageCode.INSTANCE.getMyTitles(330)).setColors(0xfffafafa, 0xfffafafa);
+        menuItem.addSubItem(mg_photo_to_text, R.drawable.msg_photo_text_framed3, org.milliygram.utils.LanguageCode.INSTANCE.getMyTitles(330)).setColors(0xfffafafa, 0xfffafafa);
         menuItem.redrawPopup(0xf9222222);
         menuItem.hideSubItem(gallery_menu_translate);
         menuItem.hideSubItem(gallery_menu_hide_translation);
-        menuItem.hideSubItem(fenix_photo_to_text);
+        menuItem.hideSubItem(mg_photo_to_text);
         setMenuItemIcon(false, true);
         menuItem.setPopupItemsSelectorColor(0x0fffffff);
 
@@ -6755,7 +6755,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             }
         });
 
-        // Novagram: "send as round video note" toggle. Sits next to the mute button, only shown for a
+        // MilliyGram: "send as round video note" toggle. Sits next to the mute button, only shown for a
         // single plain video (see the AndroidUtilities.updateViewVisibilityAnimated(roundVideoButton, ...)
         // gate in onPhotoShow). Mirrors the mute/editCover sibling lifecycle so it fades/hides with them.
         roundVideoButton = new ImageView(parentActivity);
@@ -9776,7 +9776,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         return result;
     }
 
-    // Novagram: source size of the current video in DISPLAY space, written into out[0]/out[1].
+    // MilliyGram: source size of the current video in DISPLAY space, written into out[0]/out[1].
     // Preferred source is the player, which reports the size with the container rotation and the pixel
     // aspect ratio already applied. Until it has reported we fall back to the demuxer's coded size plus the
     // container's rotation tag - correct for rotation, only blind to a non-square pixel aspect.
@@ -9796,7 +9796,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         out[1] = h;
     }
 
-    // Novagram: side of the square a round video note is encoded at. Matches Telegram's own camera notes
+    // MilliyGram: side of the square a round video note is encoded at. Matches Telegram's own camera notes
     // (server-configured roundVideoSize, 384 by default) and never upscales past the source.
     private int getRoundVideoSide() {
         if (roundVideoSideCached > 0) {
@@ -9812,7 +9812,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         return roundVideoSideCached = Math.max(fixed[0], fixed[1]);
     }
 
-    // Novagram: same bitrate Telegram uses for its own round notes (server-configured, 1000 * 1024 by default).
+    // MilliyGram: same bitrate Telegram uses for its own round notes (server-configured, 1000 * 1024 by default).
     private int getRoundVideoBitrate() {
         return Math.max(100_000, MessagesController.getInstance(currentAccount).roundVideoBitrate * 1024);
     }
@@ -9960,7 +9960,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         }
         videoEditedInfo.muted = muteVideo || sendPhotoType == SELECT_TYPE_AVATAR;
         if (sendAsRoundVideo && sendPhotoType != SELECT_TYPE_AVATAR) {
-            // Novagram: send this gallery video as a round video note. Auto center-square crop (no manual
+            // MilliyGram: send this gallery video as a round video note. Auto center-square crop (no manual
             // pan): keep the largest centered square of the source and encode a square frame — the
             // round_message flag added in SendMessagesHelper is what makes every client render it as a
             // circle. This path always transcodes (a cropState is set), so it runs off the UI thread.
@@ -10697,7 +10697,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
 
                 @Override
                 public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
-                    // Novagram: remember the DISPLAY size of the source for the round-video square crop. The
+                    // MilliyGram: remember the DISPLAY size of the source for the round-video square crop. The
                     // player hands us the size with the container rotation already applied (MediaCodec rotates
                     // when decoding to a surface, so ExoPlayer swaps w/h and inverts the SAR itself) - the same
                     // orientation the transcoder will see. Deriving the crop from the raw coded size instead
@@ -14679,7 +14679,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         int wasIndex = switchingToIndex;
         switchingToIndex = index;
         if (menuItem != null) {
-            menuItem.hideSubItem(fenix_photo_to_text);
+            menuItem.hideSubItem(mg_photo_to_text);
         }
 
         boolean isVideo = false;
@@ -14970,7 +14970,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 galleryGap.setVisibility(View.VISIBLE);
                 menuItem.showSubItem(gallery_menu_share);
                 if (newMessageObject != null && newMessageObject.isPhoto()) {
-                    menuItem.showSubItem(fenix_photo_to_text);
+                    menuItem.showSubItem(mg_photo_to_text);
                 }
             }
             groupedPhotosListView.fillList();
@@ -15157,7 +15157,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                                 mirrorItem.setVisibility(View.GONE);
                                 mirrorItem.setTag(null);
                                 AndroidUtilities.updateViewVisibilityAnimated(muteButton, !sendPhotoTypeIsGif && !isLivePhoto, 1f, animated);
-                                // Novagram: round-video toggle is available for a plain video being sent to a chat,
+                                // MilliyGram: round-video toggle is available for a plain video being sent to a chat,
                                 // and only for a SINGLE selected item — a video note can never be part of an album,
                                 // so allowing it under multi-select would let the whole group send fail on the server.
                                 // Restore the per-entry round state so it survives paging between selected items.
@@ -21425,13 +21425,13 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 videoTimelineView.setMode(VideoTimelinePlayView.MODE_VIDEO);
             }
         }
-        // Novagram: mute toggling rewrites the timeline's max-progress-diff, so re-assert the round 60s cap.
+        // MilliyGram: mute toggling rewrites the timeline's max-progress-diff, so re-assert the round 60s cap.
         if (sendAsRoundVideo) {
             updateRoundVideoButton();
         }
     }
 
-    // Novagram: reflect the round-video toggle state (accent tint when on) and enforce the 60s cap that
+    // MilliyGram: reflect the round-video toggle state (accent tint when on) and enforce the 60s cap that
     // round video notes require. Only ever called for a single plain video, where mute keeps the timeline
     // at the default 1.0 diff, so we can safely own the max-progress-diff here.
     private void updateRoundVideoButton() {
@@ -21534,7 +21534,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
 
         long subtitleSize = estimatedSize;
         if (sendAsRoundVideo) {
-            // Novagram: a round note is always re-encoded to a square at Telegram's note bitrate, so report
+            // MilliyGram: a round note is always re-encoded to a square at Telegram's note bitrate, so report
             // that instead of what the plain-video compression path would have produced.
             width = height = getRoundVideoSide();
             subtitleSize = Math.max(1, (long) (getRoundVideoBitrate() / 8.0 * (estimatedDuration / 1000.0)));
@@ -21848,7 +21848,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
 
         compressionsCount = -1;
         rotationValue = 0;
-        // Novagram: reset per video; onVideoSizeChanged fills in the real display size.
+        // MilliyGram: reset per video; onVideoSizeChanged fills in the real display size.
         roundVideoDisplayWidth = 0f;
         roundVideoDisplayHeight = 0f;
         roundVideoSideCached = 0;
@@ -21895,7 +21895,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
 
                     if (videoConvertSupported) {
                         rotationValue = params[AnimatedFileInfo.PARAM_NUM_ROTATION];
-                        // Novagram: the demuxer's size/rotation are the round-crop fallback until the player
+                        // MilliyGram: the demuxer's size/rotation are the round-crop fallback until the player
                         // reports, and they only land here - drop anything cached from the previous video.
                         roundVideoSideCached = 0;
                         updateWidthHeightBitrateForCompression();

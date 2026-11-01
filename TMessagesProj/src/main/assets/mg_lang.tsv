@@ -1665,3 +1665,14 @@ Oq	Белая	White
 Shisha	Стекло	Glass
 Neon	Неон	Neon
 Binafsha	Фиолетовая	Violet
+Statistikani ko'rish	Статистика	View statistics
+Bildirishnoma filtri	Фильтр уведомлений	Notification filter
+Faqat tanlangan chatlardan	Только от выбранных чатов	Only from selected chats
+Shaxsiy chatlar	Личные чаты	Private chats
+Istisno chatlar	Чаты-исключения	Exception chats
+Yoqilsa, faqat belgilangan turdagi chatlardan bildirishnoma keladi. Masalan, faqat \"Shaxsiy chatlar\"ni qoldirsangiz, guruh, kanal va botlardan bildirishnoma kelmaydi. Istisno chatlardan esa har doim keladi.	Если включено, уведомления приходят только от отмеченных типов чатов. Например, если оставить только \"Личные чаты\", уведомления от групп, каналов и ботов приходить не будут. От чатов-исключений уведомления приходят всегда.	When on, notifications come only from the checked chat types. For example, if you keep only \"Private chats\", groups, channels and bots won't notify you. Exception chats always notify.
+Chat qo'shish	Добавить чат	Add chat
+Bu chatlardan bildirishnoma har doim keladi, filtr ularni o'chirmaydi.	От этих чатов уведомления приходят всегда, фильтр их не отключает.	These chats always notify you; the filter does not silence them.
+Istisnolar	Исключения	Exceptions
+o'chirish	удалить	remove
+Ro'yxatdan olib tashlash uchun chatni bosing.	Нажмите на чат, чтобы удалить его из списка.	Tap a chat to remove it from the list.

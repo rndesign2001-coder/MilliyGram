@@ -132,11 +132,11 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.zxing.common.detector.MathUtils;
 
-import org.fenixuz.utils.LanguageCode;
-import org.fenixuz.ui.message_history.MessageHistory;
-import org.fenixuz.utils.By;
-import org.fenixuz.utils.DeletedMsg;
-import org.fenixuz.utils.EditMessage;
+import org.milliygram.utils.LanguageCode;
+import org.milliygram.ui.message_history.MessageHistory;
+import org.milliygram.utils.By;
+import org.milliygram.utils.DeletedMsg;
+import org.milliygram.utils.EditMessage;
 
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AccountInstance;
@@ -3022,7 +3022,7 @@ public class ChatActivity extends BaseFragment implements
             .add(NotificationCenter.didSetNewWallpapper)
             .add(NotificationCenter.didApplyNewTheme)
             .add(NotificationCenter.goingToPreviewTheme)
-            .add(NotificationCenter.novagramHistoryWarmedUp);
+            .add(NotificationCenter.mgHistoryWarmedUp);
 
         if (chatMode == MODE_EDIT_BUSINESS_LINK) {
             observersGroup.add(NotificationCenter.businessLinksUpdated);
@@ -3383,7 +3383,7 @@ public class ChatActivity extends BaseFragment implements
         }
     }
 
-    public void fenixRenderHeartFrame(MessageObject obj, CharSequence heart) {
+    public void mgRenderHeartFrame(MessageObject obj, CharSequence heart) {
         if (obj == null || obj.messageOwner == null || heart == null) {
             return;
         }
@@ -20922,7 +20922,7 @@ public class ChatActivity extends BaseFragment implements
         }
     }
 
-    private void fenixRefreshDeletedMarks() {
+    private void mgRefreshDeletedMarks() {
         if (chatListView == null) {
             return;
         }
@@ -20949,8 +20949,8 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public void didReceivedNotification(int id, int account, final Object... args) {
-        if (id == NotificationCenter.novagramHistoryWarmedUp) {
-            fenixRefreshDeletedMarks();
+        if (id == NotificationCenter.mgHistoryWarmedUp) {
+            mgRefreshDeletedMarks();
             return;
         }
         if (id == NotificationCenter.messagesDidLoad) {
@@ -22759,64 +22759,64 @@ public class ChatActivity extends BaseFragment implements
                 scheduleNowDialog.dismiss();
                 scheduleNowDialog = null;
             }
-            // Fenix delete-save: keep deleted messages visible (and tag who deleted them) based on the chosen mode.
-            boolean fenixDeletedBy = DeletedMsg.INSTANCE.getMyDelete();
-            int fenixDeletedType = DeletedMsg.INSTANCE.getCheckType();
-            By fenixBy = fenixDeletedBy ? By.Me : By.You;
-            if (fenixDeletedBy) {
+            // Milliy delete-save: keep deleted messages visible (and tag who deleted them) based on the chosen mode.
+            boolean mgDeletedBy = DeletedMsg.INSTANCE.getMyDelete();
+            int mgDeletedType = DeletedMsg.INSTANCE.getCheckType();
+            By mgBy = mgDeletedBy ? By.Me : By.You;
+            if (mgDeletedBy) {
                 DeletedMsg.INSTANCE.setMyDelete(false);
             }
-            ArrayList<Integer> fenixUnsent = new ArrayList<>();
-            ArrayList<Integer> fenixKeepable = new ArrayList<>();
+            ArrayList<Integer> mgUnsent = new ArrayList<>();
+            ArrayList<Integer> mgKeepable = new ArrayList<>();
             for (int i = 0; i < markAsDeletedMessages.size(); i++) {
-                Integer fenixId = markAsDeletedMessages.get(i);
-                if (fenixId == null) {
+                Integer mgId = markAsDeletedMessages.get(i);
+                if (mgId == null) {
                     continue;
                 }
-                MessageObject fenixMsg = messagesDict[0].get(fenixId);
-                boolean fenixSending = fenixMsg != null && fenixMsg.messageOwner != null
-                        && fenixMsg.messageOwner.send_state != MessageObject.MESSAGE_SEND_STATE_SENT;
-                if (fenixSending) {
-                    fenixUnsent.add(fenixId);
+                MessageObject mgMsg = messagesDict[0].get(mgId);
+                boolean mgSending = mgMsg != null && mgMsg.messageOwner != null
+                        && mgMsg.messageOwner.send_state != MessageObject.MESSAGE_SEND_STATE_SENT;
+                if (mgSending) {
+                    mgUnsent.add(mgId);
                 } else {
-                    fenixKeepable.add(fenixId);
+                    mgKeepable.add(mgId);
                 }
             }
-            ArrayList<MessageObject> fenixMessageObjects = DeletedMsg.INSTANCE.notify(fenixKeepable, messages, dialog_id);
-            for (int i = 0; i < fenixMessageObjects.size(); i++) {
-                MessageObject old = messagesDict[0].get(fenixMessageObjects.get(i).getId());
+            ArrayList<MessageObject> mgMessageObjects = DeletedMsg.INSTANCE.notify(mgKeepable, messages, dialog_id);
+            for (int i = 0; i < mgMessageObjects.size(); i++) {
+                MessageObject old = messagesDict[0].get(mgMessageObjects.get(i).getId());
                 int index = this.messages.indexOf(old);
                 if (index < 0) {
                     continue;
                 }
                 this.messages.get(index).forceUpdate = true;
-                this.messages.get(index).deletedBy = DeletedMsg.INSTANCE.whoDeleteStr(fenixBy);
+                this.messages.get(index).deletedBy = DeletedMsg.INSTANCE.whoDeleteStr(mgBy);
                 if (chatAdapter != null) {
-                    final int fenixPosition = chatAdapter.messagesStartRow + index;
-                    if (chatAdapter.messagesStartRow >= 0 && fenixPosition < chatAdapter.messagesEndRow) {
-                        chatAdapter.notifyItemChanged(fenixPosition);
+                    final int mgPosition = chatAdapter.messagesStartRow + index;
+                    if (chatAdapter.messagesStartRow >= 0 && mgPosition < chatAdapter.messagesEndRow) {
+                        chatAdapter.notifyItemChanged(mgPosition);
                     }
                 }
             }
-            if (DeletedMsg.SIMPLE == fenixDeletedType) {
+            if (DeletedMsg.SIMPLE == mgDeletedType) {
                 processDeletedMessages(markAsDeletedMessages, channelId, sent, !movedToScheduled);
-            } else if (DeletedMsg.SECOND == fenixDeletedType) {
-                if (fenixBy == By.Me) {
+            } else if (DeletedMsg.SECOND == mgDeletedType) {
+                if (mgBy == By.Me) {
                     processDeletedMessages(markAsDeletedMessages, channelId, sent, !movedToScheduled);
-                } else if (!fenixUnsent.isEmpty()) {
-                    processDeletedMessages(fenixUnsent, channelId, sent, !movedToScheduled);
+                } else if (!mgUnsent.isEmpty()) {
+                    processDeletedMessages(mgUnsent, channelId, sent, !movedToScheduled);
                 }
-            } else if (DeletedMsg.ALL == fenixDeletedType) {
-                ArrayList<Integer> fenixM = new ArrayList<>();
-                if (fenixBy == By.Me) {
-                    fenixM.addAll(DeletedMsg.INSTANCE.sortDeletedIds(dialog_id, fenixKeepable));
+            } else if (DeletedMsg.ALL == mgDeletedType) {
+                ArrayList<Integer> mgM = new ArrayList<>();
+                if (mgBy == By.Me) {
+                    mgM.addAll(DeletedMsg.INSTANCE.sortDeletedIds(dialog_id, mgKeepable));
                 }
-                fenixM.addAll(fenixUnsent);
-                if (!fenixM.isEmpty()) {
-                    processDeletedMessages(fenixM, channelId, sent, !movedToScheduled);
+                mgM.addAll(mgUnsent);
+                if (!mgM.isEmpty()) {
+                    processDeletedMessages(mgM, channelId, sent, !movedToScheduled);
                 }
             }
-            if (actionBar != null && actionBar.isActionModeShowed() && fenixBy == By.Me) {
+            if (actionBar != null && actionBar.isActionModeShowed() && mgBy == By.Me) {
                 clearSelectionMode();
             }
             if (movedToScheduled && chatMode != ChatActivity.MODE_SCHEDULED) {
@@ -33891,7 +33891,7 @@ public class ChatActivity extends BaseFragment implements
         boolean preserveDim = false;
         switch (option) {
             case OPTION_FENIX_EDIT_HISTORY: {
-                presentFragment(new org.fenixuz.ui.message_history.MessageHistory(selectedObject, dialog_id));
+                presentFragment(new org.milliygram.ui.message_history.MessageHistory(selectedObject, dialog_id));
                 break;
             }
             case OPTION_RETRY: {
@@ -38348,7 +38348,7 @@ public class ChatActivity extends BaseFragment implements
                     //    pinnedBottom = true;
                     //}
 
-                    // Fenix delete-save: restore the "deleted" mark for saved-deleted messages across sessions.
+                    // Milliy delete-save: restore the "deleted" mark for saved-deleted messages across sessions.
                     if (message.deletedBy == null || message.deletedBy.isEmpty()) {
                         message.deletedBy = DeletedMsg.INSTANCE.whoDelete(dialog_id, message.messageOwner.id);
                     }
@@ -46814,6 +46814,14 @@ public class ChatActivity extends BaseFragment implements
                         options.add(OPTION_MG_CUSTOM_FORWARD);
                         icons.add(R.drawable.msg_forward_replace);
                     }
+                }
+                // MilliyGram: kanal adminlari uchun post statistikasi (ko'rishlar, ulashishlar, reaksiyalar)
+                if (selectedObject != null && selectedObject.getId() > 0 && !selectedObject.isSponsored() && chatMode != MODE_SCHEDULED
+                        && ChatObject.isChannelAndNotMegaGroup(currentChat) && chatInfo != null && chatInfo.can_view_stats
+                        && selectedObject.messageOwner != null && selectedObject.messageOwner.action == null) {
+                    items.add(org.telegram.messenger.MgLang.t("Statistikani ko'rish"));
+                    options.add(OPTION_STATISTICS);
+                    icons.add(R.drawable.msg_stats);
                 }
                 if (selectedObject != null && selectedObject.getId() > 0 && !selectedObject.isSponsored() && chatMode != MODE_SCHEDULED && !org.telegram.messenger.MgSimple.isSimpleMenu()) {
                     String mgTxt = MgMessageTools.messageText(selectedObject, selectedObjectGroup);
