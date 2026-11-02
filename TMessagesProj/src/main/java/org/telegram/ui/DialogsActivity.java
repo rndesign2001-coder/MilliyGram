@@ -4117,7 +4117,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                             org.telegram.messenger.MgConfig.setDialogHidden(currentAccount, did, false);
                         }
                         getNotificationCenter().postNotificationName(NotificationCenter.dialogsNeedReload);
-                        BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Chat yana ro'yxatda ko'rinadi")).show();
+                        BulletinFactory.of(DialogsActivity.this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Chat yana ro'yxatda ko'rinadi")).show();
                     } else {
                         MgHiddenActivity.hideDialogs(DialogsActivity.this, currentAccount, new ArrayList<>(selectedDialogs));
                     }
