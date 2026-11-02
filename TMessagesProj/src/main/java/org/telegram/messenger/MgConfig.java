@@ -596,6 +596,25 @@ public class MgConfig {
         return getBool("hidden_notify", false);
     }
 
+    /** Yashirin rejim: ro'yxatda faqat yashirin chatlar qoladi */
+    public static java.util.ArrayList<org.telegram.tgnet.TLRPC.Dialog> onlyHidden(int account, java.util.ArrayList<org.telegram.tgnet.TLRPC.Dialog> dialogs) {
+        java.util.ArrayList<org.telegram.tgnet.TLRPC.Dialog> result = new java.util.ArrayList<>();
+        if (dialogs == null) {
+            return result;
+        }
+        HashSet<Long> hidden = getHiddenDialogs(account);
+        if (hidden.isEmpty()) {
+            return result;
+        }
+        for (int i = 0, n = dialogs.size(); i < n; i++) {
+            org.telegram.tgnet.TLRPC.Dialog d = dialogs.get(i);
+            if (d != null && hidden.contains(d.id)) {
+                result.add(d);
+            }
+        }
+        return result;
+    }
+
     /** Ro'yxatdan yashirin chatlarni olib tashlaydi (asl ro'yxat o'zgarmaydi) */
     public static java.util.ArrayList<org.telegram.tgnet.TLRPC.Dialog> filterHidden(int account, java.util.ArrayList<org.telegram.tgnet.TLRPC.Dialog> dialogs) {
         if (dialogs == null) {

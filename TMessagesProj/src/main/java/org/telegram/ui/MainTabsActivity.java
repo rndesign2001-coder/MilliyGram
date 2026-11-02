@@ -644,7 +644,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
                 }
             });
             // MilliyGram: uzoq bosish — yashirilgan akkauntlar
-            MgAccountMenu.attachHiddenAccounts(this, o, o.getLast());
+            MgAccountMenu.attachHiddenAccounts(this, o, o.getLast(), button);
         }
 
         if (BuildConfig.DEBUG_PRIVATE_VERSION) {

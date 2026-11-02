@@ -47,6 +47,7 @@ public class MgHiddenSettingsActivity extends UniversalFragment {
     private static final int ID_NOTIFY = 8;
     private static final int ID_ACC_NOTIFY = 9;
     private static final int ID_SHAKE = 10;
+    private static final int ID_SHUFFLE = 11;
     private static final int ID_ACC_BASE = 2000;
 
     private static final String S = MgConfig.SCOPE_HIDDEN;
@@ -104,6 +105,9 @@ public class MgHiddenSettingsActivity extends UniversalFragment {
         if (pattern) {
             items.add(UItem.asCheck(ID_INVISIBLE, org.telegram.messenger.MgLang.t("Ko'rinmas grafik kalit")).setChecked(MgConfig.isPatternInvisible(S)));
         }
+        if (!pattern) {
+            items.add(UItem.asCheck(ID_SHUFFLE, org.telegram.messenger.MgLang.t("Raqamlar joyini aralashtirish")).setChecked(MgConfig.getBool("lock_shuffle", false)));
+        }
         items.add(UItem.asCheck(ID_NO_PIN, org.telegram.messenger.MgLang.t("Parolsiz kirish")).setChecked(MgConfig.isHiddenNoPin()));
         items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Bu kod chat qulfi kodidan alohida. Parolsiz kirish yoqilsa, qidiruvni uzoq bosganda kod so'ralmaydi.")));
 
@@ -159,6 +163,9 @@ public class MgHiddenSettingsActivity extends UniversalFragment {
                 return;
             case ID_SHAKE:
                 toggle(view, "shake_to_hide", !MgConfig.isShakeToHide());
+                return;
+            case ID_SHUFFLE:
+                toggle(view, "lock_shuffle", !MgConfig.getBool("lock_shuffle", false));
                 return;
             case ID_NOTIFY:
                 toggle(view, "hidden_notify", !MgConfig.isHiddenNotifyEnabled());

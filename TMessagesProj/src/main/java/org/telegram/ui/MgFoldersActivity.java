@@ -77,7 +77,7 @@ public class MgFoldersActivity extends UniversalFragment {
                 items.add(UItem.asButtonCheck(ID_LOCAL_BASE + i, e.name, sub).setChecked(e.enabled));
             }
             items.add(UItem.asButton(ID_NEW_CATEGORY, R.drawable.msg_add, org.telegram.messenger.MgLang.t("Yangi toifa yaratish")));
-            items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Yoqish/yashirish uchun bosing. Nomini yoki ikonkasini o'zgartirish uchun uzoq bosing.\n\n• Mening kanal va guruhlarim — o'zingiz yaratgan kanal va guruhlar (ular bo'lmasa, jild ko'rinmaydi)\n• Admin — siz egasi yoki admini bo'lgan barcha guruh va kanallar\n• Mening kanallarim / guruhlarim — o'zingiz egasi bo'lganlar\n• Admin kanallar / guruhlar — siz admin, lekin egasi boshqa odam\n• Notanishlar — kontaktda yo'q odamlar (himoya yoqilganda)")));
+            items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Yoqish/yashirish uchun bosing. Nomini yoki ikonkasini o'zgartirish uchun uzoq bosing.\n\n• Administrator — o'zingiz yaratgan va admin bo'lgan barcha kanal va guruhlar (ular bo'lmasa, jild ko'rinmaydi)\n• Admin — siz egasi yoki admini bo'lgan barcha guruh va kanallar\n• Mening kanallarim / guruhlarim — o'zingiz egasi bo'lganlar\n• Admin kanallar / guruhlar — siz admin, lekin egasi boshqa odam\n• Notanishlar — kontaktda yo'q odamlar (himoya yoqilganda)")));
         }
 
         hiddenTabs.clear();

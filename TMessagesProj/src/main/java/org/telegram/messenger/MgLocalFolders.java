@@ -67,7 +67,7 @@ public class MgLocalFolders {
         icon("unread", R.drawable.msg_markunread, org.telegram.messenger.MgLang.t("O'qilmagan"));
         icon("admin_channels", R.drawable.msg_channel_create, org.telegram.messenger.MgLang.t("Mening kanallarim"));
         icon("admin_groups", R.drawable.msg_groups_create, org.telegram.messenger.MgLang.t("Mening guruhlarim"));
-        icon("my_chats", R.drawable.msg_admins, org.telegram.messenger.MgLang.t("Mening kanal va guruhlarim"));
+        icon("my_chats", R.drawable.msg_admins, org.telegram.messenger.MgLang.t("Administrator"));
         icon("mod_channels", R.drawable.msg_channel, org.telegram.messenger.MgLang.t("Admin kanallar"));
         icon("mod_groups", R.drawable.msg_groups, org.telegram.messenger.MgLang.t("Admin guruhlar"));
         icon("archive", R.drawable.msg_archive, org.telegram.messenger.MgLang.t("Arxiv"));
@@ -112,7 +112,7 @@ public class MgLocalFolders {
     }
 
     private static final Def[] DEFS = {
-            new Def(912, "my_chats", org.telegram.messenger.MgLang.t("Mening kanal va guruhlarim"), MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_OWNED, "my_chats", true, 1),
+            new Def(912, "my_chats", org.telegram.messenger.MgLang.t("Administrator"), MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS, TYPE_OWNED, "my_chats", true, 1),
             new Def(903, "private", org.telegram.messenger.MgLang.t("Profillar"), MessagesController.DIALOG_FILTER_FLAG_CONTACTS | MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS | EXCL_ARCH, TYPE_NONE, "private", true, 1),
             new Def(902, "groups", org.telegram.messenger.MgLang.t("Guruhlar"), MessagesController.DIALOG_FILTER_FLAG_GROUPS | EXCL_ARCH, TYPE_NONE, "groups", true, 2),
             new Def(904, "channels", org.telegram.messenger.MgLang.t("Kanallar"), MessagesController.DIALOG_FILTER_FLAG_CHANNELS | EXCL_ARCH, TYPE_NONE, "channels", true, 3),
@@ -132,6 +132,7 @@ public class MgLocalFolders {
         public boolean enabled;
         public ArrayList<Long> always = new ArrayList<>();
         public ArrayList<Long> never = new ArrayList<>();
+        public ArrayList<Long> pinned = new ArrayList<>(); // MilliyGram: jild ichida pin qilingan chatlar (tartib bilan)
     }
 
     public static boolean isLocal(int filterId) {
@@ -187,6 +188,7 @@ public class MgLocalFolders {
                     e.enabled = o.optBoolean("enabled", false);
                     readLongs(o.optJSONArray("always"), e.always);
                     readLongs(o.optJSONArray("never"), e.never);
+                    readLongs(o.optJSONArray("pinned"), e.pinned);
                     saved.put(e.id, e);
                 }
             }
@@ -219,6 +221,9 @@ public class MgLocalFolders {
                 e.pos = d.pos;
             }
             e.type = d.type;
+            if (d.type == TYPE_OWNED && ("Mening kanal va guruhlarim".equals(e.name) || org.telegram.messenger.MgLang.t("Mening kanal va guruhlarim").equals(e.name))) {
+                e.name = d.name; // MilliyGram: eski nom "Administrator"ga almashtiriladi
+            }
             result.add(e);
         }
         // Foydalanuvchi toifalari
@@ -257,6 +262,7 @@ public class MgLocalFolders {
                 o.put("enabled", e.enabled);
                 o.put("always", longs(e.always));
                 o.put("never", longs(e.never));
+                o.put("pinned", longs(e.pinned));
                 arr.put(o);
             }
             MgConfig.setString(prefKey(account), arr.toString());
@@ -274,6 +280,9 @@ public class MgLocalFolders {
         f.localId = 100000 + e.id; // barqaror identifikator (tab tanlovi saqlanishi uchun)
         f.alwaysShow.addAll(e.always);
         f.neverShow.addAll(e.never);
+        for (int i = 0; i < e.pinned.size(); i++) {
+            f.pinnedDialogs.put(e.pinned.get(i), i);
+        }
         return f;
     }
 
@@ -361,6 +370,16 @@ public class MgLocalFolders {
             e.always.addAll(f.alwaysShow);
             e.never.clear();
             e.never.addAll(f.neverShow);
+            // pin tartibi: kichik raqam — yuqorida
+            e.pinned.clear();
+            ArrayList<long[]> pins = new ArrayList<>();
+            for (int k = 0; k < f.pinnedDialogs.size(); k++) {
+                pins.add(new long[]{f.pinnedDialogs.keyAt(k), f.pinnedDialogs.valueAt(k)});
+            }
+            Collections.sort(pins, (x, y) -> Long.compare(x[1], y[1]));
+            for (long[] pin : pins) {
+                e.pinned.add(pin[0]);
+            }
         }
         // yashirin turgan (kanal/guruh yo'qligi uchun) "Mening kanal va guruhlarim" holatini saqlab qolish
         if (!ownedWasEnabled.isEmpty() && !hasOwnedChats(mc)) {
@@ -670,8 +689,9 @@ public class MgLocalFolders {
 
     private static final HashMap<Integer, Boolean> ownedState = new HashMap<>();
 
+    /** "Administrator" jildi: o'zi yaratgan yoki admin bo'lgan kanal va guruhlar */
     private static boolean isOwnedChat(TLRPC.Chat chat) {
-        return chat != null && chat.creator && !ChatObject.isNotInChat(chat) && !chat.deactivated
+        return chat != null && (chat.creator || chat.admin_rights != null) && !ChatObject.isNotInChat(chat) && !chat.deactivated
                 && (chat.migrated_to == null || chat.migrated_to instanceof TLRPC.TL_inputChannelEmpty);
     }
 

@@ -1676,3 +1676,12 @@ Bu chatlardan bildirishnoma har doim keladi, filtr ularni o'chirmaydi.	От эт
 Istisnolar	Исключения	Exceptions
 o'chirish	удалить	remove
 Ro'yxatdan olib tashlash uchun chatni bosing.	Нажмите на чат, чтобы удалить его из списка.	Tap a chat to remove it from the list.
+Yoqish/yashirish uchun bosing. Nomini yoki ikonkasini o'zgartirish uchun uzoq bosing.\n\n• Administrator — o'zingiz yaratgan va admin bo'lgan barcha kanal va guruhlar (ular bo'lmasa, jild ko'rinmaydi)\n• Admin — siz egasi yoki admini bo'lgan barcha guruh va kanallar\n• Mening kanallarim / guruhlarim — o'zingiz egasi bo'lganlar\n• Admin kanallar / guruhlar — siz admin, lekin egasi boshqa odam\n• Notanishlar — kontaktda yo'q odamlar (himoya yoqilganda)	Нажмите, чтобы включить/скрыть. Долгое нажатие — изменить название или значок.\n\n• Administrator — все каналы и группы, которые вы создали или где вы администратор (если их нет, папка не показывается)\n• Admin — все группы и каналы, где вы владелец или администратор\n• Мои каналы / группы — где вы владелец\n• Админ-каналы / группы — вы администратор, но владелец другой\n• Незнакомцы — люди не из контактов (когда защита включена)	Tap to enable/hide. Long-press to rename or change the icon.\n\n• Administrator — all channels and groups you created or administer (hidden if there are none)\n• Admin — all groups and channels where you are the owner or an admin\n• My channels / groups — where you are the owner\n• Admin channels / groups — you are an admin, someone else is the owner\n• Strangers — people not in your contacts (when protection is on)
+Administrator	Администратор	Administrator
+Belgilanmoqda: 	Выделение: 	Selecting: 
+ ta (eng ko'pi 1000 ta)	 (не более 1000)	 (max 1000)
+Hammasi belgilandi: 	Выделено всё: 	All selected: 
+Yashirishni bekor qilish	Отменить скрытие	Unhide
+Berkitish	Скрыть	Hide
+Raqamlar joyini aralashtirish	Перемешивать цифры	Shuffle digits
+Yashirin	Скрытый	Hidden

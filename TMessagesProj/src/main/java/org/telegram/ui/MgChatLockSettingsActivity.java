@@ -30,6 +30,7 @@ public class MgChatLockSettingsActivity extends UniversalFragment {
     private static final int ID_INVISIBLE = 4;
     private static final int ID_VIBRATE = 5;
     private static final int ID_REMOVE = 6;
+    private static final int ID_SHUFFLE = 7;
 
     private static final String S = MgConfig.SCOPE_CHAT;
 
@@ -70,6 +71,9 @@ public class MgChatLockSettingsActivity extends UniversalFragment {
             items.add(UItem.asCheck(ID_INVISIBLE, org.telegram.messenger.MgLang.t("Ko'rinmas grafik kalit")).setChecked(MgConfig.isPatternInvisible(S)));
         }
         items.add(UItem.asCheck(ID_VIBRATE, org.telegram.messenger.MgLang.t("Kiritishda tebranish")).setChecked(MgConfig.isLockVibrate()));
+        if (!pattern) {
+            items.add(UItem.asCheck(ID_SHUFFLE, org.telegram.messenger.MgLang.t("Raqamlar joyini aralashtirish")).setChecked(MgConfig.getBool("lock_shuffle", false)));
+        }
         items.add(UItem.asShadow(org.telegram.messenger.MgLang.t("Qulflangan chatlar: ") + MgConfig.getLockedCount()));
         if (has) {
             items.add(UItem.asButton(ID_REMOVE, R.drawable.msg_delete, org.telegram.messenger.MgLang.t("Kodni va barcha qulflarni o'chirish")).red());
@@ -109,6 +113,9 @@ public class MgChatLockSettingsActivity extends UniversalFragment {
                 break;
             case ID_VIBRATE:
                 toggle(view, "lock_vibrate", !MgConfig.isLockVibrate());
+                break;
+            case ID_SHUFFLE:
+                toggle(view, "lock_shuffle", !MgConfig.getBool("lock_shuffle", false));
                 break;
             case ID_REMOVE: {
                 if (getParentActivity() == null) {

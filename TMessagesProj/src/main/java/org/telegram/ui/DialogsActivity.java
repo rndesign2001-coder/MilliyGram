@@ -500,6 +500,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private ViewPage[] viewPages;
     private ActionBarMenuItem passcodeItem;
     private ActionBarMenuItem mgGhostItem; // MilliyGram: sharpa rejimi tugmasi
+    public boolean mgHiddenMode; // MilliyGram: yashirin bo'lim — faqat yashirin chatlar, sarlavha ostida "Yashirin"
     private static final int MG_GHOST_ID = 9061;
     private ActionBarMenuItem downloadsItem;
     private DownloadProgressIcon downloadProgressIcon;
@@ -2873,6 +2874,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             checkCanWrite = arguments.getBoolean("checkCanWrite", true);
             afterSignup = arguments.getBoolean("afterSignup", false);
             folderId = arguments.getInt("folderId", 0);
+            mgHiddenMode = arguments.getBoolean("mgHidden", false);
             communityId = arguments.getLong("community_id", 0);
             if (communityId != 0) {
                 community = getMessagesController().getChat(communityId);
@@ -3546,7 +3548,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 actionBar.createMenu().addItem(mg_fwd_sets, R.drawable.msg_folders); // MilliyGram: chat to'plamlari
             }
         } else {
-            if (searchString != null || folderId != 0 || communityId != 0) {
+            if (searchString != null || folderId != 0 || communityId != 0 || mgHiddenMode) {
                 actionBar.setBackButtonDrawable(backDrawable = new BackDrawable(false));
             }
             if (folderId != 0) {
@@ -3576,6 +3578,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 }
                 actionBar.setTitle(ssb, statusDrawable);
                 updateStatus(UserConfig.getInstance(currentAccount).getCurrentUser(), false);
+                if (mgHiddenMode) {
+                    actionBar.setSubtitle(org.telegram.messenger.MgLang.t("Yashirin")); // MilliyGram: yashirin bo'lim belgisi
+                }
             }
             if (folderId == 0) {
                 actionBar.setSupportsHolidayImage(true);
@@ -3988,7 +3993,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         } else {
                             hideActionMode(true);
                         }
-                    } else if (onlySelect || folderId != 0 || communityId != 0) {
+                    } else if (onlySelect || folderId != 0 || communityId != 0 || mgHiddenMode) {
                         finishFragment();
                     }
                 } else if (id == MG_GHOST_ID) {
@@ -4106,7 +4111,16 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     }
                     hideActionMode(false);
                 } else if (id == mg_hide) {
-                    MgHiddenActivity.hideDialogs(DialogsActivity.this, currentAccount, new ArrayList<>(selectedDialogs));
+                    if (mgHiddenMode) {
+                        // yashirin bo'limda: tanlangan chatlarni umumiy ro'yxatga qaytarish
+                        for (Long did : selectedDialogs) {
+                            org.telegram.messenger.MgConfig.setDialogHidden(currentAccount, did, false);
+                        }
+                        getNotificationCenter().postNotificationName(NotificationCenter.dialogsNeedReload);
+                        BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Chat yana ro'yxatda ko'rinadi")).show();
+                    } else {
+                        MgHiddenActivity.hideDialogs(DialogsActivity.this, currentAccount, new ArrayList<>(selectedDialogs));
+                    }
                     hideActionMode(true);
                 } else if (id == mg_select_range || id == mg_select_all) {
                     mgSelectDialogs(id == mg_select_all);
@@ -6900,7 +6914,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         otherItem.addSubItem(mg_shortcut, R.drawable.msg_home, org.telegram.messenger.MgLang.t("Bosh ekranga chiqarish"));
         otherItem.addSubItem(mg_category, R.drawable.msg_folders, org.telegram.messenger.MgLang.t("Toifaga qo'shish"));
         mgAddToGroupItem = otherItem.addSubItem(mg_add_to_group, R.drawable.msg_contact_add, org.telegram.messenger.MgLang.t("Guruh yoki kanalga qo'shish"));
-        otherItem.addSubItem(mg_hide, R.drawable.msg_stories_myhide, org.telegram.messenger.MgLang.t("Yashirish"));
+        otherItem.addSubItem(mg_hide, mgHiddenMode ? R.drawable.msg_views : R.drawable.msg_stories_myhide, mgHiddenMode ? org.telegram.messenger.MgLang.t("Ko'rsatish") : org.telegram.messenger.MgLang.t("Yashirish"));
         otherItem.addSubItem(mg_clear_cache, R.drawable.msg_clearcache, org.telegram.messenger.MgLang.t("Keshni tozalash"));
         otherItem.addSubItem(mg_chat_settings, R.drawable.msg_settings, org.telegram.messenger.MgLang.t("Chatlar sozlamalari"));
         mgPreviewItem = otherItem.addSubItem(mg_preview, R.drawable.msg_views, org.telegram.messenger.MgLang.t("Chat ko'rinishi"));
@@ -11559,9 +11573,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @NonNull
     public ArrayList<TLRPC.Dialog> getDialogsArray(int currentAccount, int dialogsType, int folderId, boolean frozen) {
         // MilliyGram: yashirin chatlar ro'yxatda ko'rinmaydi
-        ArrayList<TLRPC.Dialog> mgRes = org.telegram.messenger.MgConfig.filterHidden(currentAccount, mgGetDialogsArrayRaw(currentAccount, dialogsType, folderId, frozen));
+        ArrayList<TLRPC.Dialog> mgRes = mgHiddenMode
+                ? org.telegram.messenger.MgConfig.onlyHidden(currentAccount, mgGetDialogsArrayRaw(currentAccount, dialogsType, folderId, frozen))
+                : org.telegram.messenger.MgConfig.filterHidden(currentAccount, mgGetDialogsArrayRaw(currentAccount, dialogsType, folderId, frozen));
         // MilliyGram: notanishlar asosiy ro'yxatda ko'rinmaydi ("Notanishlar" jildida)
-        if (!onlySelect && communityId == 0 && folderId == 0 && !frozen && (dialogsType == DIALOGS_TYPE_DEFAULT || dialogsType == 7 || dialogsType == 8)) {
+        if (!mgHiddenMode && !onlySelect && communityId == 0 && folderId == 0 && !frozen && (dialogsType == DIALOGS_TYPE_DEFAULT || dialogsType == 7 || dialogsType == 8)) {
             MessagesController.DialogFilter mgSel = dialogsType == DIALOGS_TYPE_DEFAULT ? null : MessagesController.getInstance(currentAccount).selectedDialogFilter[dialogsType == 8 ? 1 : 0];
             if (mgSel == null || mgSel.mgLocalType != org.telegram.messenger.MgLocalFolders.TYPE_STRANGERS) {
                 mgRes = org.telegram.messenger.MgStrangers.filter(currentAccount, mgRes);

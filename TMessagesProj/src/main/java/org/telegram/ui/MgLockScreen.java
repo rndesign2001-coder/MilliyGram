@@ -73,6 +73,16 @@ public class MgLockScreen extends Dialog {
     private PatternView patternView;
 
     private final StringBuilder input = new StringBuilder();
+    private final boolean shuffled = MgConfig.getBool("lock_shuffle", false);
+    private final Runnable bgTicker = new Runnable() {
+        @Override
+        public void run() {
+            if (mgBg != null && isShowing()) {
+                mgBg.switchToNextPosition(false);
+                AndroidUtilities.runOnUIThread(this, 2600);
+            }
+        }
+    };
     private String firstEntry;
 
     /** Tekshirish (mavjud kod bilan) */
@@ -105,12 +115,8 @@ public class MgLockScreen extends Dialog {
         windowView = new FrameLayout(context);
         if (mgAnim) {
             // Telegram parol ekrani uslubi: harakatlanuvchi gradient + milliy naqsh
-            float[] hsv = new float[3];
-            android.graphics.Color.colorToHSV(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4), hsv);
-            int c1 = android.graphics.Color.HSVToColor(new float[]{hsv[0], Math.min(1f, hsv[1] * 0.9f + 0.1f), 0.55f});
-            int c2 = android.graphics.Color.HSVToColor(new float[]{(hsv[0] + 25) % 360, Math.min(1f, hsv[1] * 0.8f + 0.1f), 0.78f});
-            int c3 = android.graphics.Color.HSVToColor(new float[]{(hsv[0] + 340) % 360, Math.min(1f, hsv[1] * 0.9f + 0.1f), 0.42f});
-            int c4 = android.graphics.Color.HSVToColor(new float[]{(hsv[0] + 50) % 360, Math.min(1f, hsv[1] * 0.7f + 0.1f), 0.65f});
+            // MilliyGram ranglari: tun ko'k, moviy, binafsha, firuza
+            int c1 = 0xFF0A1A4F, c2 = 0xFF1E6FD9, c3 = 0xFF4B23A8, c4 = 0xFF0A8FA8;
             mgBg = new MotionBackgroundDrawable(c1, c2, c3, c4, false);
             try {
                 android.graphics.Bitmap pattern = org.telegram.messenger.SvgHelper.getBitmap(R.raw.mg_pattern, AndroidUtilities.displaySize.x, AndroidUtilities.displaySize.y, android.graphics.Color.BLACK, 1f, org.telegram.messenger.SvgHelper.ScaleMode.ByWidth);
@@ -122,6 +128,8 @@ public class MgLockScreen extends Dialog {
             }
             mgBg.setParentView(windowView);
             windowView.setBackground(mgBg);
+            // suzib yuruvchi nur dog'lari va miltillovchi yulduzchalar
+            windowView.addView(new GlowView(context), LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
         } else {
             windowView.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
         }
@@ -279,6 +287,23 @@ public class MgLockScreen extends Dialog {
         keypad.setOrientation(LinearLayout.VERTICAL);
         String[] letters = {"", "", "ABC", "DEF", "GHI", "JKL", "MNO", "PQRS", "TUV", "WXYZ"};
         int[][] rows = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}, {-1, 0, -2}};
+        if (shuffled) {
+            // MilliyGram: raqamlar har safar boshqa joyda — yonidagilar kodni ko'rib qola olmaydi
+            ArrayList<Integer> digits = new ArrayList<>();
+            for (int i = 0; i <= 9; i++) {
+                digits.add(i);
+            }
+            java.util.Collections.shuffle(digits, new java.security.SecureRandom());
+            int k = 0;
+            for (int[] row : rows) {
+                for (int j = 0; j < row.length; j++) {
+                    if (row[j] >= 0) {
+                        row[j] = digits.get(k++);
+                    }
+                }
+            }
+        }
+        int index = 0;
         for (int[] row : rows) {
             LinearLayout rowLayout = new LinearLayout(context);
             rowLayout.setOrientation(LinearLayout.HORIZONTAL);
@@ -300,6 +325,15 @@ public class MgLockScreen extends Dialog {
                     button = new View(context);
                 }
                 rowLayout.addView(button, LayoutHelper.createLinear(76, 76, 10, 6, 10, 6));
+                if (mgAnim) {
+                    button.setAlpha(0f);
+                    button.setScaleX(0.6f);
+                    button.setScaleY(0.6f);
+                    button.setTranslationY(AndroidUtilities.dp(24));
+                    button.animate().alpha(1f).scaleX(1f).scaleY(1f).translationY(0).setStartDelay(120 + index * 35L).setDuration(420)
+                            .setInterpolator(new android.view.animation.OvershootInterpolator(1.6f)).start();
+                }
+                index++;
             }
             keypad.addView(rowLayout, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT));
         }
@@ -317,14 +351,22 @@ public class MgLockScreen extends Dialog {
         LinearLayout button = new LinearLayout(context);
         button.setOrientation(LinearLayout.VERTICAL);
         button.setGravity(Gravity.CENTER);
-        button.setBackground(Theme.createSimpleSelectorCircleDrawable(AndroidUtilities.dp(76), col(Theme.key_windowBackgroundGray), col(Theme.key_listSelector)));
+        if (mgAnim) {
+            GradientDrawable glass = new GradientDrawable(GradientDrawable.Orientation.TL_BR, new int[]{0x33FFFFFF, 0x14FFFFFF});
+            glass.setShape(GradientDrawable.OVAL);
+            glass.setStroke(Math.max(1, AndroidUtilities.dp(1)), 0x40FFFFFF);
+            button.setBackground(new android.graphics.drawable.RippleDrawable(android.content.res.ColorStateList.valueOf(0x55FFFFFF), glass, null));
+        } else {
+            button.setBackground(Theme.createSimpleSelectorCircleDrawable(AndroidUtilities.dp(76), col(Theme.key_windowBackgroundGray), col(Theme.key_listSelector)));
+        }
+        pressAnim(button);
         TextView d = new TextView(context);
         d.setText(String.valueOf(digit));
         d.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30);
         d.setTextColor(col(Theme.key_windowBackgroundWhiteBlackText));
         d.setGravity(Gravity.CENTER);
         button.addView(d, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL));
-        if (!TextUtils.isEmpty(letters)) {
+        if (!TextUtils.isEmpty(letters) && !shuffled) {
             TextView l = new TextView(context);
             l.setText(letters);
             l.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 10);
@@ -374,8 +416,17 @@ public class MgLockScreen extends Dialog {
         int empty = col(Theme.key_windowBackgroundWhiteHintText);
         for (int i = 0; i < count; i++) {
             View dot = new View(getContext());
-            dot.setBackground(circle(i < input.length() ? accent : empty));
+            GradientDrawable g = circle(i < input.length() ? accent : 0);
+            if (i >= input.length()) {
+                g.setStroke(AndroidUtilities.dp(1.5f), empty);
+            }
+            dot.setBackground(g);
             dotsLayout.addView(dot, LayoutHelper.createLinear(14, 14, 9, 0, 9, 0));
+            if (i == input.length() - 1) {
+                dot.setScaleX(0.3f);
+                dot.setScaleY(0.3f);
+                dot.animate().scaleX(1f).scaleY(1f).setDuration(260).setInterpolator(new android.view.animation.OvershootInterpolator(3f)).start();
+            }
         }
     }
 
@@ -520,6 +571,9 @@ public class MgLockScreen extends Dialog {
         windowView.setScaleY(1.05f);
         windowView.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(180).start();
         AndroidUtilities.runOnUIThread(duckView::playAnimation, 150);
+        if (mgAnim) {
+            AndroidUtilities.runOnUIThread(bgTicker, 1200);
+        }
         if (canUseFingerprint()) {
             AndroidUtilities.runOnUIThread(this::showBiometric, 350);
         }
@@ -537,6 +591,70 @@ public class MgLockScreen extends Dialog {
     }
 
     // ---------- Grafik kalit ----------
+
+    @SuppressLint("ClickableViewAccessibility")
+    private static void pressAnim(View v) {
+        v.setOnTouchListener((view, e) -> {
+            if (e.getAction() == MotionEvent.ACTION_DOWN) {
+                view.animate().scaleX(0.88f).scaleY(0.88f).setDuration(90).setStartDelay(0).start();
+            } else if (e.getAction() == MotionEvent.ACTION_UP || e.getAction() == MotionEvent.ACTION_CANCEL) {
+                view.animate().scaleX(1f).scaleY(1f).setDuration(260).setStartDelay(0).setInterpolator(new android.view.animation.OvershootInterpolator(3f)).start();
+            }
+            return false;
+        });
+    }
+
+    /** Fon ustida sekin suzuvchi nur dog'lari va miltillovchi yulduzchalar */
+    private static class GlowView extends View {
+        private static final int STARS = 36;
+        private final android.graphics.Paint blob = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint star = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final float[] sx = new float[STARS], sy = new float[STARS], sz = new float[STARS], sp = new float[STARS];
+        private final long born = android.os.SystemClock.elapsedRealtime();
+        private float r;
+
+        GlowView(Context context) {
+            super(context);
+            java.util.Random rnd = new java.util.Random();
+            for (int i = 0; i < STARS; i++) {
+                sx[i] = rnd.nextFloat();
+                sy[i] = rnd.nextFloat();
+                sz[i] = 0.3f + rnd.nextFloat() * 0.7f;
+                sp[i] = rnd.nextFloat() * 6.28f;
+            }
+            star.setColor(0xFFFFFFFF);
+        }
+
+        @Override
+        protected void onSizeChanged(int w, int h, int ow, int oh) {
+            r = Math.max(w, h) * 0.42f;
+            blob.setShader(new android.graphics.RadialGradient(0, 0, Math.max(1f, r), new int[]{0x55FFFFFF, 0x14FFFFFF, 0x00FFFFFF}, new float[]{0f, 0.5f, 1f}, android.graphics.Shader.TileMode.CLAMP));
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+            float w = getWidth(), h = getHeight();
+            float t = (android.os.SystemClock.elapsedRealtime() - born) / 1000f;
+            for (int i = 0; i < 3; i++) {
+                float bx = w * (0.2f + 0.6f * (0.5f + 0.5f * (float) Math.sin(t * 0.23f + i * 2.1f)));
+                float by = h * (0.15f + 0.33f * i) + h * 0.07f * (float) Math.sin(t * 0.37f + i);
+                float s = 0.7f + 0.3f * (float) Math.sin(t * 0.45f + i * 1.3f);
+                blob.setAlpha(i == 1 ? 120 : 170);
+                canvas.save();
+                canvas.translate(bx, by);
+                canvas.scale(s, s * 0.85f);
+                canvas.drawCircle(0, 0, r, blob);
+                canvas.restore();
+            }
+            for (int i = 0; i < STARS; i++) {
+                float y = ((sy[i] - t * 0.01f * sz[i]) % 1f + 1f) % 1f * h;
+                float tw = 0.5f + 0.5f * (float) Math.sin(t * 2.4f * sz[i] + sp[i]);
+                star.setAlpha((int) (30 + 170 * tw * sz[i]));
+                canvas.drawCircle(sx[i] * w, y, AndroidUtilities.dp(0.8f + 1.3f * sz[i]), star);
+            }
+            postInvalidateOnAnimation();
+        }
+    }
 
     private class PatternView extends View {
 

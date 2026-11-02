@@ -109,10 +109,18 @@ public class MgAccountMenu {
             o.dismiss();
             BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check, !notifyOn ? org.telegram.messenger.MgLang.t("Bu akkaunt bildirishnomalari yoqildi") : org.telegram.messenger.MgLang.t("Bu akkauntdan bildirishnoma kelmaydi")).show();
         });
-        sub.add(R.drawable.msg_archive, org.telegram.messenger.MgLang.t("Yashirish"), () -> {
-            o.dismiss();
-            hideAccount(fragment, account);
-        });
+        if (MgConfig.isAccountHidden(account)) {
+            sub.add(R.drawable.msg_views, org.telegram.messenger.MgLang.t("Yashirishni bekor qilish"), () -> {
+                o.dismiss();
+                MgConfig.setAccountHidden(account, false);
+                NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.mainUserInfoChanged);
+            });
+        } else {
+            sub.add(R.drawable.msg_archive, org.telegram.messenger.MgLang.t("Yashirish"), () -> {
+                o.dismiss();
+                hideAccount(fragment, account);
+            });
+        }
         sub.add(R.drawable.msg_leave, org.telegram.messenger.MgLang.t("Chiqish"), true, () -> {
             o.dismiss();
             confirmLogout(fragment, account);
@@ -159,13 +167,13 @@ public class MgAccountMenu {
     }
 
     /** "Hisob qo'shish" bandini uzoq bosganda yashirilgan akkauntlar */
-    public static void attachHiddenAccounts(BaseFragment fragment, ItemOptions o, ActionBarMenuSubItem addItem) {
+    public static void attachHiddenAccounts(BaseFragment fragment, ItemOptions o, ActionBarMenuSubItem addItem, View anchor) {
         if (addItem == null) {
             return;
         }
         addItem.setOnLongClickListener(v -> {
             o.dismiss();
-            Runnable show = () -> showHiddenAccounts(fragment);
+            Runnable show = () -> showHiddenAccounts(fragment, anchor);
             if (!MgConfig.hasLock(MgConfig.SCOPE_HIDDEN)) {
                 show.run();
             } else if (MgConfig.isHiddenNoPin()) {
@@ -181,7 +189,7 @@ public class MgAccountMenu {
         });
     }
 
-    private static void showHiddenAccounts(BaseFragment fragment) {
+    private static void showHiddenAccounts(BaseFragment fragment, View anchor) {
         if (fragment.getParentActivity() == null) {
             return;
         }
@@ -190,6 +198,34 @@ public class MgAccountMenu {
             if (UserConfig.getInstance(a).isClientActivated() && MgConfig.isAccountHidden(a)) {
                 hidden.add(a);
             }
+        }
+        // MilliyGram: oddiy akkauntlar menyusi ko'rinishida (avatar, ⚙), "Berkitish" bilan
+        if (!hidden.isEmpty() && anchor != null && fragment instanceof MainTabsActivity) {
+            MainTabsActivity tabs = (MainTabsActivity) fragment;
+            ItemOptions o = ItemOptions.makeOptions(fragment, anchor, true);
+            o.addText(org.telegram.messenger.MgLang.t("Yashirilgan akkauntlar"), 16, AndroidUtilities.bold(), AndroidUtilities.dp(260));
+            o.addGap();
+            o.add(R.drawable.msg_remove, org.telegram.messenger.MgLang.t("Berkitish"), o::dismiss);
+            o.addGap();
+            for (int acc : hidden) {
+                final int account = acc;
+                LinearLayout row = tabs.accountView(acc, acc == UserConfig.selectedAccount);
+                row.setOnClickListener(v -> {
+                    o.dismiss();
+                    if (account != UserConfig.selectedAccount && LaunchActivity.instance != null) {
+                        LaunchActivity.instance.switchToAccount(account, true);
+                    }
+                });
+                decorateRow(fragment, o, row, account);
+                o.addView(row, LayoutHelper.createLinear(270, 48));
+            }
+            o.setBlur(true);
+            o.translate(0, -AndroidUtilities.dp(4));
+            android.graphics.drawable.ShapeDrawable bg = Theme.createRoundRectDrawable(AndroidUtilities.dp(28), Theme.getColor(Theme.key_windowBackgroundWhite, fragment.getResourceProvider()));
+            bg.getPaint().setShadowLayer(AndroidUtilities.dp(6), 0, AndroidUtilities.dp(1), Theme.multAlpha(0xFF000000, 0.15f));
+            o.setScrimViewBackground(bg);
+            o.show();
+            return;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getParentActivity(), fragment.getResourceProvider());
         builder.setTitle(org.telegram.messenger.MgLang.t("Yashirilgan akkauntlar"));

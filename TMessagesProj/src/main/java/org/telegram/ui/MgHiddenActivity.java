@@ -37,22 +37,29 @@ public class MgHiddenActivity extends UniversalFragment {
 
     private final ArrayList<Long> encryptedIds = new ArrayList<>();
 
+    /** Yashirin bo'lim — oddiy chatlar ro'yxati ko'rinishida (jildlar, tablar), faqat yashirin chatlar */
+    public static BaseFragment createHiddenDialogs() {
+        android.os.Bundle args = new android.os.Bundle();
+        args.putBoolean("mgHidden", true);
+        return new DialogsActivity(args);
+    }
+
     /** Yashirin bo'limni ochadi (yashirin bo'lim qulfi bilan) */
     public static void open(BaseFragment fragment) {
         if (fragment == null || fragment.getParentActivity() == null) {
             return;
         }
         if (!MgConfig.hasLock(MgConfig.SCOPE_HIDDEN)) {
-            MgChatLock.createLock(fragment, MgConfig.SCOPE_HIDDEN, MgConfig.LOCK_PIN, () -> fragment.presentFragment(new MgHiddenActivity()));
+            MgChatLock.createLock(fragment, MgConfig.SCOPE_HIDDEN, MgConfig.LOCK_PIN, () -> fragment.presentFragment(createHiddenDialogs()));
             return;
         }
         if (MgConfig.isHiddenNoPin()) {
-            fragment.presentFragment(new MgHiddenActivity());
+            fragment.presentFragment(createHiddenDialogs());
             return;
         }
         MgChatLock.askLock(fragment, MgConfig.SCOPE_HIDDEN, org.telegram.messenger.MgLang.t("Yashirin bo'lim"), ok -> {
             if (ok) {
-                fragment.presentFragment(new MgHiddenActivity());
+                fragment.presentFragment(createHiddenDialogs());
             }
         });
     }

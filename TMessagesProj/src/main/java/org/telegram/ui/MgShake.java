@@ -99,7 +99,8 @@ public class MgShake implements SensorEventListener {
     }
 
     private static boolean isSensitive(BaseFragment f) {
-        if (f instanceof MgHiddenActivity || f instanceof MgHiddenSettingsActivity || f instanceof MgChatLockSettingsActivity) {
+        if (f instanceof MgHiddenActivity || f instanceof MgHiddenSettingsActivity || f instanceof MgChatLockSettingsActivity
+                || f instanceof DialogsActivity && ((DialogsActivity) f).mgHiddenMode) {
             return true;
         }
         if (f instanceof ChatActivity) {

@@ -9354,6 +9354,16 @@ public class MessagesController extends BaseController implements NotificationCe
         if ((messages == null || messages.isEmpty()) && taskId == 0) {
             return;
         }
+        // MilliyGram: 100 tadan ko'p xabar (1000 tagacha belgilash) — server cheklovi uchun 100 talik bo'laklarga bo'linadi
+        if (messages != null && messages.size() > 100 && taskId == 0 && taskRequest == null && encryptedChat == null && !scheduled && !quickReplies && !welcomeMessages) {
+            for (int from = 0; from < messages.size(); from += 100) {
+                int to = Math.min(messages.size(), from + 100);
+                ArrayList<Integer> part = new ArrayList<>(messages.subList(from, to));
+                ArrayList<Long> partRandoms = randoms != null && randoms.size() == messages.size() ? new ArrayList<>(randoms.subList(from, to)) : randoms;
+                deleteMessages(part, partRandoms, null, dialogId, forAll, mode, cacheOnly, 0, null, topicId, movedToScheduled, movedToScheduledMessageId);
+            }
+            return;
+        }
         ArrayList<Integer> toSend = null;
         long channelId;
         if (taskId == 0) {

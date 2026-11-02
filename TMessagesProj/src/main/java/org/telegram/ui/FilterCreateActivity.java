@@ -1098,8 +1098,10 @@ public class FilterCreateActivity extends BaseFragment {
         } else {
             fragment.getMessagesController().onFilterUpdate(filter);
         }
-        fragment.getMessagesStorage().saveDialogFilter(filter, atBegin, true);
-        if (atBegin) {
+        if (!org.telegram.messenger.MgLocalFolders.isLocal(filter)) {
+            fragment.getMessagesStorage().saveDialogFilter(filter, atBegin, true);
+        }
+        if (atBegin && !org.telegram.messenger.MgLocalFolders.isLocal(filter)) {
             TLRPC.TL_messages_updateDialogFiltersOrder req = new TLRPC.TL_messages_updateDialogFiltersOrder();
             ArrayList<MessagesController.DialogFilter> filters = fragment.getMessagesController().getDialogFilters();
             for (int a = 0, N = filters.size(); a < N; a++) {
@@ -1114,6 +1116,18 @@ public class FilterCreateActivity extends BaseFragment {
 
     public static void saveFilterToServer(MessagesController.DialogFilter filter, int newFilterFlags, String newFilterName, ArrayList<TLRPC.MessageEntity> newFilterNameEntities, boolean newFilterNoanimate, int newFilterColor, ArrayList<Long> newAlwaysShow, ArrayList<Long> newNeverShow, LongSparseIntArray newPinned, boolean creatingNew, boolean atBegin, boolean hasUserChanged, boolean resetUnreadCounter, boolean progress, BaseFragment fragment, Runnable onFinish) {
         if (fragment == null || fragment.getParentActivity() == null) {
+            return;
+        }
+        if (org.telegram.messenger.MgLocalFolders.isLocal(filter)) {
+            // MilliyGram: lokal jild serverga yuborilmaydi — telefon xotirasida (pinlar bilan) saqlanadi
+            if (newPinned != null && newPinned != filter.pinnedDialogs) {
+                filter.pinnedDialogs = newPinned.clone();
+            }
+            processAddFilter(filter, newFilterFlags, newFilterName, newFilterNameEntities, newFilterNoanimate, newFilterColor, newAlwaysShow, newNeverShow, false, false, hasUserChanged, resetUnreadCounter, fragment, null);
+            org.telegram.messenger.MgLocalFolders.persist(fragment.getCurrentAccount());
+            if (onFinish != null) {
+                onFinish.run();
+            }
             return;
         }
         AlertDialog progressDialog;

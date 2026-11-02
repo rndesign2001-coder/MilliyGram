@@ -1706,6 +1706,8 @@ public class ChatActivity extends BaseFragment implements
     private final static int chat_menu_topic_create = 73;
     private final static int mg_select_range = 9040; // MilliyGram: oraliqni belgilash
     private final static int mg_select_all = 9041;   // MilliyGram: yuklangan hammasini belgilash
+    private static final int MG_SELECT_LIMIT = 1000; // MilliyGram: bir vaqtda 1000 tagacha xabar belgilash
+    private boolean mgSelectAllPending;
 
     private final static int id_chat_compose_panel = 1000;
 
@@ -1779,7 +1781,7 @@ public class ChatActivity extends BaseFragment implements
                         return;
                     }
                     if (messageObject.contentType == 0) {
-                        if (selected && selectedMessagesIds[0].size() + selectedMessagesIds[1].size() >= 100) {
+                        if (selected && selectedMessagesIds[0].size() + selectedMessagesIds[1].size() >= MG_SELECT_LIMIT) {
                             limitReached = true;
                         } else {
                             limitReached = false;
@@ -19273,7 +19275,7 @@ public class ChatActivity extends BaseFragment implements
                     }
                 }
             } else {
-                if (selectedMessagesIds[0].size() + selectedMessagesIds[1].size() >= 100) {
+                if (selectedMessagesIds[0].size() + selectedMessagesIds[1].size() >= MG_SELECT_LIMIT) {
                     AndroidUtilities.shakeView(selectedMessagesCountTextView);
                     Vibrator vibrator = (Vibrator) ApplicationLoader.applicationContext.getSystemService(Context.VIBRATOR_SERVICE);
                     if (vibrator != null) {
@@ -19624,7 +19626,7 @@ public class ChatActivity extends BaseFragment implements
             to = hi;
             step = 1;
         }
-        final int limit = 100;
+        final int limit = MG_SELECT_LIMIT;
         int added = 0;
         boolean capped = false;
         ArrayList<Integer> order = new ArrayList<>();
@@ -19657,12 +19659,27 @@ public class ChatActivity extends BaseFragment implements
         updateActionModeTitle();
         updateVisibleRows();
         int total = selectedMessagesIds[0].size() + selectedMessagesIds[1].size();
-        if (capped) {
-            BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, org.telegram.messenger.MgLang.t("Belgilandi: ") + total + org.telegram.messenger.MgLang.t(" ta. Telegram bir vaqtda ko'pi bilan 100 ta xabarni belgilashga ruxsat beradi")).show();
-        } else if (added == 0) {
+        if (!capped && added == 0 && !(all && !endReached[0])) {
             BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, all ? org.telegram.messenger.MgLang.t("Yuklangan hamma xabarlar allaqachon belgilangan") : org.telegram.messenger.MgLang.t("Oraliqdagi hamma xabarlar allaqachon belgilangan")).show();
-        } else if (all) {
-            BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Yuklangan ") + total + org.telegram.messenger.MgLang.t(" ta xabar belgilandi. Ko'proq kerak bo'lsa, yuqoriga suring va yana bosing")).show();
+        }
+        // MilliyGram: "hammasini belgilash" — 1000 taga yetguncha eski xabarlarni o'zi yuklab belgilab boradi
+        if (all && !capped && total < limit && !endReached[0] && messagesByDays.size() != 0 && chatMode == 0) {
+            mgSelectAllPending = true;
+            if (!loading) {
+                loading = true;
+                waitingForLoad.add(lastLoadIndex);
+                getMessagesController().loadMessages(dialog_id, mergeDialogId, false, 100, maxMessageId[0], 0, !cacheEndReached[0], minDate[0], classGuid, 0, 0, chatMode, threadMessageId, replyMaxReadId, lastLoadIndex++, isTopic);
+            }
+            if (actionBar != null && actionBar.isActionModeShowed()) {
+                BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, org.telegram.messenger.MgLang.t("Belgilanmoqda: ") + total + " / " + limit).show();
+            }
+            return;
+        }
+        mgSelectAllPending = false;
+        if (capped) {
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Belgilandi: ") + total + org.telegram.messenger.MgLang.t(" ta (eng ko'pi 1000 ta)")).show();
+        } else if (all && added > 0) {
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Hammasi belgilandi: ") + total + org.telegram.messenger.MgLang.t(" ta xabar")).show();
         }
     }
 
@@ -20952,6 +20969,15 @@ public class ChatActivity extends BaseFragment implements
         if (id == NotificationCenter.mgHistoryWarmedUp) {
             mgRefreshDeletedMarks();
             return;
+        }
+        if (id == NotificationCenter.messagesDidLoad && mgSelectAllPending) {
+            AndroidUtilities.runOnUIThread(() -> {
+                if (mgSelectAllPending && actionBar != null && actionBar.isActionModeShowed()) {
+                    mgSelectMessages(true);
+                } else {
+                    mgSelectAllPending = false;
+                }
+            }, 350);
         }
         if (id == NotificationCenter.messagesDidLoad) {
             didReceivedNotification_messagesDidLoad(id, account, args);
