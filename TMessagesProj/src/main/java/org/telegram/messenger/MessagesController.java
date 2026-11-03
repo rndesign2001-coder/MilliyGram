@@ -1326,6 +1326,9 @@ public class MessagesController extends BaseController implements NotificationCe
                 return true;
             }
             if (mgLocalType != 0) {
+                if (d.folder_id != 0 && mgLocalType != MgLocalFolders.TYPE_CUSTOM) {
+                    return false; // MilliyGram: arxivlangan chat lokal jildlarda ko'rinmaydi
+                }
                 return MgLocalFolders.includesByType(this, accountInstance.getMessagesController(), dialogId);
             }
             if (d.folder_id != 0 && (flags & DIALOG_FILTER_FLAG_EXCLUDE_ARCHIVED) != 0) {

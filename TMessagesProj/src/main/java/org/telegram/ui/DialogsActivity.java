@@ -714,7 +714,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private final static int remove_from_folder = 110;
     private final static int community_ungroup = 111;
     private final static int mg_favorite = 120; // MilliyGram: tanlanganlarga qo'shish
-    private final static int mg_fwd_sets = 121; // MilliyGram: uzatish oynasida chat to'plamlari
+    private final static int mg_fwd_sets = 140; // MilliyGram: uzatish oynasida chat to'plamlari
     private final static int mg_hide = 121; // MilliyGram: yashirin bo'limga
     private final static int mg_shortcut = 122;
     private final static int mg_category = 123;
@@ -2579,6 +2579,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         parentPage.updateList(true);
                     } else {
                         int added = getMessagesController().addDialogToFolder(dialog.id, folderId == 0 ? 1 : 0, -1, 0);
+                        if (folderId == 0) {
+                            mgKeepArchived();
+                        }
                         if (added != 2 || position != 0) {
                             parentPage.dialogsItemAnimator.prepareForRemove();
                             parentPage.updateList(true);
@@ -3745,6 +3748,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         return 0;
                     }
                     if (tabId == filterTabsView.getDefaultTabId()) {
+                        if (mgHiddenMode) {
+                            return org.telegram.messenger.MgLocalFolders.getHiddenUnreadCount(currentAccount, null);
+                        }
                         return getMessagesStorage().getMainUnreadCount();
                     }
                     ArrayList<MessagesController.DialogFilter> dialogFilters = getMessagesController().getDialogFilters();
@@ -3752,6 +3758,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         return 0;
                     }
                     MessagesController.DialogFilter mgTabFilter = getMessagesController().getDialogFilters().get(tabId);
+                    if (mgHiddenMode) {
+                        // MilliyGram: yashirin bo'limda faqat yashirin chatlar sanaladi
+                        return org.telegram.messenger.MgLocalFolders.getHiddenUnreadCount(currentAccount, mgTabFilter);
+                    }
                     if (org.telegram.messenger.MgLocalFolders.isLocal(mgTabFilter) || org.telegram.messenger.MgConfig.isFolderIconTabs()
                             || org.telegram.messenger.MgConfig.getBool("tab_count_muted", true)) {
                         return org.telegram.messenger.MgLocalFolders.getUnreadCount(currentAccount, mgTabFilter);
@@ -6145,7 +6155,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             } catch (Exception e) {}
             dialogsHintCell.clear();
         }
-        if (isInPreviewMode()) {
+        if (isInPreviewMode() || mgHiddenMode) {
             dialogsHintCellVisible = false;
         } else if (getMessagesController().isFrozen()) {
             dialogsHintCellVisible = true;
@@ -9599,6 +9609,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             ArrayList<Long> copy = new ArrayList<>(selectedDialogs);
             getMessagesController().addDialogToFolder(copy, canUnarchiveCount == 0 ? 1 : 0, -1, null, 0);
             if (canUnarchiveCount == 0) {
+                mgKeepArchived();
                 SharedPreferences preferences = MessagesController.getGlobalMainSettings();
                 boolean hintShowed = preferences.getBoolean("archivehint_l", false) || SharedConfig.archiveHidden;
                 if (!hintShowed) {
@@ -11587,7 +11598,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             mgRes = MgDialogActions.filterKind(MessagesController.getInstance(currentAccount), mgRes, mgArchiveKind);
         }
         // MilliyGram: "Arxivlangan chatlar" qatori jildlar tablarida ham
-        if ((dialogsType == 7 || dialogsType == 8) && folderId == 0 && communityId == 0 && !onlySelect && initialDialogsType == DIALOGS_TYPE_DEFAULT
+        if ((dialogsType == 7 || dialogsType == 8) && folderId == 0 && communityId == 0 && !onlySelect && !mgHiddenMode && initialDialogsType == DIALOGS_TYPE_DEFAULT
                 && org.telegram.messenger.MgConfig.isArchiveInAllTabs() && mgRes != null) {
             TLRPC.Dialog mgFolder = MessagesController.getInstance(currentAccount).dialogs_dict.get(DialogObject.makeFolderDialogId(1));
             if (mgFolder instanceof TLRPC.TL_dialogFolder && !mgRes.isEmpty() && mgRes.get(0) != mgFolder) {
@@ -12662,6 +12673,31 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         b.setTitle(org.telegram.messenger.MgLang.t("Chat to'plamlari"));
         b.setItems(names.toArray(new CharSequence[0]), ic, (d, w) -> actions.get(w).run());
         showDialog(b.create());
+    }
+
+    /**
+     * MilliyGram: Telegram standart holatda ovozi o'chirilmagan arxivdagi chatni (ayniqsa kanallarni)
+     * yangi xabar kelishi bilan arxivdan qaytaradi. Arxivlangan chat arxivda qolishi uchun
+     * "Ovozli chatlarni arxivda qoldirish" sozlamasi yoqiladi.
+     */
+    private void mgKeepArchived() {
+        try {
+            TLRPC.GlobalPrivacySettings settings = getContactsController().getGlobalPrivacySettings();
+            if (settings == null) {
+                getContactsController().loadGlobalPrivacySetting();
+                return;
+            }
+            if (settings.keep_archived_unmuted && settings.keep_archived_folders) {
+                return;
+            }
+            settings.keep_archived_unmuted = true;
+            settings.keep_archived_folders = true;
+            org.telegram.tgnet.tl.TL_account.setGlobalPrivacySettings req = new org.telegram.tgnet.tl.TL_account.setGlobalPrivacySettings();
+            req.settings = settings;
+            getConnectionsManager().sendRequest(req, (response, error) -> {});
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
     }
 
     private void mgSelectAll(ArrayList<Long> ids) {

@@ -234,6 +234,19 @@ public class UserConfig extends BaseController {
          return num >= 0 && num < UserConfig.MAX_ACCOUNT_COUNT && getInstance(num).isClientActivated();
     }
 
+    /**
+     * MilliyGram: ishga tushishda faqat kirilgan akkauntlar (hamda 0- va tanlangan uya) yuklanadi.
+     * Bo'sh uyalar uchun MessagesController/ConnectionsManager yaratilmaydi — ilova tez ochiladi.
+     */
+    public static boolean mgShouldInit(int account) {
+        if (account == 0 || account == selectedAccount) {
+            return true;
+        }
+        UserConfig uc = getInstance(account);
+        uc.loadConfig();
+        return uc.isClientActivated();
+    }
+
     public boolean isClientActivated() {
         synchronized (sync) {
             return currentUser != null;

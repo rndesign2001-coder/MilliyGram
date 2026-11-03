@@ -116,12 +116,13 @@ public class MgLockScreen extends Dialog {
         if (mgAnim) {
             // Telegram parol ekrani uslubi: harakatlanuvchi gradient + milliy naqsh
             // MilliyGram ranglari: tun ko'k, moviy, binafsha, firuza
-            int c1 = 0xFF0A1A4F, c2 = 0xFF1E6FD9, c3 = 0xFF4B23A8, c4 = 0xFF0A8FA8;
+            // chuqur tun ko'k, qirollik binafsha, safir, siyohrang — to'q va yumshoq o'tishlar
+            int c1 = 0xFF070B2E, c2 = 0xFF3B1E8C, c3 = 0xFF1442A8, c4 = 0xFF6A1F86;
             mgBg = new MotionBackgroundDrawable(c1, c2, c3, c4, false);
             try {
                 android.graphics.Bitmap pattern = org.telegram.messenger.SvgHelper.getBitmap(R.raw.mg_pattern, AndroidUtilities.displaySize.x, AndroidUtilities.displaySize.y, android.graphics.Color.BLACK, 1f, org.telegram.messenger.SvgHelper.ScaleMode.ByWidth);
                 if (pattern != null) {
-                    mgBg.setPatternBitmap(28, pattern);
+                    mgBg.setPatternBitmap(18, pattern);
                     mgBg.setPatternColorFilter(mgBg.getPatternColor());
                 }
             } catch (Throwable ignore) {
@@ -139,6 +140,17 @@ public class MgLockScreen extends Dialog {
         content.setOrientation(LinearLayout.VERTICAL);
         content.setGravity(Gravity.CENTER_HORIZONTAL);
         windowView.addView(content, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.CENTER, 0, 36, 0, 16));
+        // MilliyGram: fon status bar va navigatsiya paneli ostiga ham chiziladi, tugmalar esa ular ustiga tushmaydi
+        final int baseTop = AndroidUtilities.dp(36), baseBottom = AndroidUtilities.dp(16);
+        windowView.setOnApplyWindowInsetsListener((v, insets) -> {
+            ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) content.getLayoutParams();
+            lp.topMargin = baseTop + insets.getSystemWindowInsetTop();
+            lp.bottomMargin = baseBottom + insets.getSystemWindowInsetBottom();
+            lp.leftMargin = insets.getSystemWindowInsetLeft();
+            lp.rightMargin = insets.getSystemWindowInsetRight();
+            content.setLayoutParams(lp);
+            return insets;
+        });
 
         View topSpace = new View(context);
         content.addView(topSpace, LayoutHelper.createLinear(1, 0, 1f));
@@ -560,7 +572,30 @@ public class MgLockScreen extends Dialog {
         params.dimAmount = 0;
         params.flags &= ~WindowManager.LayoutParams.FLAG_DIM_BEHIND;
         params.flags |= WindowManager.LayoutParams.FLAG_SECURE;
+        // MilliyGram: to'liq ekran — status bar va navigatsiya paneli shaffof, fon butun ekranni qoplaydi
+        params.flags |= WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS;
+        params.flags &= ~(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        if (Build.VERSION.SDK_INT >= 28) {
+            params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+        }
         window.setAttributes(params);
+        try {
+            window.setStatusBarColor(0);
+            window.setNavigationBarColor(0);
+            if (Build.VERSION.SDK_INT >= 29) {
+                window.setNavigationBarContrastEnforced(false);
+                window.setStatusBarContrastEnforced(false);
+            }
+            int ui = View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+            if (!mgAnim && Build.VERSION.SDK_INT >= 23 && AndroidUtilities.computePerceivedBrightness(Theme.getColor(Theme.key_windowBackgroundWhite)) > 0.721f) {
+                ui |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                if (Build.VERSION.SDK_INT >= 26) {
+                    ui |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+                }
+            }
+            window.getDecorView().setSystemUiVisibility(ui);
+        } catch (Throwable ignore) {
+        }
     }
 
     @Override

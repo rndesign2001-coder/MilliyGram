@@ -838,6 +838,45 @@ public class MgLocalFolders {
         return c[0] == 0 && c[1] > 0;
     }
 
+    /**
+     * Yashirin bo'lim tablari uchun: faqat yashirilgan chatlar ichidagi o'qilmaganlar soni.
+     * filter == null — barcha yashirin chatlar.
+     */
+    public static int getHiddenUnreadCount(int account, MessagesController.DialogFilter filter) {
+        java.util.HashSet<Long> hidden = MgConfig.getHiddenDialogs(account);
+        if (hidden.isEmpty()) {
+            return 0;
+        }
+        MessagesController mc = MessagesController.getInstance(account);
+        AccountInstance ai = AccountInstance.getInstance(account);
+        boolean countMuted = MgConfig.getBool("tab_count_muted", true);
+        int count = 0, muted = 0;
+        for (Long id : hidden) {
+            TLRPC.Dialog d = mc.dialogs_dict.get(id);
+            if (d == null || !(d.unread_count > 0 || d.unread_mark)) {
+                continue;
+            }
+            if (filter != null) {
+                try {
+                    if (!filter.includesDialog(ai, d.id, d)) {
+                        continue;
+                    }
+                } catch (Throwable e) {
+                    continue;
+                }
+            }
+            if (mc.isDialogMuted(d.id, 0)) {
+                muted++;
+            } else {
+                count++;
+            }
+        }
+        if (countMuted) {
+            return count + muted;
+        }
+        return count > 0 ? count : muted;
+    }
+
     public static void resetUnreadCache() {
         unreadCache.clear();
     }
