@@ -24,8 +24,8 @@ import java.util.Arrays;
 public class UserConfig extends BaseController {
 
     public static int selectedAccount;
-    public final static int MAX_ACCOUNT_DEFAULT_COUNT = 100; // MilliyGram: Premium'siz ham 100 tagacha
-    public final static int MAX_ACCOUNT_COUNT = 100; // MilliyGram: 100 tagacha akkaunt (botlar bilan)
+    public final static int MAX_ACCOUNT_DEFAULT_COUNT = 30; // MilliyGram
+    public final static int MAX_ACCOUNT_COUNT = 30; // MilliyGram: 30 tagacha akkaunt (100 da ishga tushishda har bir uya uchun ulanish ochilib, ilova yopilib qolardi)
 
     private final Object sync = new Object();
     private volatile boolean configLoaded;
