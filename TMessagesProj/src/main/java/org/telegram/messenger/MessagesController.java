@@ -1322,13 +1322,13 @@ public class MessagesController extends BaseController implements NotificationCe
             if (neverShow.contains(dialogId)) {
                 return false;
             }
+            if (d != null && d.folder_id != 0 && MgConfig.getBool("folders_hide_archived", true)) {
+                return false; // MilliyGram: arxivlangan chat hech qaysi jildda ko'rinmaydi (faqat Arxivda)
+            }
             if (alwaysShow.contains(dialogId)) {
                 return true;
             }
             if (mgLocalType != 0) {
-                if (d.folder_id != 0 && mgLocalType != MgLocalFolders.TYPE_CUSTOM) {
-                    return false; // MilliyGram: arxivlangan chat lokal jildlarda ko'rinmaydi
-                }
                 return MgLocalFolders.includesByType(this, accountInstance.getMessagesController(), dialogId);
             }
             if (d.folder_id != 0 && (flags & DIALOG_FILTER_FLAG_EXCLUDE_ARCHIVED) != 0) {
@@ -11978,6 +11978,12 @@ public class MessagesController extends BaseController implements NotificationCe
             FileLog.d("processLoadedMessages size " + messagesRes.messages.size() + " in chat " + dialogId + " topic_id " + threadMessageId + " count " + count + " max_id " + max_id + " cache " + isCache + " guid " + classGuid + " load_type " + load_type + " last_message_id " + last_message_id + " index " + loadIndex + " firstUnread " + first_unread + " unread_count " + unread_count + " last_date " + last_date + " queryFromServer " + queryFromServer + " isTopic " + isTopic + " mode " + mode);
         }
         Timer.Task t1 = Timer.start(loaderLogger, "processLoadedMessages");
+        if (!isCache && mode == 0) {
+            try {
+                MgLocalDelete.filter(currentAccount, dialogId, messagesRes.messages); // MilliyGram: o'zidan o'chirilgan xabarlar
+            } catch (Throwable ignore) {
+            }
+        }
 
         long startProcessTime = SystemClock.elapsedRealtime();
         boolean createDialog = false;

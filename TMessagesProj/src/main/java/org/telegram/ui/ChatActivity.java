@@ -1265,6 +1265,7 @@ public class ChatActivity extends BaseFragment implements
     public final static int OPTION_MG_REMIND = 9103;
     public final static int OPTION_MG_SELECT_TEXT = 9104;
     public final static int OPTION_MG_DETAILS = 9105;
+    public final static int OPTION_MG_LOCAL_DELETE = 9106; // MilliyGram: admin bo'lmagan kanal/guruhda xabarni o'zidan o'chirish
 
     private final static int[] allowedNotificationsDuringChatListAnimations = new int[]{
             NotificationCenter.messagesRead,
@@ -1706,6 +1707,7 @@ public class ChatActivity extends BaseFragment implements
     private final static int chat_menu_topic_create = 73;
     private final static int mg_select_range = 9040; // MilliyGram: oraliqni belgilash
     private final static int mg_select_all = 9041;   // MilliyGram: yuklangan hammasini belgilash
+    private final static int mg_select_more = 9042;  // MilliyGram: belgilash rejimidagi ⋮ menyu
     private static final int MG_SELECT_LIMIT = 1000; // MilliyGram: bir vaqtda 1000 tagacha xabar belgilash
     private boolean mgSelectAllPending;
 
@@ -10478,7 +10480,6 @@ public class ChatActivity extends BaseFragment implements
             }
             if (!isReport()) {
                 actionModeViews.add(actionMode.addItemWithWidth(mg_select_range, R.drawable.mg_select_range, dp(44), org.telegram.messenger.MgLang.t("Oraliqni belgilash")));
-                actionModeViews.add(actionMode.addItemWithWidth(mg_select_all, R.drawable.mg_select_all, dp(44), org.telegram.messenger.MgLang.t("Hammasini belgilash")));
             }
             actionModeViews.add(actionMode.addItemWithWidth(star, R.drawable.msg_fave, dp(48), LocaleController.getString(R.string.AddToFavorites)));
             actionModeViews.add(actionMode.addItemWithWidth(copy, R.drawable.msg_copy, dp(48), LocaleController.getString(R.string.Copy)));
@@ -10487,13 +10488,16 @@ public class ChatActivity extends BaseFragment implements
             }
             actionModeViews.add(actionMode.addItemWithWidth(share, R.drawable.msg_shareout, dp(48), LocaleController.getString(R.string.ShareFile)));
             actionModeViews.add(actionMode.addItemWithWidth(delete, R.drawable.msg_delete, dp(48), LocaleController.getString(R.string.Delete)));
+            if (!isReport()) {
+                mgAddSelectMore(actionMode);
+            }
         } else {
             actionModeViews.add(actionMode.addItemWithWidth(mg_select_range, R.drawable.mg_select_range, dp(44), org.telegram.messenger.MgLang.t("Oraliqni belgilash")));
-            actionModeViews.add(actionMode.addItemWithWidth(mg_select_all, R.drawable.mg_select_all, dp(44), org.telegram.messenger.MgLang.t("Hammasini belgilash")));
             actionModeViews.add(actionMode.addItemWithWidth(edit, R.drawable.msg_edit, dp(48), LocaleController.getString(R.string.Edit)));
             actionModeViews.add(actionMode.addItemWithWidth(star, R.drawable.msg_fave, dp(48), LocaleController.getString(R.string.AddToFavorites)));
             actionModeViews.add(actionMode.addItemWithWidth(copy, R.drawable.msg_copy, dp(48), LocaleController.getString(R.string.Copy)));
             actionModeViews.add(actionMode.addItemWithWidth(delete, R.drawable.msg_delete, dp(48), LocaleController.getString(R.string.Delete)));
+            mgAddSelectMore(actionMode);
         }
         actionMode.setItemVisibility(edit, canEditMessagesCount == 1 && selectedMessagesIds[0].size() + selectedMessagesIds[1].size() == 1 ? View.VISIBLE : View.GONE);
         actionMode.setItemVisibility(copy, !isPeerNoForwards() && selectedMessagesCanCopyIds[0].size() + selectedMessagesCanCopyIds[1].size() != 0 ? View.VISIBLE : View.GONE);
@@ -10501,6 +10505,13 @@ public class ChatActivity extends BaseFragment implements
         actionMode.setItemVisibility(delete, cantDeleteMessagesCount == 0 ? View.VISIBLE : View.GONE);
         actionMode.setItemVisibility(tag_message, getUserConfig().isPremium() ? View.VISIBLE : View.GONE);
         actionMode.setItemVisibility(share, View.GONE);
+    }
+
+    /** MilliyGram: o'chirish tugmasi yonida ⋮ — ichida "Hammasini belgilash" */
+    private void mgAddSelectMore(ActionBarMenu actionMode) {
+        ActionBarMenuItem more = actionMode.addItemWithWidth(mg_select_more, R.drawable.ic_ab_other, dp(40), LocaleController.getString(R.string.AccDescrMoreOptions));
+        more.addSubItem(mg_select_all, R.drawable.mg_select_all, org.telegram.messenger.MgLang.t("Hammasini belgilash"));
+        actionModeViews.add(more);
     }
 
     private void hideTagSelector() {
@@ -12390,6 +12401,9 @@ public class ChatActivity extends BaseFragment implements
     }
 
     private void openForward(boolean fromActionBar) {
+        // MilliyGram: havola faqat shu ochilish uchun "Havola bilan birga uzatish" tanlangan bo'lsa qo'shiladi
+        mgForwardWithLinkActive = mgForwardWithLink;
+        mgForwardWithLink = false;
         if (isPeerNoForwards() || hasSelectedNoforwardsMessage()) {
             // We should update text if user changed locale without re-opening chat activity
             String str;
@@ -19684,7 +19698,8 @@ public class ChatActivity extends BaseFragment implements
     }
 
     // ================= MilliyGram: uzatish turini tanlash =================
-    private boolean mgForwardWithLink;
+    private boolean mgForwardWithLink;       // foydalanuvchi aynan "Havola bilan birga uzatish"ni tanladi
+    private boolean mgForwardWithLinkActive; // joriy uzatish oynasi uchun (har ochilishda qayta belgilanadi)
 
     private void mgShowForwardOptions() {
         View anchor = null;
@@ -34900,6 +34915,19 @@ public class ChatActivity extends BaseFragment implements
                 AndroidUtilities.runOnUIThread(() -> MgMessageTools.showDetails(ChatActivity.this, mgMsg, mgGroup), 200);
                 break;
             }
+            case OPTION_MG_LOCAL_DELETE: {
+                final ArrayList<Integer> mgIds = new ArrayList<>();
+                if (selectedObjectGroup != null) {
+                    for (MessageObject m : selectedObjectGroup.messages) {
+                        mgIds.add(m.getId());
+                    }
+                } else if (selectedObject != null) {
+                    mgIds.add(selectedObject.getId());
+                }
+                org.telegram.messenger.MgLocalDelete.delete(currentAccount, dialog_id, mgIds);
+                BulletinFactory.of(this).createSimpleBulletin(R.raw.ic_delete, org.telegram.messenger.MgLang.t("Xabar faqat sizdan o'chirildi")).show();
+                break;
+            }
             case OPTION_MG_TRANSLIT: {
                 MgMessageTools.showTranslit(this, MgMessageTools.messageText(selectedObject, selectedObjectGroup));
                 break;
@@ -35043,8 +35071,9 @@ public class ChatActivity extends BaseFragment implements
             }
         }
 
-        if (mgForwardWithLink && !fragment.isQuote && forwardingMessage == null) {
-            mgForwardWithLink = false;
+        final boolean mgWithLink = mgForwardWithLinkActive;
+        mgForwardWithLinkActive = false;
+        if (mgWithLink && !fragment.isQuote && forwardingMessage == null) {
             final String mgLinks = MgMessageTools.linksFor(this, fmessages);
             for (int a = 1; a >= 0; a--) {
                 selectedMessagesCanCopyIds[a].clear();
@@ -46910,6 +46939,10 @@ public class ChatActivity extends BaseFragment implements
                     items.add(LocaleController.getString(chatMode == MODE_SAVED && threadMessageId != getUserConfig().getClientUserId() ? R.string.Remove : R.string.Delete));
                     options.add(OPTION_DELETE);
                     icons.add(deleteIconRes);
+                } else if (chatMode == 0 && currentChat != null && org.telegram.messenger.MgLocalDelete.canDeleteLocally(message, currentChat) && (threadMessageObjects == null || !threadMessageObjects.contains(message))) {
+                    items.add(org.telegram.messenger.MgLang.t("O'chirish (faqat o'zimdan)"));
+                    options.add(OPTION_MG_LOCAL_DELETE);
+                    icons.add(R.drawable.msg_delete);
                 }
                 if (((message.messageOwner.flags & TLRPC.MESSAGE_FLAG_EDITED) != 0 || message.isEditing()) && EditMessage.INSTANCE.getEditMode()) {
                     items.add(LanguageCode.INSTANCE.getMyTitles(390));

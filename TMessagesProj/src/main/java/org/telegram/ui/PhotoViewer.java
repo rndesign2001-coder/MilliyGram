@@ -10397,6 +10397,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 }
             }
         }
+        mgUpdateVideoNotify(); // MilliyGram: bildirishnomadagi video boshqaruvi
         if ((videoPlayer != null ? videoPlayer.isPlaying() : photoViewerWebView.isPlaying()) && playbackState != ExoPlayer.STATE_ENDED) {
             if (!isPlaying) {
                 isPlaying = true;
@@ -11106,7 +11107,58 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         }
     }
 
+    private MgVideoNotify.Controller mgVideoController;
+
+    private void mgUpdateVideoNotify() {
+        try {
+            if (isCurrentVideo || currentMessageObject == null || !currentMessageObject.isVideo()) {
+                return;
+            }
+            if (mgVideoController == null) {
+                mgVideoController = new MgVideoNotify.Controller() {
+                    @Override
+                    public void toggle() {
+                        toggleVideoPlayer();
+                    }
+
+                    @Override
+                    public void seekTo(long positionMs) {
+                        seekVideoOrWebTo(positionMs);
+                    }
+
+                    @Override
+                    public long position() {
+                        return getCurrentVideoPosition();
+                    }
+
+                    @Override
+                    public long duration() {
+                        return getVideoDuration();
+                    }
+
+                    @Override
+                    public boolean isPlaying() {
+                        return isVideoPlaying();
+                    }
+                };
+            }
+            String t = null;
+            if (currentMessageObject.caption != null && currentMessageObject.caption.length() > 0) {
+                t = currentMessageObject.caption.toString();
+                if (t.length() > 60) {
+                    t = t.substring(0, 60) + "…";
+                }
+            } else if (currentMessageObject.getDocumentName() != null) {
+                t = currentMessageObject.getDocumentName();
+            }
+            MgVideoNotify.update(mgVideoController, t);
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
+    }
+
     private void releasePlayer(boolean onClose) {
+        MgVideoNotify.cancel();
         usedSurfaceView = false;
         if (pipSource != null) {
             pipSource.destroy();
