@@ -40,6 +40,7 @@ import org.telegram.messenger.SendMessagesHelper;
 import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.AlertDialog;
+import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.TextCheckCell;
 import org.telegram.ui.Components.AnimatedEmojiSpan;
@@ -79,7 +80,7 @@ public class MgCustomForward {
         boolean albumOk;
     }
 
-    public static void open(ChatActivity fragment, MessageObject selected, MessageObject.GroupedMessages group) {
+    public static void open(BaseFragment fragment, MessageObject selected, MessageObject.GroupedMessages group) {
         if (fragment == null || selected == null || fragment.getParentActivity() == null) {
             return;
         }
@@ -90,6 +91,39 @@ public class MgCustomForward {
         } else {
             st.items.add(selected);
         }
+        MessageObject withText = null;
+        for (MessageObject m : st.items) {
+            if (m.messageOwner != null && !TextUtils.isEmpty(m.messageOwner.message)) {
+                withText = m;
+                break;
+            }
+        }
+        st.primary = withText != null ? withText : st.items.get(0);
+        st.hasMedia = hasSendableMedia(st.items.get(0));
+        st.albumOk = true;
+        for (MessageObject m : st.items) {
+            if (!isPhotoOrDoc(m)) {
+                st.albumOk = false;
+            }
+        }
+        st.spoiler = st.items.get(0).hasMediaSpoilers();
+        st.originalText = buildText(st.primary);
+        st.text = st.originalText;
+        showEditor(fragment, st);
+    }
+
+    /** Media bo'limida belgilangan bir nechta xabarni maxsus uzatish */
+    public static void openMany(BaseFragment fragment, ArrayList<MessageObject> selected) {
+        if (fragment == null || selected == null || selected.isEmpty() || fragment.getParentActivity() == null) {
+            return;
+        }
+        if (selected.size() == 1) {
+            open(fragment, selected.get(0), null);
+            return;
+        }
+        State st = new State();
+        st.items.addAll(selected);
+        java.util.Collections.sort(st.items, (a, b) -> Integer.compare(a.getId(), b.getId()));
         MessageObject withText = null;
         for (MessageObject m : st.items) {
             if (m.messageOwner != null && !TextUtils.isEmpty(m.messageOwner.message)) {
@@ -161,7 +195,7 @@ public class MgCustomForward {
         return tv;
     }
 
-    private static void showEditor(ChatActivity fragment, State st) {
+    private static void showEditor(BaseFragment fragment, State st) {
         Context ctx = fragment.getParentActivity();
         if (ctx == null) {
             return;
@@ -521,7 +555,7 @@ public class MgCustomForward {
         }
     }
 
-    private static void showReplace(ChatActivity fragment, EditTextCaption target, Utilities.Callback<String> say) {
+    private static void showReplace(BaseFragment fragment, EditTextCaption target, Utilities.Callback<String> say) {
         Context ctx = fragment.getParentActivity();
         if (ctx == null) return;
         LinearLayout ll = new LinearLayout(ctx);
@@ -573,7 +607,7 @@ public class MgCustomForward {
         b.show();
     }
 
-    private static void addSignature(ChatActivity fragment, EditTextCaption target, Utilities.Callback<String> say) {
+    private static void addSignature(BaseFragment fragment, EditTextCaption target, Utilities.Callback<String> say) {
         String sig = MgConfig.getString("mg_cf_signature", "");
         if (TextUtils.isEmpty(sig)) {
             editSignature(fragment, () -> addSignature(fragment, target, say), true);
@@ -632,7 +666,7 @@ public class MgCustomForward {
     }
 
     /** Muharrir ichida tarjima (dialog yopilmaydi) */
-    private static void translateInEditor(ChatActivity fragment, int account, EditTextCaption edit, Utilities.Callback<String> say, boolean append) {
+    private static void translateInEditor(BaseFragment fragment, int account, EditTextCaption edit, Utilities.Callback<String> say, boolean append) {
         Context ctx = fragment.getParentActivity();
         if (ctx == null) {
             return;
@@ -667,7 +701,7 @@ public class MgCustomForward {
         });
     }
 
-    private static void openPicker(ChatActivity fragment, State st) {
+    private static void openPicker(BaseFragment fragment, State st) {
         Bundle args = new Bundle();
         args.putBoolean("onlySelect", true);
         args.putInt("dialogsType", DialogsActivity.DIALOGS_TYPE_FORWARD);
@@ -722,7 +756,7 @@ public class MgCustomForward {
         fragment.presentFragment(picker);
     }
 
-    private static boolean send(ChatActivity fragment, State st, MessagesStorage.TopicKey key, CharSequence comment, boolean notify, int scheduleDate) {
+    private static boolean send(BaseFragment fragment, State st, MessagesStorage.TopicKey key, CharSequence comment, boolean notify, int scheduleDate) {
         final int account = fragment.getCurrentAccount();
         final long did = key.dialogId;
         SendMessagesHelper helper = SendMessagesHelper.getInstance(account);
@@ -790,9 +824,12 @@ public class MgCustomForward {
             long groupId = Utilities.random.nextLong();
             for (int i = 0; i < st.items.size(); i++) {
                 MessageObject m = st.items.get(i);
+                if (i > 0 && i % 10 == 0) {
+                    groupId = Utilities.random.nextLong(); // albom — ko'pi bilan 10 ta
+                }
                 HashMap<String, String> params = new HashMap<>();
                 params.put("groupId", "" + groupId);
-                if (i == st.items.size() - 1) {
+                if (i == st.items.size() - 1 || i % 10 == 9) {
                     params.put("final", "1");
                 }
                 boolean withCaption = i == 0 && !textSeparately && hasText;

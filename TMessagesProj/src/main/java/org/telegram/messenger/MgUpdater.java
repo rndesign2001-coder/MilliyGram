@@ -173,24 +173,135 @@ public final class MgUpdater {
         }
         promptShown = true;
         try {
-            AlertDialog.Builder b = new AlertDialog.Builder(activity);
-            b.setTitle(MgLang.t("🎉 Yangi versiya tayyor"));
-            b.setMessage(MgLang.t("MilliyGram'ning yangi versiyasi Google Play'dan yuklab olindi. O'rnatish uchun ilova bir necha soniyaga qayta ishga tushadi."));
-            b.setPositiveButton(MgLang.t("O'rnatish"), (d, w) -> {
-                try {
-                    manager().completeUpdate();
-                } catch (Throwable e) {
-                    FileLog.e(e);
-                }
-            });
-            b.setNegativeButton(MgLang.t("Keyinroq"), null);
-            AlertDialog dlg = b.create();
+            AlertDialog dlg = styledDialog(activity,
+                    MgLang.t("Yangi versiya tayyor"),
+                    MgLang.t("MilliyGram'ning yangi versiyasi Google Play'dan yuklab olindi. O'rnatish uchun ilova bir necha soniyaga qayta ishga tushadi."),
+                    null,
+                    MgLang.t("O'rnatish"), () -> {
+                        try {
+                            manager().completeUpdate();
+                        } catch (Throwable e) {
+                            FileLog.e(e);
+                        }
+                    },
+                    MgLang.t("Keyinroq"));
             dlg.setOnDismissListener(d -> promptShown = false);
             dlg.show();
         } catch (Throwable e) {
             promptShown = false;
             FileLog.e(e);
         }
+    }
+
+    /**
+     * MilliyGram uslubidagi dialog: logo, sarlavha, matn, ixtiyoriy ro'yxat (punktlar),
+     * asosiy (urg'u rangli) va ikkinchi darajali plitka tugmalar.
+     */
+    public static AlertDialog styledDialog(Activity activity, CharSequence title, CharSequence text, String[] bullets,
+                                           CharSequence primary, Runnable onPrimary, CharSequence secondary) {
+        final AlertDialog[] dialog = new AlertDialog[1];
+        android.widget.LinearLayout box = new android.widget.LinearLayout(activity);
+        box.setOrientation(android.widget.LinearLayout.VERTICAL);
+        box.setPadding(AndroidUtilities.dp(22), AndroidUtilities.dp(22), AndroidUtilities.dp(22), AndroidUtilities.dp(14));
+        android.widget.ImageView logo = new android.widget.ImageView(activity);
+        logo.setImageResource(R.mipmap.ic_launcher_round);
+        box.addView(logo, org.telegram.ui.Components.LayoutHelper.createLinear(68, 68, android.view.Gravity.CENTER_HORIZONTAL, 0, 0, 0, 12));
+        android.widget.TextView t = new android.widget.TextView(activity);
+        t.setText(title);
+        t.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, 20);
+        t.setTypeface(AndroidUtilities.bold());
+        t.setGravity(android.view.Gravity.CENTER);
+        t.setTextColor(org.telegram.ui.ActionBar.Theme.getColor(org.telegram.ui.ActionBar.Theme.key_dialogTextBlack));
+        box.addView(t, org.telegram.ui.Components.LayoutHelper.createLinear(org.telegram.ui.Components.LayoutHelper.MATCH_PARENT, org.telegram.ui.Components.LayoutHelper.WRAP_CONTENT, 0, 0, 0, 8));
+        if (text != null) {
+            android.widget.TextView m = new android.widget.TextView(activity);
+            m.setText(text);
+            m.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, 15);
+            m.setGravity(android.view.Gravity.CENTER);
+            m.setLineSpacing(AndroidUtilities.dp(2), 1f);
+            m.setTextColor(org.telegram.ui.ActionBar.Theme.getColor(org.telegram.ui.ActionBar.Theme.key_dialogTextGray3));
+            box.addView(m, org.telegram.ui.Components.LayoutHelper.createLinear(org.telegram.ui.Components.LayoutHelper.MATCH_PARENT, org.telegram.ui.Components.LayoutHelper.WRAP_CONTENT, 0, 0, 0, 12));
+        }
+        if (bullets != null && bullets.length > 0) {
+            android.widget.LinearLayout list = new android.widget.LinearLayout(activity);
+            list.setOrientation(android.widget.LinearLayout.VERTICAL);
+            int fg = org.telegram.ui.ActionBar.Theme.getColor(org.telegram.ui.ActionBar.Theme.key_dialogTextBlack);
+            list.setBackground(org.telegram.ui.MgUi.round(org.telegram.ui.ActionBar.Theme.multAlpha(fg, 0.06f), 14));
+            list.setPadding(AndroidUtilities.dp(14), AndroidUtilities.dp(10), AndroidUtilities.dp(14), AndroidUtilities.dp(10));
+            for (String b : bullets) {
+                android.widget.TextView row = new android.widget.TextView(activity);
+                row.setText("\u2022  " + b);
+                row.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, 15);
+                row.setTextColor(fg);
+                row.setLineSpacing(AndroidUtilities.dp(1), 1f);
+                list.addView(row, org.telegram.ui.Components.LayoutHelper.createLinear(org.telegram.ui.Components.LayoutHelper.MATCH_PARENT, org.telegram.ui.Components.LayoutHelper.WRAP_CONTENT, 0, 3, 0, 3));
+            }
+            box.addView(list, org.telegram.ui.Components.LayoutHelper.createLinear(org.telegram.ui.Components.LayoutHelper.MATCH_PARENT, org.telegram.ui.Components.LayoutHelper.WRAP_CONTENT, 0, 0, 0, 14));
+        }
+        if (primary != null) {
+            box.addView(org.telegram.ui.MgUi.accentTile(activity, null, primary, () -> {
+                if (dialog[0] != null) {
+                    dialog[0].dismiss();
+                }
+                if (onPrimary != null) {
+                    onPrimary.run();
+                }
+            }), org.telegram.ui.Components.LayoutHelper.createLinear(org.telegram.ui.Components.LayoutHelper.MATCH_PARENT, 50, 0, 0, 0, 8));
+        }
+        if (secondary != null) {
+            box.addView(org.telegram.ui.MgUi.tile(activity, null, secondary, () -> {
+                if (dialog[0] != null) {
+                    dialog[0].dismiss();
+                }
+            }), org.telegram.ui.Components.LayoutHelper.createLinear(org.telegram.ui.Components.LayoutHelper.MATCH_PARENT, 50));
+        }
+        AlertDialog.Builder b = new AlertDialog.Builder(activity);
+        b.setView(box);
+        dialog[0] = b.create();
+        return dialog[0];
+    }
+
+    /** Joriy versiyadagi yangiliklar ("Yangi versiyada nimalar bor" oynasi uchun) */
+    private static final String[] WHATS_NEW = {
+            "Xabar tafsilotlari yangi ko'rinishda: HTML kod va custom emoji IDlarini bir bosishda nusxalash",
+            "Xabarga tezda o'tish: xabar raqami bo'yicha o'tish qo'shildi",
+            "Media bo'limida belgilangan fayllarni Maxsus uzatish",
+            "Uzatishda post havolasi endi qo'shilmaydi",
+            "Dialoglar va ro'yxatlar yangi yumaloq uslubda",
+    };
+
+    /** Ilova yangilangandan keyingi birinchi ochilishda yangiliklarni bir marta ko'rsatadi */
+    public static void maybeShowWhatsNew(Activity activity) {
+        final String ver = versionName();
+        if (activity == null || ver == null || ver.equals(MgConfig.getString("whatsnew_ver", null))) {
+            return;
+        }
+        // Yangi o'rnatishda (tanishtiruv hali ko'rsatilmagan) — faqat belgilab qo'yamiz
+        if (!MgConfig.getBool("onboard_v3", false)
+                || !UserConfig.getInstance(UserConfig.selectedAccount).isClientActivated()) {
+            MgConfig.setString("whatsnew_ver", ver);
+            return;
+        }
+        MgConfig.setString("whatsnew_ver", ver);
+        AndroidUtilities.runOnUIThread(() -> {
+            if (activity.isFinishing()) {
+                return;
+            }
+            try {
+                String[] items = new String[WHATS_NEW.length];
+                for (int i = 0; i < items.length; i++) {
+                    items[i] = MgLang.t(WHATS_NEW[i]);
+                }
+                styledDialog(activity,
+                        MgLang.t("MilliyGram yangilandi") + " · " + ver,
+                        MgLang.t("Yangi versiyada nimalar bor:"),
+                        items,
+                        MgLang.t("Zo'r!"), null,
+                        null).show();
+            } catch (Throwable e) {
+                FileLog.e(e);
+            }
+        }, 1500);
     }
 
     /** Ilovaning Google Play sahifasini ochadi */

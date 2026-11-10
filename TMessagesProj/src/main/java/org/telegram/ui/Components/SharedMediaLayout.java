@@ -690,6 +690,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
     public ImageView photoVideoOptionsItem;
     private RLottieImageView optionsSearchImageView;
     private ActionBarMenuItem forwardItem;
+    private ActionBarMenuItem mgCustomForwardItem; // MilliyGram: maxsus uzatish
     private ActionBarMenuItem gotoItem;
     private ActionBarMenuItem pinItem;
     private ActionBarMenuItem unpinItem;
@@ -2240,6 +2241,14 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                 actionModeLayout.addView(forwardItem, new LinearLayout.LayoutParams(dp(54), ViewGroup.LayoutParams.MATCH_PARENT));
                 actionModeViews.add(forwardItem);
                 forwardItem.setOnClickListener(v -> onActionBarItemClick(v, forward));
+
+                mgCustomForwardItem = new ActionBarMenuItem(context, null, getThemedColor(Theme.key_actionBarActionModeDefaultSelector), getThemedColor(Theme.key_actionBarActionModeDefaultIcon), false);
+                mgCustomForwardItem.setIcon(R.drawable.msg_forward_replace);
+                mgCustomForwardItem.setContentDescription(org.telegram.messenger.MgLang.t("Maxsus uzatish"));
+                mgCustomForwardItem.setDuplicateParentStateEnabled(false);
+                actionModeLayout.addView(mgCustomForwardItem, new LinearLayout.LayoutParams(dp(54), ViewGroup.LayoutParams.MATCH_PARENT));
+                actionModeViews.add(mgCustomForwardItem);
+                mgCustomForwardItem.setOnClickListener(v -> mgCustomForwardSelected());
             }
 
             pinItem = new ActionBarMenuItem(context, null, getThemedColor(Theme.key_actionBarActionModeDefaultSelector), getThemedColor(Theme.key_actionBarActionModeDefaultIcon), false);
@@ -2461,6 +2470,9 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                             }
                             if (forwardItem != null) {
                                 forwardItem.setVisibility(getClosestTab() != TAB_STORIES && getClosestTab() != TAB_BOT_PREVIEWS ? View.VISIBLE : View.GONE);
+                                if (mgCustomForwardItem != null) {
+                                    mgCustomForwardItem.setVisibility(forwardItem.getVisibility());
+                                }
                             }
                             selectedMessagesCountTextView.setNumber(selectedFiles[0].size() + selectedFiles[1].size(), false);
                             AnimatorSet animatorSet = new AnimatorSet();
@@ -2508,6 +2520,9 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                             }
                             if (forwardItem != null) {
                                 forwardItem.setVisibility(getClosestTab() != TAB_STORIES && getClosestTab() != TAB_BOT_PREVIEWS ? View.VISIBLE : View.GONE);
+                                if (mgCustomForwardItem != null) {
+                                    mgCustomForwardItem.setVisibility(forwardItem.getVisibility());
+                                }
                             }
                             AnimatorSet animatorSet = new AnimatorSet();
                             ArrayList<Animator> animators = new ArrayList<>();
@@ -3892,12 +3907,46 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
         return 0;
     }
 
+    /** MilliyGram: belgilangan media/fayllarni maxsus uzatish oynasida ochadi */
+    private void mgCustomForwardSelected() {
+        boolean noforwards = profileActivity.getMessagesController().isPeerNoForwards(dialog_id) || hasNoforwardsMessage();
+        if (noforwards) {
+            BulletinFactory.of(profileActivity).createSimpleBulletin(R.raw.chats_infotip, org.telegram.messenger.MgLang.t("Bu xabarlarni uzatish taqiqlangan")).show();
+            return;
+        }
+        ArrayList<MessageObject> list = new ArrayList<>();
+        for (int a = 1; a >= 0; a--) {
+            for (int b = 0; b < selectedFiles[a].size(); b++) {
+                MessageObject m = selectedFiles[a].valueAt(b);
+                if (m != null && m.getId() > 0) {
+                    list.add(m);
+                }
+            }
+        }
+        if (list.isEmpty()) {
+            return;
+        }
+        for (int a = 1; a >= 0; a--) {
+            selectedFiles[a].clear();
+        }
+        cantDeleteMessagesCount = 0;
+        showActionMode(false);
+        if (savedDialogsAdapter != null) {
+            savedDialogsAdapter.unselectAll();
+        }
+        updateRowsSelection(true);
+        org.telegram.ui.MgCustomForward.openMany(profileActivity, list);
+    }
+
     private void updateForwardItem() {
         if (forwardItem == null) {
             return;
         }
         boolean noforwards = profileActivity.getMessagesController().isPeerNoForwards(dialog_id) || hasNoforwardsMessage();
         forwardItem.setAlpha(noforwards ? 0.5f : 1f);
+        if (mgCustomForwardItem != null) {
+            mgCustomForwardItem.setAlpha(noforwards ? 0.5f : 1f);
+        }
         if (noforwards && forwardItem.getBackground() != null) {
             forwardItem.setBackground(null);
         } else if (!noforwards && forwardItem.getBackground() == null) {
@@ -7726,6 +7775,9 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
         }
         if (forwardItem != null) {
             forwardItem.setVisibility(getClosestTab() != TAB_STORIES && getClosestTab() != TAB_BOT_PREVIEWS && getClosestTab() != TAB_GIFTS ? View.VISIBLE : View.GONE);
+            if (mgCustomForwardItem != null) {
+                mgCustomForwardItem.setVisibility(forwardItem.getVisibility());
+            }
         }
         selectedMessagesCountTextView.setNumber(1, false);
         AnimatorSet animatorSet = new AnimatorSet();
@@ -7797,6 +7849,9 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                 }
                 if (forwardItem != null) {
                     forwardItem.setVisibility(getClosestTab() != TAB_STORIES && getClosestTab() != TAB_BOT_PREVIEWS && getClosestTab() != TAB_GIFTS ? View.VISIBLE : View.GONE);
+                    if (mgCustomForwardItem != null) {
+                        mgCustomForwardItem.setVisibility(forwardItem.getVisibility());
+                    }
                 }
                 updateStoriesPinButton();
             }
@@ -9817,6 +9872,9 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                     }
                     if (forwardItem != null) {
                         forwardItem.setVisibility(View.GONE);
+                        if (mgCustomForwardItem != null) {
+                            mgCustomForwardItem.setVisibility(forwardItem.getVisibility());
+                        }
                     }
                 }
             }

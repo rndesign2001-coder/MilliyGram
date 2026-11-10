@@ -19716,16 +19716,6 @@ public class ChatActivity extends BaseFragment implements
                     mgForwardWithLink = false;
                     openForward(true);
                 })
-                .add(R.drawable.mg_forward_link, org.telegram.messenger.MgLang.t("Havola bilan birga uzatish"), () -> {
-                    ArrayList<MessageObject> sel = mgSelectedMessages();
-                    if (MgMessageTools.linksFor(this, sel) == null) {
-                        BulletinFactory.of(this).createSimpleBulletin(R.raw.chats_infotip, org.telegram.messenger.MgLang.t("Bu chat xabarlari uchun ochiq havola yo'q — oddiy uzatiladi")).show();
-                        mgForwardWithLink = false;
-                    } else {
-                        mgForwardWithLink = true;
-                    }
-                    openForward(true);
-                })
                 .add(R.drawable.msg_forward_replace, org.telegram.messenger.MgLang.t("Maxsus uzatish"), () -> {
                     ArrayList<MessageObject> sel = mgSelectedMessages();
                     long group = 0;
@@ -19776,7 +19766,8 @@ public class ChatActivity extends BaseFragment implements
                     if (getParentActivity() != null) {
                         showDialog(AlertsCreator.createCalendarPickerDialog(getParentActivity(), 1375315200000L, param -> jumpToDate(param), themeDelegate).create());
                     }
-                });
+                },
+                id -> scrollToMessageId(id, 0, true, 0, true, 0));
     }
 
     /** MilliyGram: guruhlangan vositalar oynasi */
@@ -35071,7 +35062,8 @@ public class ChatActivity extends BaseFragment implements
             }
         }
 
-        final boolean mgWithLink = mgForwardWithLinkActive;
+        // MilliyGram: uzatishda post havolasi hech qachon qo'shilmaydi.
+        final boolean mgWithLink = false;
         mgForwardWithLinkActive = false;
         if (mgWithLink && !fragment.isQuote && forwardingMessage == null) {
             final String mgLinks = MgMessageTools.linksFor(this, fmessages);

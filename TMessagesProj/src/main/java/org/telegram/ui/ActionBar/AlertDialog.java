@@ -293,6 +293,24 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
         protected int getThemedColor(int key) {
             return Theme.getColor(key, resourcesProvider);
         }
+
+        /** MilliyGram: ro'yxat elementi — yumaloq plitka (ikonkasiz bo'lsa matn markazda) */
+        public void mgApplyTileStyle(boolean hasIcon) {
+            final int text = getThemedColor(Theme.key_dialogTextBlack);
+            setBackground(Theme.createSimpleSelectorRoundRectDrawable(dp(14),
+                    Theme.multAlpha(text, 0.06f), Theme.multAlpha(text, 0.14f)));
+            setPadding(dp(16), 0, dp(16), 0);
+            if (!hasIcon) {
+                LayoutParams lp = (LayoutParams) textView.getLayoutParams();
+                lp.gravity = Gravity.CENTER;
+                textView.setLayoutParams(lp);
+            }
+        }
+    }
+
+    /** MilliyGram uslubidagi plitkali ro'yxat yoqilganmi */
+    public static boolean mgTileItems() {
+        return org.telegram.messenger.MgConfig.getBool("mg_tile_dialogs", true);
     }
 
     public AlertDialog(Context context, int progressStyle) {
@@ -910,10 +928,16 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
                     continue;
                 }
                 AlertDialogCell cell = new AlertDialogCell(getContext(), resourcesProvider);
-                cell.setTextAndIcon(items[a], itemIcons != null ? itemIcons[a] : 0);
+                final int mgIcon = itemIcons != null ? itemIcons[a] : 0;
+                cell.setTextAndIcon(items[a], mgIcon);
                 cell.setTag(a);
                 itemViews.add(cell);
-                scrollContainer.addView(cell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50));
+                if (mgTileItems()) {
+                    cell.mgApplyTileStyle(mgIcon != 0);
+                    scrollContainer.addView(cell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50, 16, 0, 16, 8));
+                } else {
+                    scrollContainer.addView(cell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50));
+                }
                 cell.setOnClickListener(v -> {
                     if (onClickListener != null) {
                         onClickListener.onClick(AlertDialog.this, (Integer) v.getTag());

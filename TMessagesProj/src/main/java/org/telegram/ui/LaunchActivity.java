@@ -6966,6 +6966,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         MgTranslate.ensureDefaultTarget(); // MilliyGram: tarjima tili
         org.telegram.messenger.MgAutoDelete.start(); // MilliyGram: postlarni avto-o'chirish
         org.telegram.messenger.MgUpdater.check(this); // MilliyGram: yangi versiya bildirishnomasi
+        org.telegram.messenger.MgUpdater.maybeShowWhatsNew(this); // MilliyGram: yangilangandan keyin "nimalar yangi"
         MgOnboarding.maybeShow(this); // MilliyGram: birinchi ochilishdagi tanishtiruv
         AndroidUtilities.runOnUIThread(() -> {
             if (isResumed) {

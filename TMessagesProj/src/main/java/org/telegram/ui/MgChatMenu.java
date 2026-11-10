@@ -195,53 +195,83 @@ public class MgChatMenu {
         }
     }
 
-    /** "Xabarga tez o'tish" oynasi */
-    public static void showQuickJump(BaseFragment f, Runnable first, Runnable up, Runnable down, Runnable byDate) {
+    /** "Xabarga tez o'tish" oynasi — MilliyGram uslubidagi plitkali dialog */
+    public static void showQuickJump(BaseFragment f, Runnable first, Runnable up, Runnable down, Runnable byDate,
+                                     org.telegram.messenger.Utilities.Callback<Integer> byId) {
         Context ctx = f.getParentActivity();
         if (ctx == null) {
             return;
         }
         Theme.ResourcesProvider rp = f.getResourceProvider();
-        BottomSheet.Builder builder = new BottomSheet.Builder(ctx, false, rp);
+        final org.telegram.ui.ActionBar.AlertDialog[] dialog = new org.telegram.ui.ActionBar.AlertDialog[1];
         LinearLayout box = new LinearLayout(ctx);
         box.setOrientation(LinearLayout.VERTICAL);
-        box.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(12), AndroidUtilities.dp(16), AndroidUtilities.dp(12));
-        TextView head = new TextView(ctx);
-        head.setText(MgLang.t("Xabarga tez o'tish"));
-        head.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
-        head.setTypeface(AndroidUtilities.bold());
-        head.setTextColor(Theme.getColor(Theme.key_dialogTextBlack, rp));
-        box.addView(head, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 6, 0, 6, 12));
-        final BottomSheet[] sheet = new BottomSheet[1];
-        String[] names = {MgLang.t("⏮  Eng birinchi xabarga o'tish"), MgLang.t("⏫  Tepaga tez chiqish (100 ta xabar)"),
-                MgLang.t("⏬  Pastga tez tushish (eng oxirgisi)"), MgLang.t("📅  Sana bo'yicha o'tish")};
+        box.setPadding(AndroidUtilities.dp(20), AndroidUtilities.dp(4), AndroidUtilities.dp(20), AndroidUtilities.dp(4));
+        String[] names = {MgLang.t("Eng birinchisiga o'tish"), MgLang.t("Tepaga tez chiqish"),
+                MgLang.t("Pastga tez tushish"), MgLang.t("Sana bo'yicha o'tish")};
         Runnable[] actions = {first, up, down, byDate};
         for (int i = 0; i < names.length; i++) {
             if (actions[i] == null) {
                 continue;
             }
-            TextView b = new TextView(ctx);
-            b.setText(names[i]);
-            b.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
-            b.setTextColor(Theme.getColor(Theme.key_dialogTextBlack, rp));
-            b.setGravity(Gravity.CENTER);
-            GradientDrawable bg = new GradientDrawable();
-            bg.setCornerRadius(AndroidUtilities.dp(12));
-            bg.setColor(Theme.multAlpha(Theme.getColor(Theme.key_dialogTextBlack, rp), 0.06f));
-            b.setBackground(bg);
             final Runnable a = actions[i];
             final boolean keepOpen = i == 1; // tepaga chiqishni ketma-ket bosish mumkin
-            b.setOnClickListener(v -> {
-                if (!keepOpen && sheet[0] != null) {
-                    sheet[0].dismiss();
+            box.addView(MgUi.tile(ctx, rp, names[i], () -> {
+                if (!keepOpen && dialog[0] != null) {
+                    dialog[0].dismiss();
                 }
                 a.run();
-            });
-            box.addView(b, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 52, 0, 0, 0, 8));
+            }), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 52, 0, 0, 0, 10));
         }
-        builder.setCustomView(box);
-        sheet[0] = builder.create();
-        f.showDialog(sheet[0]);
+        if (byId != null) {
+            TextView label = new TextView(ctx);
+            label.setText(MgLang.t("Xabar raqami"));
+            label.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+            label.setTextColor(Theme.getColor(Theme.key_dialogTextGray3, rp));
+            label.setGravity(Gravity.CENTER);
+            box.addView(label, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 6, 0, 0));
+            final org.telegram.ui.Components.EditTextBoldCursor input = new org.telegram.ui.Components.EditTextBoldCursor(ctx);
+            input.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+            input.setTextColor(Theme.getColor(Theme.key_dialogTextBlack, rp));
+            input.setHintTextColor(Theme.getColor(Theme.key_dialogTextHint, rp));
+            input.setHint("1");
+            input.setGravity(Gravity.CENTER);
+            input.setSingleLine(true);
+            input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+            input.setBackground(null);
+            input.setLineColors(Theme.getColor(Theme.key_dialogInputField, rp), Theme.getColor(Theme.key_dialogInputFieldActivated, rp), Theme.getColor(Theme.key_text_RedBold, rp));
+            input.setCursorColor(Theme.getColor(Theme.key_dialogTextBlack, rp));
+            input.setPadding(0, AndroidUtilities.dp(6), 0, AndroidUtilities.dp(8));
+            box.addView(input, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 0, 24, 12));
+            final Runnable go = () -> {
+                int id;
+                try {
+                    id = Integer.parseInt(input.getText().toString().trim());
+                } catch (Exception e) {
+                    id = 0;
+                }
+                if (id <= 0) {
+                    AndroidUtilities.shakeViewSpring(input, -6);
+                    return;
+                }
+                if (dialog[0] != null) {
+                    dialog[0].dismiss();
+                }
+                byId.run(id);
+            };
+            input.setOnEditorActionListener((v, actionId, event) -> {
+                go.run();
+                return true;
+            });
+            box.addView(MgUi.accentTile(ctx, rp, MgLang.t("Tezda o'tish"), go),
+                    LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 52, 0, 0, 0, 6));
+        }
+        org.telegram.ui.ActionBar.AlertDialog.Builder builder = new org.telegram.ui.ActionBar.AlertDialog.Builder(ctx, rp);
+        builder.setTitle(MgLang.t("Xabarga tezda o'tish"));
+        builder.setView(box);
+        builder.setNegativeButton(MgLang.t("Yopish"), null);
+        dialog[0] = builder.create();
+        f.showDialog(dialog[0]);
     }
 
 }
