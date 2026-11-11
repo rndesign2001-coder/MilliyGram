@@ -1,0 +1,336 @@
+run=51 sha=9abd914a9d062d7b35003694a965a1d5e51ee934 status=success
+340:Note: Some input files use or override a deprecated API.
+341:Note: Recompile with -Xlint:deprecation for details.
+342:Note: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/lib/jlatexmath/jlatexmath/src/main/java/org/scilab/forge/jlatexmath/PredefinedTeXFormulaParser.java uses unchecked or unsafe operations.
+343:Note: Recompile with -Xlint:unchecked for details.
+377:Note: Some input files use or override a deprecated API.
+378:Note: Recompile with -Xlint:deprecation for details.
+404:Note: Some input files use or override a deprecated API.
+405:Note: Recompile with -Xlint:deprecation for details.
+413:Note: Some input files use or override a deprecated API.
+414:Note: Recompile with -Xlint:deprecation for details.
+419: Example of androidX reference: 'androidx/core/app/TaskStackBuilder'
+420: Example of support library reference: 'android/support/v4/media/session/MediaSessionCompat$Token'
+422: Example of androidX reference: 'androidx/car/app/media/IMediaPlaybackHost'
+423: Example of support library reference: 'android/support/v4/media/session/MediaSessionCompat$Token'
+428:Note: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj_Modules/media/libraries/decoder_ffmpeg/src/main/java/androidx/media3/decoder/ffmpeg/FfmpegAudioRenderer.java uses or overrides a deprecated API.
+429:Note: Recompile with -Xlint:deprecation for details.
+436:Note: Some input files use or override a deprecated API.
+437:Note: Recompile with -Xlint:deprecation for details.
+445:Note: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj_Modules/media/libraries/exoplayer_hls/src/main/java/androidx/media3/exoplayer/hls/HlsMediaSource.java uses or overrides a deprecated API.
+446:Note: Recompile with -Xlint:deprecation for details.
+603:Note: Some input files use or override a deprecated API.
+604:Note: Recompile with -Xlint:deprecation for details.
+664:Size: 4553463 bytes
+969:C/C++:   360 |             throwNewJavaIllegalArgumentException(env, "Unknown data saving constant: " + dataSaving);
+972:C/C++:   360 |             throwNewJavaIllegalArgumentException(env, "Unknown data saving constant: " + dataSaving);
+1428:C/C++:   360 |             throwNewJavaIllegalArgumentException(env, "Unknown data saving constant: " + dataSaving);
+1431:C/C++:   360 |             throwNewJavaIllegalArgumentException(env, "Unknown data saving constant: " + dataSaving);
+1524:/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:6595:4: Multiple substitutions specified in non-positional format of string resource string/NotificationTopicExceptionsDesctription_one. Did you mean to add the formatted="false" attribute?
+1525:/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:6596:4: Multiple substitutions specified in non-positional format of string resource string/NotificationTopicExceptionsDesctription_other. Did you mean to add the formatted="false" attribute?
+1930:Size: 90276 bytes
+1945:Note: Some input files use or override a deprecated API.
+1946:Note: Recompile with -Xlint:deprecation for details.
+1947:Note: Some input files use unchecked or unsafe operations.
+1948:Note: Recompile with -Xlint:unchecked for details.
+---
+R.raw.star_reaction_effect5 (0x7f0e0123) — fps=60, frames=90, mono=false
+R.raw.ic_unmute (0x7f0e0077) — fps=60, frames=65, mono=false
+R.raw.folder_out (0x7f0e0058) — fps=60, frames=54, mono=false
+R.raw.gif_to_keyboard (0x7f0e005d) — fps=60, frames=12, mono=false
+R.raw.chats_archiveavatar (0x7f0e002a) — fps=60, frames=50, mono=false
+R.raw.imported (0x7f0e007d) — fps=60, frames=120, mono=false
+R.raw.iphone_30 (0x7f0e0084) — fps=60, frames=180, mono=false
+R.raw.stars_topup (0x7f0e0126) — fps=60, frames=109, mono=false
+R.raw.topics_tabs (0x7f0e016c) — fps=60, frames=100, mono=false
+R.raw.filters (0x7f0e0052) — fps=60, frames=180, mono=false
+R.raw.story_bomb2 (0x7f0e0130) — fps=60, frames=51, mono=false
+R.raw.seek_speed_hint (0x7f0e0103) — fps=60, frames=42, mono=false
+R.raw.tab_location_reverse (0x7f0e0151) — fps=60, frames=5, mono=false
+R.raw.tab_sticker_reverse (0x7f0e015c) — fps=60, frames=5, mono=false
+R.raw.report_police (0x7f0e00f6) — fps=60, frames=180, mono=false
+R.raw.story_bomb1 (0x7f0e012f) — fps=60, frames=44, mono=false
+R.raw.speed_limit (0x7f0e0116) — fps=60, frames=51, mono=false
+R.raw.tab_files_reverse (0x7f0e014b) — fps=60, frames=5, mono=false
+R.raw.ic_save_to_gifs (0x7f0e0074) — fps=60, frames=90, mono=false
+R.raw.stories_intro_go_back (0x7f0e012b) — fps=60, frames=40, mono=false
+R.raw.gif_to_smile (0x7f0e005e) — fps=60, frames=12, mono=false
+R.raw.smile_to_keyboard (0x7f0e0108) — fps=60, frames=12, mono=false
+R.raw.chats_hide (0x7f0e002c) — fps=60, frames=50, mono=false
+R.raw.tab_checklist_reverse (0x7f0e0144) — fps=60, frames=5, mono=false
+R.raw.video_stop (0x7f0e018c) — fps=60, frames=60, mono=false
+R.raw.voice_muted (0x7f0e018f) — fps=60, frames=29, mono=false
+R.raw.permission_request_apk (0x7f0e00b8) — fps=60, frames=180, mono=false
+R.raw.biz_map (0x7f0e0005) — fps=60, frames=180, mono=false
+R.raw.tab_reply (0x7f0e0158) — fps=60, frames=17, mono=false
+R.raw.double_icon (0x7f0e0041) — fps=60, frames=120, mono=false
+R.raw.media_mute_unmute (0x7f0e0093) — fps=60, frames=44, mono=false
+R.raw.swipe_unmute (0x7f0e013c) — fps=60, frames=35, mono=false
+R.raw.tsv_setup_intro (0x7f0e0174) — fps=60, frames=180, mono=false
+R.raw.chats_archive (0x7f0e0029) — fps=60, frames=50, mono=false
+R.raw.topics_top (0x7f0e016d) — fps=60, frames=157, mono=false
+R.raw.passkey (0x7f0e00b2) — fps=60, frames=157, mono=false
+R.raw.media_forbidden (0x7f0e0092) — fps=60, frames=180, mono=false
+R.raw.roundcamera_flip (0x7f0e00ff) — fps=60, frames=30, mono=false
+R.raw.email_setup_heart (0x7f0e0049) — fps=60, frames=180, mono=false
+R.raw.permission_request_microphone (0x7f0e00bd) — fps=60, frames=60, mono=false
+R.raw.tab_gallery (0x7f0e014c) — fps=60, frames=17, mono=false
+R.raw.camera_wait (0x7f0e001f) — fps=60, frames=300, mono=false
+R.raw.keyboard_to_sticker (0x7f0e0087) — fps=60, frames=12, mono=false
+R.raw.star_reaction_effect4 (0x7f0e0122) — fps=60, frames=90, mono=false
+R.raw.transcribe_out (0x7f0e0170) — fps=60, frames=20, mono=false
+R.raw.msg_emoji_food (0x7f0e00a0) — fps=60, frames=60, mono=false
+R.raw.msg_emoji_activities (0x7f0e009d) — fps=60, frames=60, mono=false
+R.raw.speaker_to_bt (0x7f0e0111) — fps=60, frames=60, mono=false
+R.raw.ic_save_to_music (0x7f0e0075) — fps=60, frames=120, mono=false
+R.raw.voip_invite (0x7f0e019c) — fps=60, frames=120, mono=false
+R.raw.utyan_passcode (0x7f0e0187) — fps=60, frames=180, mono=false
+R.raw.unlock_icon (0x7f0e017d) — fps=60, frames=120, mono=false
+R.raw.download_arrow (0x7f0e0042) — fps=60, frames=30, mono=false
+R.raw.linux_30 (0x7f0e008c) — fps=60, frames=180, mono=false
+R.raw.calls_log (0x7f0e0016) — fps=60, frames=120, mono=false
+R.raw.ic_delete (0x7f0e006f) — fps=60, frames=66, mono=false
+R.raw.boosts (0x7f0e0008) — fps=60, frames=49, mono=false
+R.raw.tab_reply_reverse (0x7f0e0159) — fps=60, frames=5, mono=false
+R.raw.hand_1 (0x7f0e0067) — fps=60, frames=720, mono=false
+R.raw.import_check (0x7f0e0079) — fps=60, frames=13, mono=false
+R.raw.phone_dots_to_stars (0x7f0e00bf) — fps=60, frames=10, mono=false
+R.raw.chats_unarchive (0x7f0e002f) — fps=60, frames=50, mono=false
+R.raw.tab_colors (0x7f0e0145) — fps=60, frames=17, mono=false
+R.raw.voice_to_text (0x7f0e0192) — fps=60, frames=120, mono=false
+R.raw.fragment (0x7f0e005b) — fps=60, frames=59, mono=false
+R.raw.msg_antispam (0x7f0e009c) — fps=60, frames=62, mono=false
+R.raw.tsv_setup_email_sent (0x7f0e0172) — fps=60, frames=180, mono=false
+R.raw.notify_toggle (0x7f0e00ad) — fps=60, frames=80, mono=false
+R.raw.profile_muting (0x7f0e00e9) — fps=60, frames=37, mono=false
+R.raw.msg_stories_saved (0x7f0e00a6) — fps=60, frames=40, mono=false
+R.raw.mac_30 (0x7f0e008e) — fps=60, frames=180, mono=false
+R.raw.permission_request_camera (0x7f0e00b9) — fps=60, frames=60, mono=false
+R.raw.position_above (0x7f0e00cf) — fps=60, frames=20, mono=false
+R.raw.utyan_change_number (0x7f0e0180) — fps=60, frames=180, mono=false
+R.raw.ic_admin (0x7f0e006c) — fps=60, frames=120, mono=false
+R.raw.speed_2to1 (0x7f0e0114) — fps=60, frames=72, mono=false
+R.raw.name_show (0x7f0e00ab) — fps=60, frames=20, mono=false
+R.raw.custom_emoji_reaction (0x7f0e003a) — fps=60, frames=89, mono=false
+R.raw.channel_create (0x7f0e0025) — fps=60, frames=180, mono=false
+R.raw.utyan_gallery (0x7f0e0184) — fps=60, frames=180, mono=false
+R.raw.monetize (0x7f0e009b) — fps=60, frames=45, mono=false
+R.raw.large_message_lock (0x7f0e0089) — fps=60, frames=180, mono=false
+R.raw.msg_emoji_travel (0x7f0e00a4) — fps=60, frames=60, mono=false
+R.raw.story_repost (0x7f0e0131) — fps=60, frames=36, mono=false
+R.raw.tab_files (0x7f0e014a) — fps=60, frames=17, mono=false
+R.raw.star_reaction_effect1 (0x7f0e011f) — fps=60, frames=90, mono=false
+R.raw.swipe_community_ungroup (0x7f0e0136) — fps=60, frames=29, mono=false
+R.raw.tab_contacts (0x7f0e0147) — fps=60, frames=6, mono=false
+R.raw.caption_limit (0x7f0e0022) — fps=60, frames=90, mono=false
+R.raw.sticker_to_keyboard (0x7f0e0129) — fps=60, frames=12, mono=false
+R.raw.voip_record_saved (0x7f0e019f) — fps=60, frames=56, mono=false
+R.raw.tab_emoji_reverse (0x7f0e0149) — fps=60, frames=5, mono=false
+R.raw.contacts_sync_on (0x7f0e0037) — fps=60, frames=120, mono=false
+R.raw.tab_checklist (0x7f0e0143) — fps=60, frames=17, mono=false
+R.raw.silent_mute (0x7f0e0105) — fps=60, frames=58, mono=false
+R.raw.db_migration_placeholder (0x7f0e003c) — fps=60, frames=180, mono=false
+R.raw.group_pip_delete_icon (0x7f0e0066) — fps=60, frames=66, mono=false
+R.raw.wallet_congrats (0x7f0e01a5) — fps=60, frames=180, mono=false
+R.raw.star_reaction_effect2 (0x7f0e0120) — fps=60, frames=83, mono=false
+R.raw.tsv_setup_monkey_tracking (0x7f0e017b) — fps=60, frames=180, mono=false
+R.raw.star_reaction_click (0x7f0e011e) — fps=60, frames=125, mono=false
+R.raw.tsv_setup_hint (0x7f0e0173) — fps=60, frames=180, mono=false
+R.raw.voip_record_start (0x7f0e01a0) — fps=60, frames=64, mono=false
+R.raw.android_30 (0x7f0e0001) — fps=60, frames=180, mono=false
+R.raw.plane_logo_plain (0x7f0e00cd) — fps=60, frames=54, mono=false
+R.raw.call_mute (0x7f0e0015) — fps=60, frames=60, mono=false
+R.raw.timer_3 (0x7f0e0167) — fps=60, frames=66, mono=false
+R.raw.raised_hand (0x7f0e00f1) — fps=60, frames=90, mono=false
+R.raw.roundcamera_flash_off (0x7f0e00fd) — fps=60, frames=30, mono=false
+R.raw.photo_marker (0x7f0e00c5) — fps=60, frames=30, mono=false
+R.raw.mute_for (0x7f0e00a9) — fps=60, frames=61, mono=false
+R.raw.wallet_science (0x7f0e01a7) — fps=60, frames=180, mono=false
+R.raw.utyan_schedule (0x7f0e018a) — fps=60, frames=180, mono=false
+R.raw.tab_settings (0x7f0e015a) — fps=60, frames=6, mono=false
+R.raw.contacts_sync_off (0x7f0e0036) — fps=60, frames=120, mono=false
+R.raw.fire_on (0x7f0e0054) — fps=60, frames=120, mono=false
+R.raw.camera_flip2 (0x7f0e001b) — fps=60, frames=60, mono=false
+R.raw.hint_swipe_reply (0x7f0e006b) — fps=60, frames=120, mono=false
+R.raw.profile_leave (0x7f0e00e8) — fps=60, frames=48, mono=false
+R.raw.voip_filled (0x7f0e019b) — fps=60, frames=404, mono=false
+R.raw.position_below (0x7f0e00d0) — fps=60, frames=20, mono=false
+R.raw.tab_music (0x7f0e0154) — fps=60, frames=17, mono=false
+R.raw.write_contacts_fab_icon (0x7f0e01ae) — fps=60, frames=49, mono=false
+R.raw.hand_2 (0x7f0e0068) — fps=60, frames=540, mono=false
+R.raw.tag_icon_3 (0x7f0e0161) — fps=60, frames=57, mono=false
+R.raw.done (0x7f0e003f) — fps=60, frames=120, mono=false
+R.raw.photo_spoiler (0x7f0e00c8) — fps=60, frames=180, mono=false
+R.raw.swipe_pin (0x7f0e013a) — fps=60, frames=31, mono=false
+R.raw.passcode_lock (0x7f0e00b0) — fps=60, frames=71, mono=false
+R.raw.copy (0x7f0e0039) — fps=60, frames=61, mono=false
+R.raw.auto_night_off (0x7f0e0002) — fps=60, frames=180, mono=false
+R.raw.media_enlarge (0x7f0e0091) — fps=60, frames=20, mono=false
+R.raw.voice_mini (0x7f0e018e) — fps=60, frames=172, mono=false
+R.raw.download_finish (0x7f0e0043) — fps=60, frames=41, mono=false
+R.raw.edge_30 (0x7f0e0047) — fps=60, frames=180, mono=false
+R.raw.options_to_search (0x7f0e00af) — fps=60, frames=120, mono=false
+R.raw.not_available (0x7f0e00ac) — fps=60, frames=180, mono=false
+R.raw.utyan_draw (0x7f0e0181) — fps=60, frames=180, mono=false
+R.raw.speed_1to15 (0x7f0e0113) — fps=60, frames=75, mono=false
+R.raw.chats_unhide (0x7f0e0030) — fps=60, frames=50, mono=false
+R.raw.shared_link_enter (0x7f0e0104) — fps=60, frames=43, mono=false
+R.raw.stars_send (0x7f0e0125) — fps=60, frames=140, mono=false
+R.raw.chats_archived (0x7f0e002b) — fps=60, frames=45, mono=false
+R.raw.msg_translate (0x7f0e00a8) — fps=60, frames=180, mono=false
+R.raw.chat_audio_record_delete_3 (0x7f0e0028) — fps=60, frames=40, mono=false
+R.raw.qr_login (0x7f0e00ee) — fps=60, frames=360, mono=false
+R.raw.statistic_preload (0x7f0e0128) — fps=60, frames=180, mono=false
+R.raw.chrome_30 (0x7f0e0031) — fps=60, frames=180, mono=false
+R.raw.photo_neon (0x7f0e00c6) — fps=60, frames=30, mono=false
+R.raw.ticks_single (0x7f0e0166) — fps=60, frames=25, mono=false
+R.raw.msg_stories_archive (0x7f0e00a5) — fps=60, frames=27, mono=false
+R.raw.sound_download (0x7f0e010b) — fps=60, frames=66, mono=false
+R.raw.sticker_to_smile (0x7f0e012a) — fps=60, frames=12, mono=false
+R.raw.code_laptop (0x7f0e0032) — fps=60, frames=64, mono=false
+R.raw.tab_gallery_reverse (0x7f0e014d) — fps=60, frames=5, mono=false
+R.raw.download_progress (0x7f0e0044) — fps=60, frames=50, mono=false
+R.raw.player_prev (0x7f0e00ce) — fps=60, frames=25, mono=false
+R.raw.tab_chats (0x7f0e0142) — fps=60, frames=6, mono=false
+R.raw.tab_colors_reverse (0x7f0e0146) — fps=60, frames=5, mono=false
+R.raw.utyan_streaming (0x7f0e018b) — fps=60, frames=180, mono=false
+R.raw.tsv_setup_monkey_peek (0x7f0e017a) — fps=60, frames=33, mono=false
+R.raw.swipe_disabled (0x7f0e0138) — fps=60, frames=30, mono=false
+R.raw.qr_matrix (0x7f0e00f0) — fps=60, frames=180, mono=false
+R.raw.msg_emoji_smiles (0x7f0e00a3) — fps=60, frames=60, mono=false
+R.raw.tsv_monkey_close (0x7f0e0171) — fps=60, frames=98, mono=false
+R.raw.swipe_read (0x7f0e013b) — fps=60, frames=35, mono=false
+R.raw.tab_article (0x7f0e013f) — fps=60, frames=16, mono=false
+R.raw.camera_outline (0x7f0e001d) — fps=60, frames=86, mono=false
+R.raw.photo_text_allign (0x7f0e00ca) — fps=60, frames=60, mono=false
+R.raw.tab_gift (0x7f0e014e) — fps=60, frames=17, mono=false
+R.raw.error (0x7f0e004b) — fps=60, frames=120, mono=false
+R.raw.contact_check (0x7f0e0035) — fps=60, frames=45, mono=false
+R.raw.name_hide (0x7f0e00aa) — fps=60, frames=20, mono=false
+R.raw.tab_poll_reverse (0x7f0e0157) — fps=60, frames=5, mono=false
+R.raw.sound_off (0x7f0e010d) — fps=60, frames=61, mono=false
+R.raw.tab_music_reverse (0x7f0e0155) — fps=60, frames=5, mono=false
+R.raw.tsv_setup_monkey_idle1 (0x7f0e0178) — fps=60, frames=30, mono=false
+R.raw.tab_sticker (0x7f0e015b) — fps=60, frames=17, mono=false
+R.raw.phone_flash_call (0x7f0e00c0) — fps=60, frames=64, mono=false
+R.raw.utyan_newborn (0x7f0e0186) — fps=60, frames=180, mono=false
+R.raw.star_stroke (0x7f0e0124) — fps=60, frames=180, mono=false
+R.raw.bt_to_speaker (0x7f0e000a) — fps=60, frames=60, mono=false
+R.raw.caption_hide (0x7f0e0021) — fps=60, frames=20, mono=false
+R.raw.bot_webview_sheet_to_cross (0x7f0e0009) — fps=60, frames=22, mono=false
+R.raw.utyan_empty (0x7f0e0182) — fps=60, frames=180, mono=false
+R.raw.msg_emoji_cat (0x7f0e009e) — fps=60, frames=60, mono=false
+R.raw.photo_eraser (0x7f0e00c4) — fps=60, frames=30, mono=false
+R.raw.swipe_unread (0x7f0e013e) — fps=60, frames=36, mono=false
+R.raw.ic_boosts_replace (0x7f0e006e) — fps=60, frames=90, mono=false
+R.raw.stories_intro_go_to_next (0x7f0e012d) — fps=60, frames=39, mono=false
+R.raw.ic_save_to_gallery (0x7f0e0073) — fps=60, frames=65, mono=false
+R.raw.camera_flip (0x7f0e001a) — fps=60, frames=40, mono=false
+R.raw.addone_icon (0x7f0e0000) — fps=60, frames=120, mono=false
+R.raw.utyan_cache (0x7f0e017e) — fps=60, frames=180, mono=false
+R.raw.stories_intro_go_forward (0x7f0e012c) — fps=60, frames=38, mono=false
+R.raw.smile_to_gif (0x7f0e0107) — fps=60, frames=12, mono=false
+R.raw.tab_emoji (0x7f0e0148) — fps=60, frames=18, mono=false
+R.raw.permission_request_folder (0x7f0e00bb) — fps=60, frames=240, mono=false
+R.raw.speed_slow (0x7f0e0117) — fps=60, frames=72, mono=false
+R.raw.photo_blur (0x7f0e00c3) — fps=60, frames=30, mono=false
+R.raw.rate (0x7f0e00f2) — fps=60, frames=90, mono=false
+R.raw.gift (0x7f0e005f) — fps=60, frames=180, mono=false
+R.raw.ic_unpin (0x7f0e0078) — fps=60, frames=120, mono=false
+R.raw.swipe_delete (0x7f0e0137) — fps=60, frames=38, mono=false
+R.raw.import_progress (0x7f0e007c) — fps=60, frames=57, mono=false
+R.raw.timer_toast (0x7f0e0168) — fps=60, frames=41, mono=false
+R.raw.biz_clock (0x7f0e0003) — fps=60, frames=180, mono=false
+R.raw.topics_list (0x7f0e016b) — fps=60, frames=100, mono=false
+R.raw.safari_30 (0x7f0e0100) — fps=60, frames=180, mono=false
+R.raw.tab_location (0x7f0e0150) — fps=60, frames=17, mono=false
+R.raw.swipe_mute (0x7f0e0139) — fps=60, frames=35, mono=false
+R.raw.caption_down (0x7f0e0020) — fps=60, frames=35, mono=false
+R.raw.silent_unmute (0x7f0e0106) — fps=60, frames=58, mono=false
+R.raw.voice_outlined2 (0x7f0e0191) — fps=60, frames=84, mono=false
+R.raw.chats_swipearchive (0x7f0e002e) — fps=60, frames=120, mono=false
+R.raw.windows_30 (0x7f0e01ad) — fps=60, frames=180, mono=false
+R.raw.ic_unban (0x7f0e0076) — fps=60, frames=120, mono=false
+R.raw.phone_dots (0x7f0e00be) — fps=60, frames=60, mono=false
+R.raw.permission_request_location (0x7f0e00bc) — fps=60, frames=60, mono=false
+R.raw.large_lastseen (0x7f0e0088) — fps=60, frames=180, mono=false
+R.raw.chats_infotip (0x7f0e002d) — fps=60, frames=45, mono=false
+R.raw.tab_symbols (0x7f0e015d) — fps=60, frames=17, mono=false
+R.raw.star_premium_2 (0x7f0e011c) — fps=60, frames=50, mono=false
+R.raw.import_finish (0x7f0e007a) — fps=60, frames=120, mono=false
+R.raw.utyan_gigagroup (0x7f0e0185) — fps=60, frames=150, mono=false
+R.raw.giveaway_results (0x7f0e0065) — fps=60, frames=180, mono=false
+R.raw.transcribe (0x7f0e016e) — fps=60, frames=180, mono=false
+R.raw.bubble (0x7f0e000b) — fps=60, frames=180, mono=false
+R.raw.import_loop (0x7f0e007b) — fps=60, frames=180, mono=false
+R.raw.emoji_stars (0x7f0e004a) — fps=60, frames=180, mono=false
+R.raw.folder_share (0x7f0e0059) — fps=60, frames=91, mono=false
+R.raw.smile_to_sticker (0x7f0e0109) — fps=60, frames=12, mono=false
+R.raw.gift_crafting (0x7f0e0061) — fps=60, frames=47, mono=false
+R.raw.dartloop (0x7f0e003b) — fps=60, frames=90, mono=false
+R.raw.filter_new (0x7f0e004f) — fps=60, frames=120, mono=false
+R.raw.wallet_allset (0x7f0e01a4) — fps=60, frames=180, mono=false
+R.raw.photo_pen (0x7f0e00c7) — fps=60, frames=30, mono=false
+R.raw.tab_wallet_reverse (0x7f0e0160) — fps=60, frames=5, mono=false
+R.raw.speaker (0x7f0e0110) — fps=60, frames=34, mono=false
+R.raw.tsv_setup_monkey_idle2 (0x7f0e0179) — fps=60, frames=30, mono=false
+R.raw.fire_once (0x7f0e0055) — fps=60, frames=120, mono=false
+R.raw.transcribe_in (0x7f0e016f) — fps=60, frames=20, mono=false
+R.raw.tab_symbols_reverse (0x7f0e015e) — fps=60, frames=5, mono=false
+R.raw.voip_allow_talk (0x7f0e0196) — fps=60, frames=52, mono=false
+R.raw.forward (0x7f0e005a) — fps=60, frames=47, mono=false
+R.raw.speed_fast (0x7f0e0115) — fps=60, frames=75, mono=false
+R.raw.utyan_empty2 (0x7f0e0183) — fps=60, frames=180, mono=false
+R.raw.sun_outline (0x7f0e0134) — fps=60, frames=36, mono=false
+
+> Task :TMessagesProj_App:generateAfatReleaseStringResourceIdsAsset
+Generated 11284 string resource IDs: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj_App/build/generated/stringResourceIds/afatRelease/assets/string_resource_ids.bin
+Size: 90276 bytes
+
+> Task :TMessagesProj_App:mergeAfatReleaseAssets
+> Task :TMessagesProj_App:compressAfatReleaseAssets
+> Task :TMessagesProj_App:mergeAfatReleaseNativeDebugMetadata
+> Task :TMessagesProj:compileReleaseKotlin
+w: file:///home/runner/work/MilliyGram/MilliyGram/TMessagesProj/src/main/java/org/milliygram/ui/chat_finder/ChatFinder.kt:94:13 'fun setBackgroundDrawable(p0: Drawable!): Unit' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/MilliyGram/MilliyGram/TMessagesProj/src/main/java/org/milliygram/ui/confirmToSendMessages/ConfirmDialog.kt:20:30 'static fun getString(key: String!, res: Int): String!' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/MilliyGram/MilliyGram/TMessagesProj/src/main/java/org/milliygram/ui/confirmToSendMessages/ConfirmDialog.kt:25:30 'static fun getString(key: String!, res: Int): String!' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/MilliyGram/MilliyGram/TMessagesProj/src/main/java/org/milliygram/ui/onboarding/MilliyTour.kt:88:41 'static field statusBarHeight: Int' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/MilliyGram/MilliyGram/TMessagesProj/src/main/java/org/milliygram/utils/DeletedMsg.kt:78:29 Condition is always 'true'.
+w: file:///home/runner/work/MilliyGram/MilliyGram/TMessagesProj/src/main/java/org/milliygram/utils/EditMessage.kt:64:29 Condition is always 'true'.
+w: file:///home/runner/work/MilliyGram/MilliyGram/TMessagesProj/src/main/java/org/milliygram/utils/LanguageCode.kt:1872:52 'static fun getString(key: String!, res: Int): String!' is deprecated. Deprecated in Java.
+
+> Task :TMessagesProj:compileReleaseJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :TMessagesProj:mergeReleaseGeneratedProguardFiles
+> Task :TMessagesProj:exportReleaseConsumerProguardFiles
+> Task :TMessagesProj:processReleaseJavaRes
+> Task :TMessagesProj:bundleLibRuntimeToJarRelease
+> Task :TMessagesProj:bundleLibCompileToJarRelease
+> Task :TMessagesProj_App:mergeAfatReleaseJavaResource
+> Task :TMessagesProj_App:compileAfatReleaseJavaWithJavac
+> Task :TMessagesProj_App:mergeAfatReleaseGeneratedProguardFiles
+> Task :TMessagesProj_App:expandAfatReleaseArtProfileWildcards
+> Task :TMessagesProj_App:minifyAfatReleaseWithR8
+> Task :TMessagesProj_App:convertShrunkResourcesToBinaryAfatRelease
+> Task :TMessagesProj_App:optimizeAfatReleaseResources
+> Task :TMessagesProj_App:l8DexDesugarLibAfatRelease
+> Task :TMessagesProj_App:compileAfatReleaseArtProfile
+> Task :TMessagesProj_App:packageAfatRelease
+> Task :TMessagesProj_App:createAfatReleaseApkListingFileRedirect
+> Task :TMessagesProj_App:assembleAfatRelease
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_6-1794358611359.json
+
+[Incubating] Problems report is available at: file:///home/runner/work/MilliyGram/MilliyGram/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 24m 38s
+342 actionable tasks: 342 executed
