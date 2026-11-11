@@ -308,6 +308,16 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
         }
     }
 
+    /** MilliyGram: tasdiqlash tugmalari — yumaloq plitka (asosiysi biroz to'qroq) */
+    public static android.graphics.drawable.Drawable mgButtonBg(int color, Object tag) {
+        if (!mgTileItems()) {
+            return Theme.getRoundRectSelectorDrawable(dp(20), color);
+        }
+        boolean primary = tag instanceof Integer && (Integer) tag == Dialog.BUTTON_POSITIVE;
+        return Theme.createSimpleSelectorRoundRectDrawable(dp(14),
+                Theme.multAlpha(color, primary ? 0.14f : 0.07f), Theme.multAlpha(color, primary ? 0.26f : 0.16f));
+    }
+
     /** MilliyGram uslubidagi plitkali ro'yxat yoqilganmi */
     public static boolean mgTileItems() {
         return org.telegram.messenger.MgConfig.getBool("mg_tile_dialogs", true);
@@ -1144,7 +1154,7 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
                     @Override
                     public void setTextColor(int color) {
                         super.setTextColor(color);
-                        setBackground(Theme.getRoundRectSelectorDrawable(dp(20), color));
+                        setBackground(mgButtonBg(color, getTag()));
                     }
                 };
                 textView.setMinWidth(dp(64));
@@ -1154,7 +1164,7 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
                 textView.setGravity(Gravity.CENTER);
                 textView.setTypeface(AndroidUtilities.bold());
                 textView.setText(positiveButtonText);
-                textView.setBackground(Theme.getRoundRectSelectorDrawable(dp(20), getThemedColor(dialogButtonColorKey)));
+                textView.setBackground(mgButtonBg(getThemedColor(dialogButtonColorKey), textView.getTag()));
                 textView.setPadding(dp(12), 0, dp(12), 0);
                 if (verticalButtons) {
                     buttonsLayout.addView(textView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 40, Gravity.FILL_HORIZONTAL));
@@ -1183,7 +1193,7 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
                     @Override
                     public void setTextColor(int color) {
                         super.setTextColor(color);
-                        setBackground(Theme.getRoundRectSelectorDrawable(dp(20), color));
+                        setBackground(mgButtonBg(color, getTag()));
                     }
                 };
                 textView.setMinWidth(dp(64));
@@ -1195,7 +1205,7 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
                 textView.setEllipsize(TextUtils.TruncateAt.END);
                 textView.setSingleLine(true);
                 textView.setText(negativeButtonText.toString());
-                textView.setBackground(Theme.getRoundRectSelectorDrawable(dp(20), getThemedColor(dialogButtonColorKey)));
+                textView.setBackground(mgButtonBg(getThemedColor(dialogButtonColorKey), textView.getTag()));
                 textView.setPadding(dp(12), 0, dp(12), 0);
                 if (verticalButtons) {
                     buttonsLayout.addView(textView, 0, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 40, Gravity.FILL_HORIZONTAL));
@@ -1224,7 +1234,7 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
                     @Override
                     public void setTextColor(int color) {
                         super.setTextColor(color);
-                        setBackground(Theme.getRoundRectSelectorDrawable(dp(20), color));
+                        setBackground(mgButtonBg(color, getTag()));
                     }
                 };
                 textView.setMinWidth(dp(64));
@@ -1236,7 +1246,7 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
                 textView.setEllipsize(TextUtils.TruncateAt.END);
                 textView.setSingleLine(true);
                 textView.setText(neutralButtonText.toString());
-                textView.setBackground(Theme.getRoundRectSelectorDrawable(dp(20), getThemedColor(dialogButtonColorKey)));
+                textView.setBackground(mgButtonBg(getThemedColor(dialogButtonColorKey), textView.getTag()));
                 textView.setPadding(dp(12), 0, dp(12), 0);
                 if (verticalButtons) {
                     buttonsLayout.addView(textView, 1, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 40, Gravity.FILL_HORIZONTAL));
@@ -1265,7 +1275,7 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
                     @Override
                     public void setTextColor(int color) {
                         super.setTextColor(color);
-                        setBackgroundDrawable(Theme.getRoundRectSelectorDrawable(dp(20), color));
+                        setBackgroundDrawable(mgButtonBg(color, getTag()));
                     }
                 };
                 textView.setMinWidth(dp(64));
@@ -1277,7 +1287,7 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
                 textView.setEllipsize(TextUtils.TruncateAt.END);
                 textView.setSingleLine(true);
                 textView.setText(negative2ButtonText.toString());
-                textView.setBackground(Theme.getRoundRectSelectorDrawable(dp(20), getThemedColor(dialogButtonColorKey)));
+                textView.setBackground(mgButtonBg(getThemedColor(dialogButtonColorKey), textView.getTag()));
                 textView.setPadding(dp(12), 0, dp(12), 0);
                 if (verticalButtons) {
                     buttonsLayout.addView(textView, 0, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 40, Gravity.FILL_HORIZONTAL));

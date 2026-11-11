@@ -202,6 +202,7 @@ public class ApplicationLoader extends Application {
         }
         applicationInited = true;
         NativeLoader.initNativeLibs(ApplicationLoader.applicationContext);
+        org.telegram.ui.MgVideoNotify.cleanupStale();
 
         try {
             LocaleController.getInstance(); //TODO improve

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="mg_widget_bg">#F21C2129</color>
+    <color name="mg_widget_text">#FFF2F4F7</color>
+    <color name="mg_widget_sub">#FF9AA4B0</color>
+</resources>

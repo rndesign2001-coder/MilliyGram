@@ -180,6 +180,18 @@ public class MgCustomForward {
         }
     }
 
+    /** Ikonkali chip (emoji o'rniga — barcha telefonlarda bir xil ko'rinadi) */
+    private static TextView chip(Context ctx, int icon, String label, View.OnClickListener l) {
+        TextView tv = chip(ctx, label, l);
+        android.graphics.drawable.Drawable d = ctx.getResources().getDrawable(icon).mutate();
+        d.setColorFilter(new android.graphics.PorterDuffColorFilter(Theme.getColor(Theme.key_dialogTextBlack), android.graphics.PorterDuff.Mode.SRC_IN));
+        int sz = AndroidUtilities.dp(18);
+        d.setBounds(0, 0, sz, sz);
+        tv.setCompoundDrawables(d, null, null, null);
+        tv.setCompoundDrawablePadding(AndroidUtilities.dp(6));
+        return tv;
+    }
+
     private static TextView chip(Context ctx, String label, View.OnClickListener l) {
         TextView tv = new TextView(ctx);
         tv.setText(label);
@@ -370,8 +382,8 @@ public class MgCustomForward {
         final LinearLayout tools = new ToolGrid(ctx);
         root.addView(tools, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 20, 0, 20, 6));
 
-        tools.addView(chip(ctx, org.telegram.messenger.MgLang.t("↺ Asl matn"), v -> edit.setText(st.originalText)), null);
-        tools.addView(chip(ctx, org.telegram.messenger.MgLang.t("🔗 Havolalarni o'chirish"), v -> {
+        tools.addView(chip(ctx, R.drawable.msg_reset, org.telegram.messenger.MgLang.t("Asl matn"), v -> edit.setText(st.originalText)), null);
+        tools.addView(chip(ctx, R.drawable.msg_link2, org.telegram.messenger.MgLang.t("Havolalarni o'chirish"), v -> {
             Editable e = edit.getText();
             if (e == null) return;
             int removed = 0;
@@ -381,7 +393,7 @@ public class MgCustomForward {
             }
             say.run(removed > 0 ? org.telegram.messenger.MgLang.t("✓ Yashirin havolalar olib tashlandi: ") + removed : org.telegram.messenger.MgLang.t("Yashirin havola topilmadi"));
         }), null);
-        tools.addView(chip(ctx, org.telegram.messenger.MgLang.t("🧽 @ va linklarni tozalash"), v -> {
+        tools.addView(chip(ctx, R.drawable.msg_clear, org.telegram.messenger.MgLang.t("@ va linklarni tozalash"), v -> {
             Editable e = edit.getText();
             if (e == null) return;
             ArrayList<int[]> ranges = new ArrayList<>();
@@ -395,7 +407,7 @@ public class MgCustomForward {
             cleanupWhitespace(e);
             say.run(ranges.isEmpty() ? org.telegram.messenger.MgLang.t("Tozalanadigan narsa topilmadi") : org.telegram.messenger.MgLang.t("✓ Tozalandi: ") + ranges.size() + org.telegram.messenger.MgLang.t(" ta"));
         }), null);
-        tools.addView(chip(ctx, org.telegram.messenger.MgLang.t("🧹 Formatsiz"), v -> {
+        tools.addView(chip(ctx, R.drawable.msg_text_outlined, org.telegram.messenger.MgLang.t("Formatsiz"), v -> {
             Editable e = edit.getText();
             if (e == null) return;
             for (CharacterStyle s : e.getSpans(0, e.length(), CharacterStyle.class)) {
@@ -405,10 +417,10 @@ public class MgCustomForward {
                 e.removeSpan(s);
             }
         }), null);
-        tools.addView(chip(ctx, org.telegram.messenger.MgLang.t("🔁 Almashtirish"), v -> showReplace(fragment, edit, say)), null);
-        tools.addView(chip(ctx, org.telegram.messenger.MgLang.t("✍️ Imzo"), v -> addSignature(fragment, edit, say)), null);
-        tools.addView(chip(ctx, org.telegram.messenger.MgLang.t("🌐 Tarjima"), v -> translateInEditor(fragment, account, edit, say, false)), null);
-        tools.addView(chip(ctx, org.telegram.messenger.MgLang.t("🌐+ Tarjimani qo'shish"), v -> translateInEditor(fragment, account, edit, say, true)), null);
+        tools.addView(chip(ctx, R.drawable.msg_replace, org.telegram.messenger.MgLang.t("Almashtirish"), v -> showReplace(fragment, edit, say)), null);
+        tools.addView(chip(ctx, R.drawable.msg_edit, org.telegram.messenger.MgLang.t("Imzo"), v -> addSignature(fragment, edit, say)), null);
+        tools.addView(chip(ctx, R.drawable.msg_translate, org.telegram.messenger.MgLang.t("Tarjima"), v -> translateInEditor(fragment, account, edit, say, false)), null);
+        tools.addView(chip(ctx, R.drawable.msg_translate, org.telegram.messenger.MgLang.t("Tarjimani qo'shish"), v -> translateInEditor(fragment, account, edit, say, true)), null);
 
         root.addView(sectionLabel(ctx, org.telegram.messenger.MgLang.t("3. Yuborish")), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 14, 24, 0));
         root.addView(optionsBox, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));

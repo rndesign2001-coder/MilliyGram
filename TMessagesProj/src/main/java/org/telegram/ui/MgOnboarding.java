@@ -84,7 +84,9 @@ public class MgOnboarding {
 
     private static ArrayList<Page> pages() {
         ArrayList<Page> list = new ArrayList<>();
-        list.add(new Page(null, MgLang.t("MilliyGram'ga xush kelibsiz!"), 0xFF1E6FD9, 0xFF050F33,
+        // birinchi sahifa va tugma ilova mavzusining urg'u rangidan olinadi
+        final int accent = org.telegram.ui.ActionBar.Theme.getColor(org.telegram.ui.ActionBar.Theme.key_featuredStickers_addButton);
+        list.add(new Page(null, MgLang.t("MilliyGram'ga xush kelibsiz!"), accent, ColorUtils.blendARGB(accent, 0xFF000000, 0.82f),
                 MgLang.t("Telegram'ning barcha imkoniyatlari va o'zbek foydalanuvchilari uchun qo'shimchalar"),
                 MgLang.t("Sozlamalar → MilliyGram bo'limida hammasi bir joyda"),
                 MgLang.t("Ma'lumotlaringiz faqat telefoningizda qoladi")));
@@ -727,6 +729,10 @@ public class MgOnboarding {
         private final long born = SystemClock.elapsedRealtime();
         private boolean pulse;
 
+        private static int btnAccent() {
+            return org.telegram.ui.ActionBar.Theme.getColor(org.telegram.ui.ActionBar.Theme.key_featuredStickers_addButton);
+        }
+
         @SuppressLint("ClickableViewAccessibility")
         ShineButton(Context ctx) {
             super(ctx);
@@ -734,7 +740,7 @@ public class MgOnboarding {
             setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
             setTypeface(AndroidUtilities.bold());
             setGravity(Gravity.CENTER);
-            GradientDrawable bg = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, new int[]{0xFF06B6D4, 0xFF3B82F6, 0xFF8B5CF6});
+            GradientDrawable bg = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, new int[]{ColorUtils.blendARGB(btnAccent(), 0xFFFFFFFF, 0.25f), btnAccent(), ColorUtils.blendARGB(btnAccent(), 0xFF000000, 0.25f)});
             bg.setCornerRadius(dp(27));
             setBackground(bg);
             setElevation(dp(6));

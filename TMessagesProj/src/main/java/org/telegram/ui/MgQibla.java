@@ -71,13 +71,36 @@ public class MgQibla {
     public static final int STYLE_GOLD = 0;
     public static final int STYLE_EMERALD = 1;
     public static final int STYLE_NIGHT = 2;
+    /** Ilova mavzusi ranglari (yorug'/tungi mavzuga moslashadi) */
+    public static final int STYLE_THEME = 3;
 
     public static String[] styleNames() {
-        return new String[]{MgLang.t("Oltin"), MgLang.t("Zumrad naqsh"), MgLang.t("Tungi")};
+        return new String[]{MgLang.t("Oltin"), MgLang.t("Zumrad naqsh"), MgLang.t("Tungi"), MgLang.t("Mavzu bo'yicha")};
     }
 
     public static int getStyle() {
-        return Math.max(0, Math.min(2, MgConfig.getInt("qibla_style", STYLE_GOLD)));
+        return Math.max(0, Math.min(3, MgConfig.getInt("qibla_style", STYLE_THEME)));
+    }
+
+    // Mavzu ranglari
+    static int themeBg() {
+        return org.telegram.ui.ActionBar.Theme.getColor(org.telegram.ui.ActionBar.Theme.key_windowBackgroundWhite);
+    }
+
+    static int themeBg2() {
+        return org.telegram.ui.ActionBar.Theme.getColor(org.telegram.ui.ActionBar.Theme.key_windowBackgroundGray);
+    }
+
+    static int themeText() {
+        return org.telegram.ui.ActionBar.Theme.getColor(org.telegram.ui.ActionBar.Theme.key_windowBackgroundWhiteBlackText);
+    }
+
+    static int themeAccent() {
+        return org.telegram.ui.ActionBar.Theme.getColor(org.telegram.ui.ActionBar.Theme.key_featuredStickers_addButton);
+    }
+
+    static int themeGreen() {
+        return org.telegram.ui.ActionBar.Theme.getColor(org.telegram.ui.ActionBar.Theme.key_windowBackgroundWhiteGreenText2);
     }
 
     public static void setStyle(int s) {
@@ -338,12 +361,12 @@ public class MgQibla {
             }
             boolean aligned = live && Math.abs(wrap(shown)) < 4f;
             paint.setStyle(Paint.Style.FILL);
-            paint.setShader(new RadialGradient(cx, cy, r, aligned ? 0xFF1E9E5A : 0xFF12325E, aligned ? 0xFF0B5E34 : 0xFF081A33, Shader.TileMode.CLAMP));
+            final int acc = aligned ? themeGreen() : themeAccent();
+            paint.setColor(org.telegram.ui.ActionBar.Theme.multAlpha(acc, 0.14f));
             canvas.drawCircle(cx, cy, r, paint);
-            paint.setShader(null);
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(AndroidUtilities.dp(1.5f));
-            paint.setColor(0xFFD4AF37);
+            paint.setColor(acc);
             canvas.drawCircle(cx, cy, r, paint);
             canvas.save();
             canvas.rotate(shown, cx, cy);
@@ -354,9 +377,9 @@ public class MgQibla {
             arrow.lineTo(cx - r * 0.26f, cy + r * 0.12f);
             arrow.close();
             paint.setStyle(Paint.Style.FILL);
-            paint.setColor(0xFFF5D76E);
+            paint.setColor(acc);
             canvas.drawPath(arrow, paint);
-            paint.setColor(0xFF111111);
+            paint.setColor(themeText());
             float ks = r * 0.22f;
             canvas.drawRect(cx - ks / 2, cy + r * 0.3f, cx + ks / 2, cy + r * 0.3f + ks, paint);
             paint.setColor(0xFFD4AF37);
@@ -479,6 +502,8 @@ public class MgQibla {
                     return 0xFFE9F5DB;
                 case STYLE_NIGHT:
                     return 0xFF64E3FF;
+                case STYLE_THEME:
+                    return themeAccent();
                 default:
                     return 0xFFD4AF37;
             }
@@ -495,6 +520,10 @@ public class MgQibla {
                     top = 0xFF05070C;
                     bottom = 0xFF000000;
                     break;
+                case STYLE_THEME:
+                    top = themeBg();
+                    bottom = themeBg2();
+                    break;
                 default:
                     top = 0xFF0D2248;
                     bottom = 0xFF040A17;
@@ -504,7 +533,9 @@ public class MgQibla {
             p.setShader(new LinearGradient(0, 0, 0, h, top, bottom, Shader.TileMode.CLAMP));
             c.drawRect(0, 0, w, h, p);
             p.setShader(null);
-            if (style != STYLE_EMERALD) {
+            if (style == STYLE_THEME) {
+                // mavzu uslubida bezaksiz toza fon
+            } else if (style != STYLE_EMERALD) {
                 // miltillovchi yulduzlar
                 for (int i = 0; i < stars.length / 3; i++) {
                     float a = 0.25f + 0.75f * (0.5f + 0.5f * (float) Math.sin(t * 1.6f + stars[i * 3 + 2]));
@@ -526,7 +557,7 @@ public class MgQibla {
             }
             // aniq yo'nalishda — nurli halqa
             if (glow > 0.01f) {
-                int col = style == STYLE_NIGHT ? 0x64E3FF : style == STYLE_EMERALD ? 0x9CFFB0 : 0xFFD76E;
+                int col = style == STYLE_THEME ? (themeAccent() & 0xFFFFFF) : style == STYLE_NIGHT ? 0x64E3FF : style == STYLE_EMERALD ? 0x9CFFB0 : 0xFFD76E;
                 float pulse = 1f + 0.05f * (float) Math.sin(t * 5f);
                 p.setShader(new RadialGradient(cx, cy, R * 1.45f * pulse, new int[]{((int) (glow * 150) << 24) | col, 0x00000000}, null, Shader.TileMode.CLAMP));
                 c.drawCircle(cx, cy, R * 1.45f * pulse, p);
@@ -550,6 +581,8 @@ public class MgQibla {
                 p.setShader(new RadialGradient(cx, cy, R, 0xFF16305E, 0xFF0A1830, Shader.TileMode.CLAMP));
             } else if (style == STYLE_EMERALD) {
                 p.setShader(new RadialGradient(cx, cy, R, 0xFF137049, 0xFF0A3F29, Shader.TileMode.CLAMP));
+            } else if (style == STYLE_THEME) {
+                p.setShader(new RadialGradient(cx, cy, R, themeBg(), org.telegram.ui.ActionBar.Theme.blendOver(themeBg2(), org.telegram.ui.ActionBar.Theme.multAlpha(themeAccent(), 0.08f)), Shader.TileMode.CLAMP));
             } else {
                 p.setShader(new RadialGradient(cx, cy, R, 0xFF0B1116, 0xFF020304, Shader.TileMode.CLAMP));
             }
@@ -612,7 +645,9 @@ public class MgQibla {
             path.lineTo(cx - R * 0.07f, cy - R * 0.1f);
             path.close();
             p.setStyle(Paint.Style.FILL);
-            if (style == STYLE_NIGHT) {
+            if (style == STYLE_THEME) {
+                p.setShader(new LinearGradient(cx, cy - R * 0.62f, cx, cy, acc, org.telegram.ui.ActionBar.Theme.multAlpha(acc, 0.55f), Shader.TileMode.CLAMP));
+            } else if (style == STYLE_NIGHT) {
                 p.setShader(new LinearGradient(cx, cy - R * 0.62f, cx, cy, 0xFF9CF0FF, 0xFF1A7FA0, Shader.TileMode.CLAMP));
             } else if (style == STYLE_EMERALD) {
                 p.setShader(new LinearGradient(cx, cy - R * 0.62f, cx, cy, 0xFFFFFFFF, 0xFF7ED9A4, Shader.TileMode.CLAMP));
@@ -662,7 +697,7 @@ public class MgQibla {
             path.lineTo(cx + AndroidUtilities.dp(10), y - AndroidUtilities.dp(4));
             path.close();
             p.setStyle(Paint.Style.FILL);
-            p.setColor(aligned ? 0xFF3CE08A : 0xFFFFFFFF);
+            p.setColor(aligned ? (style == STYLE_THEME ? themeGreen() : 0xFF3CE08A) : (style == STYLE_THEME ? themeText() : 0xFFFFFFFF));
             c.drawPath(path, p);
         }
 
@@ -670,7 +705,7 @@ public class MgQibla {
             p.setStyle(Paint.Style.FILL);
             p.setColor(accent());
             c.drawCircle(cx, cy, AndroidUtilities.dp(7), p);
-            p.setColor(0xFF000000);
+            p.setColor(style == STYLE_THEME ? themeBg() : 0xFF000000);
             c.drawCircle(cx, cy, AndroidUtilities.dp(3), p);
         }
 
@@ -680,6 +715,10 @@ public class MgQibla {
     }
 
     // ------------------------------------------------------------------ oyna
+
+    private static int overlayFg() {
+        return getStyle() == STYLE_THEME ? themeText() : 0xFFFFFFFF;
+    }
 
     public static void open(BaseFragment f) {
         Activity act = f == null ? null : f.getParentActivity();
@@ -717,13 +756,15 @@ public class MgQibla {
         String[] names = styleNames();
         ArrayList<TextView> chipViews = new ArrayList<>();
         Runnable paintChips = () -> {
+            int fg = overlayFg();
             for (int i = 0; i < chipViews.size(); i++) {
                 boolean sel = i == getStyle();
                 GradientDrawable bg = new GradientDrawable();
                 bg.setCornerRadius(AndroidUtilities.dp(18));
-                bg.setColor(sel ? 0x40FFFFFF : 0x14FFFFFF);
-                bg.setStroke(AndroidUtilities.dp(1), sel ? 0xFFFFFFFF : 0x40FFFFFF);
+                bg.setColor(org.telegram.ui.ActionBar.Theme.multAlpha(fg, sel ? 0.25f : 0.08f));
+                bg.setStroke(AndroidUtilities.dp(1), org.telegram.ui.ActionBar.Theme.multAlpha(fg, sel ? 1f : 0.25f));
                 chipViews.get(i).setBackground(bg);
+                chipViews.get(i).setTextColor(fg);
             }
         };
         for (int i = 0; i < names.length; i++) {
@@ -742,7 +783,6 @@ public class MgQibla {
             chipViews.add(chip);
             chips.addView(chip, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, 4, 0, 4, 0));
         }
-        paintChips.run();
 
         TextView gps = new TextView(act);
         gps.setTextColor(0xFFFFFFFF);
@@ -771,6 +811,29 @@ public class MgQibla {
         root.addView(title, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, 48, Gravity.TOP | Gravity.LEFT, 20, 28, 0, 0));
         title.setGravity(Gravity.CENTER_VERTICAL);
 
+        // Ustki matnlar uslubga (va ilova mavzusiga) mos rangda
+        Runnable recolor = () -> {
+            int fg = overlayFg();
+            status.setTextColor(fg);
+            info.setTextColor(org.telegram.ui.ActionBar.Theme.multAlpha(fg, 0.8f));
+            gps.setTextColor(fg);
+            gbg.setColor(org.telegram.ui.ActionBar.Theme.multAlpha(fg, 0.15f));
+            gps.setBackground(gbg);
+            close.setTextColor(fg);
+            title.setTextColor(fg);
+            paintChips.run();
+        };
+        recolor.run();
+        for (TextView chip : chipViews) {
+            chip.setOnClickListener(v -> {
+                int idx = chipViews.indexOf(chip);
+                setStyle(idx);
+                compass.setStyle(idx);
+                recolor.run();
+                v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+            });
+        }
+
         final int[] lastAcc = {SensorManager.SENSOR_STATUS_ACCURACY_HIGH};
         final boolean[] gotHeading = {false};
         Runnable fillInfo = () -> {
@@ -796,10 +859,10 @@ public class MgQibla {
             float off = compass.offset();
             if (compass.isAligned()) {
                 setIfChanged(status, MgLang.t("✅ Qibla aynan oldingizda"));
-                status.setTextColor(0xFF7CF5AE);
+                status.setTextColor(getStyle() == STYLE_THEME ? themeGreen() : 0xFF7CF5AE);
             } else {
                 setIfChanged(status, off > 0 ? MgLang.t("O'ngga buriling ") + Math.round(Math.abs(off)) + "° ➜" : "⬅ " + MgLang.t("Chapga buriling ") + Math.round(Math.abs(off)) + "°");
-                status.setTextColor(0xFFFFFFFF);
+                status.setTextColor(overlayFg());
             }
         };
 

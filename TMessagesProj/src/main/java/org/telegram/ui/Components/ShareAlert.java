@@ -1856,7 +1856,8 @@ public class ShareAlert extends BottomSheet implements NotificationCenter.Notifi
                 if (arrayList != null) {
                     for (int i = 0; i < arrayList.size(); ++i) {
                         DialogsSearchAdapter.RecentSearchObject recentSearchObject = arrayList.get(i);
-                        if (recentSearchObject.object instanceof TLRPC.Chat && !ChatObject.canWriteToChat((TLRPC.Chat) recentSearchObject.object)) {
+                        if (recentSearchObject.object instanceof TLRPC.Chat && !ChatObject.canWriteToChat((TLRPC.Chat) recentSearchObject.object)
+                                || org.telegram.messenger.MgConfig.isDialogHidden(currentAccount, recentSearchObject.did)) {
                             arrayList.remove(i);
                             i--;
                         }
@@ -2932,6 +2933,9 @@ public class ShareAlert extends BottomSheet implements NotificationCenter.Notifi
                 if (dialog.id == selfUserId) {
                     continue;
                 }
+                if (org.telegram.messenger.MgConfig.isDialogHidden(currentAccount, dialog.id)) {
+                    continue; // MilliyGram: yashirin chatlar ulashish oynasida ko'rinmaydi
+                }
                 if (!DialogObject.isEncryptedDialog(dialog.id)) {
                     if (DialogObject.isUserDialog(dialog.id)) {
                         if (dialog.folder_id == 1) {
@@ -3162,6 +3166,15 @@ public class ShareAlert extends BottomSheet implements NotificationCenter.Notifi
                 @Override
                 public void onDataSetChanged(int searchId) {
                     lastGlobalSearchId = searchId;
+                    // MilliyGram: yashirin chatlar server qidiruvida ham ko'rinmaydi
+                    ArrayList<TLObject> mgServer = searchAdapterHelper.getLocalServerSearch();
+                    for (int i = mgServer.size() - 1; i >= 0; i--) {
+                        TLObject o = mgServer.get(i);
+                        long did = o instanceof TLRPC.User ? ((TLRPC.User) o).id : o instanceof TLRPC.Chat ? -((TLRPC.Chat) o).id : 0;
+                        if (did != 0 && org.telegram.messenger.MgConfig.isDialogHidden(currentAccount, did)) {
+                            mgServer.remove(i);
+                        }
+                    }
                     if (lastLocalSearchId != searchId) {
                         searchResult.clear();
                     }
@@ -3388,6 +3401,14 @@ public class ShareAlert extends BottomSheet implements NotificationCenter.Notifi
                 if (gridView.getAdapter() != searchAdapter) {
                     topBeforeSwitch = getCurrentTop();
                     searchAdapter.notifyDataSetChanged();
+                }
+                for (int a = result.size() - 1; a >= 0; a--) {
+                    DialogSearchResult r = (DialogSearchResult) result.get(a);
+                    long rid = r.object instanceof TLRPC.User ? ((TLRPC.User) r.object).id
+                            : r.object instanceof TLRPC.Chat ? -((TLRPC.Chat) r.object).id : 0;
+                    if (rid != 0 && org.telegram.messenger.MgConfig.isDialogHidden(currentAccount, rid)) {
+                        result.remove(a); // MilliyGram
+                    }
                 }
                 for (int a = 0; a < result.size(); a++) {
                     DialogSearchResult obj = (DialogSearchResult) result.get(a);

@@ -1744,3 +1744,34 @@ Xabarga tezda o'tish: xabar raqami bo'yicha o'tish qo'shildi	Быстрый пе
 Media bo'limida belgilangan fayllarni Maxsus uzatish	Особая пересылка выбранных файлов в разделе медиа	Custom forward for selected files in the media section
 Uzatishda post havolasi endi qo'shilmaydi	При пересылке ссылка на пост больше не добавляется	Forwarding no longer adds the post link
 Dialoglar va ro'yxatlar yangi yumaloq uslubda	Диалоги и списки в новом скруглённом стиле	Dialogs and lists in a new rounded style
+O'chirilgan hisoblar	Удалённые аккаунты	Deleted accounts
+Oxirgi 1 soatda qo'shilganlar	Вступившие за последний час	Joined in the last hour
+Oxirgi 24 soatda qo'shilganlar	Вступившие за 24 часа	Joined in the last 24 hours
+Oxirgi 7 kunda qo'shilganlar	Вступившие за 7 дней	Joined in the last 7 days
+Rasmsiz va username'siz	Без фото и юзернейма	No photo and no username
+Hammasi	Все	All
+Belgilashni bekor qilish	Снять выделение	Clear selection
+Asosiy akkaunt	Основной аккаунт	Main account
+Mavzu bo'yicha	По теме	Match theme
+Asl matn	Исходный текст	Original text
+Havolalarni o'chirish	Удалить ссылки	Remove links
+@ va linklarni tozalash	Убрать @ и ссылки	Remove @ and links
+Tarjimani qo'shish	Добавить перевод	Add translation
+Oxirgi tanlov (	Последний выбор (	Last selection (
+Belgilanganlarni to'plam qilib saqlash (	Сохранить выбранные как набор (	Save selected as a set (
+To'plamni o'chirish…	Удалить набор…	Delete set…
+Arxivda qoldirish	Оставлять в архиве	Keep in archive
+Ovozi yoqilgan chatlar yangi xabar kelganda arxivdan chiqib ketadi. Arxivlangan chatlar arxivda qolishi uchun akkauntingizdagi \"Ovozli chatlarni arxivda qoldirish\" sozlamasini yoqaymi? Buni keyin Maxfiylik sozlamalaridan o'zgartirish mumkin.	Чаты со звуком покидают архив при новом сообщении. Включить в аккаунте настройку \"Оставлять чаты со звуком в архиве\", чтобы архивированные чаты оставались там? Её можно изменить позже в настройках конфиденциальности.	Unmuted chats leave the archive when a new message arrives. Turn on the account setting \"Keep unmuted chats archived\" so archived chats stay there? You can change it later in Privacy settings.
+Kerak emas	Не нужно	No thanks
+Kanal statistikasi	Статистика канала	Channel statistics
+Kanal ma'lumotida \"O'sish statistikasi\"ni yoqing	Включите \"Статистику роста\" в информации о канале	Turn on \"Growth statistics\" in channel info
+Kanal	Канал	Channel
+obunachi	подписчиков	subscribers
+24 soat: 	24 ч: 	24 h: 
+7 kun: 	7 дн: 	7 d: 
+Bosh ekran uchun kanal statistikasi vidjeti	Виджет статистики канала для главного экрана	Channel statistics home screen widget
+PIN-kod himoyasi kuchaytirildi, yashirin chatlar ro'yxati shifrlanadi	Защита PIN-кода усилена, список скрытых чатов шифруется	Stronger PIN protection, hidden chats list is encrypted
+Yashirin chatlar endi Ulashish oynasida ham ko'rinmaydi	Скрытые чаты больше не видны в окне «Поделиться»	Hidden chats no longer appear in the Share sheet
+\"Faqat o'zimdan o'chirish\" qilingan post qaytib chiqmaydi	Пост, удалённый «только у себя», больше не возвращается	Posts deleted \"only for me\" no longer come back
+Video bildirishnomasi endi surib o'chiriladi	Уведомление видео теперь можно смахнуть	Video notification can now be swiped away
+Tasdiqlash oynalari va menyular yangi yumaloq uslubda	Окна подтверждения и меню в новом скруглённом стиле	Confirmation dialogs and menus in the new rounded style

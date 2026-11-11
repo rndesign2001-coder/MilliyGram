@@ -268,8 +268,20 @@ public class MgConfig {
     }
 
     public static boolean checkLock(String scope, String secret) {
-        String h = prefs().getString(k(scope, "chat_pin_hash", "hidden_pin_hash"), null);
-        return h != null && h.equals(hash(secret));
+        String key = k(scope, "chat_pin_hash", "hidden_pin_hash");
+        String h = prefs().getString(key, null);
+        if (h == null) {
+            return false;
+        }
+        if (h.startsWith(HASH_V2)) {
+            return verifyV2(h, secret);
+        }
+        // eski (tuzsiz SHA-256) format: to'g'ri bo'lsa, yangi formatga ko'chiramiz
+        if (h.equals(legacyHash(secret))) {
+            prefs().edit().putString(key, hash(secret)).apply();
+            return true;
+        }
+        return false;
     }
 
     public static void removeLock(String scope) {
@@ -337,7 +349,63 @@ public class MgConfig {
         prefs().edit().putStringSet(lockedKey(account), set).apply();
     }
 
+    // PIN xeshi: har bir kod uchun tasodifiy tuz + PBKDF2 (ko'p marta takrorlanadi — tanlab topish qiyin)
+    private static final String HASH_V2 = "v2$";
+    private static final int PBKDF2_ITERATIONS = 20000;
+
+    private static String hex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder(bytes.length * 2);
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
+    }
+
+    private static byte[] unhex(String s) {
+        byte[] out = new byte[s.length() / 2];
+        for (int i = 0; i < out.length; i++) {
+            out[i] = (byte) Integer.parseInt(s.substring(i * 2, i * 2 + 2), 16);
+        }
+        return out;
+    }
+
+    private static byte[] pbkdf2(String secret, byte[] salt, int iterations) throws Exception {
+        javax.crypto.spec.PBEKeySpec spec = new javax.crypto.spec.PBEKeySpec(secret.toCharArray(), salt, iterations, 256);
+        try {
+            return javax.crypto.SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(spec).getEncoded();
+        } finally {
+            spec.clearPassword();
+        }
+    }
+
+    /** v2$<takror>$<tuz>$<xesh> */
     private static String hash(String pin) {
+        try {
+            byte[] salt = new byte[16];
+            new java.security.SecureRandom().nextBytes(salt);
+            return HASH_V2 + PBKDF2_ITERATIONS + "$" + hex(salt) + "$" + hex(pbkdf2(pin, salt, PBKDF2_ITERATIONS));
+        } catch (Throwable e) {
+            FileLog.e(e);
+            return legacyHash(pin);
+        }
+    }
+
+    private static boolean verifyV2(String stored, String secret) {
+        try {
+            String[] parts = stored.substring(HASH_V2.length()).split("\\$");
+            if (parts.length != 3) {
+                return false;
+            }
+            byte[] expected = unhex(parts[2]);
+            byte[] actual = pbkdf2(secret, unhex(parts[1]), Integer.parseInt(parts[0]));
+            return MessageDigest.isEqual(expected, actual);
+        } catch (Throwable e) {
+            FileLog.e(e);
+            return false;
+        }
+    }
+
+    private static String legacyHash(String pin) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] bytes = md.digest(("milliygram:" + pin).getBytes("UTF-8"));
@@ -545,6 +613,26 @@ public class MgConfig {
         return "hidden_dialogs_" + account;
     }
 
+    private static String hiddenEncKey(int account) {
+        return "hidden_enc_" + account;
+    }
+
+    /** Yashirin ro'yxatni shifrlab saqlaydi; Keystore ishlamasa — eski usulda */
+    private static void saveHidden(int account, java.util.Collection<Long> set) {
+        String enc = MgSecure.encrypt(android.text.TextUtils.join(",", set));
+        SharedPreferences.Editor editor = prefs().edit();
+        if (enc != null) {
+            editor.putString(hiddenEncKey(account), enc).remove(hiddenKey(account));
+        } else {
+            HashSet<String> strings = new HashSet<>();
+            for (Long id : set) {
+                strings.add(String.valueOf(id));
+            }
+            editor.putStringSet(hiddenKey(account), strings).remove(hiddenEncKey(account));
+        }
+        editor.apply();
+    }
+
     public static HashSet<Long> getHiddenDialogs(int account) {
         synchronized (hiddenSync) {
             HashSet<Long> cached = hiddenCache.get(account);
@@ -553,10 +641,30 @@ public class MgConfig {
             }
             HashSet<Long> result = new HashSet<>();
             try {
-                for (String s : prefs().getStringSet(hiddenKey(account), new HashSet<>())) {
-                    try {
-                        result.add(Long.parseLong(s));
-                    } catch (NumberFormatException ignore) {
+                String enc = prefs().getString(hiddenEncKey(account), null);
+                if (enc != null) {
+                    String plain = MgSecure.decrypt(enc);
+                    if (plain == null) {
+                        return result; // Keystore vaqtincha ishlamadi — keshlamaymiz, keyin qayta urinamiz
+                    }
+                    if (!plain.isEmpty()) {
+                        for (String s : plain.split(",")) {
+                            try {
+                                result.add(Long.parseLong(s));
+                            } catch (NumberFormatException ignore) {
+                            }
+                        }
+                    }
+                } else {
+                    // eski ochiq ro'yxat — o'qib, shifrlangan ko'rinishga ko'chiramiz
+                    for (String s : prefs().getStringSet(hiddenKey(account), new HashSet<>())) {
+                        try {
+                            result.add(Long.parseLong(s));
+                        } catch (NumberFormatException ignore) {
+                        }
+                    }
+                    if (!result.isEmpty()) {
+                        saveHidden(account, result);
                     }
                 }
             } catch (Throwable e) {
@@ -577,17 +685,18 @@ public class MgConfig {
 
     public static void setDialogHidden(int account, long dialogId, boolean hidden) {
         synchronized (hiddenSync) {
+            if (hiddenCache.get(account) == null && prefs().contains(hiddenEncKey(account)) && getHiddenDialogs(account).isEmpty()
+                    && hiddenCache.get(account) == null) {
+                FileLog.e("MgConfig: hidden list unavailable, not overwriting");
+                return;
+            }
             HashSet<Long> set = new HashSet<>(getHiddenDialogs(account));
             if (hidden) {
                 set.add(dialogId);
             } else {
                 set.remove(dialogId);
             }
-            HashSet<String> strings = new HashSet<>();
-            for (Long id : set) {
-                strings.add(String.valueOf(id));
-            }
-            prefs().edit().putStringSet(hiddenKey(account), strings).apply();
+            saveHidden(account, set);
             hiddenCache.put(account, set);
         }
     }

@@ -89,7 +89,7 @@ public class MgAccountMenu {
         sub.addText(displayName(account), 15);
         sub.addGap();
         boolean isMain = MgConfig.getMainAccount() == account;
-        sub.add(R.drawable.msg_home, isMain ? org.telegram.messenger.MgLang.t("✓ Asosiy akkaunt") : org.telegram.messenger.MgLang.t("Asosiy akkaunt sifatida tanlash"), () -> {
+        sub.add(R.drawable.msg_home, isMain ? org.telegram.messenger.MgLang.t("Asosiy akkaunt") : org.telegram.messenger.MgLang.t("Asosiy akkaunt sifatida tanlash"), () -> {
             o.dismiss();
             MgConfig.setMainAccount(isMain ? -1 : account);
             BulletinFactory.of(fragment).createSimpleBulletin(R.raw.contact_check,

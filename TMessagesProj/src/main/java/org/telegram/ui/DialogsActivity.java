@@ -12632,7 +12632,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         ArrayList<Integer> icons = new ArrayList<>();
         ArrayList<Runnable> actions = new ArrayList<>();
         if (!last.isEmpty()) {
-            names.add(org.telegram.messenger.MgLang.t("🕘 Oxirgi tanlov (") + last.size() + org.telegram.messenger.MgLang.t(" ta)"));
+            names.add(org.telegram.messenger.MgLang.t("Oxirgi tanlov (") + last.size() + org.telegram.messenger.MgLang.t(" ta)"));
             icons.add(R.drawable.msg_recent);
             actions.add(() -> mgSelectAll(last));
         }
@@ -12643,12 +12643,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             actions.add(() -> mgSelectAll(set.ids));
         }
         if (!selectedDialogs.isEmpty()) {
-            names.add(org.telegram.messenger.MgLang.t("➕ Belgilanganlarni to'plam qilib saqlash (") + selectedDialogs.size() + org.telegram.messenger.MgLang.t(" ta)"));
+            names.add(org.telegram.messenger.MgLang.t("Belgilanganlarni to'plam qilib saqlash (") + selectedDialogs.size() + org.telegram.messenger.MgLang.t(" ta)"));
             icons.add(R.drawable.msg_add);
             actions.add(this::mgSaveForwardSet);
         }
         if (!sets.isEmpty()) {
-            names.add(org.telegram.messenger.MgLang.t("🗑 To'plamni o'chirish…"));
+            names.add(org.telegram.messenger.MgLang.t("To'plamni o'chirish…"));
             icons.add(R.drawable.msg_delete);
             actions.add(() -> {
                 CharSequence[] n = new CharSequence[sets.size()];
@@ -12681,6 +12681,35 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
      * "Ovozli chatlarni arxivda qoldirish" sozlamasi yoqiladi.
      */
     private void mgKeepArchived() {
+        // 0 — hali so'ralmagan, 1 — rozi, 2 — rad etgan
+        int choice = org.telegram.messenger.MgConfig.getInt("keep_archived_choice", 0);
+        if (choice == 2) {
+            return;
+        }
+        if (choice == 1) {
+            mgApplyKeepArchived();
+            return;
+        }
+        TLRPC.GlobalPrivacySettings current = getContactsController().getGlobalPrivacySettings();
+        if (current != null && current.keep_archived_unmuted && current.keep_archived_folders) {
+            org.telegram.messenger.MgConfig.setInt("keep_archived_choice", 1);
+            return;
+        }
+        if (getParentActivity() == null) {
+            return;
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+        builder.setTitle(org.telegram.messenger.MgLang.t("Arxivda qoldirish"));
+        builder.setMessage(org.telegram.messenger.MgLang.t("Ovozi yoqilgan chatlar yangi xabar kelganda arxivdan chiqib ketadi. Arxivlangan chatlar arxivda qolishi uchun akkauntingizdagi \"Ovozli chatlarni arxivda qoldirish\" sozlamasini yoqaymi? Buni keyin Maxfiylik sozlamalaridan o'zgartirish mumkin."));
+        builder.setPositiveButton(org.telegram.messenger.MgLang.t("Yoqish"), (d, w) -> {
+            org.telegram.messenger.MgConfig.setInt("keep_archived_choice", 1);
+            mgApplyKeepArchived();
+        });
+        builder.setNegativeButton(org.telegram.messenger.MgLang.t("Kerak emas"), (d, w) -> org.telegram.messenger.MgConfig.setInt("keep_archived_choice", 2));
+        showDialog(builder.create());
+    }
+
+    private void mgApplyKeepArchived() {
         try {
             TLRPC.GlobalPrivacySettings settings = getContactsController().getGlobalPrivacySettings();
             if (settings == null) {

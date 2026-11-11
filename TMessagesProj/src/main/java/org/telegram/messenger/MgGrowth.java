@@ -175,6 +175,17 @@ public final class MgGrowth {
             sb.append(p.time).append(':').append(p.count);
         }
         MgConfig.setString(key(account, chatId), sb.toString());
+        // vidjet uchun: kanal nomi va ro'yxat
+        try {
+            TLRPC.Chat chat = MessagesController.getInstance(account).getChat(chatId);
+            if (chat != null && chat.title != null) {
+                MgConfig.setString("gr_name_" + account + "_" + chatId, chat.title);
+            }
+            MgStatsWidget.remember(account, chatId);
+            MgStatsWidget.updateAll(ApplicationLoader.applicationContext);
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
     }
 
     private static boolean due(int account, long chatId) {

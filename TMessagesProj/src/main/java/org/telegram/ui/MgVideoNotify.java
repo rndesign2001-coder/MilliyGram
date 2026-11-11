@@ -42,6 +42,7 @@ public class MgVideoNotify {
     private static final String ACTION_TOGGLE = "org.milliygram.video.TOGGLE";
     private static final String ACTION_BACK = "org.milliygram.video.BACK";
     private static final String ACTION_FWD = "org.milliygram.video.FWD";
+    private static final String ACTION_DISMISS = "org.milliygram.video.DISMISS";
 
     private static Controller controller;
     private static MediaSession session;
@@ -68,6 +69,21 @@ public class MgVideoNotify {
             ensureSession();
             ensureReceiver();
             post();
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
+    }
+
+    /**
+     * Ilova jarayoni tizim tomonidan yopilgan bo'lsa, oldingi seansdan qolgan bildirishnoma
+     * va media seansini tozalaydi. Ilova ishga tushganda chaqiriladi.
+     */
+    public static void cleanupStale() {
+        try {
+            NotificationManager nm = (NotificationManager) ctx().getSystemService(Context.NOTIFICATION_SERVICE);
+            if (nm != null && controller == null) {
+                nm.cancel(ID);
+            }
         } catch (Throwable e) {
             FileLog.e(e);
         }
@@ -160,6 +176,7 @@ public class MgVideoNotify {
         f.addAction(ACTION_TOGGLE);
         f.addAction(ACTION_BACK);
         f.addAction(ACTION_FWD);
+        f.addAction(ACTION_DISMISS);
         if (Build.VERSION.SDK_INT >= 33) {
             ctx().registerReceiver(receiver, f, Context.RECEIVER_NOT_EXPORTED);
         } else {
@@ -174,6 +191,14 @@ public class MgVideoNotify {
             return;
         }
         try {
+            if (ACTION_DISMISS.equals(action)) {
+                // foydalanuvchi surib o'chirdi — videoni to'xtatamiz, qayta chiqarmaymiz
+                shown = false;
+                if (c.isPlaying()) {
+                    c.toggle();
+                }
+                return;
+            }
             if (ACTION_TOGGLE.equals(action)) {
                 if (wantPlay == null || wantPlay != c.isPlaying()) {
                     c.toggle();
@@ -230,7 +255,9 @@ public class MgVideoNotify {
                 .setContentText(org.telegram.messenger.MgLang.t("Video"))
                 .setOnlyAlertOnce(true)
                 .setShowWhen(false)
-                .setOngoing(playing)
+                .setOngoing(false)
+                .setAutoCancel(false)
+                .setDeleteIntent(pi(ACTION_DISMISS, 4))
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setContentIntent(PendingIntent.getActivity(ctx(), 0x4D47, open, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
                 .addAction(new Notification.Action.Builder(R.drawable.ic_action_previous, org.telegram.messenger.MgLang.t("10 s orqaga"), pi(ACTION_BACK, 1)).build())

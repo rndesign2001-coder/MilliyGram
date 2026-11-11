@@ -11978,7 +11978,7 @@ public class MessagesController extends BaseController implements NotificationCe
             FileLog.d("processLoadedMessages size " + messagesRes.messages.size() + " in chat " + dialogId + " topic_id " + threadMessageId + " count " + count + " max_id " + max_id + " cache " + isCache + " guid " + classGuid + " load_type " + load_type + " last_message_id " + last_message_id + " index " + loadIndex + " firstUnread " + first_unread + " unread_count " + unread_count + " last_date " + last_date + " queryFromServer " + queryFromServer + " isTopic " + isTopic + " mode " + mode);
         }
         Timer.Task t1 = Timer.start(loaderLogger, "processLoadedMessages");
-        if (!isCache && mode == 0) {
+        if (mode == 0) {
             try {
                 MgLocalDelete.filter(currentAccount, dialogId, messagesRes.messages); // MilliyGram: o'zidan o'chirilgan xabarlar
             } catch (Throwable ignore) {
@@ -13360,6 +13360,7 @@ public class MessagesController extends BaseController implements NotificationCe
 
     public void processLoadedDialogs(final TLRPC.messages_Dialogs dialogsRes, ArrayList<TLRPC.EncryptedChat> encChats, ArrayList<TLRPC.UserFull> fullUsers, int folderId, int offset, int count, int loadType, boolean resetEnd, boolean migrate, boolean fromCache) {
         Utilities.stageQueue.postRunnable(() -> {
+            MgLocalDelete.filterTop(currentAccount, dialogsRes.messages); // MilliyGram: o'zidan o'chirilgan oxirgi post
             if (!firstGettingTask) {
                 getNewDeleteTask(null, null);
                 firstGettingTask = true;
@@ -14102,6 +14103,7 @@ public class MessagesController extends BaseController implements NotificationCe
 
     public void processDialogsUpdate(final TLRPC.messages_Dialogs dialogsRes, ArrayList<TLRPC.EncryptedChat> encChats, boolean fromCache) {
         Utilities.stageQueue.postRunnable(() -> {
+            MgLocalDelete.filterTop(currentAccount, dialogsRes.messages); // MilliyGram
             LongSparseArray<TLRPC.Dialog> new_dialogs_dict = new LongSparseArray<>();
             LongSparseArray<ArrayList<MessageObject>> new_dialogMessage = new LongSparseArray<>();
             LongSparseArray<TLRPC.User> usersDict = new LongSparseArray<>(dialogsRes.users.size());

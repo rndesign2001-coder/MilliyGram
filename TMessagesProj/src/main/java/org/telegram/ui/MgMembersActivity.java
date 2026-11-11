@@ -309,18 +309,20 @@ public class MgMembersActivity extends UniversalFragment {
             return;
         }
         CharSequence[] opts = {
-                org.telegram.messenger.MgLang.t("👻 O'chirilgan hisoblar"),
-                org.telegram.messenger.MgLang.t("🤖 Botlar"),
-                org.telegram.messenger.MgLang.t("🕐 Oxirgi 1 soatda qo'shilganlar"),
-                org.telegram.messenger.MgLang.t("📅 Oxirgi 24 soatda qo'shilganlar"),
-                org.telegram.messenger.MgLang.t("📆 Oxirgi 7 kunda qo'shilganlar"),
-                org.telegram.messenger.MgLang.t("🎭 Rasmsiz va username'siz"),
-                org.telegram.messenger.MgLang.t("☑️ Hammasi"),
-                org.telegram.messenger.MgLang.t("✖️ Belgilashni bekor qilish")
+                org.telegram.messenger.MgLang.t("O'chirilgan hisoblar"),
+                org.telegram.messenger.MgLang.t("Botlar"),
+                org.telegram.messenger.MgLang.t("Oxirgi 1 soatda qo'shilganlar"),
+                org.telegram.messenger.MgLang.t("Oxirgi 24 soatda qo'shilganlar"),
+                org.telegram.messenger.MgLang.t("Oxirgi 7 kunda qo'shilganlar"),
+                org.telegram.messenger.MgLang.t("Rasmsiz va username'siz"),
+                org.telegram.messenger.MgLang.t("Hammasi"),
+                org.telegram.messenger.MgLang.t("Belgilashni bekor qilish")
         };
         AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
         b.setTitle(org.telegram.messenger.MgLang.t("Tez belgilash"));
-        b.setItems(opts, (d, w) -> {
+        int[] icons = {R.drawable.msg_user_remove, R.drawable.msg_bot, R.drawable.msg_recent, R.drawable.msg_calendar2,
+                R.drawable.msg_calendar, R.drawable.msg_contacts, R.drawable.msg_select, R.drawable.msg_cancel};
+        b.setItems(opts, icons, (d, w) -> {
             int now = ConnectionsManager.getInstance(currentAccount).getCurrentTime();
             int before = selected.size();
             if (w == 7) {

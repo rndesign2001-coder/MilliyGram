@@ -1159,6 +1159,13 @@ public class BottomSheet extends Dialog implements BaseFragment.AttachedSheet {
             return imageView;
         }
 
+        /** MilliyGram: yumaloq plitka ko'rinishi */
+        public void mgApplyTileStyle() {
+            final int text = getThemedColor(Theme.key_dialogTextBlack);
+            setBackground(Theme.createSimpleSelectorRoundRectDrawable(AndroidUtilities.dp(14),
+                    Theme.multAlpha(text, 0.06f), Theme.multAlpha(text, 0.14f)));
+        }
+
         protected int getThemedColor(int key) {
             return Theme.getColor(key, resourcesProvider);
         }
@@ -1470,8 +1477,15 @@ public class BottomSheet extends Dialog implements BaseFragment.AttachedSheet {
                     }
                     BottomSheetCell cell = new BottomSheetCell(getContext(), cellType, resourcesProvider);
                     cell.setTextAndIcon(items[a], itemIcons != null ? itemIcons[a] : 0, null, bigTitle);
-                    containerView.addView(cell, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 48, Gravity.LEFT | Gravity.TOP, 0, topOffset, 0, 0));
-                    topOffset += 48;
+                    if (cellType == 0 && AlertDialog.mgTileItems()) {
+                        // MilliyGram: pastki menyu elementlari — yumaloq plitkalar
+                        cell.mgApplyTileStyle();
+                        containerView.addView(cell, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 46, Gravity.LEFT | Gravity.TOP, 12, topOffset + 2, 12, 0));
+                        topOffset += 50;
+                    } else {
+                        containerView.addView(cell, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 48, Gravity.LEFT | Gravity.TOP, 0, topOffset, 0, 0));
+                        topOffset += 48;
+                    }
                     cell.setTag(a);
                     cell.setOnClickListener(v -> dismissWithButtonClick((Integer) v.getTag()));
                     itemViews.add(cell);

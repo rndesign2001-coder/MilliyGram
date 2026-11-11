@@ -263,11 +263,12 @@ public final class MgUpdater {
 
     /** Joriy versiyadagi yangiliklar ("Yangi versiyada nimalar bor" oynasi uchun) */
     private static final String[] WHATS_NEW = {
-            "Xabar tafsilotlari yangi ko'rinishda: HTML kod va custom emoji IDlarini bir bosishda nusxalash",
-            "Xabarga tezda o'tish: xabar raqami bo'yicha o'tish qo'shildi",
-            "Media bo'limida belgilangan fayllarni Maxsus uzatish",
-            "Uzatishda post havolasi endi qo'shilmaydi",
-            "Dialoglar va ro'yxatlar yangi yumaloq uslubda",
+            "Bosh ekran uchun kanal statistikasi vidjeti",
+            "PIN-kod himoyasi kuchaytirildi, yashirin chatlar ro'yxati shifrlanadi",
+            "Yashirin chatlar endi Ulashish oynasida ham ko'rinmaydi",
+            "\"Faqat o'zimdan o'chirish\" qilingan post qaytib chiqmaydi",
+            "Video bildirishnomasi endi surib o'chiriladi",
+            "Tasdiqlash oynalari va menyular yangi yumaloq uslubda",
     };
 
     /** Ilova yangilangandan keyingi birinchi ochilishda yangiliklarni bir marta ko'rsatadi */

@@ -90,6 +90,31 @@ public class MgLocalDelete {
         }
     }
 
+    /** Chatlar ro'yxati (server yoki kesh) uchun oxirgi xabarlardan o'zidan o'chirilganlarini olib tashlaydi */
+    public static void filterTop(int account, ArrayList<TLRPC.Message> messages) {
+        if (messages == null || messages.isEmpty()) {
+            return;
+        }
+        try {
+            for (int i = messages.size() - 1; i >= 0; i--) {
+                TLRPC.Message m = messages.get(i);
+                if (m == null || m.peer_id == null) {
+                    continue;
+                }
+                long did = MessageObject.getDialogId(m);
+                if (did >= 0) {
+                    continue;
+                }
+                HashSet<Integer> set = get(account, did);
+                if (!set.isEmpty() && set.contains(m.id)) {
+                    messages.remove(i);
+                }
+            }
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
+    }
+
     /** Admin huquqi bo'lmagan kanal/guruhdagi xabarni o'zidan o'chirish mumkinmi */
     public static boolean canDeleteLocally(MessageObject message, TLRPC.Chat chat) {
         return message != null && chat != null && message.getId() > 0 && !message.isSponsored()
