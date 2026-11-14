@@ -414,7 +414,11 @@ public final class MgGrowth {
 
     /** Admin jurnali (oxirgi 48 soat): kirganlar/chiqqanlar voqealarini kunlar bo'yicha sanaydi */
     private static void loadAdminLog(int account, long chatId, Runnable done) {
-        long lastSeen = Long.parseLong(MgConfig.getString("grd_last_" + account + "_" + chatId, "0"));
+        long lastSeen = 0;
+        try {
+            lastSeen = Long.parseLong(MgConfig.getString("grd_last_" + account + "_" + chatId, "0"));
+        } catch (Throwable ignore) {
+        }
         java.util.TreeMap<Integer, int[]> add = new java.util.TreeMap<>();
         long[] maxSeen = {lastSeen};
         pageAdminLog(account, chatId, 0, lastSeen, add, maxSeen, 0, () -> {

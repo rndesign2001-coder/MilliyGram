@@ -186,7 +186,11 @@ public class MgMembersActivity extends UniversalFragment {
 
     private static int parseWait(String t) {
         Matcher m = Pattern.compile("(\\d+)").matcher(t);
-        return m.find() ? Math.min(Integer.parseInt(m.group(1)), 300) : 5;
+        if (!m.find()) {
+            return 5;
+        }
+        String d = m.group(1);
+        return d.length() > 4 ? 300 : Math.min(Integer.parseInt(d), 300); // juda katta son — chegaraga keltiramiz
     }
 
     // ================= Ro'yxat =================
