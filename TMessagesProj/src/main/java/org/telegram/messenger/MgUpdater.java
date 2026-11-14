@@ -263,12 +263,8 @@ public final class MgUpdater {
 
     /** Joriy versiyadagi yangiliklar ("Yangi versiyada nimalar bor" oynasi uchun) */
     private static final String[] WHATS_NEW = {
-            "Bosh ekran uchun kanal statistikasi vidjeti",
-            "PIN-kod himoyasi kuchaytirildi, yashirin chatlar ro'yxati shifrlanadi",
-            "Yashirin chatlar endi Ulashish oynasida ham ko'rinmaydi",
-            "\"Faqat o'zimdan o'chirish\" qilingan post qaytib chiqmaydi",
-            "Video bildirishnomasi endi surib o'chiriladi",
-            "Tasdiqlash oynalari va menyular yangi yumaloq uslubda",
+            "\"Hadya yuborish\" Sozlamalarda va profil menyusida",
+            "Web ilovalardan do'stlarga ulashishda ilova yopilib qolishi tuzatildi",
     };
 
     /** Ilova yangilangandan keyingi birinchi ochilishda yangiliklarni bir marta ko'rsatadi */

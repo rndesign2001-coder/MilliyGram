@@ -309,6 +309,7 @@ public class ApplicationLoader extends Application {
         }
 
         super.onCreate();
+        MgCrash.install(); // MilliyGram: kutilmagan yopilish sababini saqlash
 
         // AndroidUtilities must be initialized before FileLog
         final String helloWorld = AndroidUtilities.getHelloWorld();

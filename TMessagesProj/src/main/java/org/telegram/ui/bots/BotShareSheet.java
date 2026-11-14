@@ -86,7 +86,7 @@ public class BotShareSheet extends BottomSheetWithRecyclerListView {
                     if (!TextUtils.isEmpty(m.url)) {
                         final Runnable callback = loadWebPagePreview(currentAccount, m.url, webpage -> {
                             progressDialog.dismiss();
-                            new BotShareSheet(context, currentAccount, botId, result, null, webpage, resourcesProvider, whenOpened, whenDone).show();
+                            mgSafeShow(context, currentAccount, botId, result, null, webpage, resourcesProvider, whenOpened, whenDone);
                         });
                         progressDialog.setOnCancelListener(di -> callback.run());
                         return;
@@ -95,7 +95,7 @@ public class BotShareSheet extends BottomSheetWithRecyclerListView {
                 final File[] finalFile = new File[1];
                 final Runnable open = () -> {
                     progressDialog.dismiss();
-                    new BotShareSheet(context, currentAccount, botId, result, finalFile[0], null, resourcesProvider, whenOpened, whenDone).show();
+                    mgSafeShow(context, currentAccount, botId, result, finalFile[0], null, resourcesProvider, whenOpened, whenDone);
                 };
                 if (result != null && result.result.content != null && !TextUtils.isEmpty(result.result.content.url) && (
                     result.result.send_message instanceof TLRPC.TL_botInlineMessageMediaAuto ||
@@ -134,6 +134,23 @@ public class BotShareSheet extends BottomSheetWithRecyclerListView {
         }));
     }
 
+    /** MilliyGram: ko'rinishni yaratishda xato bo'lsa, butun ilova yopilmasin */
+    private static void mgSafeShow(Context context, int currentAccount, long botId, TLRPC.TL_messages_preparedInlineMessage result, File file, TLRPC.WebPage webpage,
+                                   Theme.ResourcesProvider resourcesProvider, Runnable whenOpened, Utilities.Callback2<String, ArrayList<Long>> whenDone) {
+        try {
+            new BotShareSheet(context, currentAccount, botId, result, file, webpage, resourcesProvider, whenOpened, whenDone).show();
+        } catch (Throwable e) {
+            FileLog.e(e);
+            org.telegram.messenger.MgCrash.remember(e);
+            if (whenDone != null) {
+                try {
+                    whenDone.run("UNKNOWN_ERROR", null);
+                } catch (Throwable ignore) {
+                }
+            }
+        }
+    }
+
     public static Runnable loadWebPagePreview(int currentAccount, String url, Utilities.Callback<TLRPC.WebPage> whenLoaded) {
         final int[] reqId = new int[1];
         final NotificationCenter.NotificationCenterDelegate[] delegateToRemove = new NotificationCenter.NotificationCenterDelegate[1];
@@ -142,7 +159,8 @@ public class BotShareSheet extends BottomSheetWithRecyclerListView {
         req.message = url;
         reqId[0] = ConnectionsManager.getInstance(currentAccount).sendRequestTyped(req, AndroidUtilities::runOnUIThread, (res, err) -> {
             reqId[0] = -1;
-            if (res.media instanceof TLRPC.TL_messageMediaEmpty || res.media.webpage instanceof TLRPC.TL_webPageEmpty) {
+            // MilliyGram: server xato qaytarsa (res == null) ilova yiqilmasin — havolasiz ko'rinish bilan davom etamiz
+            if (res == null || res.media == null || res.media instanceof TLRPC.TL_messageMediaEmpty || res.media.webpage instanceof TLRPC.TL_webPageEmpty) {
                 whenLoaded.run(null);
                 return;
             }
@@ -158,7 +176,7 @@ public class BotShareSheet extends BottomSheetWithRecyclerListView {
                                 if (webPages != null && webPages.containsKey(pendingId)) {
                                     final TLRPC.WebPage webpage = webPages.get(pendingId);
                                     if (delegateToRemove[0] != null) {
-                                        NotificationCenter.getInstance(currentAccount).addObserver(delegateToRemove[0], NotificationCenter.didReceivedWebpagesInUpdates);
+                                        NotificationCenter.getInstance(currentAccount).removeObserver(delegateToRemove[0], NotificationCenter.didReceivedWebpagesInUpdates);
                                         delegateToRemove[0] = null;
                                     }
                                     whenLoaded.run(webpage instanceof TLRPC.TL_webPage ? webpage : null);
@@ -181,7 +199,7 @@ public class BotShareSheet extends BottomSheetWithRecyclerListView {
                 reqId[0] = -1;
             }
             if (delegateToRemove[0] != null) {
-                NotificationCenter.getInstance(currentAccount).addObserver(delegateToRemove[0], NotificationCenter.didReceivedWebpagesInUpdates);
+                NotificationCenter.getInstance(currentAccount).removeObserver(delegateToRemove[0], NotificationCenter.didReceivedWebpagesInUpdates);
                 delegateToRemove[0] = null;
             }
         };

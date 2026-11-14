@@ -1775,3 +1775,7 @@ Yashirin chatlar endi Ulashish oynasida ham ko'rinmaydi	Скрытые чаты 
 \"Faqat o'zimdan o'chirish\" qilingan post qaytib chiqmaydi	Пост, удалённый «только у себя», больше не возвращается	Posts deleted \"only for me\" no longer come back
 Video bildirishnomasi endi surib o'chiriladi	Уведомление видео теперь можно смахнуть	Video notification can now be swiped away
 Tasdiqlash oynalari va menyular yangi yumaloq uslubda	Окна подтверждения и меню в новом скруглённом стиле	Confirmation dialogs and menus in the new rounded style
+Xatolik qayd etildi	Зафиксирована ошибка	An error was recorded
+Oldingi safar ilovada xatolik yuz berdi. Uni tuzatishimiz uchun xato matnini nusxalab, dasturchiga yuboring. Matnda faqat texnik ma'lumot bor.	В прошлый раз в приложении произошла ошибка. Скопируйте текст ошибки и отправьте разработчику, чтобы мы её исправили. В тексте только техническая информация.	The app ran into an error last time. Copy the error text and send it to the developer so we can fix it. It contains only technical information.
+\"Hadya yuborish\" Sozlamalarda va profil menyusida	«Отправить подарок» в настройках и меню профиля	\"Send a gift\" in Settings and the profile menu
+Web ilovalardan do'stlarga ulashishda ilova yopilib qolishi tuzatildi	Исправлено закрытие приложения при отправке друзьям из веб-приложений	Fixed the app closing when sharing to friends from web apps
