@@ -24,6 +24,9 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Gradle uchun kerakli submodullar
+        run: git submodule update --init --recursive --depth 1 --jobs 4 TMessagesProj_Modules/media TMessagesProj/lib/jlatexmath
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
