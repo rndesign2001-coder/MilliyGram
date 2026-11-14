@@ -4,6 +4,9 @@ name: Java tekshiruvi (tez)
 # Natija ci-check branch'idagi log.txt ga yoziladi.
 on:
   workflow_dispatch:
+  push:
+    branches: [ 'claude/**' ]
+    paths: [ 'TMessagesProj/src/**', 'TMessagesProj_App/src/**', '**.gradle', 'gradle.properties', '.github/workflows/compile-check.yml' ]
 
 permissions:
   contents: write
