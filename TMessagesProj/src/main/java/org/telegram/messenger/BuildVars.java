@@ -43,6 +43,8 @@ public class BuildVars {
 
     // works only on official app ids, disable on your forks
     public static boolean SUPPORTS_PASSKEYS = false;
+    // works only on official app ids (Firebase SIM verification) — disabled in MilliyGram
+    public static boolean SUPPORTS_FPNV = false;
 
     static {
         if (ApplicationLoader.applicationContext != null) {
