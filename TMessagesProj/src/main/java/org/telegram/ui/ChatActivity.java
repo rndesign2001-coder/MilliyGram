@@ -31137,7 +31137,6 @@ public class ChatActivity extends BaseFragment implements
         super.dismissCurrentDialog();
     }
 
-    @Override
     /**
      * MilliyGram: chatga kirmasdan ko'rishda audio/ovozli xabar shu yerning o'zida o'ynaydi,
      * rasm/video esa ko'rish oynasida ochiladi — chat to'liq ochilmaydi va "tinglandi" belgisi yuborilmaydi.
@@ -31191,6 +31190,7 @@ public class ChatActivity extends BaseFragment implements
         return false;
     }
 
+    @Override
     public void setInPreviewMode(boolean value) {
         super.setInPreviewMode(value);
         if (currentUser != null && audioCallIconItem != null) {
