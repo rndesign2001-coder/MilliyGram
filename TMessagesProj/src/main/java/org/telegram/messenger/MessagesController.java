@@ -14529,8 +14529,16 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public void markMentionMessageAsRead(int mid, long channelId, long did) {
+        markMentionMessageAsRead(mid, channelId, did, true);
+    }
+
+    /**
+     * MilliyGram: mediaContent=false (matnli xabar) bo'lsa, sharpa rejimida ham @ o'qilgan deb belgilanadi —
+     * bu boshqa odamga hech narsa ko'rsatmaydi. Ovozli/dumaloq xabarda esa "tinglandi" bilinib qolmasligi uchun yuborilmaydi.
+     */
+    public void markMentionMessageAsRead(int mid, long channelId, long did, boolean mediaContent) {
         getMessagesStorage().markMentionMessageAsRead(-channelId, mid, did);
-        if (org.telegram.ui.MgGhostMode.hideRead(currentAccount)) {
+        if (mediaContent && org.telegram.ui.MgGhostMode.hideRead(currentAccount)) {
             return;
         }
         if (channelId != 0) {
@@ -14656,9 +14664,22 @@ public class MessagesController extends BaseController implements NotificationCe
         }
     }
 
+    /** MilliyGram: sharpa rejimida komment (thread) qayerigacha o'qilgani — faqat shu telefonda */
+    public static int mgGhostThreadRead(int account, long dialogId, long threadId) {
+        return MgConfig.getInt("ghr_" + account + "_" + dialogId + "_" + threadId, 0);
+    }
+
     private void completeReadTask(ReadTask task) {
         if (org.telegram.ui.MgGhostMode.hideRead(currentAccount)) {
-            return; // MilliyGram: sharpa rejimi — o'qilganlik belgisi yuborilmaydi
+            // MilliyGram: sharpa rejimi — o'qilganlik belgisi yuborilmaydi, lekin kommentlarda o'qish joyini
+            // telefonda eslab qolamiz: aks holda har kirganda eski javobga qayta olib boradi
+            if (task.replyId != 0 && task.maxId > 0) {
+                String k = "ghr_" + currentAccount + "_" + task.dialogId + "_" + task.replyId;
+                if (task.maxId > MgConfig.getInt(k, 0)) {
+                    MgConfig.setInt(k, task.maxId);
+                }
+            }
+            return;
         }
         if (task.replyId != 0 && task.monoForumPeerId == 0) {
             TLRPC.TL_messages_readDiscussion req = new TLRPC.TL_messages_readDiscussion();

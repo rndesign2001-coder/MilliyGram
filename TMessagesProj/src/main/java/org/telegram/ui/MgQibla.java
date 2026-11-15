@@ -206,9 +206,32 @@ public class MgQibla {
             declination = dec;
         }
 
+        // MilliyGram: haqiqiy magnit sensori bo'lmasa, "Rotation vector" faqat giroskopdan yasalgan bo'ladi
+        // va doim bir tomonni ko'rsatadi — bunday telefonda kompas yo'q deb hisoblaymiz
         public boolean isAvailable() {
-            return sm != null && (sm.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) != null
-                    || sm.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null && sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null);
+            return sm != null && sm.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null
+                    && (sm.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) != null || sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null);
+        }
+
+        // Sensor bor, lekin ishlamayaptimi (qiymat kelmaydi, o'zgarmaydi yoki Yer maydoniga mos emas)
+        private int magCount;
+        private float magSum;
+        private final float[] magPrev = new float[3];
+        private boolean magChanged;
+        private Runnable onBroken;
+        private final Runnable brokenCheck = () -> {
+            boolean broken = magCount == 0 || !magChanged;
+            if (!broken) {
+                float avg = magSum / magCount;
+                broken = avg < 5f || avg > 250f; // Yer magnit maydoni ~25–65 µT
+            }
+            if (broken && onBroken != null) {
+                onBroken.run();
+            }
+        };
+
+        public void setOnBroken(Runnable r) {
+            onBroken = r;
         }
 
         public void start() {
@@ -217,6 +240,14 @@ public class MgQibla {
             }
             Sensor rv = sm.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
             Sensor mag = sm.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+            if (mag == null) {
+                return;
+            }
+            magCount = 0;
+            magSum = 0;
+            magChanged = false;
+            AndroidUtilities.cancelRunOnUIThread(brokenCheck);
+            AndroidUtilities.runOnUIThread(brokenCheck, 5000);
             if (rv != null) {
                 useVector = true;
                 sm.registerListener(this, rv, SensorManager.SENSOR_DELAY_GAME);
@@ -234,6 +265,7 @@ public class MgQibla {
         }
 
         public void stop() {
+            AndroidUtilities.cancelRunOnUIThread(brokenCheck);
             try {
                 if (sm != null) {
                     sm.unregisterListener(this);
@@ -254,6 +286,17 @@ public class MgQibla {
         @Override
         public void onSensorChanged(SensorEvent e) {
             int type = e.sensor.getType();
+            if (type == Sensor.TYPE_MAGNETIC_FIELD && e.values.length >= 3) {
+                float x = e.values[0], y = e.values[1], z = e.values[2];
+                if (magCount > 0 && (Math.abs(x - magPrev[0]) > 0.01f || Math.abs(y - magPrev[1]) > 0.01f || Math.abs(z - magPrev[2]) > 0.01f)) {
+                    magChanged = true;
+                }
+                magPrev[0] = x;
+                magPrev[1] = y;
+                magPrev[2] = z;
+                magSum += (float) Math.sqrt(x * x + y * y + z * z);
+                magCount++;
+            }
             boolean ready = false;
             if (type == Sensor.TYPE_ROTATION_VECTOR) {
                 try {
@@ -882,6 +925,15 @@ public class MgQibla {
                 compass.performHapticFeedback(Build.VERSION.SDK_INT >= 30 ? HapticFeedbackConstants.CONFIRM : HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
             } catch (Throwable ignore) {
             }
+        });
+        heading.setOnBroken(() -> {
+            if (!dialog.isShowing()) {
+                return;
+            }
+            heading.stop();
+            gotHeading[0] = false;
+            status.setText(MgLang.t("Kompas ishlamayapti"));
+            info.setText(MgLang.t("Telefoningizdagi kompas (magnit sensori) javob bermayapti, shuning uchun yo'nalish noto'g'ri bo'lishi mumkin. Qibla shimoldan soat mili bo'yicha ") + Math.round(qiblaBearing()) + "° (" + directionName(qiblaBearing()) + MgLang.t("). Quyosh yoki xarita yordamida yo'nalishni toping."));
         });
         if (!heading.isAvailable()) {
             status.setText(MgLang.t("Telefoningizda kompas sensori yo'q"));

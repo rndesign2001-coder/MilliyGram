@@ -18454,7 +18454,7 @@ public class ChatActivity extends BaseFragment implements
                             final INavigationLayout layout = parentLayout;
                             removeSelfFromStack(false);
                             layout.presentFragment(ProfileActivity.of(dialog_id));
-                        } else {
+                        } else if (!mgPreviewMediaTap(this, ev.getX(), ev.getY())) {
                             parentLayout.expandPreviewFragment();
                         }
                         ev.setAction(MotionEvent.ACTION_CANCEL);
@@ -31138,6 +31138,59 @@ public class ChatActivity extends BaseFragment implements
     }
 
     @Override
+    /**
+     * MilliyGram: chatga kirmasdan ko'rishda audio/ovozli xabar shu yerning o'zida o'ynaydi,
+     * rasm/video esa ko'rish oynasida ochiladi — chat to'liq ochilmaydi va "tinglandi" belgisi yuborilmaydi.
+     */
+    private boolean mgPreviewMediaTap(View root, float x, float y) {
+        try {
+            if (chatListView == null || root == null) {
+                return false;
+            }
+            int[] a = new int[2], b = new int[2];
+            root.getLocationInWindow(a);
+            chatListView.getLocationInWindow(b);
+            View child = chatListView.findChildViewUnder(x + a[0] - b[0], y + a[1] - b[1]);
+            if (!(child instanceof ChatMessageCell)) {
+                return false;
+            }
+            MessageObject m = ((ChatMessageCell) child).getMessageObject();
+            if (m == null || m.isSponsored()) {
+                return false;
+            }
+            if (m.isVoice() || m.isMusic()) {
+                MediaController mc = MediaController.getInstance();
+                if (mc.isPlayingMessage(m) && !mc.isMessagePaused()) {
+                    mc.pauseMessage(m);
+                    return true;
+                }
+                org.milliygram.utils.ChatPreviewState.INSTANCE.setActive(dialog_id);
+                boolean started;
+                try {
+                    started = mc.playMessage(m);
+                } finally {
+                    org.milliygram.utils.ChatPreviewState.INSTANCE.clear();
+                }
+                if (!started && m.getDocument() != null) {
+                    // hali yuklanmagan — yuklab olamiz, keyingi bosishda o'ynaydi
+                    getFileLoader().loadFile(m.getDocument(), m, FileLoader.PRIORITY_HIGH, 0);
+                    BulletinFactory.of(this).createSimpleBulletin(R.raw.ic_download, org.telegram.messenger.MgLang.t("Yuklanmoqda… tayyor bo'lgach yana bosing")).show();
+                }
+                return true;
+            }
+            if (m.isPhoto() || m.isVideo() || m.isGif() || m.type == MessageObject.TYPE_PHOTO || m.type == MessageObject.TYPE_VIDEO) {
+                if (getParentActivity() == null) {
+                    return false;
+                }
+                PhotoViewer.getInstance().setParentActivity(ChatActivity.this, themeDelegate);
+                return PhotoViewer.getInstance().openPhoto(m, ChatActivity.this, dialog_id, mergeDialogId, getTopicId(), photoViewerProvider);
+            }
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
+        return false;
+    }
+
     public void setInPreviewMode(boolean value) {
         super.setInPreviewMode(value);
         if (currentUser != null && audioCallIconItem != null) {
@@ -31193,7 +31246,7 @@ public class ChatActivity extends BaseFragment implements
                         } else {
                             sideControlsButtonsLayout.setButtonCount(ChatActivitySideControlsButtonsLayout.BUTTON_MENTION, newMentionsCount, true);
                         }
-                        getMessagesController().markMentionMessageAsRead(message.getId(), ChatObject.isChannel(currentChat) ? currentChat.id : 0, dialog_id);
+                        getMessagesController().markMentionMessageAsRead(message.getId(), ChatObject.isChannel(currentChat) ? currentChat.id : 0, dialog_id, message.isVoice() || message.isRoundVideo() || message.isMusic());
                         message.setContentIsRead();
                     }
                     if (view instanceof ChatMessageCell) {
@@ -37474,6 +37527,14 @@ public class ChatActivity extends BaseFragment implements
                 chatListView.invalidateViews();
                 Bundle args = new Bundle();
                 long dialogId = arrayList.get(0).getDialogId();
+                // MilliyGram: sharpa rejimida o'qilgan joy serverga yuborilmagan — telefonda eslab qolingan joydan ochamiz
+                int mgLocalRead = MessagesController.mgGhostThreadRead(currentAccount, dialogId, arrayList.get(arrayList.size() - 1).getId());
+                if (mgLocalRead > discussionMessage.read_inbox_max_id) {
+                    discussionMessage.read_inbox_max_id = mgLocalRead;
+                    if (discussionMessage.max_id != 0 && mgLocalRead >= discussionMessage.max_id) {
+                        discussionMessage.unread_count = 0;
+                    }
+                }
                 args.putLong("chat_id", -dialogId);
                 args.putInt("message_id", Math.max(1, discussionMessage.read_inbox_max_id));
                 args.putInt("unread_count", discussionMessage.unread_count);
@@ -39935,7 +39996,7 @@ public class ChatActivity extends BaseFragment implements
                             } else {
                                 sideControlsButtonsLayout.setButtonCount(ChatActivitySideControlsButtonsLayout.BUTTON_MENTION, newMentionsCount, true);
                             }
-                            getMessagesController().markMentionMessageAsRead(message.getId(), ChatObject.isChannel(currentChat) ? currentChat.id : 0, dialog_id);
+                            getMessagesController().markMentionMessageAsRead(message.getId(), ChatObject.isChannel(currentChat) ? currentChat.id : 0, dialog_id, message.isVoice() || message.isRoundVideo() || message.isMusic());
                             message.setContentIsRead();
                         }
                     }
