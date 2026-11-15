@@ -1785,3 +1785,6 @@ Xabarlardagi vidjetlar, mavzular uchun yon panel, yangi ovoz yozish sozlamalari	
 Yuklanmoqda… tayyor bo'lgach yana bosing	Загрузка… нажмите ещё раз, когда будет готово	Downloading… tap again when ready
 Kompas ishlamayapti	Компас не работает	Compass is not working
 Telefoningizdagi kompas (magnit sensori) javob bermayapti, shuning uchun yo'nalish noto'g'ri bo'lishi mumkin. Qibla shimoldan soat mili bo'yicha 	Компас (магнитный датчик) телефона не отвечает, поэтому направление может быть неверным. Кибла по часовой стрелке от севера: 	Your phone's compass (magnetic sensor) is not responding, so the direction may be wrong. Qibla is clockwise from north at 
+Sharpa rejimida kommentlar endi eski javobga qayta olib bormaydi	В режиме призрака комментарии больше не возвращают к старому ответу	Ghost mode: comments no longer jump back to an old reply
+Chatga kirmasdan ko'rishda audio shu yerda o'ynaydi, rasm va video ochiladi	В предпросмотре чата аудио играет на месте, фото и видео открываются	Chat preview: audio plays in place, photos and videos open
+Kompas yo'q yoki ishlamaydigan telefonlarda Qibla bu haqda ogohlantiradi	Кибла предупреждает, если компаса нет или он не работает	Qibla warns when the phone has no working compass

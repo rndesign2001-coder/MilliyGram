@@ -263,10 +263,9 @@ public final class MgUpdater {
 
     /** Joriy versiyadagi yangiliklar ("Yangi versiyada nimalar bor" oynasi uchun) */
     private static final String[] WHATS_NEW = {
-            "MilliyGram endi Telegram 13.2 asosida: barcha so'nggi imkoniyatlar",
-            "Hamyon (Gram), QR bilan ulashish, sovg'alarni hamyonga ko'chirish",
-            "Xabarlardagi vidjetlar, mavzular uchun yon panel, yangi ovoz yozish sozlamalari",
-            "\"Hadya yuborish\" Sozlamalarda va profil menyusida",
+            "Sharpa rejimida kommentlar endi eski javobga qayta olib bormaydi",
+            "Chatga kirmasdan ko'rishda audio shu yerda o'ynaydi, rasm va video ochiladi",
+            "Kompas yo'q yoki ishlamaydigan telefonlarda Qibla bu haqda ogohlantiradi",
     };
 
     /** Ilova yangilangandan keyingi birinchi ochilishda yangiliklarni bir marta ko'rsatadi */
