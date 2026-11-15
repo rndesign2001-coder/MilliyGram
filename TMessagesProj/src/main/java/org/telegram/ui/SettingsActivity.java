@@ -834,7 +834,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
         if (!getMessagesController().premiumFeaturesBlocked()) {
             items.add(SettingCell.Factory.of(15, 0xFFF45255, 0xFFDF3955, R.drawable.settings_business, getString(R.string.TelegramBusiness)));
         }
-        if (!ApplicationLoader.isPlayStoreBuild() || !getMessagesController().premiumPurchaseBlocked()) { // MilliyGram: APK'da doim; Play build'da faqat Play Billing bo'lsa
+        { // MilliyGram: "Hadya yuborish" doim ko'rinadi (Yulduzlar bilan ishlaydi)
             items.add(SettingCell.Factory.of(16, 0xFFF38B31, 0xFFE26314, R.drawable.settings_gift, getString(R.string.SendAGift)));
         }
         if (items.get(items.size() - 1).viewType != UniversalAdapter.VIEW_TYPE_SHADOW)
