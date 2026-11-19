@@ -503,6 +503,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private ViewPage[] viewPages;
     private ActionBarMenuItem passcodeItem;
     private ActionBarMenuItem mgGhostItem; // MilliyGram: sharpa rejimi tugmasi
+    public String mgSpace; // MilliyGram: iborali yashirin chatlar — ochiq makon (null — PIN bo'limi)
+    private int mgPhraseSeq;
+    private boolean mgSpaceClosing;
     public boolean mgHiddenMode; // MilliyGram: yashirin bo'lim — faqat yashirin chatlar, sarlavha ostida "Yashirin"
     private static final int MG_GHOST_ID = 9061;
     private ActionBarMenuItem downloadsItem;
@@ -2797,6 +2800,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             afterSignup = arguments.getBoolean("afterSignup", false);
             folderId = arguments.getInt("folderId", 0);
             mgHiddenMode = arguments.getBoolean("mgHidden", false);
+            mgSpace = arguments.getString("mgSpace", null);
+            if (mgSpace != null) {
+                mgHiddenMode = true;
+            }
             communityId = arguments.getLong("community_id", 0);
             if (communityId != 0) {
                 community = getMessagesController().getChat(communityId);
@@ -2836,6 +2843,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
 
         observersGroup = getNotificationCenter().createObserversGroup(this);
+        if (mgSpace != null) {
+            observersGroup.addGlobal(NotificationCenter.mgHiddenSpaceClosed);
+        }
 
         if (searchString == null) {
             currentConnectionState = getConnectionsManager().getConnectionState();
@@ -3019,6 +3029,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @Override
     public void onFragmentDestroy() {
         super.onFragmentDestroy();
+        if (mgSpace != null && !mgSpaceClosing && mgSpace.equals(org.telegram.messenger.MgHiddenSpaces.active())) {
+            mgSpaceClosing = true;
+            org.telegram.messenger.MgHiddenSpaces.leave(); // orqaga chiqildi — rejim yopiladi
+        }
         if (observersGroup != null) {
             observersGroup.removeAllObservers();
             observersGroup = null;
@@ -3359,6 +3373,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         showSearch(true, false, true);
                     }
                 }
+                if (mgPhraseCheck(text)) {
+                    return; // MilliyGram: ibora tekshirilguncha matn serverga yuborilmaydi
+                }
                 if (searchViewPager != null) {
                     searchViewPager.onTextChanged(text);
                 }
@@ -3399,7 +3416,16 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             mgKindItem.setContentDescription(org.telegram.messenger.MgLang.t("Arxivni saralash"));
             mgKindItem.setOnClickListener(v -> mgShowArchiveKindPicker());
         }
-        if (initialDialogsType == DIALOGS_TYPE_DEFAULT && folderId == 0 && communityId == 0) {
+        if (mgSpace != null) {
+            // MilliyGram: iborali yashirin chatlar — "Chat qo'shish" va "Chiqish"
+            ActionBarMenuItem mgAddItem = menu.addItem(9061, R.drawable.msg_add);
+            mgAddItem.setContentDescription(org.telegram.messenger.MgLang.t("Chat qo'shish"));
+            mgAddItem.setOnClickListener(v -> mgAddChatsToSpace());
+            ActionBarMenuItem mgLeaveItem = menu.addItem(9062, R.drawable.msg_secret);
+            mgLeaveItem.setContentDescription(org.telegram.messenger.MgLang.t("Chiqish"));
+            mgLeaveItem.setOnClickListener(v -> org.telegram.messenger.MgHiddenSpaces.leave());
+        }
+        if (initialDialogsType == DIALOGS_TYPE_DEFAULT && folderId == 0 && communityId == 0 && mgSpace == null) {
             // MilliyGram: namoz vaqti / ob-havo chipi (⋮ tugmasining chap tomonida)
             mgInfoChipHolder = MgInfoChip.attach(DialogsActivity.this, menu, context);
         }
@@ -3503,7 +3529,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 actionBar.setTitle(ssb, statusDrawable);
                 updateStatus(UserConfig.getInstance(currentAccount).getCurrentUser(), false);
                 if (mgHiddenMode) {
-                    actionBar.setSubtitle(org.telegram.messenger.MgLang.t("Yashirin")); // MilliyGram: yashirin bo'lim belgisi
+                    actionBar.setSubtitle(mgSpace != null ? org.telegram.messenger.MgLang.t("Yashirin chatlar · ibora") : org.telegram.messenger.MgLang.t("Yashirin")); // MilliyGram: yashirin bo'lim belgisi
                 }
             }
             if (folderId == 0) {
@@ -3670,7 +3696,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     }
                     if (tabId == filterTabsView.getDefaultTabId()) {
                         if (mgHiddenMode) {
-                            return org.telegram.messenger.MgLocalFolders.getHiddenUnreadCount(currentAccount, null);
+                            return org.telegram.messenger.MgLocalFolders.getHiddenUnreadCount(currentAccount, null, mgSpace);
                         }
                         return getMessagesStorage().getMainUnreadCount();
                     }
@@ -3681,7 +3707,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     MessagesController.DialogFilter mgTabFilter = getMessagesController().getDialogFilters().get(tabId);
                     if (mgHiddenMode) {
                         // MilliyGram: yashirin bo'limda faqat yashirin chatlar sanaladi
-                        return org.telegram.messenger.MgLocalFolders.getHiddenUnreadCount(currentAccount, mgTabFilter);
+                        return org.telegram.messenger.MgLocalFolders.getHiddenUnreadCount(currentAccount, mgTabFilter, mgSpace);
                     }
                     if (org.telegram.messenger.MgLocalFolders.isLocal(mgTabFilter) || org.telegram.messenger.MgConfig.isFolderIconTabs()
                             || org.telegram.messenger.MgConfig.getBool("tab_count_muted", true)) {
@@ -4044,8 +4070,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 } else if (id == mg_hide) {
                     if (mgHiddenMode) {
                         // yashirin bo'limda: tanlangan chatlarni umumiy ro'yxatga qaytarish
-                        for (Long did : selectedDialogs) {
-                            org.telegram.messenger.MgConfig.setDialogHidden(currentAccount, did, false);
+                        if (mgSpace != null) {
+                            org.telegram.messenger.MgHiddenSpaces.remove(currentAccount, mgSpace, new ArrayList<>(selectedDialogs));
+                        } else {
+                            for (Long did : selectedDialogs) {
+                                org.telegram.messenger.MgConfig.setDialogHidden(currentAccount, did, false);
+                            }
                         }
                         getNotificationCenter().postNotificationName(NotificationCenter.dialogsNeedReload);
                         BulletinFactory.of(DialogsActivity.this).createSimpleBulletin(R.raw.contact_check, org.telegram.messenger.MgLang.t("Chat yana ro'yxatda ko'rinadi")).show();
@@ -7028,6 +7058,109 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     }
 
     /** Tanlangan chatni o'qilgan deb belgilamasdan oldindan ko'rish */
+    /**
+     * MilliyGram: qidiruvga yozilgan matn yashirin chatlar iborasi bo'lsa, rejimni ochadi.
+     * Ibora tekshirilguncha matn qidiruvga (va serverga) uzatilmaydi. true — tekshiruv boshlandi.
+     */
+    private boolean mgPhraseCheck(String text) {
+        final int seq = ++mgPhraseSeq;
+        if (mgHiddenMode || onlySelect || initialDialogsType != DIALOGS_TYPE_DEFAULT || !org.telegram.messenger.MgHiddenSpaces.mayBePhrase(text)) {
+            return false;
+        }
+        Utilities.globalQueue.postRunnable(() -> {
+            final String space = org.telegram.messenger.MgHiddenSpaces.match(text);
+            AndroidUtilities.runOnUIThread(() -> {
+                if (seq != mgPhraseSeq || getParentActivity() == null) {
+                    return;
+                }
+                if (space == null) {
+                    if (searchViewPager != null) {
+                        searchViewPager.onTextChanged(text);
+                    }
+                    return;
+                }
+                try {
+                    fragmentSearchField.editText.setText("");
+                    AndroidUtilities.hideKeyboard(fragmentSearchField.editText);
+                    fragmentSearchFieldWatcher.toggleSearch(false);
+                } catch (Throwable e) {
+                    FileLog.e(e);
+                }
+                mgOpenSpace(this, currentAccount, space);
+            });
+        });
+        return true;
+    }
+
+    /** Iborali yashirin chatlar rejimini ochadi */
+    public static void mgOpenSpace(BaseFragment from, int account, String space) {
+        if (from == null || space == null) {
+            return;
+        }
+        org.telegram.messenger.MgHiddenSpaces.enter(account, space);
+        Bundle args = new Bundle();
+        args.putBoolean("mgHidden", true);
+        args.putString("mgSpace", space);
+        DialogsActivity f = new DialogsActivity(args);
+        from.presentFragment(f);
+        if (org.telegram.messenger.MgHiddenSpaces.dialogs(account, space).isEmpty()) {
+            AndroidUtilities.runOnUIThread(() -> BulletinFactory.of(f).createSimpleBulletin(R.raw.chats_infotip,
+                    org.telegram.messenger.MgLang.t("Yashirin chatlar ochildi. Chat qo'shish uchun + tugmasini bosing."))
+                    .show(), 400);
+        }
+    }
+
+    /** "Chat qo'shish": tanlangan chatlar shu iboraga o'tadi va hamma joyda yashiriladi */
+    private void mgAddChatsToSpace() {
+        if (mgSpace == null || getParentActivity() == null) {
+            return;
+        }
+        final String space = mgSpace;
+        UsersSelectActivity picker = new UsersSelectActivity(true, new ArrayList<>(), 0);
+        // boshqa iboralar va PIN bo'limidagi chatlar ro'yxatda ko'rinmaydi
+        picker.mgExclude = did -> org.telegram.messenger.MgConfig.isDialogHidden(currentAccount, did)
+                && !org.telegram.messenger.MgHiddenSpaces.dialogs(currentAccount, space).contains(did);
+        picker.setDelegate((ids, flags) -> {
+            ArrayList<Long> add = new ArrayList<>();
+            for (Long id : ids) {
+                if (id != null && id != getUserConfig().getClientUserId()) {
+                    add.add(id);
+                }
+            }
+            if (!add.isEmpty()) {
+                org.telegram.messenger.MgHiddenSpaces.add(currentAccount, space, add);
+                BulletinFactory.of(this).createSimpleBulletin(R.raw.contact_check,
+                        add.size() + org.telegram.messenger.MgLang.t(" ta chat yashirin chatlarga qo'shildi")).show();
+            }
+        });
+        presentFragment(picker);
+    }
+
+    /** Rejim yopilganda — shu oyna va undan keyin ochilgan oynalar yopiladi */
+    private void mgCloseSpace() {
+        if (mgSpaceClosing) {
+            return;
+        }
+        mgSpaceClosing = true;
+        try {
+            INavigationLayout layout = getParentLayout();
+            if (layout == null) {
+                return;
+            }
+            java.util.List<BaseFragment> stack = new ArrayList<>(layout.getFragmentStack());
+            int idx = stack.indexOf(this);
+            if (idx < 0) {
+                return;
+            }
+            for (int i = stack.size() - 1; i > idx; i--) {
+                layout.removeFragmentFromStack(stack.get(i));
+            }
+            finishFragment();
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
+    }
+
     private void mgPreviewDialog(long did) {
         for (int p = 0; viewPages != null && p < viewPages.length; p++) {
             RecyclerListView lv = viewPages[p].listView;
@@ -11033,6 +11166,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @SuppressWarnings("unchecked")
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
+        if (id == NotificationCenter.mgHiddenSpaceClosed) {
+            mgCloseSpace();
+            return;
+        }
         if (id == NotificationCenter.dialogsNeedReload) {
             if (viewPages == null || dialogsListFrozen) {
                 return;
@@ -11518,7 +11655,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     public ArrayList<TLRPC.Dialog> getDialogsArray(int currentAccount, int dialogsType, int folderId, boolean frozen) {
         // MilliyGram: yashirin chatlar ro'yxatda ko'rinmaydi
         ArrayList<TLRPC.Dialog> mgRes = mgHiddenMode
-                ? org.telegram.messenger.MgConfig.onlyHidden(currentAccount, mgGetDialogsArrayRaw(currentAccount, dialogsType, folderId, frozen))
+                ? org.telegram.messenger.MgConfig.onlyHidden(currentAccount, mgGetDialogsArrayRaw(currentAccount, dialogsType, folderId, frozen), mgSpace)
                 : org.telegram.messenger.MgConfig.filterHidden(currentAccount, mgGetDialogsArrayRaw(currentAccount, dialogsType, folderId, frozen));
         // MilliyGram: notanishlar asosiy ro'yxatda ko'rinmaydi ("Notanishlar" jildida)
         if (!mgHiddenMode && !onlySelect && communityId == 0 && folderId == 0 && !frozen && (dialogsType == DIALOGS_TYPE_DEFAULT || dialogsType == 7 || dialogsType == 8)) {

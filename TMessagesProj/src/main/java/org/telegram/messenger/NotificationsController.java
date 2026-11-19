@@ -3404,8 +3404,9 @@ public class NotificationsController extends BaseController implements Notificat
     }
 
     private int getNotifyOverride(SharedPreferences preferences, long dialog_id, long topicId) {
-        if (!MgConfig.isHiddenNotifyEnabled() && MgConfig.isDialogHidden(currentAccount, dialog_id)) {
-            return 2; // MilliyGram: yashirin chat — bildirishnoma yo'q
+        if (!MgConfig.isHiddenNotifyEnabled() && MgConfig.isDialogHidden(currentAccount, dialog_id)
+                || MgHiddenSpaces.contains(currentAccount, dialog_id)) {
+            return 2; // MilliyGram: yashirin chat — bildirishnoma yo'q (iborali yashirin chatlar — doim jim)
         }
         if (!MgStrangers.isNotifyEnabled() && MgStrangers.belongsInInbox(currentAccount, dialog_id)) {
             return 2; // MilliyGram: notanishdan — ovozsiz

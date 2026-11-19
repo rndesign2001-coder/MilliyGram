@@ -6891,6 +6891,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     @Override
     public void onUserInteraction() {
         super.onUserInteraction();
+        org.telegram.messenger.MgHiddenSpaces.touch();
         voipLaunchedInBackground = false;
     }
 
@@ -6955,6 +6956,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     @Override
     protected void onStart() {
         super.onStart();
+        org.telegram.messenger.MgHiddenSpaces.onAppForeground(); // MilliyGram
         isStarted = true;
         PipCoordinator.getInstance().onActivityStart(this);
         Browser.bindCustomTabsService(this);
@@ -6968,6 +6970,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     @Override
     protected void onStop() {
         super.onStop();
+        org.telegram.messenger.MgHiddenSpaces.onAppBackground(); // MilliyGram
         GramWalletStorageAuth.onActivityStopped(this);
         isStarted = false;
         PipCoordinator.getInstance().onActivityStop(this);

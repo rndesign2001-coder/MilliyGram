@@ -1788,3 +1788,44 @@ Telefoningizdagi kompas (magnit sensori) javob bermayapti, shuning uchun yo'nali
 Sharpa rejimida kommentlar endi eski javobga qayta olib bormaydi	В режиме призрака комментарии больше не возвращают к старому ответу	Ghost mode: comments no longer jump back to an old reply
 Chatga kirmasdan ko'rishda audio shu yerda o'ynaydi, rasm va video ochiladi	В предпросмотре чата аудио играет на месте, фото и видео открываются	Chat preview: audio plays in place, photos and videos open
 Kompas yo'q yoki ishlamaydigan telefonlarda Qibla bu haqda ogohlantiradi	Кибла предупреждает, если компаса нет или он не работает	Qibla warns when the phone has no working compass
+Yashirin chatlar	Скрытые чаты	Hidden Chats
+Ibora	Фраза	Phrase
+Iborani takrorlang	Повторите фразу	Repeat Phrase
+Yashirin chatlarni ochish uchun iborani chatlar qidiruviga yozing. Har bir ibora o'zining alohida chatlar to'plamini ochadi: yangi ibora bo'sh boshlanadi, avvalgi iboralar ishlashda davom etadi. Yashirin chatlar faqat shu telefondagi MilliyGram'da ishlaydi va boshqa qurilmalarga sinxronlanmaydi. 	Чтобы открыть скрытые чаты, введите фразу в поиск чатов. Каждая фраза открывает свой набор чатов: новая начинается пустой, а заданные ранее продолжают работать. Скрытые чаты работают только в MilliyGram на этом телефоне и не синхронизируются с другими устройствами. 	To open hidden chats, type the phrase in chat search. Each phrase opens its own set of chats: a new phrase starts empty, and phrases you set earlier keep working. Hidden chats work only in MilliyGram on this phone and don't sync to your other devices. 
+Qanday ishlaydi	Как это работает	How it works
+Kamida 8 ta belgi ishlating, yaxshisi bir necha so'z. Iborani unutmang: u hech qayerda saqlanmaydi va uni tiklab bo'lmaydi. Unutsangiz, bu chatlar shu telefonda yashirin qoladi — akkauntdan chiqib, qayta kirguningizcha.	Используйте не менее 8 символов, лучше несколько слов. Не забудьте фразу: она нигде не хранится и не восстанавливается. Без неё чаты останутся скрытыми на этом телефоне, пока вы не выйдете из аккаунта и не войдёте снова.	Use at least 8 characters, ideally several words. Don't forget it: the phrase isn't stored anywhere and can't be recovered. Without it, these chats stay hidden on this phone until you log out and log back in.
+Barcha iboralarni o'chirish	Удалить все фразы	Delete All Phrases
+Hozircha ibora o'rnatilmagan	Фразы ещё не заданы	No phrases set yet
+O'rnatilgan iboralar: 	Заданные фразы: 	Phrases set: 
+Ibora kamida 8 ta belgidan iborat bo'lsin	Фраза должна быть не короче 8 символов	The phrase must be at least 8 characters
+Iboralar mos kelmadi	Фразы не совпадают	Phrases don't match
+Iborani saqlab bo'lmadi	Не удалось сохранить фразу	Couldn't save the phrase
+Bu ibora allaqachon bor	Такая фраза уже есть	This phrase already exists
+Ibora o'rnatildi	Фраза задана	Phrase set
+Endi bosh ekrandagi qidiruvga shu iborani yozsangiz, yashirin chatlar ochiladi. U yerda + tugmasi bilan chat qo'shing.	Теперь введите эту фразу в поиск на главном экране — откроются скрытые чаты. Там добавьте чаты кнопкой +.	Now type this phrase into the search on the main screen to open hidden chats. Add chats there with the + button.
+Hozir ochish	Открыть сейчас	Open Now
+Barcha iboralar o'chiriladi va ulardagi chatlar yana oddiy ro'yxatda ko'rinadi. Davom etamizmi?	Все фразы будут удалены, а их чаты снова появятся в обычном списке. Продолжить?	All phrases will be deleted and their chats will show in the regular list again. Continue?
+Iboralar o'chirildi, chatlar ro'yxatga qaytdi	Фразы удалены, чаты вернулись в список	Phrases deleted, chats are back in the list
+Ba'zi chatlarni shu telefonda ko'zdan yashiring. Ular faqat iborangizni chatlar qidiruviga yozganingizdan keyin ko'rinadi.	Скройте некоторые чаты на этом телефоне. Они появятся только после ввода вашей фразы в поиск чатов.	Keep some chats out of sight on this phone. They show up only after you type your phrase in chat search.
+Ko'zdan yashirin	Вне поля зрения	Out of Sight
+Yashirin chatlar ro'yxat, jildlar, qidiruv, bildirishnomalar va ulashish oynasidan yo'qoladi.	Скрытые чаты исчезают из списка, папок, поиска, уведомлений и окна «Поделиться».	Hidden chats disappear from your chat list, folders, search, notifications and the Share sheet.
+Ibora bilan ochiladi	Открываются фразой	Opened by a Phrase
+Iborani chatlar qidiruviga yozing. U hech qachon saqlanmaydi va qidiruv tekshiruv tugaguncha kutadi — ibora serverga yuborilmaydi.	Введите фразу в поиск чатов. Она никогда не сохраняется, а поиск ждёт окончания проверки — фраза не уходит на сервер.	Type your phrase in chat search. It is never stored, and search waits for the check, so the phrase never leaves your phone.
+Faqat shu telefonda	Только на этом телефоне	Only on This Phone
+Iboralar va yashirin chatlar faqat shu telefondagi MilliyGram'da saqlanadi. Boshqa qurilmalarda bu chatlar odatdagidek ko'rinadi.	Фразы и скрытые чаты хранятся только в MilliyGram на этом телефоне. На других устройствах эти чаты видны как обычно.	Phrases and hidden chats are kept only by MilliyGram on this phone. Your other devices keep showing these chats as usual.
+Har bir iboraga alohida makon	Отдельное пространство для каждой фразы	A Space for Each Phrase
+Har bir ibora o'z chatlar to'plamini ochadi. Yangi ibora bo'sh boshlanadi va boshqa iboradagi chatlarni ko'rsatmaydi.	Каждая фраза открывает свой набор чатов. Новая фраза начинается пустой и не показывает чаты другой фразы.	Every phrase opens its own set of chats. A new phrase starts empty and never shows chats hidden with another one.
+Jim qo'ng'iroqlar	Тихие звонки	Silent Calls
+Rejimdan tashqarida yashirin chatlardan kelgan qo'ng'iroqlar jimgina rad etiladi.	Звонки из скрытых чатов тихо отклоняются, пока вы вне этого режима.	Calls from hidden chats are declined quietly while you are outside this mode.
+Iborani unutmang	Не забудьте фразу	Don't Forget Your Phrase
+U hech qayerda saqlanmaydi va tiklab bo'lmaydi. Unutsangiz, chatlar akkauntdan chiqib qayta kirguningizcha yashirin qoladi.	Она нигде не хранится и не восстанавливается. Без неё чаты останутся скрытыми, пока вы не выйдете из аккаунта и не войдёте снова.	It isn't stored anywhere and can't be recovered. Without it, these chats stay hidden until you log out and log back in.
+O'zi yopiladi	Закрываются сами	Closes on Its Own
+Qulf tugmasi bilan darhol chiqasiz. Ekran o'chsa, ilova 1 daqiqa fonda tursa yoki 5 daqiqa harakatsiz qolsa — rejim o'zi yopiladi.	Кнопка с замком закрывает режим сразу. Выключение экрана, 1 минута в фоне или 5 минут бездействия закрывают его автоматически.	The lock button leaves at once. Screen off, a minute in the background or five idle minutes close it too.
+Yashirin chatlar akkauntingizning bir qismi bo'lib qoladi, Telegram serverlari ularni odatdagidek saqlaydi. Shu telefonda ular MilliyGram'ning shifrlangan xotirasida turadi.	Скрытые чаты остаются частью вашего аккаунта, и серверы Telegram хранят их как обычно. На этом телефоне они лежат в зашифрованном хранилище MilliyGram.	Hidden chats are still part of your account, and Telegram's servers keep them as usual. On this phone they stay in MilliyGram's encrypted storage.
+Tushunarli	Понятно	Understood
+Yashirin chatlar · ibora	Скрытые чаты · фраза	Hidden chats · phrase
+Yashirin chatlar ochildi. Chat qo'shish uchun + tugmasini bosing.	Скрытые чаты открыты. Нажмите +, чтобы добавить чаты.	Hidden chats are open. Tap + to add chats.
+ ta chat yashirin chatlarga qo'shildi	 чат(ов) добавлено в скрытые	 chat(s) added to hidden chats
+Yangi: iborali yashirin chatlar — Sozlamalar → Maxfiylik → Yashirin chatlar	Новое: скрытые чаты по фразе — Настройки → Конфиденциальность → Скрытые чаты	New: phrase-protected hidden chats — Settings → Privacy → Hidden Chats
+Iborani qidiruvga yozing — yashirin chatlar ochiladi, har bir iboraga alohida to'plam	Введите фразу в поиск — откроются скрытые чаты, у каждой фразы свой набор	Type the phrase in search to open hidden chats, a separate set for each phrase
+Yashirin chatlardan qo'ng'iroqlar jimgina rad etiladi, rejim o'zi yopiladi	Звонки из скрытых чатов тихо отклоняются, режим закрывается сам	Calls from hidden chats are declined quietly, and the mode closes on its own

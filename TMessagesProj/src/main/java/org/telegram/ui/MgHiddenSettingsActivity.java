@@ -86,7 +86,7 @@ public class MgHiddenSettingsActivity extends UniversalFragment {
     protected void fillItems(ArrayList<UItem> items, UniversalAdapter adapter) {
         items.add(UItem.asTopViewStatic(org.telegram.messenger.MgLang.t("Yashirin chatlar va akkauntlar faqat shu yerda boshqariladi. Yashirin bo'limga kirish: bosh ekranda qidiruv 🔍 tugmasini uzoq bosing."), R.drawable.msg_archive));
         items.add(UItem.asButton(ID_OPEN, R.drawable.msg_archive, org.telegram.messenger.MgLang.t("Yashirin chatlarni ochish"),
-                MgConfig.getHiddenDialogs(currentAccount).isEmpty() ? "" : String.valueOf(MgConfig.getHiddenDialogs(currentAccount).size())));
+                MgConfig.getLegacyHidden(currentAccount).isEmpty() ? "" : String.valueOf(MgConfig.getLegacyHidden(currentAccount).size())));
         items.add(UItem.asShadow(null));
 
         items.add(UItem.asHeader(org.telegram.messenger.MgLang.t("Yashirilgan akkauntlar")));

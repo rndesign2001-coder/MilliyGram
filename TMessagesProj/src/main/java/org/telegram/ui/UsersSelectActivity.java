@@ -362,6 +362,17 @@ public class UsersSelectActivity extends BaseFragment implements NotificationCen
 
 
 
+    /** MilliyGram: true qaytsa — bu chat ro'yxatda ko'rsatilmaydi (masalan, boshqa iboradagi yashirin chatlar) */
+    public org.telegram.messenger.Utilities.CallbackReturn<Long, Boolean> mgExclude;
+
+    private boolean mgExcluded(long did) {
+        try {
+            return mgExclude != null && Boolean.TRUE.equals(mgExclude.run(did));
+        } catch (Throwable e) {
+            return false;
+        }
+    }
+
     public UsersSelectActivity(boolean include, ArrayList<Long> arrayList, int flags) {
         super();
         isInclude = include;
@@ -1110,7 +1121,7 @@ public class UsersSelectActivity extends BaseFragment implements NotificationCen
             ArrayList<TLRPC.Dialog> dialogs = getMessagesController().getAllDialogs();
             for (int a = 0, N = dialogs.size(); a < N; a++) {
                 TLRPC.Dialog dialog = dialogs.get(a);
-                if (DialogObject.isEncryptedDialog(dialog.id)) {
+                if (DialogObject.isEncryptedDialog(dialog.id) || mgExcluded(dialog.id)) {
                     continue;
                 }
                 if (DialogObject.isUserDialog(dialog.id)) {
@@ -1143,6 +1154,16 @@ public class UsersSelectActivity extends BaseFragment implements NotificationCen
             searchAdapterHelper = new SearchAdapterHelper(false);
             searchAdapterHelper.setAllowGlobalResults(false);
             searchAdapterHelper.setDelegate((searchId) -> {
+                if (mgExclude != null) {
+                    ArrayList<TLObject> mgServer = searchAdapterHelper.getLocalServerSearch();
+                    for (int i = mgServer.size() - 1; i >= 0; i--) {
+                        TLObject o = mgServer.get(i);
+                        long did = o instanceof TLRPC.User ? ((TLRPC.User) o).id : o instanceof TLRPC.Chat ? -((TLRPC.Chat) o).id : 0;
+                        if (did != 0 && mgExcluded(did)) {
+                            mgServer.remove(i);
+                        }
+                    }
+                }
                 if (searchRunnable == null && !searchAdapterHelper.isSearchInProgress()) {
                     emptyView.showProgress(false);
                 }

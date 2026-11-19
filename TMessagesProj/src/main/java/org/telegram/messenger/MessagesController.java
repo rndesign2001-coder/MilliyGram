@@ -16256,6 +16256,11 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public void performLogout(int type) {
+        try {
+            MgHiddenSpaces.clearAccount(currentAccount); // MilliyGram: chiqilganda shu akkauntning iborali yashirin chatlari tozalanadi
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
         if (type == 1) {
             GramWalletStorage.wipeForUser(ApplicationLoader.applicationContext, currentAccount, getUserConfig().getClientUserId());
             unregistedPush();
@@ -20670,6 +20675,21 @@ public class MessagesController extends BaseController implements NotificationCe
 //                                svc.answerToRequestForConference((TL_phone.phoneCallRequested) call);
 //                                continue;
 //                            }
+                            // MilliyGram: iborali yashirin chatdan qo'ng'iroq — rejimdan tashqarida jimgina rad etiladi
+                            final long mgCaller = call.participant_id == getUserConfig().getClientUserId() ? call.admin_id : call.participant_id;
+                            if (MgHiddenSpaces.shouldDeclineCall(currentAccount, mgCaller)) {
+                                final TL_phone.discardCall mgReq = new TL_phone.discardCall();
+                                mgReq.peer = new TLRPC.TL_inputPhoneCall();
+                                mgReq.peer.access_hash = call.access_hash;
+                                mgReq.peer.id = call.id;
+                                mgReq.reason = new TLRPC.TL_phoneCallDiscardReasonHangup();
+                                getConnectionsManager().sendRequest(mgReq, (response, error) -> {
+                                    if (response instanceof TLRPC.Updates) {
+                                        processUpdates((TLRPC.Updates) response, false);
+                                    }
+                                });
+                                continue;
+                            }
                             if (svc != null || VoIPService.callIShouldHavePutIntoIntent != null || !callStateIsIdle) {
                                 if (svc != null && svc.getAccount() != currentAccount && svc.getUser() != null && svc.getUser().id == getUserConfig().getClientUserId()) {
                                     // calling from the same device, don't discard

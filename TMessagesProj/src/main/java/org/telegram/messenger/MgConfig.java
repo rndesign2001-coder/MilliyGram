@@ -633,7 +633,19 @@ public class MgConfig {
         editor.apply();
     }
 
+    /** Barcha yashirin chatlar: PIN bo'limi + iborali yashirin chatlar (hamma joyda yashirish uchun) */
     public static HashSet<Long> getHiddenDialogs(int account) {
+        HashSet<Long> spaces = MgHiddenSpaces.all(account);
+        if (spaces.isEmpty()) {
+            return getLegacyHidden(account);
+        }
+        HashSet<Long> out = new HashSet<>(getLegacyHidden(account));
+        out.addAll(spaces);
+        return out;
+    }
+
+    /** Faqat PIN bilan ochiladigan yashirin bo'lim chatlari */
+    public static HashSet<Long> getLegacyHidden(int account) {
         synchronized (hiddenSync) {
             HashSet<Long> cached = hiddenCache.get(account);
             if (cached != null) {
@@ -679,18 +691,18 @@ public class MgConfig {
         if (dialogId == 0) {
             return false;
         }
-        HashSet<Long> set = getHiddenDialogs(account);
-        return !set.isEmpty() && set.contains(dialogId);
+        HashSet<Long> set = getLegacyHidden(account);
+        return !set.isEmpty() && set.contains(dialogId) || MgHiddenSpaces.contains(account, dialogId);
     }
 
     public static void setDialogHidden(int account, long dialogId, boolean hidden) {
         synchronized (hiddenSync) {
-            if (hiddenCache.get(account) == null && prefs().contains(hiddenEncKey(account)) && getHiddenDialogs(account).isEmpty()
+            if (hiddenCache.get(account) == null && prefs().contains(hiddenEncKey(account)) && getLegacyHidden(account).isEmpty()
                     && hiddenCache.get(account) == null) {
                 FileLog.e("MgConfig: hidden list unavailable, not overwriting");
                 return;
             }
-            HashSet<Long> set = new HashSet<>(getHiddenDialogs(account));
+            HashSet<Long> set = new HashSet<>(getLegacyHidden(account));
             if (hidden) {
                 set.add(dialogId);
             } else {
@@ -707,11 +719,16 @@ public class MgConfig {
 
     /** Yashirin rejim: ro'yxatda faqat yashirin chatlar qoladi */
     public static java.util.ArrayList<org.telegram.tgnet.TLRPC.Dialog> onlyHidden(int account, java.util.ArrayList<org.telegram.tgnet.TLRPC.Dialog> dialogs) {
+        return onlyHidden(account, dialogs, null);
+    }
+
+    /** space == null — PIN bo'limi; aks holda shu iboraning chatlari */
+    public static java.util.ArrayList<org.telegram.tgnet.TLRPC.Dialog> onlyHidden(int account, java.util.ArrayList<org.telegram.tgnet.TLRPC.Dialog> dialogs, String space) {
         java.util.ArrayList<org.telegram.tgnet.TLRPC.Dialog> result = new java.util.ArrayList<>();
         if (dialogs == null) {
             return result;
         }
-        HashSet<Long> hidden = getHiddenDialogs(account);
+        HashSet<Long> hidden = space == null ? getLegacyHidden(account) : MgHiddenSpaces.dialogs(account, space);
         if (hidden.isEmpty()) {
             return result;
         }
@@ -765,7 +782,7 @@ public class MgConfig {
             JSONObject values = new JSONObject();
             for (Map.Entry<String, ?> e : prefs().getAll().entrySet()) {
                 String key = e.getKey();
-                if (key.startsWith("chat_pin") || key.equals("mg_ad_recs") || key.startsWith("ad_mode_") || key.startsWith("fwd_sets") || key.startsWith("fwd_last_") || key.equals("qibla_gps") || key.startsWith("upd_") || key.startsWith("gbt_") || key.startsWith("lock_fail_") || key.startsWith("lock_until_") || key.startsWith("dlg_") || key.startsWith("hidden_pin") || key.startsWith("hidden_lock") || key.startsWith("locked_dialogs_") || key.startsWith("hidden_dialogs_") || key.startsWith("hidden_account_") || key.startsWith("ghost_") || key.startsWith("account_alias_") || key.startsWith("mg_local_folders_") || key.equals("main_account") || key.equals("lock_type") || key.equals("fake_name")) {
+                if (key.startsWith("chat_pin") || key.equals("mg_ad_recs") || key.startsWith("ad_mode_") || key.startsWith("fwd_sets") || key.startsWith("fwd_last_") || key.equals("qibla_gps") || key.startsWith("upd_") || key.startsWith("gbt_") || key.startsWith("lock_fail_") || key.startsWith("lock_until_") || key.startsWith("dlg_") || key.startsWith("hidden_pin") || key.startsWith("hidden_lock") || key.startsWith("locked_dialogs_") || key.startsWith("hidden_dialogs_") || key.startsWith("hidden_enc_") || key.startsWith("hs_") || key.startsWith("ghr_") || key.startsWith("hidden_account_") || key.startsWith("ghost_") || key.startsWith("account_alias_") || key.startsWith("mg_local_folders_") || key.equals("main_account") || key.equals("lock_type") || key.equals("fake_name")) {
                     continue;
                 }
                 Object v = e.getValue();
@@ -797,7 +814,7 @@ public class MgConfig {
             Iterator<String> keys = values.keys();
             while (keys.hasNext()) {
                 String key = keys.next();
-                if (key.startsWith("chat_pin") || key.equals("mg_ad_recs") || key.startsWith("ad_mode_") || key.startsWith("fwd_sets") || key.startsWith("fwd_last_") || key.equals("qibla_gps") || key.startsWith("upd_") || key.startsWith("gbt_") || key.startsWith("lock_fail_") || key.startsWith("lock_until_") || key.startsWith("dlg_") || key.startsWith("hidden_pin") || key.startsWith("hidden_lock") || key.startsWith("locked_dialogs_") || key.startsWith("hidden_dialogs_") || key.startsWith("hidden_account_") || key.startsWith("ghost_") || key.startsWith("account_alias_") || key.startsWith("mg_local_folders_") || key.equals("main_account") || key.equals("lock_type") || key.equals("fake_name")) {
+                if (key.startsWith("chat_pin") || key.equals("mg_ad_recs") || key.startsWith("ad_mode_") || key.startsWith("fwd_sets") || key.startsWith("fwd_last_") || key.equals("qibla_gps") || key.startsWith("upd_") || key.startsWith("gbt_") || key.startsWith("lock_fail_") || key.startsWith("lock_until_") || key.startsWith("dlg_") || key.startsWith("hidden_pin") || key.startsWith("hidden_lock") || key.startsWith("locked_dialogs_") || key.startsWith("hidden_dialogs_") || key.startsWith("hidden_enc_") || key.startsWith("hs_") || key.startsWith("ghr_") || key.startsWith("hidden_account_") || key.startsWith("ghost_") || key.startsWith("account_alias_") || key.startsWith("mg_local_folders_") || key.equals("main_account") || key.equals("lock_type") || key.equals("fake_name")) {
                     continue;
                 }
                 JSONObject item = values.getJSONObject(key);

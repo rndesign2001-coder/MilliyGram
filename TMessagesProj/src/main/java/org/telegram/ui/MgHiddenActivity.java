@@ -126,7 +126,7 @@ public class MgHiddenActivity extends UniversalFragment {
         ArrayList<Long> groups = new ArrayList<>();
         ArrayList<Long> channels = new ArrayList<>();
         ArrayList<Long> bots = new ArrayList<>();
-        for (Long id : MgConfig.getHiddenDialogs(currentAccount)) {
+        for (Long id : MgConfig.getLegacyHidden(currentAccount)) {
             if (DialogObject.isEncryptedDialog(id)) {
                 encryptedIds.add(id);
             } else if (id > 0) {

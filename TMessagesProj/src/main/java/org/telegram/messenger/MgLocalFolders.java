@@ -843,7 +843,12 @@ public class MgLocalFolders {
      * filter == null — barcha yashirin chatlar.
      */
     public static int getHiddenUnreadCount(int account, MessagesController.DialogFilter filter) {
-        java.util.HashSet<Long> hidden = MgConfig.getHiddenDialogs(account);
+        return getHiddenUnreadCount(account, filter, null);
+    }
+
+    /** space == null — PIN bo'limi, aks holda shu iboraning chatlari */
+    public static int getHiddenUnreadCount(int account, MessagesController.DialogFilter filter, String space) {
+        java.util.HashSet<Long> hidden = space == null ? MgConfig.getLegacyHidden(account) : MgHiddenSpaces.dialogs(account, space);
         if (hidden.isEmpty()) {
             return 0;
         }

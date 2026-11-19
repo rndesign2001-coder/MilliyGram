@@ -263,9 +263,9 @@ public final class MgUpdater {
 
     /** Joriy versiyadagi yangiliklar ("Yangi versiyada nimalar bor" oynasi uchun) */
     private static final String[] WHATS_NEW = {
-            "Sharpa rejimida kommentlar endi eski javobga qayta olib bormaydi",
-            "Chatga kirmasdan ko'rishda audio shu yerda o'ynaydi, rasm va video ochiladi",
-            "Kompas yo'q yoki ishlamaydigan telefonlarda Qibla bu haqda ogohlantiradi",
+            "Yangi: iborali yashirin chatlar — Sozlamalar → Maxfiylik → Yashirin chatlar",
+            "Iborani qidiruvga yozing — yashirin chatlar ochiladi, har bir iboraga alohida to'plam",
+            "Yashirin chatlardan qo'ng'iroqlar jimgina rad etiladi, rejim o'zi yopiladi",
     };
 
     /** Ilova yangilangandan keyingi birinchi ochilishda yangiliklarni bir marta ko'rsatadi */
