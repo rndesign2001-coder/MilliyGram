@@ -1,0 +1,177 @@
+run=57 sha=29892b9709fc1472192e6b662ad1e98ea0a895dc status=running
+               total        used        free      shared  buff/cache   available
+Mem:           15983        5252        3353          49        7772       10730
+Swap:          11263           0       11263
+312:Note: Some input files use or override a deprecated API.
+313:Note: Recompile with -Xlint:deprecation for details.
+314:Note: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/lib/jlatexmath/jlatexmath/src/main/java/org/scilab/forge/jlatexmath/PredefinedTeXFormulaParser.java uses unchecked or unsafe operations.
+315:Note: Recompile with -Xlint:unchecked for details.
+346:Note: Some input files use or override a deprecated API.
+347:Note: Recompile with -Xlint:deprecation for details.
+407:Note: Some input files use or override a deprecated API.
+408:Note: Recompile with -Xlint:deprecation for details.
+429:Note: Some input files use or override a deprecated API.
+430:Note: Recompile with -Xlint:deprecation for details.
+435: Example of androidX reference: 'androidx/core/app/TaskStackBuilder'
+436: Example of support library reference: 'android/support/v4/media/session/MediaSessionCompat$Token'
+438: Example of androidX reference: 'androidx/car/app/media/IMediaPlaybackHost'
+439: Example of support library reference: 'android/support/v4/media/session/MediaSessionCompat$Token'
+444:Note: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj_Modules/media/libraries/decoder_ffmpeg/src/main/java/androidx/media3/decoder/ffmpeg/ExperimentalFfmpegVideoDecoder.java uses or overrides a deprecated API.
+445:Note: Recompile with -Xlint:deprecation for details.
+452:Note: Some input files use or override a deprecated API.
+453:Note: Recompile with -Xlint:deprecation for details.
+461:Note: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj_Modules/media/libraries/exoplayer_hls/src/main/java/androidx/media3/exoplayer/hls/HlsMediaSource.java uses or overrides a deprecated API.
+462:Note: Recompile with -Xlint:deprecation for details.
+474:Note: Some input files use or override a deprecated API.
+475:Note: Recompile with -Xlint:deprecation for details.
+---
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:generateReleaseAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:mergeReleaseAssets
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:mergeReleaseShaders
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:compileReleaseShaders NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:generateReleaseAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:mergeReleaseAssets
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:mergeReleaseShaders
+> Task :jlatexmath:mergeReleaseAssets
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:compileReleaseShaders NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:generateReleaseAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:mergeReleaseAssets
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:mergeReleaseShaders
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:compileReleaseShaders NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:generateReleaseAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:mergeReleaseShaders
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:mergeReleaseAssets
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:compileReleaseShaders NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:generateReleaseAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:mergeReleaseShaders
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:mergeReleaseAssets
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:compileReleaseShaders NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:generateReleaseAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:mergeReleaseAssets
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:mergeReleaseShaders
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:compileReleaseShaders NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:generateReleaseAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:mergeReleaseShaders
+> Task :TMessagesProj_Modules:media3:media-lib-session:compileReleaseShaders NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-session:generateReleaseAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:mergeReleaseAssets
+> Task :TMessagesProj_Modules:media3:media-lib-session:mergeReleaseAssets
+> Task :TMessagesProj_App:extractAfatReleaseVersionControlInfo
+> Task :TMessagesProj_App:collectAfatReleaseDependencies
+> Task :TMessagesProj_App:sdkAfatReleaseDependencyData
+> Task :TMessagesProj_App:validateSigningAfatRelease
+> Task :TMessagesProj_App:writeAfatReleaseAppMetadata
+> Task :TMessagesProj_App:writeAfatReleaseSigningConfigVersions
+
+> Task :TMessagesProj:buildCMakeRelWithDebInfo[arm64-v8a][tmessages.49,twidget]
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:550:11: warning: field '_e2eEncryptDecrypt' will be initialized after field '_userIds' [-Wreorder-ctor]
+C/C++:   550 |         , _e2eEncryptDecrypt(std::move(descriptor.e2eEncryptDecrypt))
+C/C++:       |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++:       |           _userIds(std::make_shared<GRUserIdRegistry>())
+C/C++:   551 |         , _userIds(std::make_shared<GRUserIdRegistry>())
+C/C++:       |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++:       |           _e2eEncryptDecrypt(std::move(descriptor.e2eEncryptDecrypt))
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:769:101: warning: lambda capture 'opusPayloadType' is not required to be captured for this use [-Wunused-lambda-capture]
+C/C++:   769 |             _peerConnectionObserver->onUnDemuxableRtpPacket = [tap, weak, threads, userIds, hasE2e, opusPayloadType](const webrtc::RtpPacketReceived &packet) {
+C/C++:       |                                                                                                   ~~^~~~~~~~~~~~~~~
+C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:1:
+C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.h:5:
+C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/functional:526:
+C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__functional/boyer_moore_searcher.h:22:
+C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:33:
+C/C++: /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/unique_ptr.h:601:30: warning: 'RtcEventLogFactory' is deprecated: Use default constructor [-Wdeprecated-declarations]
+C/C++:   601 |   return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...));
+C/C++:       |                              ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:692:39: note: in instantiation of function template specialization 'std::make_unique<webrtc::RtcEventLogFactory, webrtc::TaskQueueFactory *>' requested here
+C/C++:   692 |         deps.event_log_factory = std::make_unique<webrtc::RtcEventLogFactory>(deps.task_queue_factory.get());
+C/C++:       |                                       ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/api/rtc_event_log/rtc_event_log_factory.h:29:5: note: 'RtcEventLogFactory' has been explicitly marked deprecated here
+C/C++:    29 |   [[deprecated("Use default constructor")]]  //
+C/C++:       |     ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:2523:10: warning: private field '_disableAudioInput' is not used [-Wunused-private-field]
+C/C++:  2523 |     bool _disableAudioInput = false;
+C/C++:       |          ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:2524:10: warning: private field '_enableSystemMute' is not used [-Wunused-private-field]
+C/C++:  2524 |     bool _enableSystemMute = false;
+C/C++:       |          ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:2531:9: warning: private field '_minOutgoingVideoBitrateKbit' is not used [-Wunused-private-field]
+C/C++:  2531 |     int _minOutgoingVideoBitrateKbit = 100;
+C/C++:       |         ^
+C/C++: 6 warnings generated.
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2CompatImpl.cpp:354:5: warning: field '_videoCapture' will be initialized after field '_signalingTranslator' [-Wreorder-ctor]
+C/C++:   352 |     _eventLog(std::make_unique<webrtc::RtcEventLogNull>()),
+C/C++:       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++:       |     _signalingTranslator(_encryptionKey.isOutgoing)
+C/C++:   353 |     _taskQueueFactory(webrtc::CreateDefaultTaskQueueFactory()),
+C/C++:       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++:       |     _eventLog(std::make_unique<webrtc::RtcEventLogNull>())
+C/C++:   354 |     _videoCapture(descriptor.videoCapture),
+C/C++:       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++:       |     _taskQueueFactory(webrtc::CreateDefaultTaskQueueFactory())
+C/C++:   355 |     _signalingTranslator(_encryptionKey.isOutgoing) {
+C/C++:       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++:       |     _videoCapture(descriptor.videoCapture)
+C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2CompatImpl.cpp:1:
+C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2CompatImpl.h:5:
+C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/Instance.h:5:
+C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/functional:526:
+C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__functional/boyer_moore_searcher.h:22:
+C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:33:
+C/C++: /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/unique_ptr.h:601:30: warning: 'RtcEventLogFactory' is deprecated: Use default constructor [-Wdeprecated-declarations]
+C/C++:   601 |   return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...));
+C/C++:       |                              ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2CompatImpl.cpp:442:68: note: in instantiation of function template specialization 'std::make_unique<webrtc::RtcEventLogFactory, webrtc::TaskQueueFactory *>' requested here
+C/C++:   442 |         peerConnectionFactoryDependencies.event_log_factory = std::make_unique<webrtc::RtcEventLogFactory>(peerConnectionFactoryDependencies.task_queue_factory.get());
+C/C++:       |                                                                    ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/api/rtc_event_log/rtc_event_log_factory.h:29:5: note: 'RtcEventLogFactory' has been explicitly marked deprecated here
+C/C++:    29 |   [[deprecated("Use default constructor")]]  //
+C/C++:       |     ^
+C/C++: 2 warnings generated.
+C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2ReferenceImpl.cpp:1:
+C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2ReferenceImpl.h:5:
+C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/Instance.h:5:
+C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/functional:526:
+C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__functional/boyer_moore_searcher.h:22:
+C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:33:
+C/C++: /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/unique_ptr.h:601:30: warning: 'RtcEventLogFactory' is deprecated: Use default constructor [-Wdeprecated-declarations]
+C/C++:   601 |   return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...));
+C/C++:       |                              ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2ReferenceImpl.cpp:522:68: note: in instantiation of function template specialization 'std::make_unique<webrtc::RtcEventLogFactory, webrtc::TaskQueueFactory *>' requested here
+C/C++:   522 |         peerConnectionFactoryDependencies.event_log_factory = std::make_unique<webrtc::RtcEventLogFactory>(peerConnectionFactoryDependencies.task_queue_factory.get());
+C/C++:       |                                                                    ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/api/rtc_event_log/rtc_event_log_factory.h:29:5: note: 'RtcEventLogFactory' has been explicitly marked deprecated here
+C/C++:    29 |   [[deprecated("Use default constructor")]]  //
+C/C++:       |     ^
+C/C++: 1 warning generated.
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/wasm_module_entry.cpp:16:16: warning: unknown attribute 'import_module' ignored [-Wunknown-attributes]
+C/C++:    16 | __attribute__((import_module("env"), import_name("host_emit")))
+C/C++:       |                ^~~~~~~~~~~~~~~~~~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/wasm_module_entry.cpp:16:38: warning: unknown attribute 'import_name' ignored [-Wunknown-attributes]
+C/C++:    16 | __attribute__((import_module("env"), import_name("host_emit")))
+C/C++:       |                                      ^~~~~~~~~~~~~~~~~~~~~~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/wasm_module_entry.cpp:28:16: warning: unknown attribute 'export_name' ignored [-Wunknown-attributes]
+C/C++:    28 | __attribute__((export_name("rt_alloc")))
+C/C++:       |                ^~~~~~~~~~~~~~~~~~~~~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/wasm_module_entry.cpp:33:16: warning: unknown attribute 'export_name' ignored [-Wunknown-attributes]
+C/C++:    33 | __attribute__((export_name("rt_free")))
+C/C++:       |                ^~~~~~~~~~~~~~~~~~~~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/wasm_module_entry.cpp:38:16: warning: unknown attribute 'export_name' ignored [-Wunknown-attributes]
+C/C++:    38 | __attribute__((export_name("core_init")))
+C/C++:       |                ^~~~~~~~~~~~~~~~~~~~~~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/wasm_module_entry.cpp:48:16: warning: unknown attribute 'export_name' ignored [-Wunknown-attributes]
+C/C++:    48 | __attribute__((export_name("core_on_event")))
+C/C++:       |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++: 6 warnings generated.
+C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/CallCoreHost.cpp:1:
+C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/CallCoreHost.h:4:
+C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/deque:205:
+C/C++: /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/unique_ptr.h:601:30: warning: 'RtcEventLogFactory' is deprecated: Use default constructor [-Wdeprecated-declarations]
+C/C++:   601 |   return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...));
+C/C++:       |                              ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/CallCoreHost.cpp:601:64: note: in instantiation of function template specialization 'std::make_unique<webrtc::RtcEventLogFactory, webrtc::TaskQueueFactory *>' requested here
+C/C++:   601 |     peerConnectionFactoryDependencies.event_log_factory = std::make_unique<webrtc::RtcEventLogFactory>(peerConnectionFactoryDependencies.task_queue_factory.get());
+C/C++:       |                                                                ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/api/rtc_event_log/rtc_event_log_factory.h:29:5: note: 'RtcEventLogFactory' has been explicitly marked deprecated here
+C/C++:    29 |   [[deprecated("Use default constructor")]]  //
+C/C++:       |     ^
+C/C++: 1 warning generated.
