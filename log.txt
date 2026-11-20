@@ -1,6 +1,6 @@
 run=57 sha=29892b9709fc1472192e6b662ad1e98ea0a895dc status=running
                total        used        free      shared  buff/cache   available
-Mem:           15983        4862        2924          50        8591       11120
+Mem:           15983        5498        1457          50        9422       10484
 Swap:          11263           0       11263
 312:Note: Some input files use or override a deprecated API.
 313:Note: Recompile with -Xlint:deprecation for details.
@@ -24,7 +24,111 @@ Swap:          11263           0       11263
 462:Note: Recompile with -Xlint:deprecation for details.
 474:Note: Some input files use or override a deprecated API.
 475:Note: Recompile with -Xlint:deprecation for details.
+989:C/C++:   407 |             throwNewJavaIllegalArgumentException(env, "Unknown data saving constant: " + dataSaving);
+992:C/C++:   407 |             throwNewJavaIllegalArgumentException(env, "Unknown data saving constant: " + dataSaving);
 ---
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgnet/Datacenter.cpp:447:62: warning: '&&' within '||' [-Wlogical-op-parentheses]
+C/C++:   447 |     if (flags == 0 && (authKeyPerm == nullptr || PFS_ENABLED && authKeyTemp == nullptr) && !addressesIpv4Temp.empty()) {
+C/C++:       |                                               ~~ ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgnet/Datacenter.cpp:447:62: note: place parentheses around the '&&' expression to silence this warning
+C/C++:   447 |     if (flags == 0 && (authKeyPerm == nullptr || PFS_ENABLED && authKeyTemp == nullptr) && !addressesIpv4Temp.empty()) {
+C/C++:       |                                                  ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++: 4 warnings generated.
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgnet/ConnectionsManager.cpp:1076:215: warning: format specifies type 'unsigned long long' but the argument has type 'long' [-Wformat]
+C/C++:  1076 |                 if (LOGS_ENABLED) DEBUG_D("connection(%p, account%u, dc%u, type %d) received unparsed packet on 0x%" PRIx64, connection, instanceNum, datacenter->getDatacenterId(), connection->getConnectionType(), req_msg_id);
+C/C++:       |                                                                                                                   ~~~~~~~~~                                                                                           ^~~~~~~~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgnet/ConnectionsManager.cpp:1082:214: warning: format specifies type 'unsigned long long' but the argument has type 'long' [-Wformat]
+C/C++:  1082 |             if (LOGS_ENABLED) DEBUG_D("connection(%p, account%u, dc%u, type %d) received unprocessed packet on 0x%" PRIx64, connection, instanceNum, datacenter->getDatacenterId(), connection->getConnectionType(), req_msg_id);
+C/C++:       |                                                                                                                  ~~~~~~~~~                                                                                           ^~~~~~~~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgnet/ConnectionsManager.cpp:2053:101: warning: expression with side effects will be evaluated despite being used as an operand to 'typeid' [-Wpotentially-evaluated-expression]
+C/C++:  2053 |         if (LOGS_ENABLED) DEBUG_D("send request wrapped %p - %s", request->rpcRequest.get(), typeid(*(request->rpcRequest.get())).name());
+C/C++:       |                                                                                                     ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgnet/ConnectionsManager.cpp:2307:5: warning: non-void lambda does not return a value in all control paths [-Wreturn-type]
+C/C++:  2307 |     });
+C/C++:       |     ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgnet/ConnectionsManager.cpp:3206:155: warning: expression with side effects will be evaluated despite being used as an operand to 'typeid' [-Wpotentially-evaluated-expression]
+C/C++:  3206 |                             if (LOGS_ENABLED) DEBUG_D("wrap body(%p, %s) to TL_invokeAfterMsg, token = %d, after 0x%" PRIx64, message->body.get(), typeid(*(message->body.get())).name(), networkMessage->requestId, request->msg_id);
+C/C++:       |                                                                                                                                                           ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgnet/ConnectionsManager.cpp:3399:17: warning: unused variable 'is_inited' [-Wunused-variable]
+C/C++:  3399 |     static bool is_inited = []() {
+C/C++:       |                 ^~~~~~~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgnet/ConnectionsManager.cpp:3431:43: warning: array subscript is of type 'char' [-Wchar-subscripts]
+C/C++:  3431 |             auto value = url_char_to_value[base64.c_str()[i++]];
+C/C++:       |                                           ^~~~~~~~~~~~~~~~~~~~
+C/C++: 7 warnings generated.
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/desktop_capturer/DesktopCaptureSourceHelper.cpp:258:35: warning: explicit capture of 'this' with a capture default of '=' is a C++20 extension [-Wc++20-extensions]
+C/C++:   258 |     _callback.setOnFatalError([=, this] {
+C/C++:       |                                   ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/desktop_capturer/DesktopCaptureSourceHelper.cpp:264:30: warning: explicit capture of 'this' with a capture default of '=' is a C++20 extension [-Wc++20-extensions]
+C/C++:   264 |     _callback.setOnPause([=, this] (bool pause) {
+C/C++:       |                              ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/desktop_capturer/DesktopCaptureSourceHelper.cpp:338:41: warning: explicit capture of 'this' with a capture default of '=' is a C++20 extension [-Wc++20-extensions]
+C/C++:   338 |     _scheduler.runDelayed(_delayMs, [=, this] {
+C/C++:       |                                         ^
+C/C++: 3 warnings generated.
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:550:11: warning: field '_e2eEncryptDecrypt' will be initialized after field '_userIds' [-Wreorder-ctor]
+C/C++:   550 |         , _e2eEncryptDecrypt(std::move(descriptor.e2eEncryptDecrypt))
+C/C++:       |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++:       |           _userIds(std::make_shared<GRUserIdRegistry>())
+C/C++:   551 |         , _userIds(std::make_shared<GRUserIdRegistry>())
+C/C++:       |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++:       |           _e2eEncryptDecrypt(std::move(descriptor.e2eEncryptDecrypt))
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:769:101: warning: lambda capture 'opusPayloadType' is not required to be captured for this use [-Wunused-lambda-capture]
+C/C++:   769 |             _peerConnectionObserver->onUnDemuxableRtpPacket = [tap, weak, threads, userIds, hasE2e, opusPayloadType](const webrtc::RtpPacketReceived &packet) {
+C/C++:       |                                                                                                   ~~^~~~~~~~~~~~~~~
+C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:1:
+C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.h:5:
+C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/functional:526:
+C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__functional/boyer_moore_searcher.h:22:
+C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:33:
+C/C++: /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/unique_ptr.h:601:30: warning: 'RtcEventLogFactory' is deprecated: Use default constructor [-Wdeprecated-declarations]
+C/C++:   601 |   return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...));
+C/C++:       |                              ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:692:39: note: in instantiation of function template specialization 'std::make_unique<webrtc::RtcEventLogFactory, webrtc::TaskQueueFactory *>' requested here
+C/C++:   692 |         deps.event_log_factory = std::make_unique<webrtc::RtcEventLogFactory>(deps.task_queue_factory.get());
+C/C++:       |                                       ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/api/rtc_event_log/rtc_event_log_factory.h:29:5: note: 'RtcEventLogFactory' has been explicitly marked deprecated here
+C/C++:    29 |   [[deprecated("Use default constructor")]]  //
+C/C++:       |     ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:2523:10: warning: private field '_disableAudioInput' is not used [-Wunused-private-field]
+C/C++:  2523 |     bool _disableAudioInput = false;
+C/C++:       |          ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:2524:10: warning: private field '_enableSystemMute' is not used [-Wunused-private-field]
+C/C++:  2524 |     bool _enableSystemMute = false;
+C/C++:       |          ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:2531:9: warning: private field '_minOutgoingVideoBitrateKbit' is not used [-Wunused-private-field]
+C/C++:  2531 |     int _minOutgoingVideoBitrateKbit = 100;
+C/C++:       |         ^
+C/C++: 6 warnings generated.
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2CompatImpl.cpp:354:5: warning: field '_videoCapture' will be initialized after field '_signalingTranslator' [-Wreorder-ctor]
+C/C++:   352 |     _eventLog(std::make_unique<webrtc::RtcEventLogNull>()),
+C/C++:       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++:       |     _signalingTranslator(_encryptionKey.isOutgoing)
+C/C++:   353 |     _taskQueueFactory(webrtc::CreateDefaultTaskQueueFactory()),
+C/C++:       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++:       |     _eventLog(std::make_unique<webrtc::RtcEventLogNull>())
+C/C++:   354 |     _videoCapture(descriptor.videoCapture),
+C/C++:       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++:       |     _taskQueueFactory(webrtc::CreateDefaultTaskQueueFactory())
+C/C++:   355 |     _signalingTranslator(_encryptionKey.isOutgoing) {
+C/C++:       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++:       |     _videoCapture(descriptor.videoCapture)
+C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2CompatImpl.cpp:1:
+C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2CompatImpl.h:5:
+C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/Instance.h:5:
+C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/functional:526:
+C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__functional/boyer_moore_searcher.h:22:
+C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:33:
+C/C++: /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/unique_ptr.h:601:30: warning: 'RtcEventLogFactory' is deprecated: Use default constructor [-Wdeprecated-declarations]
+C/C++:   601 |   return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...));
+C/C++:       |                              ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2CompatImpl.cpp:442:68: note: in instantiation of function template specialization 'std::make_unique<webrtc::RtcEventLogFactory, webrtc::TaskQueueFactory *>' requested here
+C/C++:   442 |         peerConnectionFactoryDependencies.event_log_factory = std::make_unique<webrtc::RtcEventLogFactory>(peerConnectionFactoryDependencies.task_queue_factory.get());
+C/C++:       |                                                                    ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/api/rtc_event_log/rtc_event_log_factory.h:29:5: note: 'RtcEventLogFactory' has been explicitly marked deprecated here
+C/C++:    29 |   [[deprecated("Use default constructor")]]  //
+C/C++:       |     ^
+C/C++: 2 warnings generated.
 C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2ReferenceImpl.cpp:1:
 C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2ReferenceImpl.h:5:
 C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/Instance.h:5:
@@ -73,105 +177,3 @@ C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/api
 C/C++:    29 |   [[deprecated("Use default constructor")]]  //
 C/C++:       |     ^
 C/C++: 1 warning generated.
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/modules/utility/source/jvm_android.cc:82:10: warning: unused variable 'ret' [-Wunused-variable]
-C/C++:    82 |     jint ret = jvm->AttachCurrentThread(&env, nullptr);
-C/C++:       |          ^~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/modules/utility/source/jvm_android.cc:78:11: warning: unused variable 'jni' [-Wunused-variable]
-C/C++:    78 |   JNIEnv* jni = GetEnv(jvm);
-C/C++:       |           ^~~
-C/C++: 2 warnings generated.
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/call/call.cc:72:
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/video_receive_stream2.h:38:
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.h:393:7: warning: declaration does not declare anything [-Wmissing-declarations]
-C/C++:   393 |       RTC_GUARDED_BY(packet_sequence_checker_);
-C/C++:       |       ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:31:27: note: expanded from macro 'RTC_GUARDED_BY'
-C/C++:    31 | #define RTC_GUARDED_BY(x) RTC_THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
-C/C++:       |                           ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:23:46: note: expanded from macro 'RTC_THREAD_ANNOTATION_ATTRIBUTE__'
-C/C++:    23 | #define RTC_THREAD_ANNOTATION_ATTRIBUTE__(x) __attribute__((x))
-C/C++:       |                                              ^
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/call/call.cc:72:
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/video_receive_stream2.h:38:
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.h:393:7: warning: attribute guarded_by ignored, because it is not attached to a declaration [-Wignored-attributes]
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:31:71: note: expanded from macro 'RTC_GUARDED_BY'
-C/C++:    31 | #define RTC_GUARDED_BY(x) RTC_THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
-C/C++:       |                                                                       ^
-C/C++: 2 warnings generated.
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/video_source_sink_controller.cc:40:55: warning: format specifies type 'long' but the argument has type 'rtc::VideoSourceInterface<VideoFrame> *' [-Wformat]
-C/C++:    40 |     DEBUG_D("$%d: SetSource(): new source as %ld", a, source_);
-C/C++:       |                                              ~~~      ^~~~~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/video_source_sink_controller.cc:67:60: warning: format specifies type 'long' but the argument has type 'rtc::VideoSourceInterface<VideoFrame> *' [-Wformat]
-C/C++:    67 |     DEBUG_D("$%d: PushSourceSinkSettings(): 2 src=%ld", a, source_);
-C/C++:       |                                                   ~~~      ^~~~~~~
-C/C++: 2 warnings generated.
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/video_quality_observer2.cc:21:
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/video_receive_stream2.h:38:
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.h:393:7: warning: declaration does not declare anything [-Wmissing-declarations]
-C/C++:   393 |       RTC_GUARDED_BY(packet_sequence_checker_);
-C/C++:       |       ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:31:27: note: expanded from macro 'RTC_GUARDED_BY'
-C/C++:    31 | #define RTC_GUARDED_BY(x) RTC_THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
-C/C++:       |                           ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:23:46: note: expanded from macro 'RTC_THREAD_ANNOTATION_ATTRIBUTE__'
-C/C++:    23 | #define RTC_THREAD_ANNOTATION_ATTRIBUTE__(x) __attribute__((x))
-C/C++:       |                                              ^
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/video_quality_observer2.cc:21:
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/video_receive_stream2.h:38:
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.h:393:7: warning: attribute guarded_by ignored, because it is not attached to a declaration [-Wignored-attributes]
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:31:71: note: expanded from macro 'RTC_GUARDED_BY'
-C/C++:    31 | #define RTC_GUARDED_BY(x) RTC_THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
-C/C++:       |                                                                       ^
-C/C++: 2 warnings generated.
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/video_receive_stream2.cc:11:
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/video_receive_stream2.h:38:
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.h:393:7: warning: declaration does not declare anything [-Wmissing-declarations]
-C/C++:   393 |       RTC_GUARDED_BY(packet_sequence_checker_);
-C/C++:       |       ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:31:27: note: expanded from macro 'RTC_GUARDED_BY'
-C/C++:    31 | #define RTC_GUARDED_BY(x) RTC_THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
-C/C++:       |                           ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:23:46: note: expanded from macro 'RTC_THREAD_ANNOTATION_ATTRIBUTE__'
-C/C++:    23 | #define RTC_THREAD_ANNOTATION_ATTRIBUTE__(x) __attribute__((x))
-C/C++:       |                                              ^
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/video_receive_stream2.cc:11:
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/video_receive_stream2.h:38:
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.h:393:7: warning: attribute guarded_by ignored, because it is not attached to a declaration [-Wignored-attributes]
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:31:71: note: expanded from macro 'RTC_GUARDED_BY'
-C/C++:    31 | #define RTC_GUARDED_BY(x) RTC_THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
-C/C++:       |                                                                       ^
-C/C++: 2 warnings generated.
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/receive_statistics_proxy.cc:25:
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/video_receive_stream2.h:38:
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.h:393:7: warning: declaration does not declare anything [-Wmissing-declarations]
-C/C++:   393 |       RTC_GUARDED_BY(packet_sequence_checker_);
-C/C++:       |       ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:31:27: note: expanded from macro 'RTC_GUARDED_BY'
-C/C++:    31 | #define RTC_GUARDED_BY(x) RTC_THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
-C/C++:       |                           ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:23:46: note: expanded from macro 'RTC_THREAD_ANNOTATION_ATTRIBUTE__'
-C/C++:    23 | #define RTC_THREAD_ANNOTATION_ATTRIBUTE__(x) __attribute__((x))
-C/C++:       |                                              ^
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/receive_statistics_proxy.cc:25:
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/video_receive_stream2.h:38:
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.h:393:7: warning: attribute guarded_by ignored, because it is not attached to a declaration [-Wignored-attributes]
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:31:71: note: expanded from macro 'RTC_GUARDED_BY'
-C/C++:    31 | #define RTC_GUARDED_BY(x) RTC_THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
-C/C++:       |                                                                       ^
-C/C++: 2 warnings generated.
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.cc:11:
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.h:393:7: warning: declaration does not declare anything [-Wmissing-declarations]
-C/C++:   393 |       RTC_GUARDED_BY(packet_sequence_checker_);
-C/C++:       |       ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:31:27: note: expanded from macro 'RTC_GUARDED_BY'
-C/C++:    31 | #define RTC_GUARDED_BY(x) RTC_THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
-C/C++:       |                           ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:23:46: note: expanded from macro 'RTC_THREAD_ANNOTATION_ATTRIBUTE__'
-C/C++:    23 | #define RTC_THREAD_ANNOTATION_ATTRIBUTE__(x) __attribute__((x))
-C/C++:       |                                              ^
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.cc:11:
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.h:393:7: warning: attribute guarded_by ignored, because it is not attached to a declaration [-Wignored-attributes]
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:31:71: note: expanded from macro 'RTC_GUARDED_BY'
-C/C++:    31 | #define RTC_GUARDED_BY(x) RTC_THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
-C/C++:       |                                                                       ^
-C/C++: 2 warnings generated.
