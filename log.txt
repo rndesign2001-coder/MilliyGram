@@ -1,6 +1,6 @@
 run=57 sha=29892b9709fc1472192e6b662ad1e98ea0a895dc status=running
                total        used        free      shared  buff/cache   available
-Mem:           15983       12868         193          51        3317        3114
+Mem:           15983        1101       12959          52        2319       14881
 Swap:          11263           0       11263
 312:Note: Some input files use or override a deprecated API.
 313:Note: Recompile with -Xlint:deprecation for details.
@@ -36,25 +36,6 @@ Swap:          11263           0       11263
 2089:Note: Some input files use unchecked or unsafe operations.
 2090:Note: Recompile with -Xlint:unchecked for details.
 ---
-R.raw.msg_emoji_smiles (0x7f0e00a7) — fps=60, frames=60, mono=false
-R.raw.edge_30 (0x7f0e0047) — fps=60, frames=180, mono=false
-R.raw.gram (0x7f0e0067) — fps=60, frames=20, mono=false
-R.raw.tab_chats (0x7f0e0143) — fps=60, frames=6, mono=false
-R.raw.photo_suggest_icon (0x7f0e00c9) — fps=60, frames=85, mono=false
-R.raw.tsv_monkey_close (0x7f0e0173) — fps=60, frames=98, mono=false
-R.raw.chats_archived (0x7f0e002b) — fps=60, frames=45, mono=false
-R.raw.caption_hide (0x7f0e0021) — fps=60, frames=20, mono=false
-R.raw.roundcamera_flip (0x7f0e0100) — fps=60, frames=30, mono=false
-R.raw.call_accept (0x7f0e0014) — fps=60, frames=180, mono=false
-R.raw.chats_archiveavatar (0x7f0e002a) — fps=60, frames=50, mono=false
-R.raw.gift (0x7f0e0060) — fps=60, frames=180, mono=false
-R.raw.caption_limit (0x7f0e0022) — fps=60, frames=90, mono=false
-R.raw.seek_speed_hint (0x7f0e0104) — fps=60, frames=42, mono=false
-R.raw.camera_flip (0x7f0e001a) — fps=60, frames=40, mono=false
-R.raw.video_stop (0x7f0e018e) — fps=60, frames=60, mono=false
-R.raw.code_laptop (0x7f0e0032) — fps=60, frames=64, mono=false
-R.raw.topics_sidebar (0x7f0e016d) — fps=60, frames=100, mono=false
-R.raw.notify_toggle (0x7f0e00b1) — fps=60, frames=80, mono=false
 R.raw.tsv_setup_monkey_tracking (0x7f0e017d) — fps=60, frames=180, mono=false
 R.raw.media_mute_unmute (0x7f0e0097) — fps=60, frames=44, mono=false
 R.raw.star_reaction_click (0x7f0e011f) — fps=60, frames=125, mono=false
@@ -186,3 +167,22 @@ Note: Recompile with -Xlint:unchecked for details.
 > Task :TMessagesProj_App:mergeAfatReleaseGeneratedProguardFiles
 > Task :TMessagesProj_App:expandAfatReleaseArtProfileWildcards
 > Task :TMessagesProj_App:minifyAfatReleaseWithR8
+> Task :TMessagesProj_App:convertShrunkResourcesToBinaryAfatRelease
+> Task :TMessagesProj_App:optimizeAfatReleaseResources
+> Task :TMessagesProj_App:l8DexDesugarLibAfatRelease
+> Task :TMessagesProj_App:compileAfatReleaseArtProfile
+> Task :TMessagesProj_App:packageAfatRelease
+> Task :TMessagesProj_App:createAfatReleaseApkListingFileRedirect
+> Task :TMessagesProj_App:assembleAfatRelease
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_6-1795195256233.json
+
+[Incubating] Problems report is available at: file:///home/runner/work/MilliyGram/MilliyGram/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 23m 51s
+341 actionable tasks: 341 executed
