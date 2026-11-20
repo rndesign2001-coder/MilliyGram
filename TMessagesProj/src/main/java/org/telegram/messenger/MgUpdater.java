@@ -263,9 +263,8 @@ public final class MgUpdater {
 
     /** Joriy versiyadagi yangiliklar ("Yangi versiyada nimalar bor" oynasi uchun) */
     private static final String[] WHATS_NEW = {
-            "Yangi: iborali yashirin chatlar — Sozlamalar → Maxfiylik → Yashirin chatlar",
-            "Iborani qidiruvga yozing — yashirin chatlar ochiladi, har bir iboraga alohida to'plam",
-            "Yashirin chatlardan qo'ng'iroqlar jimgina rad etiladi, rejim o'zi yopiladi",
+            "\"Xabar mavjud emas\" yozuvi ketma-ket chiqib qolishi tuzatildi",
+            "Yuklab bo'lmagan fayl uchun aniq ogohlantirish",
     };
 
     /** Ilova yangilangandan keyingi birinchi ochilishda yangiliklarni bir marta ko'rsatadi */

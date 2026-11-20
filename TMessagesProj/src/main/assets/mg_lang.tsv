@@ -1829,3 +1829,7 @@ Yashirin chatlar ochildi. Chat qo'shish uchun + tugmasini bosing.	Скрытые
 Yangi: iborali yashirin chatlar — Sozlamalar → Maxfiylik → Yashirin chatlar	Новое: скрытые чаты по фразе — Настройки → Конфиденциальность → Скрытые чаты	New: phrase-protected hidden chats — Settings → Privacy → Hidden Chats
 Iborani qidiruvga yozing — yashirin chatlar ochiladi, har bir iboraga alohida to'plam	Введите фразу в поиск — откроются скрытые чаты, у каждой фразы свой набор	Type the phrase in search to open hidden chats, a separate set for each phrase
 Yashirin chatlardan qo'ng'iroqlar jimgina rad etiladi, rejim o'zi yopiladi	Звонки из скрытых чатов тихо отклоняются, режим закрывается сам	Calls from hidden chats are declined quietly, and the mode closes on its own
+Faylni yuklab bo'lmadi: xabar o'chirilgan	Не удалось загрузить файл: сообщение удалено	Couldn't download the file: the message was deleted
+Faylni yuklab bo'lmadi	Не удалось загрузить файл	Couldn't download the file
+\"Xabar mavjud emas\" yozuvi ketma-ket chiqib qolishi tuzatildi	Исправлено повторяющееся сообщение «Сообщение не существует»	Fixed the repeating \"Message doesn't exist\" notice
+Yuklab bo'lmagan fayl uchun aniq ogohlantirish	Понятное уведомление о файле, который не удалось загрузить	A clear notice for files that couldn't be downloaded

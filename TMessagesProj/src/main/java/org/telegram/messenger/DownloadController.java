@@ -1547,10 +1547,17 @@ public class DownloadController extends BaseController implements NotificationCe
 
     }
 
+    // MilliyGram: bitta fayl uchun xato yozuvi qayta-qayta chiqmasligi uchun (hujjat ID -> oxirgi ko'rsatilgan vaqt)
+    private static final HashMap<Long, Long> mgFailNotified = new HashMap<>();
+    private static final long MG_FAIL_NOTIFY_INTERVAL = 10 * 60_000L;
+
     public void onDownloadFail(MessageObject parentObject, int reason) {
         if (parentObject == null) {
             return;
         }
+        // MilliyGram: xatodan keyin fayl "yuklanmalar"ga qayta tushmasin — aks holda avto-yuklash har safar
+        // yana urinadi va "Xabar mavjud emas" yozuvi ilova qayta ochilguncha ketma-ket chiqadi
+        parentObject.putInDownloadsStore = false;
 
         AndroidUtilities.runOnUIThread(() -> {
             boolean removed = false;
@@ -1558,7 +1565,10 @@ public class DownloadController extends BaseController implements NotificationCe
             for (int i = 0; i < downloadingFiles.size(); i++) {
                 TLRPC.Document downloadingDocument = downloadingFiles.get(i).getDocument();
                 if (downloadingDocument == null || parentDocument != null && downloadingDocument.id == parentDocument.id) {
-                    downloadingFiles.remove(i);
+                    MessageObject failed = downloadingFiles.remove(i);
+                    if (failed != null) {
+                        failed.putInDownloadsStore = false;
+                    }
                     removed = true;
                     break;
                 }
@@ -1566,7 +1576,16 @@ public class DownloadController extends BaseController implements NotificationCe
             if (removed) {
                 getNotificationCenter().postNotificationName(NotificationCenter.onDownloadingFilesChanged);
                 if (reason == 0) {
-                    NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.showBulletin, Bulletin.TYPE_ERROR, LocaleController.formatString("MessageNotFound", R.string.MessageNotFound));
+                    long docId = parentDocument != null ? parentDocument.id : 0;
+                    long now = android.os.SystemClock.elapsedRealtime();
+                    Long last = mgFailNotified.get(docId);
+                    if (last != null && now - last < MG_FAIL_NOTIFY_INTERVAL) {
+                        return;
+                    }
+                    mgFailNotified.put(docId, now);
+                    boolean keptDeleted = !android.text.TextUtils.isEmpty(parentObject.deletedBy);
+                    NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.showBulletin, Bulletin.TYPE_ERROR,
+                            keptDeleted ? MgLang.t("Faylni yuklab bo'lmadi: xabar o'chirilgan") : MgLang.t("Faylni yuklab bo'lmadi"));
                 } else if (reason == -1) {
                     LaunchActivity.checkFreeDiscSpaceStatic(2);
                 }
