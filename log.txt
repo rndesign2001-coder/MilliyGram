@@ -1,6 +1,6 @@
 run=57 sha=29892b9709fc1472192e6b662ad1e98ea0a895dc status=running
                total        used        free      shared  buff/cache   available
-Mem:           15983        5498        1457          50        9422       10484
+Mem:           15983        5053        1268          51       10057       10929
 Swap:          11263           0       11263
 312:Note: Some input files use or override a deprecated API.
 313:Note: Recompile with -Xlint:deprecation for details.
@@ -26,154 +26,156 @@ Swap:          11263           0       11263
 475:Note: Recompile with -Xlint:deprecation for details.
 989:C/C++:   407 |             throwNewJavaIllegalArgumentException(env, "Unknown data saving constant: " + dataSaving);
 992:C/C++:   407 |             throwNewJavaIllegalArgumentException(env, "Unknown data saving constant: " + dataSaving);
+1519:C/C++:   407 |             throwNewJavaIllegalArgumentException(env, "Unknown data saving constant: " + dataSaving);
+1522:C/C++:   407 |             throwNewJavaIllegalArgumentException(env, "Unknown data saving constant: " + dataSaving);
 ---
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgnet/Datacenter.cpp:447:62: warning: '&&' within '||' [-Wlogical-op-parentheses]
-C/C++:   447 |     if (flags == 0 && (authKeyPerm == nullptr || PFS_ENABLED && authKeyTemp == nullptr) && !addressesIpv4Temp.empty()) {
-C/C++:       |                                               ~~ ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgnet/Datacenter.cpp:447:62: note: place parentheses around the '&&' expression to silence this warning
-C/C++:   447 |     if (flags == 0 && (authKeyPerm == nullptr || PFS_ENABLED && authKeyTemp == nullptr) && !addressesIpv4Temp.empty()) {
-C/C++:       |                                                  ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
-C/C++: 4 warnings generated.
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgnet/ConnectionsManager.cpp:1076:215: warning: format specifies type 'unsigned long long' but the argument has type 'long' [-Wformat]
-C/C++:  1076 |                 if (LOGS_ENABLED) DEBUG_D("connection(%p, account%u, dc%u, type %d) received unparsed packet on 0x%" PRIx64, connection, instanceNum, datacenter->getDatacenterId(), connection->getConnectionType(), req_msg_id);
-C/C++:       |                                                                                                                   ~~~~~~~~~                                                                                           ^~~~~~~~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgnet/ConnectionsManager.cpp:1082:214: warning: format specifies type 'unsigned long long' but the argument has type 'long' [-Wformat]
-C/C++:  1082 |             if (LOGS_ENABLED) DEBUG_D("connection(%p, account%u, dc%u, type %d) received unprocessed packet on 0x%" PRIx64, connection, instanceNum, datacenter->getDatacenterId(), connection->getConnectionType(), req_msg_id);
-C/C++:       |                                                                                                                  ~~~~~~~~~                                                                                           ^~~~~~~~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgnet/ConnectionsManager.cpp:2053:101: warning: expression with side effects will be evaluated despite being used as an operand to 'typeid' [-Wpotentially-evaluated-expression]
-C/C++:  2053 |         if (LOGS_ENABLED) DEBUG_D("send request wrapped %p - %s", request->rpcRequest.get(), typeid(*(request->rpcRequest.get())).name());
-C/C++:       |                                                                                                     ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgnet/ConnectionsManager.cpp:2307:5: warning: non-void lambda does not return a value in all control paths [-Wreturn-type]
-C/C++:  2307 |     });
-C/C++:       |     ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgnet/ConnectionsManager.cpp:3206:155: warning: expression with side effects will be evaluated despite being used as an operand to 'typeid' [-Wpotentially-evaluated-expression]
-C/C++:  3206 |                             if (LOGS_ENABLED) DEBUG_D("wrap body(%p, %s) to TL_invokeAfterMsg, token = %d, after 0x%" PRIx64, message->body.get(), typeid(*(message->body.get())).name(), networkMessage->requestId, request->msg_id);
-C/C++:       |                                                                                                                                                           ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgnet/ConnectionsManager.cpp:3399:17: warning: unused variable 'is_inited' [-Wunused-variable]
-C/C++:  3399 |     static bool is_inited = []() {
-C/C++:       |                 ^~~~~~~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgnet/ConnectionsManager.cpp:3431:43: warning: array subscript is of type 'char' [-Wchar-subscripts]
-C/C++:  3431 |             auto value = url_char_to_value[base64.c_str()[i++]];
-C/C++:       |                                           ^~~~~~~~~~~~~~~~~~~~
-C/C++: 7 warnings generated.
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/desktop_capturer/DesktopCaptureSourceHelper.cpp:258:35: warning: explicit capture of 'this' with a capture default of '=' is a C++20 extension [-Wc++20-extensions]
-C/C++:   258 |     _callback.setOnFatalError([=, this] {
-C/C++:       |                                   ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/desktop_capturer/DesktopCaptureSourceHelper.cpp:264:30: warning: explicit capture of 'this' with a capture default of '=' is a C++20 extension [-Wc++20-extensions]
-C/C++:   264 |     _callback.setOnPause([=, this] (bool pause) {
-C/C++:       |                              ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/desktop_capturer/DesktopCaptureSourceHelper.cpp:338:41: warning: explicit capture of 'this' with a capture default of '=' is a C++20 extension [-Wc++20-extensions]
-C/C++:   338 |     _scheduler.runDelayed(_delayMs, [=, this] {
-C/C++:       |                                         ^
-C/C++: 3 warnings generated.
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:550:11: warning: field '_e2eEncryptDecrypt' will be initialized after field '_userIds' [-Wreorder-ctor]
-C/C++:   550 |         , _e2eEncryptDecrypt(std::move(descriptor.e2eEncryptDecrypt))
-C/C++:       |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-C/C++:       |           _userIds(std::make_shared<GRUserIdRegistry>())
-C/C++:   551 |         , _userIds(std::make_shared<GRUserIdRegistry>())
-C/C++:       |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-C/C++:       |           _e2eEncryptDecrypt(std::move(descriptor.e2eEncryptDecrypt))
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:769:101: warning: lambda capture 'opusPayloadType' is not required to be captured for this use [-Wunused-lambda-capture]
-C/C++:   769 |             _peerConnectionObserver->onUnDemuxableRtpPacket = [tap, weak, threads, userIds, hasE2e, opusPayloadType](const webrtc::RtpPacketReceived &packet) {
-C/C++:       |                                                                                                   ~~^~~~~~~~~~~~~~~
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:1:
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.h:5:
-C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/functional:526:
-C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__functional/boyer_moore_searcher.h:22:
-C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:33:
-C/C++: /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/unique_ptr.h:601:30: warning: 'RtcEventLogFactory' is deprecated: Use default constructor [-Wdeprecated-declarations]
-C/C++:   601 |   return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...));
-C/C++:       |                              ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:692:39: note: in instantiation of function template specialization 'std::make_unique<webrtc::RtcEventLogFactory, webrtc::TaskQueueFactory *>' requested here
-C/C++:   692 |         deps.event_log_factory = std::make_unique<webrtc::RtcEventLogFactory>(deps.task_queue_factory.get());
-C/C++:       |                                       ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/api/rtc_event_log/rtc_event_log_factory.h:29:5: note: 'RtcEventLogFactory' has been explicitly marked deprecated here
-C/C++:    29 |   [[deprecated("Use default constructor")]]  //
-C/C++:       |     ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:2523:10: warning: private field '_disableAudioInput' is not used [-Wunused-private-field]
-C/C++:  2523 |     bool _disableAudioInput = false;
-C/C++:       |          ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:2524:10: warning: private field '_enableSystemMute' is not used [-Wunused-private-field]
-C/C++:  2524 |     bool _enableSystemMute = false;
-C/C++:       |          ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:2531:9: warning: private field '_minOutgoingVideoBitrateKbit' is not used [-Wunused-private-field]
-C/C++:  2531 |     int _minOutgoingVideoBitrateKbit = 100;
-C/C++:       |         ^
-C/C++: 6 warnings generated.
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2CompatImpl.cpp:354:5: warning: field '_videoCapture' will be initialized after field '_signalingTranslator' [-Wreorder-ctor]
-C/C++:   352 |     _eventLog(std::make_unique<webrtc::RtcEventLogNull>()),
-C/C++:       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-C/C++:       |     _signalingTranslator(_encryptionKey.isOutgoing)
-C/C++:   353 |     _taskQueueFactory(webrtc::CreateDefaultTaskQueueFactory()),
-C/C++:       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-C/C++:       |     _eventLog(std::make_unique<webrtc::RtcEventLogNull>())
-C/C++:   354 |     _videoCapture(descriptor.videoCapture),
-C/C++:       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-C/C++:       |     _taskQueueFactory(webrtc::CreateDefaultTaskQueueFactory())
-C/C++:   355 |     _signalingTranslator(_encryptionKey.isOutgoing) {
-C/C++:       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-C/C++:       |     _videoCapture(descriptor.videoCapture)
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2CompatImpl.cpp:1:
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2CompatImpl.h:5:
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/Instance.h:5:
-C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/functional:526:
-C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__functional/boyer_moore_searcher.h:22:
-C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:33:
-C/C++: /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/unique_ptr.h:601:30: warning: 'RtcEventLogFactory' is deprecated: Use default constructor [-Wdeprecated-declarations]
-C/C++:   601 |   return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...));
-C/C++:       |                              ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2CompatImpl.cpp:442:68: note: in instantiation of function template specialization 'std::make_unique<webrtc::RtcEventLogFactory, webrtc::TaskQueueFactory *>' requested here
-C/C++:   442 |         peerConnectionFactoryDependencies.event_log_factory = std::make_unique<webrtc::RtcEventLogFactory>(peerConnectionFactoryDependencies.task_queue_factory.get());
-C/C++:       |                                                                    ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/api/rtc_event_log/rtc_event_log_factory.h:29:5: note: 'RtcEventLogFactory' has been explicitly marked deprecated here
-C/C++:    29 |   [[deprecated("Use default constructor")]]  //
-C/C++:       |     ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:23:46: note: expanded from macro 'RTC_THREAD_ANNOTATION_ATTRIBUTE__'
+C/C++:    23 | #define RTC_THREAD_ANNOTATION_ATTRIBUTE__(x) __attribute__((x))
+C/C++:       |                                              ^
+C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.cc:11:
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.h:393:7: warning: attribute guarded_by ignored, because it is not attached to a declaration [-Wignored-attributes]
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:31:71: note: expanded from macro 'RTC_GUARDED_BY'
+C/C++:    31 | #define RTC_GUARDED_BY(x) RTC_THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
+C/C++:       |                                                                       ^
 C/C++: 2 warnings generated.
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2ReferenceImpl.cpp:1:
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2ReferenceImpl.h:5:
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/Instance.h:5:
-C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/functional:526:
-C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__functional/boyer_moore_searcher.h:22:
-C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:33:
-C/C++: /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/unique_ptr.h:601:30: warning: 'RtcEventLogFactory' is deprecated: Use default constructor [-Wdeprecated-declarations]
-C/C++:   601 |   return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...));
-C/C++:       |                              ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2ReferenceImpl.cpp:522:68: note: in instantiation of function template specialization 'std::make_unique<webrtc::RtcEventLogFactory, webrtc::TaskQueueFactory *>' requested here
-C/C++:   522 |         peerConnectionFactoryDependencies.event_log_factory = std::make_unique<webrtc::RtcEventLogFactory>(peerConnectionFactoryDependencies.task_queue_factory.get());
-C/C++:       |                                                                    ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/api/rtc_event_log/rtc_event_log_factory.h:29:5: note: 'RtcEventLogFactory' has been explicitly marked deprecated here
-C/C++:    29 |   [[deprecated("Use default constructor")]]  //
-C/C++:       |     ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:50:1: warning: typedef requires a name [-Wmissing-declarations]
+C/C++:    50 | typedef struct VideoInfo {
+C/C++:       | ^~~~~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:143:10: warning: format string is not a string literal (potentially insecure) [-Wformat-security]
+C/C++:   143 |     LOGE(line);
+C/C++:       |          ^~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/c_utils.h:11:67: note: expanded from macro 'LOGE'
+C/C++:    11 | #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+C/C++:       |                                                                   ^~~~~~~~~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:143:10: note: treat the string as an argument to avoid this
+C/C++:   143 |     LOGE(line);
+C/C++:       |          ^
+C/C++:       |          "%s", 
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/c_utils.h:11:67: note: expanded from macro 'LOGE'
+C/C++:    11 | #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+C/C++:       |                                                                   ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:152:37: warning: format specifies type 'int' but the argument has type 'const enum AVPixelFormat *' [-Wformat]
+C/C++:   152 |         LOGE("available format %d", p);
+C/C++:       |                                ~~   ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/c_utils.h:11:67: note: expanded from macro 'LOGE'
+C/C++:    11 | #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+C/C++:       |                                                                   ^~~~~~~~~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:643:13: warning: comparison between NULL and non-pointer ('jlong' (aka 'long long') and NULL) [-Wnull-arithmetic]
+C/C++:   643 |     if (ptr == NULL) {
+C/C++:       |         ~~~ ^  ~~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:643:16: warning: implicit conversion of NULL constant to 'jlong' (aka 'long long') [-Wnull-conversion]
+C/C++:   643 |     if (ptr == NULL) {
+C/C++:       |             ~~ ^~~~
+C/C++:       |                0
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:668:13: warning: comparison between NULL and non-pointer ('jlong' (aka 'long long') and NULL) [-Wnull-arithmetic]
+C/C++:   668 |     if (ptr == NULL) {
+C/C++:       |         ~~~ ^  ~~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:668:16: warning: implicit conversion of NULL constant to 'jlong' (aka 'long long') [-Wnull-conversion]
+C/C++:   668 |     if (ptr == NULL) {
+C/C++:       |             ~~ ^~~~
+C/C++:       |                0
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:676:13: warning: comparison between NULL and non-pointer ('jlong' (aka 'long long') and NULL) [-Wnull-arithmetic]
+C/C++:   676 |     if (ptr == NULL) {
+C/C++:       |         ~~~ ^  ~~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:676:16: warning: implicit conversion of NULL constant to 'jlong' (aka 'long long') [-Wnull-conversion]
+C/C++:   676 |     if (ptr == NULL) {
+C/C++:       |             ~~ ^~~~
+C/C++:       |                0
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:768:39: warning: '&&' within '||' [-Wlogical-op-parentheses]
+C/C++:   768 |     if (!(wantedWidth == frame->width && wantedHeight == frame->height || wantedWidth == frame->height && wantedHeight == frame->width)) {
+C/C++:       |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:768:39: note: place parentheses around the '&&' expression to silence this warning
+C/C++:   768 |     if (!(wantedWidth == frame->width && wantedHeight == frame->height || wantedWidth == frame->height && wantedHeight == frame->width)) {
+C/C++:       |                                       ^
+C/C++:       |           (                                                           )
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:768:104: warning: '&&' within '||' [-Wlogical-op-parentheses]
+C/C++:   768 |     if (!(wantedWidth == frame->width && wantedHeight == frame->height || wantedWidth == frame->height && wantedHeight == frame->width)) {
+C/C++:       |                                                                        ~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:768:104: note: place parentheses around the '&&' expression to silence this warning
+C/C++:   768 |     if (!(wantedWidth == frame->width && wantedHeight == frame->height || wantedWidth == frame->height && wantedHeight == frame->width)) {
+C/C++:       |                                                                                                        ^                              
+C/C++:       |                                                                           (                                                           )
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:146:27: warning: unused function 'get_format' [-Wunused-function]
+C/C++:   146 | static enum AVPixelFormat get_format(AVCodecContext *ctx,
+C/C++:       |                           ^~~~~~~~~~
+C/C++: 12 warnings generated.
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/image.cpp:652:15: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+C/C++:   652 |     int stack[div * 4];
+C/C++:       |               ^~~~~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/image.cpp:652:15: note: initializer of 'div' is not a constant expression
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/image.cpp:647:15: note: declared here
+C/C++:   647 |     const int div = radius + radius + 1;
+C/C++:       |               ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/image.cpp:655:14: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+C/C++:   655 |     int vmin[MAX(w, h)];
+C/C++:       |              ^~~~~~~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/c_utils.h:21:19: note: expanded from macro 'MAX'
+C/C++:    21 | #define MAX(x, y) ((x) > (y)) ? (x) : (y)
+C/C++:       |                   ^~~~~~~~~~~~~~~~~~~~~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/image.cpp:655:14: note: read of non-const variable 'w' is not allowed in a constant expression
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/c_utils.h:21:20: note: expanded from macro 'MAX'
+C/C++:    21 | #define MAX(x, y) ((x) > (y)) ? (x) : (y)
+C/C++:       |                    ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/image.cpp:633:9: note: declared here
+C/C++:   633 |     int w = info.width;
+C/C++:       |         ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/image.cpp:685:9: warning: variable 'yw' set but not used [-Wunused-but-set-variable]
+C/C++:   685 |     int yw = 0, yi = 0;
+C/C++:       |         ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/image.cpp:923:49: warning: implicit conversion from 'int' to 'float' changes value from 2147483647 to 2147483648 [-Wimplicit-const-int-float-conversion]
+C/C++:   923 |             noise = (rand() - rand()) / 255.F / RAND_MAX;
+C/C++:       |                                               ~ ^~~~~~~~
+C/C++: /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/stdlib.h:132:18: note: expanded from macro 'RAND_MAX'
+C/C++:   132 | #define RAND_MAX 0x7fffffff
+C/C++:       |                  ^~~~~~~~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/image.cpp:1075:38: warning: 'gatherPositions' has C-linkage specified, but returns incomplete type 'std::vector<std::pair<float, float>>' which could be incompatible with C [-Wreturn-type-c-linkage]
+C/C++:  1075 | std::vector<std::pair<float, float>> gatherPositions(std::vector<std::pair<float, float>> list, int phase) {
+C/C++:       |                                      ^
+C/C++: 5 warnings generated.
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/ffmpeg_jni.cc:31:9: warning: '__STDC_CONSTANT_MACROS' macro redefined [-Wmacro-redefined]
+C/C++:    31 | #define __STDC_CONSTANT_MACROS
+C/C++:       |         ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/.cxx/RelWithDebInfo/3884x18f/armeabi-v7a/<command line>:46:9: note: previous definition is here
+C/C++:    46 | #define __STDC_CONSTANT_MACROS 1
+C/C++:       |         ^
 C/C++: 1 warning generated.
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/wasm_module_entry.cpp:16:16: warning: unknown attribute 'import_module' ignored [-Wunknown-attributes]
-C/C++:    16 | __attribute__((import_module("env"), import_name("host_emit")))
-C/C++:       |                ^~~~~~~~~~~~~~~~~~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/wasm_module_entry.cpp:16:38: warning: unknown attribute 'import_name' ignored [-Wunknown-attributes]
-C/C++:    16 | __attribute__((import_module("env"), import_name("host_emit")))
-C/C++:       |                                      ^~~~~~~~~~~~~~~~~~~~~~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/wasm_module_entry.cpp:28:16: warning: unknown attribute 'export_name' ignored [-Wunknown-attributes]
-C/C++:    28 | __attribute__((export_name("rt_alloc")))
-C/C++:       |                ^~~~~~~~~~~~~~~~~~~~~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/wasm_module_entry.cpp:33:16: warning: unknown attribute 'export_name' ignored [-Wunknown-attributes]
-C/C++:    33 | __attribute__((export_name("rt_free")))
-C/C++:       |                ^~~~~~~~~~~~~~~~~~~~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/wasm_module_entry.cpp:38:16: warning: unknown attribute 'export_name' ignored [-Wunknown-attributes]
-C/C++:    38 | __attribute__((export_name("core_init")))
-C/C++:       |                ^~~~~~~~~~~~~~~~~~~~~~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/wasm_module_entry.cpp:48:16: warning: unknown attribute 'export_name' ignored [-Wunknown-attributes]
-C/C++:    48 | __attribute__((export_name("core_on_event")))
-C/C++:       |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:407:88: warning: adding 'jint' (aka 'int') to a string does not append to the string [-Wstring-plus-int]
+C/C++:   407 |             throwNewJavaIllegalArgumentException(env, "Unknown data saving constant: " + dataSaving);
+C/C++:       |                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:407:88: note: use array indexing to silence this warning
+C/C++:   407 |             throwNewJavaIllegalArgumentException(env, "Unknown data saving constant: " + dataSaving);
+C/C++:       |                                                                                        ^           
+C/C++:       |                                                       &                                [           ]
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:557:34: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+C/C++:   557 |                     jint intFill[size];
+C/C++:       |                                  ^~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:557:34: note: read of non-const variable 'size' is not allowed in a constant expression
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:552:34: note: declared here
+C/C++:   552 |                     unsigned int size = update.updates.size();
+C/C++:       |                                  ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:558:38: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+C/C++:   558 |                     jfloat floatFill[size];
+C/C++:       |                                      ^~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:558:38: note: read of non-const variable 'size' is not allowed in a constant expression
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:552:34: note: declared here
+C/C++:   552 |                     unsigned int size = update.updates.size();
+C/C++:       |                                  ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:559:39: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+C/C++:   559 |                     jboolean boolFill[size];
+C/C++:       |                                       ^~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:559:39: note: read of non-const variable 'size' is not allowed in a constant expression
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:552:34: note: declared here
+C/C++:   552 |                     unsigned int size = update.updates.size();
+C/C++:       |                                  ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:608:30: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+C/C++:   608 |                 jint intFill[size];
+C/C++:       |                              ^~~~
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:608:30: note: read of non-const variable 'size' is not allowed in a constant expression
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:605:30: note: declared here
+C/C++:   605 |                 unsigned int size = ssrcs.size();
+C/C++:       |                              ^
+C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:1386:39: warning: format specifies type 'int' but the argument has type 'jlong' (aka 'long long') [-Wformat]
+C/C++:  1386 |     DEBUG_D("setConferenceCallId %d", call_id);
+C/C++:       |                                  ~~   ^~~~~~~
+C/C++:       |                                  %lld
 C/C++: 6 warnings generated.
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/CallCoreHost.cpp:1:
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/CallCoreHost.h:4:
-C/C++: In file included from /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/deque:205:
-C/C++: /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/unique_ptr.h:601:30: warning: 'RtcEventLogFactory' is deprecated: Use default constructor [-Wdeprecated-declarations]
-C/C++:   601 |   return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...));
-C/C++:       |                              ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/CallCoreHost.cpp:601:64: note: in instantiation of function template specialization 'std::make_unique<webrtc::RtcEventLogFactory, webrtc::TaskQueueFactory *>' requested here
-C/C++:   601 |     peerConnectionFactoryDependencies.event_log_factory = std::make_unique<webrtc::RtcEventLogFactory>(peerConnectionFactoryDependencies.task_queue_factory.get());
-C/C++:       |                                                                ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/api/rtc_event_log/rtc_event_log_factory.h:29:5: note: 'RtcEventLogFactory' has been explicitly marked deprecated here
-C/C++:    29 |   [[deprecated("Use default constructor")]]  //
-C/C++:       |     ^
-C/C++: 1 warning generated.
