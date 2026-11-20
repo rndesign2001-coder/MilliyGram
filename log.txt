@@ -1,6 +1,6 @@
 run=57 sha=29892b9709fc1472192e6b662ad1e98ea0a895dc status=running
                total        used        free      shared  buff/cache   available
-Mem:           15983        5053        1268          51       10057       10929
+Mem:           15983       12868         193          51        3317        3114
 Swap:          11263           0       11263
 312:Note: Some input files use or override a deprecated API.
 313:Note: Recompile with -Xlint:deprecation for details.
@@ -28,154 +28,161 @@ Swap:          11263           0       11263
 992:C/C++:   407 |             throwNewJavaIllegalArgumentException(env, "Unknown data saving constant: " + dataSaving);
 1519:C/C++:   407 |             throwNewJavaIllegalArgumentException(env, "Unknown data saving constant: " + dataSaving);
 1522:C/C++:   407 |             throwNewJavaIllegalArgumentException(env, "Unknown data saving constant: " + dataSaving);
+1644:/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:6705:4: Multiple substitutions specified in non-positional format of string resource string/NotificationTopicExceptionsDesctription_one. Did you mean to add the formatted="false" attribute?
+1645:/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:6706:4: Multiple substitutions specified in non-positional format of string resource string/NotificationTopicExceptionsDesctription_other. Did you mean to add the formatted="false" attribute?
+2071:Size: 93876 bytes
+2087:Note: Some input files use or override a deprecated API.
+2088:Note: Recompile with -Xlint:deprecation for details.
+2089:Note: Some input files use unchecked or unsafe operations.
+2090:Note: Recompile with -Xlint:unchecked for details.
 ---
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:23:46: note: expanded from macro 'RTC_THREAD_ANNOTATION_ATTRIBUTE__'
-C/C++:    23 | #define RTC_THREAD_ANNOTATION_ATTRIBUTE__(x) __attribute__((x))
-C/C++:       |                                              ^
-C/C++: In file included from /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.cc:11:
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.h:393:7: warning: attribute guarded_by ignored, because it is not attached to a declaration [-Wignored-attributes]
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:31:71: note: expanded from macro 'RTC_GUARDED_BY'
-C/C++:    31 | #define RTC_GUARDED_BY(x) RTC_THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
-C/C++:       |                                                                       ^
-C/C++: 2 warnings generated.
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:50:1: warning: typedef requires a name [-Wmissing-declarations]
-C/C++:    50 | typedef struct VideoInfo {
-C/C++:       | ^~~~~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:143:10: warning: format string is not a string literal (potentially insecure) [-Wformat-security]
-C/C++:   143 |     LOGE(line);
-C/C++:       |          ^~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/c_utils.h:11:67: note: expanded from macro 'LOGE'
-C/C++:    11 | #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
-C/C++:       |                                                                   ^~~~~~~~~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:143:10: note: treat the string as an argument to avoid this
-C/C++:   143 |     LOGE(line);
-C/C++:       |          ^
-C/C++:       |          "%s", 
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/c_utils.h:11:67: note: expanded from macro 'LOGE'
-C/C++:    11 | #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
-C/C++:       |                                                                   ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:152:37: warning: format specifies type 'int' but the argument has type 'const enum AVPixelFormat *' [-Wformat]
-C/C++:   152 |         LOGE("available format %d", p);
-C/C++:       |                                ~~   ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/c_utils.h:11:67: note: expanded from macro 'LOGE'
-C/C++:    11 | #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
-C/C++:       |                                                                   ^~~~~~~~~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:643:13: warning: comparison between NULL and non-pointer ('jlong' (aka 'long long') and NULL) [-Wnull-arithmetic]
-C/C++:   643 |     if (ptr == NULL) {
-C/C++:       |         ~~~ ^  ~~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:643:16: warning: implicit conversion of NULL constant to 'jlong' (aka 'long long') [-Wnull-conversion]
-C/C++:   643 |     if (ptr == NULL) {
-C/C++:       |             ~~ ^~~~
-C/C++:       |                0
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:668:13: warning: comparison between NULL and non-pointer ('jlong' (aka 'long long') and NULL) [-Wnull-arithmetic]
-C/C++:   668 |     if (ptr == NULL) {
-C/C++:       |         ~~~ ^  ~~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:668:16: warning: implicit conversion of NULL constant to 'jlong' (aka 'long long') [-Wnull-conversion]
-C/C++:   668 |     if (ptr == NULL) {
-C/C++:       |             ~~ ^~~~
-C/C++:       |                0
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:676:13: warning: comparison between NULL and non-pointer ('jlong' (aka 'long long') and NULL) [-Wnull-arithmetic]
-C/C++:   676 |     if (ptr == NULL) {
-C/C++:       |         ~~~ ^  ~~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:676:16: warning: implicit conversion of NULL constant to 'jlong' (aka 'long long') [-Wnull-conversion]
-C/C++:   676 |     if (ptr == NULL) {
-C/C++:       |             ~~ ^~~~
-C/C++:       |                0
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:768:39: warning: '&&' within '||' [-Wlogical-op-parentheses]
-C/C++:   768 |     if (!(wantedWidth == frame->width && wantedHeight == frame->height || wantedWidth == frame->height && wantedHeight == frame->width)) {
-C/C++:       |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:768:39: note: place parentheses around the '&&' expression to silence this warning
-C/C++:   768 |     if (!(wantedWidth == frame->width && wantedHeight == frame->height || wantedWidth == frame->height && wantedHeight == frame->width)) {
-C/C++:       |                                       ^
-C/C++:       |           (                                                           )
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:768:104: warning: '&&' within '||' [-Wlogical-op-parentheses]
-C/C++:   768 |     if (!(wantedWidth == frame->width && wantedHeight == frame->height || wantedWidth == frame->height && wantedHeight == frame->width)) {
-C/C++:       |                                                                        ~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:768:104: note: place parentheses around the '&&' expression to silence this warning
-C/C++:   768 |     if (!(wantedWidth == frame->width && wantedHeight == frame->height || wantedWidth == frame->height && wantedHeight == frame->width)) {
-C/C++:       |                                                                                                        ^                              
-C/C++:       |                                                                           (                                                           )
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/gifvideo.cpp:146:27: warning: unused function 'get_format' [-Wunused-function]
-C/C++:   146 | static enum AVPixelFormat get_format(AVCodecContext *ctx,
-C/C++:       |                           ^~~~~~~~~~
-C/C++: 12 warnings generated.
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/image.cpp:652:15: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
-C/C++:   652 |     int stack[div * 4];
-C/C++:       |               ^~~~~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/image.cpp:652:15: note: initializer of 'div' is not a constant expression
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/image.cpp:647:15: note: declared here
-C/C++:   647 |     const int div = radius + radius + 1;
-C/C++:       |               ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/image.cpp:655:14: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
-C/C++:   655 |     int vmin[MAX(w, h)];
-C/C++:       |              ^~~~~~~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/c_utils.h:21:19: note: expanded from macro 'MAX'
-C/C++:    21 | #define MAX(x, y) ((x) > (y)) ? (x) : (y)
-C/C++:       |                   ^~~~~~~~~~~~~~~~~~~~~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/image.cpp:655:14: note: read of non-const variable 'w' is not allowed in a constant expression
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/c_utils.h:21:20: note: expanded from macro 'MAX'
-C/C++:    21 | #define MAX(x, y) ((x) > (y)) ? (x) : (y)
-C/C++:       |                    ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/image.cpp:633:9: note: declared here
-C/C++:   633 |     int w = info.width;
-C/C++:       |         ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/image.cpp:685:9: warning: variable 'yw' set but not used [-Wunused-but-set-variable]
-C/C++:   685 |     int yw = 0, yi = 0;
-C/C++:       |         ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/image.cpp:923:49: warning: implicit conversion from 'int' to 'float' changes value from 2147483647 to 2147483648 [-Wimplicit-const-int-float-conversion]
-C/C++:   923 |             noise = (rand() - rand()) / 255.F / RAND_MAX;
-C/C++:       |                                               ~ ^~~~~~~~
-C/C++: /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/stdlib.h:132:18: note: expanded from macro 'RAND_MAX'
-C/C++:   132 | #define RAND_MAX 0x7fffffff
-C/C++:       |                  ^~~~~~~~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/image.cpp:1075:38: warning: 'gatherPositions' has C-linkage specified, but returns incomplete type 'std::vector<std::pair<float, float>>' which could be incompatible with C [-Wreturn-type-c-linkage]
-C/C++:  1075 | std::vector<std::pair<float, float>> gatherPositions(std::vector<std::pair<float, float>> list, int phase) {
-C/C++:       |                                      ^
-C/C++: 5 warnings generated.
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/ffmpeg_jni.cc:31:9: warning: '__STDC_CONSTANT_MACROS' macro redefined [-Wmacro-redefined]
-C/C++:    31 | #define __STDC_CONSTANT_MACROS
-C/C++:       |         ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/.cxx/RelWithDebInfo/3884x18f/armeabi-v7a/<command line>:46:9: note: previous definition is here
-C/C++:    46 | #define __STDC_CONSTANT_MACROS 1
-C/C++:       |         ^
-C/C++: 1 warning generated.
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:407:88: warning: adding 'jint' (aka 'int') to a string does not append to the string [-Wstring-plus-int]
-C/C++:   407 |             throwNewJavaIllegalArgumentException(env, "Unknown data saving constant: " + dataSaving);
-C/C++:       |                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:407:88: note: use array indexing to silence this warning
-C/C++:   407 |             throwNewJavaIllegalArgumentException(env, "Unknown data saving constant: " + dataSaving);
-C/C++:       |                                                                                        ^           
-C/C++:       |                                                       &                                [           ]
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:557:34: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
-C/C++:   557 |                     jint intFill[size];
-C/C++:       |                                  ^~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:557:34: note: read of non-const variable 'size' is not allowed in a constant expression
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:552:34: note: declared here
-C/C++:   552 |                     unsigned int size = update.updates.size();
-C/C++:       |                                  ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:558:38: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
-C/C++:   558 |                     jfloat floatFill[size];
-C/C++:       |                                      ^~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:558:38: note: read of non-const variable 'size' is not allowed in a constant expression
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:552:34: note: declared here
-C/C++:   552 |                     unsigned int size = update.updates.size();
-C/C++:       |                                  ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:559:39: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
-C/C++:   559 |                     jboolean boolFill[size];
-C/C++:       |                                       ^~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:559:39: note: read of non-const variable 'size' is not allowed in a constant expression
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:552:34: note: declared here
-C/C++:   552 |                     unsigned int size = update.updates.size();
-C/C++:       |                                  ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:608:30: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
-C/C++:   608 |                 jint intFill[size];
-C/C++:       |                              ^~~~
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:608:30: note: read of non-const variable 'size' is not allowed in a constant expression
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:605:30: note: declared here
-C/C++:   605 |                 unsigned int size = ssrcs.size();
-C/C++:       |                              ^
-C/C++: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:1386:39: warning: format specifies type 'int' but the argument has type 'jlong' (aka 'long long') [-Wformat]
-C/C++:  1386 |     DEBUG_D("setConferenceCallId %d", call_id);
-C/C++:       |                                  ~~   ^~~~~~~
-C/C++:       |                                  %lld
-C/C++: 6 warnings generated.
+R.raw.msg_emoji_smiles (0x7f0e00a7) — fps=60, frames=60, mono=false
+R.raw.edge_30 (0x7f0e0047) — fps=60, frames=180, mono=false
+R.raw.gram (0x7f0e0067) — fps=60, frames=20, mono=false
+R.raw.tab_chats (0x7f0e0143) — fps=60, frames=6, mono=false
+R.raw.photo_suggest_icon (0x7f0e00c9) — fps=60, frames=85, mono=false
+R.raw.tsv_monkey_close (0x7f0e0173) — fps=60, frames=98, mono=false
+R.raw.chats_archived (0x7f0e002b) — fps=60, frames=45, mono=false
+R.raw.caption_hide (0x7f0e0021) — fps=60, frames=20, mono=false
+R.raw.roundcamera_flip (0x7f0e0100) — fps=60, frames=30, mono=false
+R.raw.call_accept (0x7f0e0014) — fps=60, frames=180, mono=false
+R.raw.chats_archiveavatar (0x7f0e002a) — fps=60, frames=50, mono=false
+R.raw.gift (0x7f0e0060) — fps=60, frames=180, mono=false
+R.raw.caption_limit (0x7f0e0022) — fps=60, frames=90, mono=false
+R.raw.seek_speed_hint (0x7f0e0104) — fps=60, frames=42, mono=false
+R.raw.camera_flip (0x7f0e001a) — fps=60, frames=40, mono=false
+R.raw.video_stop (0x7f0e018e) — fps=60, frames=60, mono=false
+R.raw.code_laptop (0x7f0e0032) — fps=60, frames=64, mono=false
+R.raw.topics_sidebar (0x7f0e016d) — fps=60, frames=100, mono=false
+R.raw.notify_toggle (0x7f0e00b1) — fps=60, frames=80, mono=false
+R.raw.tsv_setup_monkey_tracking (0x7f0e017d) — fps=60, frames=180, mono=false
+R.raw.media_mute_unmute (0x7f0e0097) — fps=60, frames=44, mono=false
+R.raw.star_reaction_click (0x7f0e011f) — fps=60, frames=125, mono=false
+R.raw.permission_request_folder (0x7f0e00bb) — fps=60, frames=240, mono=false
+R.raw.ticks_double (0x7f0e0166) — fps=60, frames=54, mono=false
+R.raw.permission_request_apk (0x7f0e00b8) — fps=60, frames=180, mono=false
+R.raw.download_finish (0x7f0e0043) — fps=60, frames=41, mono=false
+R.raw.custom_emoji_reaction (0x7f0e003a) — fps=60, frames=89, mono=false
+R.raw.fire_on (0x7f0e0054) — fps=60, frames=120, mono=false
+R.raw.swipe_disabled (0x7f0e0139) — fps=60, frames=30, mono=false
+R.raw.star_fill (0x7f0e011b) — fps=60, frames=180, mono=false
+R.raw.msg_emoji_objects (0x7f0e00a5) — fps=60, frames=60, mono=false
+R.raw.utyan_passcode (0x7f0e0189) — fps=60, frames=180, mono=false
+R.raw.smile_to_keyboard (0x7f0e0109) — fps=60, frames=12, mono=false
+R.raw.msg_stories_saved (0x7f0e00aa) — fps=60, frames=40, mono=false
+R.raw.voip_unmuted (0x7f0e01a5) — fps=60, frames=120, mono=false
+R.raw.phone_dots (0x7f0e00be) — fps=60, frames=60, mono=false
+R.raw.keyboard_to_gif (0x7f0e0088) — fps=60, frames=12, mono=false
+R.raw.download_arrow (0x7f0e0042) — fps=60, frames=30, mono=false
+R.raw.tsv_setup_monkey_close_and_peek_to_idle (0x7f0e0179) — fps=60, frames=33, mono=false
+R.raw.ic_delete (0x7f0e0072) — fps=60, frames=66, mono=false
+R.raw.tag_icon_3 (0x7f0e0162) — fps=60, frames=57, mono=false
+R.raw.tab_gallery (0x7f0e014d) — fps=60, frames=17, mono=false
+R.raw.swipe_delete (0x7f0e0138) — fps=60, frames=38, mono=false
+R.raw.import_finish (0x7f0e007d) — fps=60, frames=120, mono=false
+R.raw.silent_unmute (0x7f0e0107) — fps=60, frames=58, mono=false
+R.raw.linkbroken (0x7f0e008e) — fps=60, frames=120, mono=false
+R.raw.star_stroke (0x7f0e0125) — fps=60, frames=180, mono=false
+R.raw.imported (0x7f0e0080) — fps=60, frames=120, mono=false
+R.raw.tab_poll (0x7f0e0157) — fps=60, frames=17, mono=false
+R.raw.msg_emoji_cat (0x7f0e00a2) — fps=60, frames=60, mono=false
+R.raw.utyan_schedule (0x7f0e018c) — fps=60, frames=180, mono=false
+R.raw.dartloop (0x7f0e003b) — fps=60, frames=90, mono=false
+R.raw.double_icon (0x7f0e0041) — fps=60, frames=120, mono=false
+R.raw.options_to_search (0x7f0e00b3) — fps=60, frames=120, mono=false
+R.raw.rate (0x7f0e00f3) — fps=60, frames=90, mono=false
+R.raw.voice_muted (0x7f0e0191) — fps=60, frames=29, mono=false
+R.raw.voip_invite (0x7f0e019e) — fps=60, frames=120, mono=false
+R.raw.transcribe_out (0x7f0e0172) — fps=60, frames=20, mono=false
+R.raw.permission_request_contacts (0x7f0e00ba) — fps=60, frames=120, mono=false
+R.raw.fire_once (0x7f0e0055) — fps=60, frames=120, mono=false
+R.raw.topics_list (0x7f0e016c) — fps=60, frames=100, mono=false
+R.raw.email_setup_heart (0x7f0e0049) — fps=60, frames=180, mono=false
+R.raw.plane_logo_plain (0x7f0e00cd) — fps=60, frames=54, mono=false
+R.raw.swipe_pin (0x7f0e013b) — fps=60, frames=31, mono=false
+R.raw.passcode_lock (0x7f0e00b4) — fps=60, frames=71, mono=false
+R.raw.photo_arrow (0x7f0e00c2) — fps=60, frames=30, mono=false
+R.raw.ubuntu_30 (0x7f0e017e) — fps=60, frames=180, mono=false
+R.raw.tab_colors_reverse (0x7f0e0147) — fps=60, frames=5, mono=false
+R.raw.tsv_setup_mail (0x7f0e0177) — fps=60, frames=160, mono=false
+R.raw.tab_calls (0x7f0e0142) — fps=60, frames=6, mono=false
+R.raw.tab_gallery_reverse (0x7f0e014e) — fps=60, frames=5, mono=false
+R.raw.dots_loading (0x7f0e0040) — fps=60, frames=60, mono=false
+R.raw.emoji_stars (0x7f0e004a) — fps=60, frames=180, mono=false
+R.raw.ic_unmute (0x7f0e007a) — fps=60, frames=65, mono=false
+R.raw.firefox_30 (0x7f0e0057) — fps=60, frames=180, mono=false
+R.raw.forward (0x7f0e005b) — fps=60, frames=47, mono=false
+R.raw.ic_admin (0x7f0e006f) — fps=60, frames=120, mono=false
+R.raw.call_mute (0x7f0e0015) — fps=60, frames=60, mono=false
+R.raw.msg_emoji_travel (0x7f0e00a8) — fps=60, frames=60, mono=false
+R.raw.media_shrink (0x7f0e0098) — fps=60, frames=20, mono=false
+R.raw.photo_pen (0x7f0e00c7) — fps=60, frames=30, mono=false
+R.raw.chats_archive (0x7f0e0029) — fps=60, frames=50, mono=false
+R.raw.msg_stories_archive (0x7f0e00a9) — fps=60, frames=27, mono=false
+R.raw.story_repost (0x7f0e0132) — fps=60, frames=36, mono=false
+R.raw.tab_emoji (0x7f0e0149) — fps=60, frames=18, mono=false
+R.raw.stories_intro_go_forward (0x7f0e012d) — fps=60, frames=38, mono=false
+R.raw.convert_video (0x7f0e0038) — fps=60, frames=38, mono=false
+R.raw.import_check (0x7f0e007c) — fps=60, frames=13, mono=false
+R.raw.tab_checklist_reverse (0x7f0e0145) — fps=60, frames=5, mono=false
+R.raw.keyboard_to_smile (0x7f0e0089) — fps=60, frames=12, mono=false
+R.raw.passcode_lock_close (0x7f0e00b5) — fps=60, frames=39, mono=false
+R.raw.star_reaction_effect5 (0x7f0e0124) — fps=60, frames=90, mono=false
+R.raw.profile_voicechat (0x7f0e00eb) — fps=60, frames=48, mono=false
+R.raw.tab_article_reverse (0x7f0e0141) — fps=60, frames=5, mono=false
+R.raw.error (0x7f0e004b) — fps=60, frames=120, mono=false
+R.raw.tsv_setup_monkey_idle2 (0x7f0e017b) — fps=60, frames=30, mono=false
+R.raw.group_pip_delete_icon (0x7f0e0069) — fps=60, frames=66, mono=false
+R.raw.bt_to_speaker (0x7f0e000a) — fps=60, frames=60, mono=false
+R.raw.shared_link_enter (0x7f0e0105) — fps=60, frames=43, mono=false
+R.raw.utyan_empty2 (0x7f0e0185) — fps=60, frames=180, mono=false
+R.raw.tab_models_reverse (0x7f0e0154) — fps=60, frames=5, mono=false
+R.raw.swipe_mute (0x7f0e013a) — fps=60, frames=35, mono=false
+R.raw.tab_checklist (0x7f0e0144) — fps=60, frames=17, mono=false
+R.raw.ic_unban (0x7f0e0079) — fps=60, frames=120, mono=false
+R.raw.sms_incoming_info (0x7f0e010b) — fps=60, frames=90, mono=false
+R.raw.ipad_30 (0x7f0e0086) — fps=60, frames=180, mono=false
+R.raw.star_premium_2 (0x7f0e011d) — fps=60, frames=50, mono=false
+R.raw.tab_location (0x7f0e0151) — fps=60, frames=17, mono=false
+R.raw.utyan_empty (0x7f0e0184) — fps=60, frames=180, mono=false
+R.raw.tsv_setup_email_sent (0x7f0e0174) — fps=60, frames=180, mono=false
+R.raw.calls_log (0x7f0e0016) — fps=60, frames=120, mono=false
+R.raw.large_message_lock (0x7f0e008c) — fps=60, frames=180, mono=false
+R.raw.timer_toast (0x7f0e0169) — fps=60, frames=41, mono=false
+R.raw.write_contacts_fab_icon (0x7f0e01b3) — fps=60, frames=49, mono=false
+R.raw.folder_in (0x7f0e0058) — fps=60, frames=57, mono=false
+R.raw.transcribe (0x7f0e0170) — fps=60, frames=180, mono=false
+
+> Task :TMessagesProj_App:generateAfatReleaseStringResourceIdsAsset
+Generated 11734 string resource IDs: /home/runner/work/MilliyGram/MilliyGram/TMessagesProj_App/build/generated/stringResourceIds/afatRelease/assets/string_resource_ids.bin
+Size: 93876 bytes
+
+> Task :TMessagesProj_App:mergeAfatReleaseAssets
+> Task :TMessagesProj_App:compressAfatReleaseAssets
+> Task :TMessagesProj_App:mergeAfatReleaseNativeDebugMetadata
+
+> Task :TMessagesProj:compileReleaseKotlin
+w: file:///home/runner/work/MilliyGram/MilliyGram/TMessagesProj/src/main/java/org/milliygram/ui/chat_finder/ChatFinder.kt:94:13 'fun setBackgroundDrawable(p0: Drawable!): Unit' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/MilliyGram/MilliyGram/TMessagesProj/src/main/java/org/milliygram/ui/confirmToSendMessages/ConfirmDialog.kt:20:30 'static fun getString(key: String!, res: Int): String!' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/MilliyGram/MilliyGram/TMessagesProj/src/main/java/org/milliygram/ui/confirmToSendMessages/ConfirmDialog.kt:25:30 'static fun getString(key: String!, res: Int): String!' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/MilliyGram/MilliyGram/TMessagesProj/src/main/java/org/milliygram/ui/onboarding/MilliyTour.kt:88:41 'static field statusBarHeight: Int' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/MilliyGram/MilliyGram/TMessagesProj/src/main/java/org/milliygram/utils/DeletedMsg.kt:78:29 Condition is always 'true'.
+w: file:///home/runner/work/MilliyGram/MilliyGram/TMessagesProj/src/main/java/org/milliygram/utils/EditMessage.kt:64:29 Condition is always 'true'.
+w: file:///home/runner/work/MilliyGram/MilliyGram/TMessagesProj/src/main/java/org/milliygram/utils/LanguageCode.kt:1872:52 'static fun getString(key: String!, res: Int): String!' is deprecated. Deprecated in Java.
+
+> Task :TMessagesProj:compileReleaseJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :TMessagesProj:mergeReleaseGeneratedProguardFiles
+> Task :TMessagesProj:exportReleaseConsumerProguardFiles
+> Task :TMessagesProj:processReleaseJavaRes
+> Task :TMessagesProj:bundleLibCompileToJarRelease
+> Task :TMessagesProj:bundleLibRuntimeToJarRelease
+> Task :TMessagesProj_App:mergeAfatReleaseJavaResource
+> Task :TMessagesProj_App:compileAfatReleaseJavaWithJavac
+> Task :TMessagesProj_App:mergeAfatReleaseGeneratedProguardFiles
+> Task :TMessagesProj_App:expandAfatReleaseArtProfileWildcards
+> Task :TMessagesProj_App:minifyAfatReleaseWithR8
