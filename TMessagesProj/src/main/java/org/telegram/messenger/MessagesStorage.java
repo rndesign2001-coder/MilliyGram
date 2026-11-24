@@ -4462,6 +4462,10 @@ public class MessagesStorage extends BaseController {
         if (message == null) {
             return false;
         }
+        // MilliyGram: o'chirishda "Xabar faylini ham o'chirish" tanlanmagan — fayl telefonda qoladi
+        if (!forceCache && org.telegram.messenger.MgMediaDelete.shouldKeep(message)) {
+            return false;
+        }
         int type = 0;
         long id = 0;
         TLRPC.Document document = MessageObject.getDocument(message);

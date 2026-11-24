@@ -7895,6 +7895,7 @@ public class AlertsCreator {
         }
 
         final boolean[] deleteForAll = new boolean[1];
+        final View[] mgForAllView = new View[1]; // MilliyGram: "hamma uchun" katakchasi (fayl tanlovlari bilan birga ko'rsatiladi)
         boolean canRevokeInbox = user != null && MessagesController.getInstance(currentAccount).canRevokePmInbox;
         int revokeTimeLimit;
         if (user != null) {
@@ -8043,8 +8044,7 @@ public class AlertsCreator {
                     deleteForAll[0] = !deleteForAll[0];
                     cell12.setChecked(deleteForAll[0], true);
                 });
-                builder.setView(frameLayout);
-                builder.setCustomViewOffset(9);
+                mgForAllView[0] = frameLayout;
             }
         } else if (!scheduled && !isSavedMessages && !ChatObject.isChannel(chat) && encryptedChat == null) {
             if (user != null && user.id != UserConfig.getInstance(currentAccount).getClientUserId() && (!user.bot || user.support) || chat != null) {
@@ -8102,12 +8102,97 @@ public class AlertsCreator {
                     deleteForAll[0] = !deleteForAll[0];
                     cell1.setChecked(deleteForAll[0], true);
                 });
-                builder.setView(frameLayout);
-                builder.setCustomViewOffset(9);
+                mgForAllView[0] = frameLayout;
             }
         }
 
+        // MilliyGram: yuklangan fayl bilan nima qilish — "Xabar faylini ham o'chirish" / "Faqat faylni o'chirish"
+        final ArrayList<MessageObject> mgTargets = new ArrayList<>();
+        if (selectedGroup != null) {
+            mgTargets.addAll(selectedGroup.messages);
+        } else if (selectedMessage != null) {
+            mgTargets.add(selectedMessage);
+        } else if (selectedMessages != null) {
+            for (int a = 1; a >= 0; a--) {
+                for (int b = 0; b < selectedMessages[a].size(); b++) {
+                    mgTargets.add(selectedMessages[a].valueAt(b));
+                }
+            }
+        }
+        boolean mgAnyFile = false;
+        if (encryptedChat == null && !scheduled && !quickReplies) {
+            for (int k = 0; k < mgTargets.size() && k < 200 && !mgAnyFile; k++) {
+                mgAnyFile = org.telegram.messenger.MgMediaDelete.hasLocalFile(currentAccount, mgTargets.get(k));
+            }
+        }
+        final boolean[] mgDeleteFile = {true};
+        final boolean[] mgOnlyFile = {false};
+        if (mgAnyFile) {
+            LinearLayout mgBox = new LinearLayout(activity);
+            mgBox.setOrientation(LinearLayout.VERTICAL);
+            CheckBoxCell fileCell = new CheckBoxCell(activity, 1, resourcesProvider);
+            CheckBoxCell onlyCell = new CheckBoxCell(activity, 1, resourcesProvider);
+            fileCell.setBackgroundDrawable(Theme.getSelectorDrawable(false));
+            onlyCell.setBackgroundDrawable(Theme.getSelectorDrawable(false));
+            fileCell.setText(org.telegram.messenger.MgLang.t("Xabar faylini ham o'chirish"), "", true, false);
+            onlyCell.setText(org.telegram.messenger.MgLang.t("Faqat faylni o'chirish (xabar qoladi)"), "", false, false);
+            fileCell.setPadding(LocaleController.isRTL ? dp(16) : dp(8), 0, LocaleController.isRTL ? dp(8) : dp(16), 0);
+            onlyCell.setPadding(LocaleController.isRTL ? dp(16) : dp(8), 0, LocaleController.isRTL ? dp(8) : dp(16), 0);
+            mgBox.addView(fileCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48));
+            mgBox.addView(onlyCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48));
+            final View forAll = mgForAllView[0];
+            if (forAll != null) {
+                mgBox.addView(forAll, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48));
+            }
+            fileCell.setOnClickListener(v -> {
+                if (mgOnlyFile[0]) {
+                    return;
+                }
+                mgDeleteFile[0] = !mgDeleteFile[0];
+                fileCell.setChecked(mgDeleteFile[0], true);
+            });
+            onlyCell.setOnClickListener(v -> {
+                mgOnlyFile[0] = !mgOnlyFile[0];
+                onlyCell.setChecked(mgOnlyFile[0], true);
+                // faqat fayl o'chirilsa — boshqa tanlovlar ma'nosiz
+                fileCell.setEnabled(!mgOnlyFile[0]);
+                fileCell.setAlpha(mgOnlyFile[0] ? 0.5f : 1f);
+                if (forAll != null) {
+                    forAll.setEnabled(!mgOnlyFile[0]);
+                    forAll.setAlpha(mgOnlyFile[0] ? 0.5f : 1f);
+                    if (forAll instanceof ViewGroup && ((ViewGroup) forAll).getChildCount() > 0) {
+                        ((ViewGroup) forAll).getChildAt(0).setEnabled(!mgOnlyFile[0]);
+                    }
+                }
+            });
+            builder.setView(mgBox);
+            builder.setCustomViewOffset(9);
+        } else if (mgForAllView[0] != null) {
+            builder.setView(mgForAllView[0]);
+            builder.setCustomViewOffset(9);
+        }
+
         AlertDialog.OnButtonClickListener deleteAction = (dialogInterface, i) -> {
+            if (mgOnlyFile[0]) {
+                org.telegram.messenger.MgMediaDelete.deleteFilesOnly(currentAccount, mgTargets, removed -> {
+                    if (fragment.getParentActivity() != null) {
+                        BulletinFactory.of(fragment).createSimpleBulletin(R.raw.ic_delete, removed > 0
+                                ? org.telegram.messenger.MgLang.t("Fayl telefondan o'chirildi, xabar qoldi")
+                                : org.telegram.messenger.MgLang.t("Telefonda o'chiriladigan fayl topilmadi")).show();
+                    }
+                });
+                if (selectedMessages != null && selectedMessage == null) {
+                    selectedMessages[0].clear();
+                    selectedMessages[1].clear();
+                }
+                if (onDelete != null) {
+                    onDelete.run();
+                }
+                return;
+            }
+            if (!mgDeleteFile[0]) {
+                org.telegram.messenger.MgMediaDelete.keepFilesOf(mgTargets);
+            }
             DeletedMsg.INSTANCE.setMyDelete(true);
             ArrayList<Integer> ids = null;
             long thisDialogId = dialogId;

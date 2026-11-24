@@ -1848,3 +1848,9 @@ Yangi o'zbek lotin alifbosi (2026): Kirill, eski va yangi lotin o'rtasida o'giri
 Maxsus uzatishda \"Lotin ↔ Kirill\" tugmasi, tezkor amallar tekislandi	«Латиница ↔ Кириллица» в особой пересылке, быстрые действия выровнены	"Latin ↔ Cyrillic" in custom forward, quick actions aligned
 Qisqa xabarlar yonida \"≡\" menyu: saqlash va ulashish	Меню «≡» у коротких сообщений: сохранить и поделиться	"≡" menu next to short messages: save and share
 Telefondagi video nusxasi buzilgan edi — serverdan qayta yuklanmoqda. Yuklangach yana oching.	Копия видео на телефоне была повреждена — загружается заново с сервера. Откройте снова после загрузки.	The video copy on this phone was corrupted — downloading it again from the server. Open it again when done.
+Xabar faylini ham o'chirish	Удалить и файл сообщения	Also delete the message file
+Faqat faylni o'chirish (xabar qoladi)	Удалить только файл (сообщение останется)	Delete only the file (keep message)
+Fayl telefondan o'chirildi, xabar qoldi	Файл удалён с телефона, сообщение осталось	File deleted from the phone, message kept
+Telefonda o'chiriladigan fayl topilmadi	На телефоне нет файла для удаления	No file on the phone to delete
+O'chirishda tanlov: xabar faylini ham o'chirish yoki faqat faylni o'chirish	При удалении: удалить и файл или только файл	When deleting: also delete the file, or delete only the file
+Telefondagi buzilgan video nusxasi avtomatik qayta yuklanadi	Повреждённая копия видео на телефоне загружается заново автоматически	A corrupted video copy on the phone is re-downloaded automatically

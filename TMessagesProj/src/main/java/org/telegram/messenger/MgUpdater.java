@@ -263,9 +263,9 @@ public final class MgUpdater {
 
     /** Joriy versiyadagi yangiliklar ("Yangi versiyada nimalar bor" oynasi uchun) */
     private static final String[] WHATS_NEW = {
+            "O'chirishda tanlov: xabar faylini ham o'chirish yoki faqat faylni o'chirish",
+            "Telefondagi buzilgan video nusxasi avtomatik qayta yuklanadi",
             "Yangi o'zbek lotin alifbosi (2026): Kirill, eski va yangi lotin o'rtasida o'girish",
-            "Maxsus uzatishda \"Lotin ↔ Kirill\" tugmasi, tezkor amallar tekislandi",
-            "Qisqa xabarlar yonida \"≡\" menyu: saqlash va ulashish",
     };
 
     /** Ilova yangilangandan keyingi birinchi ochilishda yangiliklarni bir marta ko'rsatadi */
