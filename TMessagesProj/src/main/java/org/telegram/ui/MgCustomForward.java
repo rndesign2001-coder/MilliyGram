@@ -421,6 +421,21 @@ public class MgCustomForward {
         tools.addView(chip(ctx, R.drawable.msg_edit, org.telegram.messenger.MgLang.t("Imzo"), v -> addSignature(fragment, edit, say)), null);
         tools.addView(chip(ctx, R.drawable.msg_translate, org.telegram.messenger.MgLang.t("Tarjima"), v -> translateInEditor(fragment, account, edit, say, false)), null);
         tools.addView(chip(ctx, R.drawable.msg_translate, org.telegram.messenger.MgLang.t("Tarjimani qo'shish"), v -> translateInEditor(fragment, account, edit, say, true)), null);
+        tools.addView(chip(ctx, R.drawable.msg_language, org.telegram.messenger.MgLang.t("Lotin ↔ Kirill"), v -> {
+            Editable e0 = edit.getText();
+            if (e0 == null || !org.telegram.messenger.MgTranslit.hasLetters(e0)) {
+                say.run(org.telegram.messenger.MgLang.t("O'giriladigan matn yo'q"));
+                return;
+            }
+            MgMessageTools.scriptPicker(ctx, fragment.getResourceProvider(), e0, target -> {
+                Editable e = edit.getText();
+                if (e == null) return;
+                CharSequence out = org.telegram.messenger.MgTranslit.convertSpanned(new SpannableStringBuilder(e), target);
+                edit.setText(out);
+                edit.setSelection(edit.length());
+                say.run(org.telegram.messenger.MgLang.t("✓ O'girildi: ") + org.telegram.messenger.MgTranslit.scriptName(target));
+            }).show();
+        }), null);
 
         root.addView(sectionLabel(ctx, org.telegram.messenger.MgLang.t("3. Yuborish")), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 24, 14, 24, 0));
         root.addView(optionsBox, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
@@ -524,9 +539,21 @@ public class MgCustomForward {
             if (row == null || row.getChildCount() >= 2) {
                 row = new LinearLayout(getContext());
                 row.setOrientation(HORIZONTAL);
+                row.setBaselineAligned(false);
                 super.addView(row, -1, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 44));
             }
-            row.addView(child, LayoutHelper.createLinear(0, 40, 1f, 4, 2, 4, 2));
+            if (child instanceof TextView) {
+                // bir xil ko'rinish: ikonka chapda bir chiziqda, matn bir qatorda, sig'masa kichrayadi
+                TextView tv = (TextView) child;
+                tv.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
+                tv.setSingleLine(true);
+                tv.setMaxLines(1);
+                tv.setEllipsize(TextUtils.TruncateAt.END);
+                tv.setPadding(AndroidUtilities.dp(12), 0, AndroidUtilities.dp(8), 0);
+                tv.setCompoundDrawablePadding(AndroidUtilities.dp(8));
+                androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(tv, 10, 13, 1, TypedValue.COMPLEX_UNIT_DIP);
+            }
+            row.addView(child, LayoutHelper.createLinear(0, 40, 1f, Gravity.CENTER_VERTICAL, 4, 2, 4, 2));
         }
 
         @Override

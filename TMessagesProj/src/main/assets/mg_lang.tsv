@@ -1833,3 +1833,17 @@ Faylni yuklab bo'lmadi: xabar o'chirilgan	Не удалось загрузить
 Faylni yuklab bo'lmadi	Не удалось загрузить файл	Couldn't download the file
 \"Xabar mavjud emas\" yozuvi ketma-ket chiqib qolishi tuzatildi	Исправлено повторяющееся сообщение «Сообщение не существует»	Fixed the repeating \"Message doesn't exist\" notice
 Yuklab bo'lmagan fayl uchun aniq ogohlantirish	Понятное уведомление о файле, который не удалось загрузить	A clear notice for files that couldn't be downloaded
+Xabarni saqlash	Сохранить сообщение	Save message
+Asl xabarga o'tish	Перейти к оригиналу	Go to original
+Xabarni ulashish	Поделиться сообщением	Share message
+Yozuvni o'zgartirish	Сменить письменность	Change script
+Hozirgi yozuv: 	Текущая письменность: 	Current script: 
+Lotin ↔ Kirill	Латиница ↔ Кириллица	Latin ↔ Cyrillic
+O'giriladigan matn yo'q	Нет текста для преобразования	No text to convert
+✓ O'girildi: 	✓ Преобразовано: 	✓ Converted: 
+Kirill yozuvi	Кириллица	Cyrillic script
+Yangi lotin yozuvi (2026)	Новая латиница (2026)	New Latin script (2026)
+Eski lotin yozuvi (1995)	Старая латиница (1995)	Old Latin script (1995)
+Yangi o'zbek lotin alifbosi (2026): Kirill, eski va yangi lotin o'rtasida o'girish	Новый узбекский латинский алфавит (2026): преобразование между кириллицей, старой и новой латиницей	New Uzbek Latin alphabet (2026): convert between Cyrillic, old and new Latin
+Maxsus uzatishda \"Lotin ↔ Kirill\" tugmasi, tezkor amallar tekislandi	«Латиница ↔ Кириллица» в особой пересылке, быстрые действия выровнены	"Latin ↔ Cyrillic" in custom forward, quick actions aligned
+Qisqa xabarlar yonida \"≡\" menyu: saqlash va ulashish	Меню «≡» у коротких сообщений: сохранить и поделиться	"≡" menu next to short messages: save and share

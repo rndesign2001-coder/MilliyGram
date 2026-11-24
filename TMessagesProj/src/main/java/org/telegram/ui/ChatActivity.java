@@ -31141,6 +31141,67 @@ public class ChatActivity extends BaseFragment implements
      * MilliyGram: chatga kirmasdan ko'rishda audio/ovozli xabar shu yerning o'zida o'ynaydi,
      * rasm/video esa ko'rish oynasida ochiladi — chat to'liq ochilmaydi va "tinglandi" belgisi yuborilmaydi.
      */
+    /** MilliyGram: qisqa xabar yonidagi "≡" tugmasi menyusi (saqlash / ulashish yoki asl xabarga o'tish) */
+    private void mgShowSideMenu(ChatMessageCell cell) {
+        Context ctx = getParentActivity();
+        if (ctx == null || cell == null || !cell.isAttachedToWindow()) {
+            return;
+        }
+        ActionBarPopupWindow.ActionBarPopupWindowLayout layout = new ActionBarPopupWindow.ActionBarPopupWindowLayout(ctx, R.drawable.popup_fixed_alert3, themeDelegate);
+        layout.setMinimumWidth(AndroidUtilities.dp(200));
+        final ActionBarPopupWindow[] win = new ActionBarPopupWindow[1];
+        ActionBarMenuSubItem save = ActionBarMenuItem.addItem(true, false, layout, R.drawable.mg_cloud_save, org.telegram.messenger.MgLang.t("Xabarni saqlash"), false, themeDelegate);
+        save.setOnClickListener(v -> {
+            if (win[0] != null) {
+                win[0].dismiss();
+            }
+            cell.mgPerformSide(true);
+        });
+        final boolean goTo = cell.isMgSideGoTo();
+        ActionBarMenuSubItem second = ActionBarMenuItem.addItem(false, true, layout, goTo ? R.drawable.msg_go_up : R.drawable.msg_share,
+                goTo ? org.telegram.messenger.MgLang.t("Asl xabarga o'tish") : org.telegram.messenger.MgLang.t("Xabarni ulashish"), false, themeDelegate);
+        second.setOnClickListener(v -> {
+            if (win[0] != null) {
+                win[0].dismiss();
+            }
+            cell.mgPerformSide(false);
+        });
+        ActionBarPopupWindow window = new ActionBarPopupWindow(layout, LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT);
+        win[0] = window;
+        window.setPauseNotifications(true);
+        window.setDismissAnimationDuration(220);
+        window.setOutsideTouchable(true);
+        window.setClippingEnabled(true);
+        window.setAnimationStyle(R.style.PopupContextAnimation);
+        window.setFocusable(true);
+        layout.measure(View.MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(1000), View.MeasureSpec.AT_MOST), View.MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(1000), View.MeasureSpec.AT_MOST));
+        final int w = layout.getMeasuredWidth(), h = layout.getMeasuredHeight();
+        int[] loc = new int[2];
+        cell.getLocationInWindow(loc);
+        final int bx = loc[0] + (int) cell.getSideButtonStartX(), by = loc[1] + (int) cell.getSideButtonStartY();
+        final int scrW = AndroidUtilities.displaySize.x, scrH = AndroidUtilities.displaySize.y + AndroidUtilities.statusBarHeight;
+        int x = bx + AndroidUtilities.dp(32) - w + AndroidUtilities.dp(8);
+        if (x + w > scrW) {
+            x = scrW - w;
+        }
+        if (x < 0) {
+            x = 0;
+        }
+        int y = by + AndroidUtilities.dp(32);
+        if (y + h > scrH - AndroidUtilities.dp(8)) {
+            y = by - h;
+        }
+        if (y < AndroidUtilities.statusBarHeight) {
+            y = AndroidUtilities.statusBarHeight;
+        }
+        try {
+            window.showAtLocation(cell, Gravity.LEFT | Gravity.TOP, x, y);
+            window.dimBehind();
+        } catch (Exception e) {
+            FileLog.e(e);
+        }
+    }
+
     private boolean mgPreviewMediaTap(View root, float x, float y) {
         try {
             if (chatListView == null || root == null) {
@@ -41075,6 +41136,10 @@ public class ChatActivity extends BaseFragment implements
             if (getParentActivity() == null) {
                 return;
             }
+            if (cell.isMgSideMenu()) {
+                mgShowSideMenu(cell);
+                return;
+            }
             if (cell.isMgSaveSideButton()) {
                 MessageObject mgMsg = cell.getMessageObject();
                 ArrayList<MessageObject> mgList = new ArrayList<>();
@@ -47730,7 +47795,7 @@ public class ChatActivity extends BaseFragment implements
                 if (selectedObject != null && selectedObject.getId() > 0 && !selectedObject.isSponsored() && chatMode != MODE_SCHEDULED && !org.telegram.messenger.MgSimple.isSimpleMenu()) {
                     String mgTxt = MgMessageTools.messageText(selectedObject, selectedObjectGroup);
                     if (!TextUtils.isEmpty(mgTxt) && org.telegram.messenger.MgTranslit.hasLetters(mgTxt)) {
-                        items.add(org.telegram.messenger.MgTranslit.isCyrillic(mgTxt) ? org.telegram.messenger.MgLang.t("Lotinga o'girish") : org.telegram.messenger.MgLang.t("Kirillga o'girish"));
+                        items.add(org.telegram.messenger.MgLang.t("Yozuvni o'zgartirish"));
                         options.add(OPTION_MG_TRANSLIT);
                         icons.add(R.drawable.msg_language);
                     }

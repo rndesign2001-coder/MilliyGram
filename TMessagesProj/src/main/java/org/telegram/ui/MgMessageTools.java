@@ -64,30 +64,74 @@ public class MgMessageTools {
         return m.messageOwner.message;
     }
 
+    /**
+     * Yozuvni tanlash oynasi: Kirill, eski lotin (1995) va yangi lotin (2026).
+     * Matnning joriy yozuvi ro'yxatda ko'rsatilmaydi.
+     */
+    public static void pickScript(BaseFragment f, CharSequence text, org.telegram.messenger.Utilities.Callback<Integer> onPick) {
+        Context ctx = f == null ? null : f.getParentActivity();
+        if (ctx == null || onPick == null) {
+            return;
+        }
+        f.showDialog(scriptPicker(ctx, f.getResourceProvider(), text, onPick).create());
+    }
+
+    /** Boshqa oyna ustida ochish uchun ({@code builder.show()}) */
+    public static AlertDialog.Builder scriptPicker(Context ctx, Theme.ResourcesProvider rp, CharSequence text, org.telegram.messenger.Utilities.Callback<Integer> onPick) {
+        final int cur = MgTranslit.detect(text);
+        final ArrayList<Integer> targets = new ArrayList<>();
+        final ArrayList<CharSequence> names = new ArrayList<>();
+        final ArrayList<Integer> icons = new ArrayList<>();
+        for (int sc : new int[]{MgTranslit.LAT_NEW, MgTranslit.LAT, MgTranslit.CYR}) {
+            if (sc == cur) {
+                continue;
+            }
+            android.text.SpannableStringBuilder sb = new android.text.SpannableStringBuilder(MgTranslit.scriptName(sc));
+            int st = sb.length();
+            sb.append("\n").append(MgTranslit.scriptSample(sc));
+            sb.setSpan(new android.text.style.RelativeSizeSpan(0.8f), st, sb.length(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb.setSpan(new android.text.style.ForegroundColorSpan(Theme.getColor(Theme.key_dialogTextGray3, rp)), st, sb.length(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            targets.add(sc);
+            names.add(sb);
+            icons.add(R.drawable.msg_language);
+        }
+        int[] ic = new int[icons.size()];
+        for (int i = 0; i < ic.length; i++) {
+            ic[i] = icons.get(i);
+        }
+        AlertDialog.Builder b = new AlertDialog.Builder(ctx, rp);
+        b.setTitle(org.telegram.messenger.MgLang.t("Yozuvni o'zgartirish"));
+        b.setMessage(org.telegram.messenger.MgLang.t("Hozirgi yozuv: ") + MgTranslit.scriptName(cur));
+        b.setItems(names.toArray(new CharSequence[0]), ic, (d, w) -> onPick.run(targets.get(w)));
+        b.setNegativeButton(org.telegram.messenger.MgLang.t("Bekor qilish"), null);
+        return b;
+    }
+
     public static void showTranslit(BaseFragment f, String text) {
         Context ctx = f.getParentActivity();
         if (ctx == null || TextUtils.isEmpty(text)) {
             return;
         }
-        boolean cyr = MgTranslit.isCyrillic(text);
-        final String out = MgTranslit.flip(text);
-        TextView tv = new TextView(ctx);
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
-        tv.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
-        tv.setTextIsSelectable(true);
-        tv.setText(out);
-        android.widget.ScrollView scroll = new android.widget.ScrollView(ctx);
-        scroll.setPadding(AndroidUtilities.dp(24), AndroidUtilities.dp(4), AndroidUtilities.dp(24), AndroidUtilities.dp(4));
-        scroll.addView(tv);
-        AlertDialog.Builder b = new AlertDialog.Builder(ctx, f.getResourceProvider());
-        b.setTitle(cyr ? org.telegram.messenger.MgLang.t("Lotin yozuvida") : org.telegram.messenger.MgLang.t("Kirill yozuvida"));
-        b.setView(scroll);
-        b.setPositiveButton(org.telegram.messenger.MgLang.t("Nusxalash"), (d, w) -> {
-            AndroidUtilities.addToClipboard(out);
-            BulletinFactory.of(f).createCopyBulletin(org.telegram.messenger.MgLang.t("Matn nusxalandi")).show();
+        pickScript(f, text, target -> {
+            final String out = MgTranslit.convert(text, target);
+            TextView tv = new TextView(ctx);
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
+            tv.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
+            tv.setTextIsSelectable(true);
+            tv.setText(out);
+            android.widget.ScrollView scroll = new android.widget.ScrollView(ctx);
+            scroll.setPadding(AndroidUtilities.dp(24), AndroidUtilities.dp(4), AndroidUtilities.dp(24), AndroidUtilities.dp(4));
+            scroll.addView(tv);
+            AlertDialog.Builder b = new AlertDialog.Builder(ctx, f.getResourceProvider());
+            b.setTitle(MgTranslit.scriptName(target));
+            b.setView(scroll);
+            b.setPositiveButton(org.telegram.messenger.MgLang.t("Nusxalash"), (d, w) -> {
+                AndroidUtilities.addToClipboard(out);
+                BulletinFactory.of(f).createCopyBulletin(org.telegram.messenger.MgLang.t("Matn nusxalandi")).show();
+            });
+            b.setNegativeButton(org.telegram.messenger.MgLang.t("Yopish"), null);
+            f.showDialog(b.create());
         });
-        b.setNegativeButton(org.telegram.messenger.MgLang.t("Yopish"), null);
-        f.showDialog(b.create());
     }
 
     // ================= Keyin eslatish =================
