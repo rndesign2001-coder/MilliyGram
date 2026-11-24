@@ -10700,6 +10700,9 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                         return;
                     }
                     FileLog.e(e);
+                    if (mgRepairBrokenVideo()) {
+                        return;
+                    }
                     if (!menuItem.isSubItemVisible(gallery_menu_openin)) {
                         return;
                     }
@@ -11105,6 +11108,61 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             flashView.setBackgroundColor(0xffffffff);
             flashView.setAlpha(0.0f);
             aspectRatioFrameLayout.addView(flashView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.CENTER));
+        }
+    }
+
+    // MilliyGram: telefondagi video fayli buzilgan bo'lsa (pleyer xato beradi) — faylni o'chirib, serverdan qayta yuklaydi.
+    // Har bir hujjat uchun bir marta (sessiya davomida), aks holda odatdagi "tashqi pleyerda ochish" oynasi chiqadi.
+    private static final java.util.HashSet<Long> mgRepairedDocs = new java.util.HashSet<>();
+
+    private boolean mgRepairBrokenVideo() {
+        try {
+            final MessageObject mo = currentMessageObject;
+            if (mo == null || mo.messageOwner == null || parentActivity == null || mo.isSending() || mo.isEditing() || mo.scheduled) {
+                return false;
+            }
+            final TLRPC.Document doc = mo.getDocument();
+            if (doc == null || doc.id == 0 || doc.access_hash == 0 || mo.messageOwner.media != null && mo.messageOwner.media.ttl_seconds != 0) {
+                return false;
+            }
+            if (!mgRepairedDocs.add(doc.id)) {
+                return false;
+            }
+            final int account = currentAccount;
+            final FileLoader fl = FileLoader.getInstance(account);
+            final String cacheRoot = FileLoader.checkDirectory(FileLoader.MEDIA_DIR_CACHE) == null ? null : FileLoader.checkDirectory(FileLoader.MEDIA_DIR_CACHE).getAbsolutePath();
+            final java.util.ArrayList<File> broken = new java.util.ArrayList<>();
+            broken.add(fl.getPathToAttach(doc));
+            broken.add(fl.getPathToAttach(doc, true));
+            final String attach = mo.messageOwner.attachPath;
+            // faqat Telegram keshidagi nusxa (galereyadagi asl fayl hech qachon o'chirilmaydi)
+            if (!TextUtils.isEmpty(attach) && cacheRoot != null && attach.startsWith(cacheRoot)) {
+                broken.add(new File(attach));
+                mo.messageOwner.attachPath = "";
+                mo.attachPathExists = false;
+            }
+            fl.cancelLoadFile(doc);
+            closePhoto(false, false);
+            mo.mediaExists = false;
+            Utilities.globalQueue.postRunnable(() -> {
+                for (File f : broken) {
+                    try {
+                        if (f != null && f.isFile()) {
+                            f.delete();
+                        }
+                    } catch (Throwable ignore) {
+                    }
+                }
+                AndroidUtilities.runOnUIThread(() -> {
+                    FileLoader.getInstance(account).loadFile(doc, mo, FileLoader.PRIORITY_HIGH, 0);
+                    NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.updateMessageMedia, mo.messageOwner);
+                });
+            });
+            BulletinFactory.global().createSimpleBulletin(R.raw.info, org.telegram.messenger.MgLang.t("Telefondagi video nusxasi buzilgan edi — serverdan qayta yuklanmoqda. Yuklangach yana oching.")).show();
+            return true;
+        } catch (Throwable t) {
+            FileLog.e(t);
+            return false;
         }
     }
 
