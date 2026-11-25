@@ -1,0 +1,122 @@
+run=14 sha=40681c27a2841ba65f3da0e5e2c1c4377f0ad1be status=success
+---
+
+> Task :TMessagesProj_App:mergeAfatReleaseResources
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:4398:4: Multiple substitutions specified in non-positional format of string resource string/Gift2ActiveAuctionsActiveBidActive. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:4401:4: Multiple substitutions specified in non-positional format of string resource string/Gift2ActiveAuctionsActiveRound. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:4452:4: Multiple substitutions specified in non-positional format of string resource string/Gift2AuctionInfo2_one. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:4453:4: Multiple substitutions specified in non-positional format of string resource string/Gift2AuctionInfo2_other. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:4456:4: Multiple substitutions specified in non-positional format of string resource string/Gift2AuctionInfoLearnMore2_one. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:4457:4: Multiple substitutions specified in non-positional format of string resource string/Gift2AuctionInfoLearnMore2_other. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:4458:4: Multiple substitutions specified in non-positional format of string resource string/Gift2AuctionInfo_one. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:4459:4: Multiple substitutions specified in non-positional format of string resource string/Gift2AuctionInfo_other. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:4504:4: Multiple substitutions specified in non-positional format of string resource string/Gift2AuctionsChangeRecipient2. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:4514:4: Multiple substitutions specified in non-positional format of string resource string/Gift2AveragePriceHint. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:4637:4: Multiple substitutions specified in non-positional format of string resource string/Gift2InfoOutConverted_one. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:4638:4: Multiple substitutions specified in non-positional format of string resource string/Gift2InfoOutConverted_other. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:4931:4: Multiple substitutions specified in non-positional format of string resource string/GiftAuctionInfo1Text_one. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:4932:4: Multiple substitutions specified in non-positional format of string resource string/GiftAuctionInfo1Text_other. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:5038:4: Multiple substitutions specified in non-positional format of string resource string/GiftOfferPayMulti. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:6705:4: Multiple substitutions specified in non-positional format of string resource string/NotificationTopicExceptionsDesctription_one. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:6706:4: Multiple substitutions specified in non-positional format of string resource string/NotificationTopicExceptionsDesctription_other. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:9325:4: Multiple substitutions specified in non-positional format of string resource string/StarRatingDescription1. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:9326:4: Multiple substitutions specified in non-positional format of string resource string/StarRatingDescription2. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:9327:4: Multiple substitutions specified in non-positional format of string resource string/StarRatingDescription3. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:9738:4: Multiple substitutions specified in non-positional format of string resource string/StoryAddedToAlbumTitle_one. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:9739:4: Multiple substitutions specified in non-positional format of string resource string/StoryAddedToAlbumTitle_other. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:9947:4: Multiple substitutions specified in non-positional format of string resource string/StoryRemovedFromAlbumTitle_one. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:9948:4: Multiple substitutions specified in non-positional format of string resource string/StoryRemovedFromAlbumTitle_other. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:10019:4: Multiple substitutions specified in non-positional format of string resource string/SuggestAPostBelowSubtitleStarsAndTime. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:10073:4: Multiple substitutions specified in non-positional format of string resource string/SuggestionAgreementReachedAdmin1. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:10074:4: Multiple substitutions specified in non-positional format of string resource string/SuggestionAgreementReachedAdmin1PastSimple. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:10076:4: Multiple substitutions specified in non-positional format of string resource string/SuggestionAgreementReachedAdmin2. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:10077:4: Multiple substitutions specified in non-positional format of string resource string/SuggestionAgreementReachedAdmin3Stars. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:10078:4: Multiple substitutions specified in non-positional format of string resource string/SuggestionAgreementReachedAdmin3TON. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:10079:4: Multiple substitutions specified in non-positional format of string resource string/SuggestionAgreementReachedAdmin4Stars. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:10080:4: Multiple substitutions specified in non-positional format of string resource string/SuggestionAgreementReachedAdmin4TON. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:10081:4: Multiple substitutions specified in non-positional format of string resource string/SuggestionAgreementReachedUser1. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:10082:4: Multiple substitutions specified in non-positional format of string resource string/SuggestionAgreementReachedUser1PastSimple. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:10085:4: Multiple substitutions specified in non-positional format of string resource string/SuggestionAgreementReachedUser3Stars. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:10086:4: Multiple substitutions specified in non-positional format of string resource string/SuggestionAgreementReachedUser3TON. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:10087:4: Multiple substitutions specified in non-positional format of string resource string/SuggestionAgreementReachedUser4Stars. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:10088:4: Multiple substitutions specified in non-positional format of string resource string/SuggestionAgreementReachedUser4TON. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:10521:4: Multiple substitutions specified in non-positional format of string resource string/UnconfirmedAuthMultipleFrom_one. Did you mean to add the formatted="false" attribute?
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/build/intermediates/packaged_res/release/packageReleaseResources/values/values.xml:10522:4: Multiple substitutions specified in non-positional format of string resource string/UnconfirmedAuthMultipleFrom_other. Did you mean to add the formatted="false" attribute?
+
+> Task :TMessagesProj_App:parseAfatReleaseLocalResources
+
+> Task :TMessagesProj_App:processAfatReleaseMainManifest
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/config/release/AndroidManifest_SDK23.xml Warning:
+	uses-permission#android.permission.WRITE_EXTERNAL_STORAGE was tagged at AndroidManifest_SDK23.xml:0 to replace another declaration but no other declaration present
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/config/release/AndroidManifest_SDK23.xml:56:9-64:20 Warning:
+	receiver#com.google.android.gms.measurement.AppMeasurementReceiver@android:enabled was tagged at AndroidManifest_SDK23.xml:56 to replace other declarations but no other declaration present
+/home/runner/work/MilliyGram/MilliyGram/TMessagesProj/config/release/AndroidManifest_SDK23.xml:66:9-70:40 Warning:
+	service#com.google.android.gms.measurement.AppMeasurementService@android:enabled was tagged at AndroidManifest_SDK23.xml:66 to replace other declarations but no other declaration present
+
+> Task :TMessagesProj_App:processAfatReleaseManifest
+> Task :TMessagesProj_App:processAfatReleaseManifestForPackage
+
+> Task :TMessagesProj_App:processAfatReleaseResources
+=== :TMessagesProj_App:processAfatReleaseResources ===
+AAPT additional parameters:
+  --stable-ids
+  /home/runner/work/MilliyGram/MilliyGram/TMessagesProj_App/build/generated/telegramStrings/afatRelease/stable-ids.txt
+
+warn: removing resource uz.milliygram.app:string/AddManyMembersAlertNamesText_few without required default value.
+warn: removing resource uz.milliygram.app:string/AddManyMembersAlertNamesText_two without required default value.
+warn: removing resource uz.milliygram.app:string/AddManyMembersAlertTitle_few without required default value.
+warn: removing resource uz.milliygram.app:string/AddManyMembersAlertTitle_many without required default value.
+warn: removing resource uz.milliygram.app:string/AddManyMembersAlertTitle_two without required default value.
+warn: removing resource uz.milliygram.app:string/EmailPasswordConfirmText3 without required default value.
+warn: removing resource uz.milliygram.app:string/Languages_few without required default value.
+warn: removing resource uz.milliygram.app:string/Languages_many without required default value.
+warn: removing resource uz.milliygram.app:string/Languages_two without required default value.
+warn: removing resource uz.milliygram.app:string/Languages_zero without required default value.
+warn: removing resource uz.milliygram.app:string/NoContactsYet without required default value.
+warn: removing resource uz.milliygram.app:string/NoContactsYetLine1 without required default value.
+warn: removing resource uz.milliygram.app:string/NoContactsYetLine2 without required default value.
+warn: removing resource uz.milliygram.app:string/NoContactsYetLine3 without required default value.
+warn: removing resource uz.milliygram.app:string/PleaseEnterFirstPassword without required default value.
+warn: removing resource uz.milliygram.app:string/PleaseEnterPassword without required default value.
+warn: removing resource uz.milliygram.app:string/ResetAccountButton without required default value.
+warn: removing resource uz.milliygram.app:string/ResetMyAccountText without required default value.
+warn: removing resource uz.milliygram.app:string/ShareTelegram without required default value.
+warn: removing resource uz.milliygram.app:string/UseProxyForCalls without required default value.
+warn: removing resource uz.milliygram.app:string/UseProxyForCallsInfo without required default value.
+warn: removing resource uz.milliygram.app:string/WidgetPasscodeEnable2 without required default value.
+warn: removing resource uz.milliygram.app:string/YourEmailCode without required default value.
+warn: removing resource uz.milliygram.app:string/YourEmailCodeInfo without required default value.
+warn: removing resource uz.milliygram.app:string/YourPasswordSuccessText without required default value.
+warn: removing resource uz.milliygram.app:string/formatterMonthName without required default value.
+warn: removing resource uz.milliygram.app:string/formatterMonthYear2 without required default value.
+
+
+> Task :TMessagesProj:compileReleaseKotlin
+w: file:///home/runner/work/MilliyGram/MilliyGram/TMessagesProj/src/main/java/org/milliygram/ui/chat_finder/ChatFinder.kt:94:13 'fun setBackgroundDrawable(p0: Drawable!): Unit' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/MilliyGram/MilliyGram/TMessagesProj/src/main/java/org/milliygram/ui/confirmToSendMessages/ConfirmDialog.kt:20:30 'static fun getString(key: String!, res: Int): String!' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/MilliyGram/MilliyGram/TMessagesProj/src/main/java/org/milliygram/ui/confirmToSendMessages/ConfirmDialog.kt:25:30 'static fun getString(key: String!, res: Int): String!' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/MilliyGram/MilliyGram/TMessagesProj/src/main/java/org/milliygram/ui/onboarding/MilliyTour.kt:88:41 'static field statusBarHeight: Int' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/MilliyGram/MilliyGram/TMessagesProj/src/main/java/org/milliygram/utils/DeletedMsg.kt:78:29 Condition is always 'true'.
+w: file:///home/runner/work/MilliyGram/MilliyGram/TMessagesProj/src/main/java/org/milliygram/utils/EditMessage.kt:64:29 Condition is always 'true'.
+w: file:///home/runner/work/MilliyGram/MilliyGram/TMessagesProj/src/main/java/org/milliygram/utils/LanguageCode.kt:1872:52 'static fun getString(key: String!, res: Int): String!' is deprecated. Deprecated in Java.
+
+> Task :TMessagesProj:compileReleaseJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :TMessagesProj:bundleLibCompileToJarRelease
+> Task :TMessagesProj_App:compileAfatReleaseJavaWithJavac
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_3-1795588560777.json
+
+[Incubating] Problems report is available at: file:///home/runner/work/MilliyGram/MilliyGram/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 3m 6s
+200 actionable tasks: 200 executed
