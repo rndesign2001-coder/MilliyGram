@@ -737,8 +737,7 @@ public class MessagesController extends BaseController implements NotificationCe
     public boolean starsLocked;
 
     public boolean starsPurchaseAvailable() {
-        // MilliyGram: Play versiyasida raqamli tovarlar faqat Play Billing orqali sotilishi mumkin
-        return !starsLocked && !ApplicationLoader.isPlayStoreBuild();
+        return !starsLocked;
     }
     public boolean premiumFeaturesBlocked() {
         return premiumLocked && !getUserConfig().isPremium();
